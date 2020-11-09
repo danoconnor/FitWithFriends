@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+  p Login page
+  form(action='oauth/authorize', method='POST')
+    | Username:
+    input(type='text' name='username' placeholder='')
+    br
+    | Password:
+    input(type='password' name='password' placeholder='')
+    br
+    input(type='submit', value='Login')
