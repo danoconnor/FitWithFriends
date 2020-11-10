@@ -50,8 +50,8 @@ module.exports.getAccessToken = function (bearerToken) {
             return {
                 accessToken: token.access_token,
                 client: { id: token.client_id },
-                expires: token.expires,
-                user: { id: token.userId }, // could be any object
+                accessTokenExpiresAt: token.access_token_expires_on,
+                user: { id: token.user_id }
             };
         });
 };
