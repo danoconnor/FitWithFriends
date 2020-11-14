@@ -30,7 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.js" />
-    <Content Include="oauth\cryptoHelpers.js">
+    <Content Include="utilities\cryptoHelpers.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="oauth\model.js" />
@@ -41,11 +41,15 @@
     <Content Include="package.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
+    <Content Include="utilities\database.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\index.pug" />
     <Content Include="views\layout.pug" />
     <Content Include="views\error.pug" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="utilities\" />
     <Folder Include="oauth\" />
     <Folder Include="public\" />
     <Folder Include="public\images\" />

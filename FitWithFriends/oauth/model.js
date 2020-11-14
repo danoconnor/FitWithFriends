@@ -3,29 +3,15 @@
  * Module dependencies.
  */
 
-const cryptoHelpers = require('./cryptoHelpers')
-const pgp = require('pg-promise')()
-
-/*
- *  Connect to database
- */
-
-const cn = {
-    host: process.env.PGHOST,
-    port: process.env.PGPORT,
-    database: process.env.PGDATABASE,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
-};
-
-const pg = pgp(cn)
+const cryptoHelpers = require('../utilities/cryptoHelpers')
+const database = require('../utilities/database')
 
 /*
  *  Authroization codes
  */
 
 module.exports.saveAuthorizationCode = function (token, client, user) {
-    pg.query('INSERT INTO oauth_tokens(access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)', [
+    database.query('INSERT INTO oauth_tokens(access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)', [
         token.accessToken,
         token.accessTokenExpiresOn,
         client.id,
@@ -42,7 +28,7 @@ module.exports.saveAuthorizationCode = function (token, client, user) {
  */
 
 module.exports.getAccessToken = function (bearerToken) {
-    return pg.query('SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE access_token = $1', [bearerToken])
+    return database.query('SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE access_token = $1', [bearerToken])
         .then(function (result) {
             if (!result.length) { return false }
             var token = result[0];
@@ -61,7 +47,7 @@ module.exports.getAccessToken = function (bearerToken) {
  */
 
 module.exports.getClient = function (clientId, clientSecret) {
-    return pg.query('SELECT client_id, client_secret, redirect_uri FROM oauth_clients WHERE client_id = $1', [clientId])
+    return database.query('SELECT client_id, client_secret, redirect_uri FROM oauth_clients WHERE client_id = $1', [clientId])
         .then(function (result) {
             if (!result.length) { return false }
             var oAuthClient = result[0];
@@ -83,7 +69,7 @@ module.exports.getClient = function (clientId, clientSecret) {
  */
 
 module.exports.getRefreshToken = function (bearerToken) {
-    return pg.query('SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE refresh_token = $1', [bearerToken])
+    return database.query('SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE refresh_token = $1', [bearerToken])
         .then(function (result) {
             return result.length ? result[0] : false;
         });
@@ -95,7 +81,7 @@ module.exports.getRefreshToken = function (bearerToken) {
 
 module.exports.getUser = function (username, password) {
     // Lookup user by username so we can get the salt, then check that password hash matches
-    return pg.query('SELECT * FROM users WHERE username = $1', [username])
+    return database.query('SELECT * FROM users WHERE username = $1', [username])
         .then(function (result) {
             const user = result.length ? result[0] : false;
             if (!user) {
@@ -103,9 +89,9 @@ module.exports.getUser = function (username, password) {
                 return false
             }
 
-            const salt = user.passwordSalt
+            const salt = user.password_salt
             const expectedPasswordHash = cryptoHelpers.getHash(password, salt)
-            if (expectedPasswordHash === user.passwordHash) {
+            if (expectedPasswordHash === user.password_hash) {
                 return user
             } else {
                 // Password did not match
@@ -119,7 +105,7 @@ module.exports.getUser = function (username, password) {
  */
 
 module.exports.saveToken = function (token, client, user) {
-    return pg.query('INSERT INTO oauth_tokens(access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4, $5, $6)', [
+    return database.query('INSERT INTO oauth_tokens(access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4, $5, $6)', [
         token.accessToken,
         token.accessTokenExpiresAt,
         client.clientId,
