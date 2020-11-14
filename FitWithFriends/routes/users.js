@@ -12,11 +12,25 @@ router.get('/',  function (req, res) {
 
 router.get('/:userId', oauthServer.authenticate(), function (req, res) {
     if (res.locals.oauth.token.user.id !== req.params.userId) {
+        // Authenticated user does not match requested user
         res.sendStatus(401)
         return
     }
 
-    res.send('User ID: ' + req.params.userId)
+    database.query('SELECT display_name from users WHERE userid = $1', [req.params.userId])
+        .then(function (result) {
+            if (!result.length) {
+                res.sendStatus(404);
+                return;
+            }
+
+            res.json(result);
+        })
+        .catch(function (error) {
+            // TODO: log error
+            res.sendStatus(500);
+            return;
+        });
 })
 
 // Create user endpoint
@@ -48,6 +62,7 @@ router.put('/', function (req, res) {
             database.query('INSERT INTO users(username, password_hash, password_salt, display_name) VALUES ($1, $2, $3, $4)', [username, passwordHash, salt, displayName])
                 .then(function (result) {
                     // TODO: return token here so user doesn't have to login after creating account?
+                    // TODO: return userId here?
                     res.sendStatus(200);
                 })
                 .catch(function (error) {
