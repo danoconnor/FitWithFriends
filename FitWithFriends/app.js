@@ -9,7 +9,8 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var oauth = require('./routes/auth')
+var oauth = require('./routes/auth');
+const competitions = require('./routes/competitions');
 
 const oauthServer = require('./oauth/server')
 
@@ -29,7 +30,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/oauth', oauth);
-app.use('/users', users)
+app.use('/users', users);
+app.use('/competitions', oauthServer.authenticate(), competitions);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -11,3 +11,10 @@ module.exports.getHash = function(value, salt, algorithm = 'sha512') {
     hash.update(value);
     return hash.digest('hex');
 } 
+
+module.exports.getRandomToken = function () {
+    const bytes = crypto.randomBytes(256)
+    return crypto.createHash('sha1')
+        .update(bytes)
+        .digest('hex');
+}

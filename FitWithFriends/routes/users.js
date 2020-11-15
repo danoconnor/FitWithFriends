@@ -1,9 +1,9 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const database = require('../utilities/database')
-const cryptoHelpers = require('../utilities/cryptoHelpers')
-const oauthServer = require('../oauth/server')
+const database = require('../utilities/database');
+const cryptoHelpers = require('../utilities/cryptoHelpers');
+const oauthServer = require('../oauth/server');
 
 /* GET users listing. */
 router.get('/',  function (req, res) {
@@ -31,11 +31,12 @@ router.get('/:userId', oauthServer.authenticate(), function (req, res) {
             res.sendStatus(500);
             return;
         });
-})
+});
 
 // Create user endpoint
 // Expects username, password, and displayName in the request body
 // Returns bad request if the username is already in use or if the username/password do not meet a minimum length requirement
+// Returns the new user's userId if the user was created successfully
 router.put('/', function (req, res) {
     const username = req.body['username'];
     const password = req.body['password'];
@@ -59,11 +60,17 @@ router.put('/', function (req, res) {
             const salt = cryptoHelpers.getRandomString();
             const passwordHash = cryptoHelpers.getHash(password, salt);
 
-            database.query('INSERT INTO users(username, password_hash, password_salt, display_name) VALUES ($1, $2, $3, $4)', [username, passwordHash, salt, displayName])
+            database.query('INSERT INTO users(username, password_hash, password_salt, display_name) VALUES ($1, $2, $3, $4) RETURNING userid', [username, passwordHash, salt, displayName])
                 .then(function (result) {
-                    // TODO: return token here so user doesn't have to login after creating account?
-                    // TODO: return userId here?
-                    res.sendStatus(200);
+                    // Expect the new user's userId to be returned so we can provide it to the client
+                    if (!result.length) {
+                        res.sendStatus(500);
+                        return;
+                    }
+
+                    res.json({
+                        userId: result[0].userid
+                    });
                 })
                 .catch(function (error) {
                     // TODO: log error
