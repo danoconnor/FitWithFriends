@@ -9,7 +9,8 @@ const cryptoHelpers = require('../utilities/cryptoHelpers');
 router.get('/', function (req, res) {
     database.query('SELECT competitionid from users_competitions WHERE userid = $1', [res.locals.oauth.token.user.id])
         .then(function (result) {
-            res.json(result.map(obj => { obj.competitionid }));
+            const competitionIds = result.map(obj => parseInt(obj.competitionid));
+            res.json(competitionIds);
         })
         .catch(function (error) {
             // TODO: log error
@@ -24,6 +25,11 @@ router.put('/', function (req, res) {
     const startDate = new Date(req.body['startDate']);
     const endDate = new Date(req.body['endDate']);
     const displayName = req.body['displayName'];
+
+    if (!startDate || !endDate || !displayName) {
+        res.sendStatus(400);
+        return;
+    }
 
     // Generate an access code for this competition so users can be added
     const accessToken = cryptoHelpers.getRandomToken();
@@ -45,6 +51,41 @@ router.put('/', function (req, res) {
                         'competition_id': competitionId,
                         'accessCode': accessToken
                     });
+                })
+                .catch(function (error) {
+                    // TODO: log error
+                    res.sendStatus(500);
+                    return;
+                });
+        })
+        .catch(function (error) {
+            // TODO: log error
+            res.sendStatus(500);
+            return;
+        });
+});
+
+// Join existing competition endpoint - adds the currently authenticated user to the competition that matches the given token
+// Expects a competition access token in the request body
+router.put('/join', function (req, res) {
+    const accessToken = req.body['accessToken'];
+    if (!accessToken) {
+        res.sendStatus(400);
+        return;
+    }
+
+    // Find matching competition and validate access token
+    database.query('SELECT competition_id from competitions WHERE access_token = $1', accessToken)
+        .then(function (result) {
+            if (!result.length) {
+                res.sendStatus(404);
+                return;
+            }
+
+            const competitionId = result[0].competition_id;
+            database.query('INSERT INTO users_competitions VALUES ($1, $2)', [res.locals.oauth.token.user.id, competitionId])
+                .then(function (result) {
+                    res.sendStatus(200);
                 })
                 .catch(function (error) {
                     // TODO: log error
