@@ -30,6 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="app.js" />
+    <None Include="FitWithFriends - Web Deploy.pubxml" />
     <Content Include="routes\competitions.js">
       <SubType>Code</SubType>
     </Content>

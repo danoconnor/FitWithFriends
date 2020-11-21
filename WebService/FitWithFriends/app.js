@@ -8,11 +8,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
-var oauth = require('./routes/auth');
-const competitions = require('./routes/competitions');
+//var users = require('./routes/users');
+//var oauth = require('./routes/auth');
+//const competitions = require('./routes/competitions');
 
-const oauthServer = require('./oauth/server')
+//const oauthServer = require('./oauth/server')
 
 var app = express();
 
@@ -29,9 +29,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/oauth', oauth);
-app.use('/users', users);
-app.use('/competitions', oauthServer.authenticate(), competitions);
+//app.use('/oauth', oauth);
+//app.use('/users', users);
+//app.use('/competitions', oauthServer.authenticate(), competitions);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -44,7 +44,7 @@ app.use(function (req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+//if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
@@ -52,17 +52,17 @@ if (app.get('env') === 'development') {
             error: err
         });
     });
-}
+//}
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
+//app.use(function (err, req, res, next) {
+//    res.status(err.status || 500);
+//    res.render('error', {
+//        message: err.message,
+//        error: {}
+//    });
+//});
 
 app.set('port', process.env.PORT || 3000);
 
