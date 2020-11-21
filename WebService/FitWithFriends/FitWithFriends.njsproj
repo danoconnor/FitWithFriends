@@ -31,6 +31,7 @@
   <ItemGroup>
     <Content Include="app.js" />
     <None Include="FitWithFriends - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\FitWithFriends - Web Deploy.pubxml" />
     <Content Include="routes\competitions.js">
       <SubType>Code</SubType>
     </Content>
@@ -53,6 +54,8 @@
     <Content Include="views\error.pug" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Properties\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="utilities\" />
     <Folder Include="oauth\" />
     <Folder Include="public\" />
