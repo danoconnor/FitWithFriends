@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Client secrets that shouldn't be synced to source control
+Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift
+
 # User-specific files
 *.rsuser
 *.suo
