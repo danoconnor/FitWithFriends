@@ -1,0 +1,6 @@
+framework module Pods_FitWithFriends {
+  umbrella header "Pods-FitWithFriends-umbrella.h"
+
+  export *
+  module * { export * }
+}

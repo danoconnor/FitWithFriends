@@ -8,6 +8,6 @@
 import Foundation
 
 enum TokenError: Error {
-    case expired
+    case expired(token: Token)
     case notFound
 }

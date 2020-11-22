@@ -23,10 +23,9 @@ class Logger {
         DDLog.sharedInstance.add(fileLogger)
 
         #if DEBUG
-            if let consoleLogger = DDTTYLogger.sharedInstance {
-                consoleLogger.logFormatter = logFormatter
-                DDLog.sharedInstance.add(consoleLogger)
-            }
+            let consoleLogger = DDOSLogger.sharedInstance
+            consoleLogger.logFormatter = logFormatter
+            DDLog.sharedInstance.add(consoleLogger)
         #endif
     }
 

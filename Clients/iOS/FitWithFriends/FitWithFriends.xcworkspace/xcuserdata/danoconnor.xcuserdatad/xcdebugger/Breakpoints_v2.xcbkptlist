@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "FC79E5B6-C1BA-4729-A790-87B45BCABC5C"
+   type = "0"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0F13C95C-4D74-42E7-ABFB-2F88874042F1"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FitWithFriends/Views/CreateAccountView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
+            landmarkName = "body"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2F192E38-AB79-415D-ACC0-4B34ECD3F44E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FitWithFriends/ViewModels/CreateAccountViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
+            landmarkName = "createAccount(username:password:passwordConfirmation:displayName:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "2F192E38-AB79-415D-ACC0-4B34ECD3F44E - 60208c46813e9561"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FitWithFriends.CreateAccountViewModel.createAccount(username: Swift.String, password: Swift.String, passwordConfirmation: Swift.String, displayName: Swift.String) -&gt; ()"
+                  moduleName = "FitWithFriends"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/danoconnor/Code/FitWithFriends/Clients/iOS/FitWithFriends/FitWithFriends/ViewModels/CreateAccountViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45"
+                  offsetFromSymbolStart = "622">
+               </Location>
+               <Location
+                  uuid = "2F192E38-AB79-415D-ACC0-4B34ECD3F44E - f95d18ca10a57018"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;FitWithFriends.User, Swift.Error&gt;) -&gt; () in FitWithFriends.CreateAccountViewModel.createAccount(username: Swift.String, password: Swift.String, passwordConfirmation: Swift.String, displayName: Swift.String) -&gt; ()"
+                  moduleName = "FitWithFriends"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/danoconnor/Code/FitWithFriends/Clients/iOS/FitWithFriends/FitWithFriends/ViewModels/CreateAccountViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45"
+                  offsetFromSymbolStart = "137">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "34915227-B83C-4B3F-A33D-C0E95162EF9A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FitWithFriends/Service/ServiceCommunicator.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
+            landmarkName = "createUser(username:password:displayName:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "30F56553-9F7E-4145-BBA7-DD54F01CDD57"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FitWithFriends/Utilities/Networking/HttpConnector.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "39"
+            endingLineNumber = "39"
+            landmarkName = "makeRequest(url:headers:body:method:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2439CB9C-3D40-43F2-BCC7-F02D7D8BA2A6"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FitWithFriends/Utilities/Networking/HttpConnector.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "makeRequest(url:headers:body:method:completion:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "2439CB9C-3D40-43F2-BCC7-F02D7D8BA2A6 - 2d6f04d5e10ab87"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FitWithFriends.HttpConnector.makeRequest&lt;A where A: Swift.Decodable&gt;(url: Swift.String, headers: Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Any&gt;&gt;, body: Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;, method: FitWithFriends.HttpMethod, completion: (Swift.Result&lt;A, Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "FitWithFriends"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/danoconnor/Code/FitWithFriends/Clients/iOS/FitWithFriends/FitWithFriends/Utilities/Networking/HttpConnector.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "37"
+                  endingLineNumber = "37"
+                  offsetFromSymbolStart = "2250">
+               </Location>
+               <Location
+                  uuid = "2439CB9C-3D40-43F2-BCC7-F02D7D8BA2A6 - 8a3952764095e3e9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (Swift.Optional&lt;Foundation.Data&gt;, Swift.Optional&lt;__C.NSURLResponse&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in FitWithFriends.HttpConnector.makeRequest&lt;A where A: Swift.Decodable&gt;(url: Swift.String, headers: Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Any&gt;&gt;, body: Swift.Optional&lt;Swift.Dictionary&lt;Swift.String, Swift.String&gt;&gt;, method: FitWithFriends.HttpMethod, completion: (Swift.Result&lt;A, Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "FitWithFriends"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/danoconnor/Code/FitWithFriends/Clients/iOS/FitWithFriends/FitWithFriends/Utilities/Networking/HttpConnector.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "39"
+                  endingLineNumber = "39"
+                  offsetFromSymbolStart = "358">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

@@ -20,13 +20,15 @@ class TokenManager {
         self.keychainUtilities = keychainUtilities
     }
 
-    func getCachedToken() -> Result<Token, Error> {
+    func getCachedToken() -> Result<Token, TokenError> {
         // Use the in-memory token cache for performance
         if let token = cachedToken {
-            return token.isAccessTokenExpired ? .failure(TokenError.expired) : .success(token)
+            Logger.traceInfo(message: "Found token in memory cache")
+            return token.isAccessTokenExpired ? .failure(TokenError.expired(token: token)) : .success(token)
         }
 
         // If we don't have a token in memory, check the keychain
+        Logger.traceInfo(message: "Searching for token in keychain")
         let keychainResult = keychainUtilities.getKeychainItem(accessGroup: tokenKeychainGroup,
                                                                service: tokenKeychainService,
                                                                account: tokenKeychainAccount)
@@ -34,12 +36,14 @@ class TokenManager {
         switch keychainResult {
         case let .success(data):
             if let keychainToken = data as? Token {
+                Logger.traceInfo(message: "Found token in keychain")
                 cachedToken = keychainToken
-                return keychainToken.isAccessTokenExpired ? .failure(TokenError.expired) : .success(keychainToken)
+                return keychainToken.isAccessTokenExpired ? .failure(TokenError.expired(token: keychainToken)) : .success(keychainToken)
             } else {
                 fallthrough
             }
         case .failure:
+            Logger.traceInfo(message: "No token found in keychain")
             return .failure(TokenError.notFound)
         }
     }
