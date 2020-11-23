@@ -21,7 +21,7 @@ router.get('/', function (req, res) {
 
 // Create new competition. The currently authenticated user will become the admin for the competition.
 // The request should have startDate, endDate, and displayName values
-router.put('/', function (req, res) {
+router.post('/', function (req, res) {
     const startDate = new Date(req.body['startDate']);
     const endDate = new Date(req.body['endDate']);
     const displayName = req.body['displayName'];
@@ -67,7 +67,7 @@ router.put('/', function (req, res) {
 
 // Join existing competition endpoint - adds the currently authenticated user to the competition that matches the given token
 // Expects a competition access token in the request body
-router.put('/join', function (req, res) {
+router.post('/join', function (req, res) {
     const accessToken = req.body['accessToken'];
     if (!accessToken) {
         res.sendStatus(400);

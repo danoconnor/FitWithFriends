@@ -37,7 +37,7 @@ router.get('/:userId', oauthServer.authenticate(), function (req, res) {
 // Expects username, password, and displayName in the request body
 // Returns bad request if the username is already in use or if the username/password do not meet a minimum length requirement
 // Returns the new user's userId if the user was created successfully
-router.put('/', function (req, res) {
+router.post('/', function (req, res) {
     const username = req.body['username'];
     const password = req.body['password'];
 
