@@ -26,7 +26,7 @@ class ServiceCommunicator {
         ]
 
         makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/users",
-                                            method: .put,
+                                            method: .post,
                                             body: requestBody,
                                             completion: completion)
     }
@@ -51,7 +51,7 @@ class ServiceCommunicator {
         let authString = "\(SecretConstants.clientId):\(SecretConstants.clientSecret)"
         let base64AuthString = authString.data(using: .utf8)!.base64EncodedString()
 
-        let headers: [String: Any] = [
+        let headers: [String: String] = [
             RequestConstants.Headers.authorization: "Basic \(base64AuthString)"
         ]
 
@@ -72,13 +72,8 @@ class ServiceCommunicator {
         case let .failure(error):
             switch error {
             case let .expired(token):
-                if !token.isRefreshTokenExpired {
-                    Logger.traceInfo(message: "Found token for request but access token is expired")
-                    refreshTokenAndRetryRequest(expiredToken: token, url: url, method: method, body: body, completion: completion)
-                } else {
-                    Logger.traceInfo(message: "Found token for request but access and refresh tokens are expired")
-                    fallthrough
-                }
+                Logger.traceInfo(message: "Found token for request but access token is expired")
+                refreshTokenAndRetryRequest(expiredToken: token, url: url, method: method, body: body, completion: completion)
             default:
                 completion(.failure(error))
                 return

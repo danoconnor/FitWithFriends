@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     @State private var createAccountViewShown = false
+    @State private var loginViewShown = false
 
     var body: some View {
         VStack {
@@ -19,9 +20,14 @@ struct WelcomeView: View {
 
             Spacer()
 
-            Button("Login") { }
-                .font(.title2)
-                .padding()
+            Button("Login") {
+                loginViewShown = true
+            }
+            .font(.title2)
+            .padding()
+            .sheet(isPresented: $loginViewShown, content: {
+                LoginView()
+            })
 
             Button ("Create Account") {
                 createAccountViewShown = true

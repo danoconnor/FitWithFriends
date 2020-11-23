@@ -35,10 +35,16 @@ class TokenManager {
 
         switch keychainResult {
         case let .success(data):
-            if let keychainToken = data as? Token {
-                Logger.traceInfo(message: "Found token in keychain")
-                cachedToken = keychainToken
-                return keychainToken.isAccessTokenExpired ? .failure(TokenError.expired(token: keychainToken)) : .success(keychainToken)
+            if let data = data as? Data {
+                Logger.traceInfo(message: "Found token data in keychain")
+                do {
+                    let token = try JSONDecoder().decode(Token.self, from: data)
+                    cachedToken = token
+                    return token.isAccessTokenExpired ? .failure(TokenError.expired(token: token)) : .success(token)
+                } catch {
+                    Logger.traceError(message: "Got token data from keychain but failed to deserialize it", error: error)
+                    fallthrough
+                }
             } else {
                 fallthrough
             }
@@ -50,14 +56,21 @@ class TokenManager {
 
     func storeToken(_ token: Token) {
         cachedToken = token
-        let keychainResult = keychainUtilities.writeKeychainItem(data: token,
-                                                                 accessGroup: tokenKeychainGroup,
-                                                                 service: tokenKeychainService,
-                                                                 account: tokenKeychainAccount,
-                                                                 updateExistingItemIfNecessary: true)
 
-        if let error = keychainResult {
-            Logger.traceError(message: "Could not save token to keychain", error: error)
+        do {
+            let jsonEncoder = JSONEncoder()
+            let tokenJson = try jsonEncoder.encode(token)
+            let keychainResult = keychainUtilities.writeKeychainItem(data: tokenJson as AnyObject,
+                                                                     accessGroup: tokenKeychainGroup,
+                                                                     service: tokenKeychainService,
+                                                                     account: tokenKeychainAccount,
+                                                                     updateExistingItemIfNecessary: true)
+
+            if let error = keychainResult {
+                Logger.traceError(message: "Could not save token to keychain", error: error)
+            }
+        } catch {
+            Logger.traceError(message: "Failed to serialize token for keychain storage", error: error)
         }
     }
 }

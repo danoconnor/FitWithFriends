@@ -26,18 +26,22 @@
 		0B99FC23256A275E00673133 /* KeychainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC22256A275E00673133 /* KeychainError.swift */; };
 		0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC26256A29A300673133 /* SecretConstants.swift */; };
 		0B99FC2B256A2C5300673133 /* ErrorResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC2A256A2C5300673133 /* ErrorResponse.swift */; };
-		0B99FC2E256A2CFB00673133 /* AccessToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC2D256A2CFB00673133 /* AccessToken.swift */; };
+		0B99FC2E256A2CFB00673133 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC2D256A2CFB00673133 /* Token.swift */; };
 		0B99FC31256A2E7900673133 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC30256A2E7900673133 /* User.swift */; };
 		0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC33256A3BA600673133 /* TokenManager.swift */; };
 		0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC37256A3DFC00673133 /* TokenError.swift */; };
 		0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADAE256AD88100EB1B60 /* RequestConstants.swift */; };
 		0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADBE256AE2FB00EB1B60 /* ObjectGraph.swift */; };
 		0B9BADC4256AE44600EB1B60 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */; };
+		0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D0256B3754008FE93C /* LoginView.swift */; };
+		0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */; };
+		0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29DB256B3B23008FE93C /* ViewState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0B2D7494256AE65F00821775 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
+		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
 		0B99FBCA256A016900673133 /* FitWithFriends.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitWithFriends.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitWithFriendsApp.swift; sourceTree = "<group>"; };
 		0B99FBD1256A016900673133 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -56,13 +60,16 @@
 		0B99FC22256A275E00673133 /* KeychainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainError.swift; sourceTree = "<group>"; };
 		0B99FC26256A29A300673133 /* SecretConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretConstants.swift; sourceTree = "<group>"; };
 		0B99FC2A256A2C5300673133 /* ErrorResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResponse.swift; sourceTree = "<group>"; };
-		0B99FC2D256A2CFB00673133 /* AccessToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessToken.swift; sourceTree = "<group>"; };
+		0B99FC2D256A2CFB00673133 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		0B99FC30256A2E7900673133 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0B99FC33256A3BA600673133 /* TokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManager.swift; sourceTree = "<group>"; };
 		0B99FC37256A3DFC00673133 /* TokenError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenError.swift; sourceTree = "<group>"; };
 		0B9BADAE256AD88100EB1B60 /* RequestConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestConstants.swift; sourceTree = "<group>"; };
 		0B9BADBE256AE2FB00EB1B60 /* ObjectGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectGraph.swift; sourceTree = "<group>"; };
 		0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		0BCB29D0256B3754008FE93C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		0BCB29DB256B3B23008FE93C /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		471E2A9E1AD1822300B03A10 /* Pods-FitWithFriends.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FitWithFriends.release.xcconfig"; path = "Target Support Files/Pods-FitWithFriends/Pods-FitWithFriends.release.xcconfig"; sourceTree = "<group>"; };
 		5B89CF2BFD681C5843F6F837 /* Pods-FitWithFriends.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FitWithFriends.debug.xcconfig"; path = "Target Support Files/Pods-FitWithFriends/Pods-FitWithFriends.debug.xcconfig"; sourceTree = "<group>"; };
 		D85632C16073505DA84F856F /* Pods_FitWithFriends.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FitWithFriends.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,6 +91,8 @@
 			isa = PBXGroup;
 			children = (
 				0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */,
+				0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */,
+				0BCB29DB256B3B23008FE93C /* ViewState.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -109,6 +118,7 @@
 		0B99FBCC256A016900673133 /* FitWithFriends */ = {
 			isa = PBXGroup;
 			children = (
+				0B35971E256B4506006D956A /* FitWithFriends.entitlements */,
 				0B99FC25256A290900673133 /* Model */,
 				0B99FC19256A250D00673133 /* Service */,
 				0B99FC15256A208E00673133 /* Authentication */,
@@ -202,7 +212,7 @@
 		0B99FC25256A290900673133 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				0B99FC2D256A2CFB00673133 /* AccessToken.swift */,
+				0B99FC2D256A2CFB00673133 /* Token.swift */,
 				0B99FC30256A2E7900673133 /* User.swift */,
 			);
 			path = Model;
@@ -223,6 +233,7 @@
 			children = (
 				0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */,
 				0B2D7494256AE65F00821775 /* CreateAccountView.swift */,
+				0BCB29D0256B3754008FE93C /* LoginView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -363,12 +374,15 @@
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
 				0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */,
 				0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */,
+				0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
 				0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */,
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
+				0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */,
 				0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */,
 				0B99FC31256A2E7900673133 /* User.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,
+				0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */,
 				0B99FC06256A0BA800673133 /* LogFormatter.swift in Sources */,
 				0B99FC1C256A262D00673133 /* ServiceCommunicator.swift in Sources */,
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
@@ -378,7 +392,7 @@
 				0B99FC20256A273D00673133 /* KeychainUtilities.swift in Sources */,
 				0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */,
 				0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */,
-				0B99FC2E256A2CFB00673133 /* AccessToken.swift in Sources */,
+				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
 				0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -508,6 +522,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FitWithFriends/FitWithFriends.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FitWithFriends/Preview Content\"";
 				DEVELOPMENT_TEAM = 3T983VBXV5;
@@ -531,6 +546,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FitWithFriends/FitWithFriends.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FitWithFriends/Preview Content\"";
 				DEVELOPMENT_TEAM = 3T983VBXV5;

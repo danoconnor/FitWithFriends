@@ -7,33 +7,9 @@
 
 import Combine
 import Foundation
-import SwiftUI
 
 class CreateAccountViewModel: ObservableObject {
-    enum AccountCreationState: Equatable {
-        case notStarted
-        case inProgress
-        case failed(errorMessage: String)
-        case success
-
-        var isFailed: Bool {
-            switch self {
-            case .failed: return true
-            default: return false
-            }
-        }
-
-        var errorMessage: String {
-            switch self {
-            case let .failed(errorMessage):
-                return errorMessage
-            default:
-                return ""
-            }
-        }
-    }
-
-    @Published var state: AccountCreationState = .notStarted
+    @Published var state: ViewOperationState = .notStarted
 
     func createAccount(username: String, password: String, passwordConfirmation: String, displayName: String) {
         if let errorMessage = validateInput(username: username, password: password, passwordConfirmation: passwordConfirmation, displayName: displayName) {
@@ -46,10 +22,10 @@ class CreateAccountViewModel: ObservableObject {
             switch result {
             case .success:
                 // TODO: do something with the returned user - store user ID?
-                self?.state = .success
+                self?.setState(.success)
             case let .failure(error):
                 Logger.traceError(message: "Failed to create new user", error: error)
-                self?.state = .failed(errorMessage: "Could not create user")
+                self?.setState(.failed(errorMessage: "Could not create user"))
             }
         }
     }
@@ -74,5 +50,11 @@ class CreateAccountViewModel: ObservableObject {
 
         // No error
         return nil
+    }
+
+    private func setState(_ newState: ViewOperationState) {
+        DispatchQueue.main.async { [weak self] in
+            self?.state = newState
+        }
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 class HttpConnector {
-    func makeRequest<T: Decodable>(url: String, headers: [String: Any]? = nil, body: [String: String]? = nil, method: HttpMethod, completion: @escaping (Result<T, Error>) -> Void) {
+    func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: String]? = nil, method: HttpMethod, completion: @escaping (Result<T, Error>) -> Void) {
         guard let urlObj = URL(string: url) else {
             completion(.failure(HttpError.invalidUrl(url: url)))
             return
@@ -27,16 +27,39 @@ class HttpConnector {
             request.httpBody = bodyString.data(using: .utf8)
         }
 
-        let configuration = URLSessionConfiguration.default
         if let headers = headers {
-            configuration.httpAdditionalHeaders = headers
+            headers.forEach {
+                request.setValue($0.value, forHTTPHeaderField: $0.key)
+            }
         }
 
-        let session = URLSession.init(configuration: configuration)
-
-        let dataTask = session.dataTask(with: request) { data, urlResponse, error in
-            // TODO: Parse response for error details
+        let dataTask = URLSession.shared.dataTask(with: request) { data, urlResponse, error in
             if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let httpResponse = urlResponse as? HTTPURLResponse else {
+                Logger.traceError(message: "Response was not HTTPURLResponse")
+                completion(.failure(HttpError.generic))
+                return
+            }
+
+            guard (200 ... 299).contains(httpResponse.statusCode) else {
+                var error = HttpError.generic
+                if (400 ... 499).contains(httpResponse.statusCode) {
+                    error = HttpError.clientError(code: httpResponse.statusCode)
+                } else if (500 ... 599).contains(httpResponse.statusCode) {
+                    error = HttpError.serverError(code: httpResponse.statusCode)
+                }
+
+                var message: String?
+                if let responseData = data,
+                   let responseString = String(data: responseData, encoding: .utf8) {
+                    message = responseString
+                }
+
+                Logger.traceError(message: "Received HTTP error. \(message ?? "")", error: error)
                 completion(.failure(error))
                 return
             }

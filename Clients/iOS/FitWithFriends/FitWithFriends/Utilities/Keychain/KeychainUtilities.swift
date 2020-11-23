@@ -8,8 +8,6 @@
 import Foundation
 
 public class KeychainUtilities {
-    private let keychainAccessGroupPrefix: String = "TODO"
-
     func getKeychainItem(accessGroup: String, service: String, account: String) -> Result<AnyObject, KeychainError> {
         let queryDictionary: [CFString: Any?] = [
             kSecClass: kSecClassGenericPassword,
@@ -77,15 +75,6 @@ public class KeychainUtilities {
         var addItemDictionary = queryDictionary
         addItemDictionary[kSecValueData] = encodedData
 
-        // We don't want our keychain items to be backed up/restored to a different device
-        addItemDictionary[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-        addItemDictionary[kSecAttrSynchronizable] = kCFBooleanFalse
-
-        if #available(macOS 10.15, iOS 13, *) {
-            // Use the modern iOS-style keychain on Mac (this value has no effect on iOS)
-            addItemDictionary[kSecUseDataProtectionKeychain] = true
-        }
-
         var status = SecItemAdd(addItemDictionary as CFDictionary, nil)
 
         if status == errSecDuplicateItem, updateExistingItemIfNecessary {
@@ -131,10 +120,10 @@ public class KeychainUtilities {
 
     private func getAccessGroupWithPrefix(accessGroup: String) -> String {
         // Don't re-add the prefix if our caller has already added it
-        if accessGroup.contains(keychainAccessGroupPrefix) {
+        if accessGroup.contains(SecretConstants.keychainPrefix) {
             return accessGroup
         }
 
-        return "\(keychainAccessGroupPrefix).\(accessGroup)"
+        return "\(SecretConstants.keychainPrefix).\(accessGroup)"
     }
 }

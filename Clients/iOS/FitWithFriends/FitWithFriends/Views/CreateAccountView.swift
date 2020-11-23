@@ -17,30 +17,31 @@ struct CreateAccountView: View {
 
     var body: some View {
         VStack {
+            Spacer()
+
             Text("Create new account")
                 .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
                 .padding()
-
-            Spacer()
 
             TextField("What's your name?", text: $displayName)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
-            TextField("Choose a username", text: $username)
+            TextField("Choose a username to login with", text: $username)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
-            TextField("Set your password", text: $password)
-                .padding()
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .textContentType(.newPassword)
-
-            TextField("Confirm your password", text: $passwordConfirmation)
+            SecureField("Set your password", text: $password)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .textContentType(.newPassword)
 
+            SecureField("Confirm your password", text: $passwordConfirmation)
+                .padding()
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .textContentType(.newPassword)
+
+            Spacer()
             Spacer()
 
             if viewModel.state.isFailed {
@@ -63,9 +64,9 @@ struct CreateAccountView: View {
                                         passwordConfirmation: passwordConfirmation,
                                         displayName: displayName)
             }
-                .font(.title2)
-                .padding()
-                .disabled(viewModel.state == .inProgress)
+            .font(.title2)
+            .padding()
+            .disabled(viewModel.state == .inProgress)
         }
     }
 }
