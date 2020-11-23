@@ -5,6 +5,7 @@
 
 # Client secrets that shouldn't be synced to source control
 Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift
+Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace/xcuserdata
 
 # User-specific files
 *.rsuser
