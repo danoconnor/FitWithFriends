@@ -121,7 +121,8 @@ module.exports.saveToken = function (token, client, user) {
             refreshTokenExpiresAt: token.refreshTokenExpiresAt,
             scope: token.scope,
             client: client,
-            user: user
+            user: user,
+            userId: user.userid
         }
     }).catch(function (error) {
         // TODO: log error
