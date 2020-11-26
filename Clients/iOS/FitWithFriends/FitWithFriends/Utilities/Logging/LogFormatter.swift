@@ -17,11 +17,17 @@ class LogFormatter: NSObject, DDLogFormatter {
     }
 
     func format(message logMessage: DDLogMessage) -> String? {
-        return String(format: "%@ | %@ | %@ | %@: %@ | %@",
+        // logMessage.file will contain the full path to the file, so parse it to just get the filename
+        var file = "<file>"
+        if let lastFilePart = logMessage.file.split(separator: "/").last {
+            file = String(lastFilePart)
+        }
+
+        return String(format: "%@ | %@ | %@ | %@:%@ | %@",
                       dateFormatter.string(from: logMessage.timestamp),
                       logMessage.flag.description,
                       logMessage.threadID,
-                      logMessage.file,
+                      file,
                       logMessage.line.description,
                       logMessage.message)
     }
