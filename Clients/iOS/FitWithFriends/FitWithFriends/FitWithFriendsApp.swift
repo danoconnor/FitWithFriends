@@ -9,6 +9,8 @@ import SwiftUI
 
 @main
 struct FitWithFriendsApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+
     init() {
         Logger.setupLogging()
     }

@@ -67,6 +67,24 @@ class ServiceCommunicator {
                                             })
     }
 
+    func registerApnsToken(token: String, completion: @escaping (Error?) -> Void) {
+        let requestBody: [String: String] = [
+            "apnsToken": token
+        ]
+
+        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/pushNotifications/register",
+                                          method: .post,
+                                          body: requestBody,
+                                          completion: { (result: Result<EmptyReponse, Error>) in
+                                            switch result {
+                                            case let .failure(error):
+                                                completion(error)
+                                            default:
+                                                completion(nil)
+                                            }
+                                          })
+    }
+
     /// Makes a request to the service and authenticates by providing the client ID/secret.
     /// This request is not authenticated as a specific user
     private func makeRequestWithClientAuthentication<T: Decodable>(url: String, method: HttpMethod, body: [String: String]? = nil, completion: @escaping (Result<T, Error>) -> Void) {

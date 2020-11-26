@@ -13,12 +13,15 @@ class ObjectGraph {
     let authenticationManager: AuthenticationManager
     let httpConnector: HttpConnector
     let keychainUtilities: KeychainUtilities
+    let pushNotificationManager: PushNotificationManager
     let serviceCommunicator: ServiceCommunicator
     let tokenManager: TokenManager
+    let userDefaults: UserDefaults
 
     init() {
         httpConnector = HttpConnector()
         keychainUtilities = KeychainUtilities()
+        userDefaults = UserDefaults.standard
 
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
 
@@ -27,5 +30,9 @@ class ObjectGraph {
 
         authenticationManager = AuthenticationManager(serviceCommunicator: serviceCommunicator,
                                                       tokenManager: tokenManager)
+
+        pushNotificationManager = PushNotificationManager(authenticationManager: authenticationManager,
+                                                          serviceCommunicator: serviceCommunicator,
+                                                          userDefaults: userDefaults)
     }
 }
