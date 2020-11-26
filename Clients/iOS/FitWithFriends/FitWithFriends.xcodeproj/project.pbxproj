@@ -10,6 +10,8 @@
 		08E225A62BBD71DC2CE0416B /* Pods_FitWithFriends.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D85632C16073505DA84F856F /* Pods_FitWithFriends.framework */; };
 		0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7494256AE65F00821775 /* CreateAccountView.swift */; };
 		0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */; };
+		0B359721256C731A006D956A /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359720256C731A006D956A /* MainContentView.swift */; };
+		0B359724256C7357006D956A /* AppStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359723256C7357006D956A /* AppStateViewModel.swift */; };
 		0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */; };
 		0B99FBD2256A016900673133 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B99FBD1256A016900673133 /* Assets.xcassets */; };
 		0B99FBD5256A016900673133 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B99FBD4256A016900673133 /* Preview Assets.xcassets */; };
@@ -42,6 +44,8 @@
 		0B2D7494256AE65F00821775 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
 		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
+		0B359720256C731A006D956A /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
+		0B359723256C7357006D956A /* AppStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateViewModel.swift; sourceTree = "<group>"; };
 		0B99FBCA256A016900673133 /* FitWithFriends.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitWithFriends.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitWithFriendsApp.swift; sourceTree = "<group>"; };
 		0B99FBD1256A016900673133 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -90,6 +94,7 @@
 		0B2D7497256AE6B700821775 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				0B359723256C7357006D956A /* AppStateViewModel.swift */,
 				0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */,
 				0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */,
 				0BCB29DB256B3B23008FE93C /* ViewState.swift */,
@@ -234,6 +239,7 @@
 				0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */,
 				0B2D7494256AE65F00821775 /* CreateAccountView.swift */,
 				0BCB29D0256B3754008FE93C /* LoginView.swift */,
+				0B359720256C731A006D956A /* MainContentView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -373,6 +379,7 @@
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
 				0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */,
+				0B359721256C731A006D956A /* MainContentView.swift in Sources */,
 				0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */,
 				0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
@@ -391,6 +398,7 @@
 				0B9BADC4256AE44600EB1B60 /* WelcomeView.swift in Sources */,
 				0B99FC20256A273D00673133 /* KeychainUtilities.swift in Sources */,
 				0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */,
+				0B359724256C7357006D956A /* AppStateViewModel.swift in Sources */,
 				0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */,
 				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
 				0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */,

@@ -10,6 +10,7 @@ import Foundation
 class ObjectGraph {
     static let sharedInstance = ObjectGraph()
 
+    let authenticationManager: AuthenticationManager
     let httpConnector: HttpConnector
     let keychainUtilities: KeychainUtilities
     let serviceCommunicator: ServiceCommunicator
@@ -23,5 +24,8 @@ class ObjectGraph {
 
         serviceCommunicator = ServiceCommunicator(httpConnector: httpConnector,
                                                   tokenManager: tokenManager)
+
+        authenticationManager = AuthenticationManager(serviceCommunicator: serviceCommunicator,
+                                                      tokenManager: tokenManager)
     }
 }

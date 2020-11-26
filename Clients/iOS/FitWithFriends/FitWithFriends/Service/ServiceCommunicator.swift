@@ -45,6 +45,28 @@ class ServiceCommunicator {
                                             completion: completion)
     }
 
+    /// Gets a new access token using the refresh token
+    func getToken(token: Token, completion: @escaping (Result<Token, Error>) -> Void) {
+        Logger.traceInfo(message: "Requesting new access token using refresh token")
+
+        let requestBody: [String: String] = [
+            RequestConstants.Body.grantType: RequestConstants.Body.refreshTokenGrant,
+            RequestConstants.Body.refreshToken: token.refresh_token
+        ]
+
+        makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
+                                            method: .post,
+                                            body: requestBody,
+                                            completion: { (result: Result<Token, Error>) in
+                                                switch result {
+                                                case let .success(token):
+                                                    completion(.success(token))
+                                                case let .failure(error):
+                                                    completion(.failure(error))
+                                                }
+                                            })
+    }
+
     /// Makes a request to the service and authenticates by providing the client ID/secret.
     /// This request is not authenticated as a specific user
     private func makeRequestWithClientAuthentication<T: Decodable>(url: String, method: HttpMethod, body: [String: String]? = nil, completion: @escaping (Result<T, Error>) -> Void) {
@@ -82,24 +104,15 @@ class ServiceCommunicator {
     }
 
     private func refreshTokenAndRetryRequest<T: Decodable>(expiredToken: Token, url: String, method: HttpMethod, body: [String: String]? = nil, completion: @escaping (Result<T, Error>) -> Void) {
-        Logger.traceInfo(message: "Requesting new access token using refresh token")
-
-        let requestBody: [String: String] = [
-            RequestConstants.Body.grantType: RequestConstants.Body.refreshTokenGrant,
-            RequestConstants.Body.refreshToken: expiredToken.refresh_token
-        ]
-        
-        makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
-                                            method: .post,
-                                            body: requestBody,
-                                            completion: { [weak self] (result: Result<Token, Error>) in
-                                                switch result {
-                                                case let .success(token):
-                                                    self?.tokenManager.storeToken(token)
-                                                    self?.makeRequestWithUserAuthentication(url: url, method: method, body: body, completion: completion)
-                                                case let .failure(error):
-                                                    completion(.failure(error))
-                                                }
-        })
+        getToken(token: expiredToken) { [weak self] result in
+            switch result {
+            case let .success(token):
+                self?.tokenManager.storeToken(token)
+                self?.makeRequestWithUserAuthentication(url: url, method: method, body: body, completion: completion)
+            case let .failure(error):
+                Logger.traceError(message: "Could not refresh token", error: error)
+                completion(.failure(error))
+            }
+        }
     }
 }

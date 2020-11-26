@@ -73,4 +73,16 @@ class TokenManager {
             Logger.traceError(message: "Failed to serialize token for keychain storage", error: error)
         }
     }
+
+    func deleteAllTokens() {
+        if let error = keychainUtilities.deleteKeychainItem(accessGroup: tokenKeychainGroup,
+                                                            service: tokenKeychainService,
+                                                            account: tokenKeychainAccount) {
+            Logger.traceError(message: "Failed to delete tokens from keychain", error: error)
+            return
+        }
+
+        cachedToken = nil
+        Logger.traceInfo(message: "Successfully deleted cached tokens")
+    }
 }

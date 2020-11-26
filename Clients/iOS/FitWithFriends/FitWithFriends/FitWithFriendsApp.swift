@@ -15,7 +15,7 @@ struct FitWithFriendsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            WelcomeView()
+            MainContentView()
         }
     }
 }
