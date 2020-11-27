@@ -46,14 +46,17 @@ class PushNotificationManager {
             }
 
             Logger.traceInfo(message: "Received authorization for push notifications: \(granted)")
-            UIApplication.shared.registerForRemoteNotifications()
+
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
         }
     }
 
-    func registerTokenIfNecessary(_ token: Data) {
+    func registerPushTokenIfNecessary(_ pushToken: Data) {
         // Check to see if the token has changed since the last time
         // If it has, send the new token to the service
-        let tokenString = convertTokenToString(data: token)
+        let tokenString = convertPushTokenToString(data: pushToken)
         let tokenPart = tokenString.suffix(10)
 
         if let cachedTokenPart = userDefaults.string(forKey: tokenCacheKey),
@@ -76,7 +79,7 @@ class PushNotificationManager {
         
     }
 
-    private func convertTokenToString(data: Data) -> String {
+    private func convertPushTokenToString(data: Data) -> String {
         var token: String = ""
         for i in 0 ..< data.count {
             token += String(format: "%02.2hhx", data[i] as CVarArg)

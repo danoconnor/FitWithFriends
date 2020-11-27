@@ -16,7 +16,7 @@ extension AppDelegate: UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        ObjectGraph.sharedInstance.pushNotificationManager.registerTokenIfNecessary(deviceToken)
+        ObjectGraph.sharedInstance.pushNotificationManager.registerPushTokenIfNecessary(deviceToken)
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
