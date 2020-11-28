@@ -18,6 +18,11 @@ class HealthKitManager {
     private var loginStateCancellable: AnyCancellable?
 
     var shouldPromptUser: Bool {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            Logger.traceWarning(message: "Health data is not available on this device. Should not prompt user for permissions")
+            return false
+        }
+
         // Apple does not provide a way to check the current health permissions,
         // so the best we can do is check if we've shown the prompt before
         return userDefaults.bool(forKey: HealthKitManager.healthPromptKey) != true
@@ -27,12 +32,6 @@ class HealthKitManager {
          userDefaults: UserDefaults) {
         self.authenticationManager = authenticationManager
         self.userDefaults = userDefaults
-
-//        loginStateCancellable =  authenticationManager.$loginState.sink { [weak self] state in
-//            if state == .loggedIn {
-//                self?.requestHealthKitPermission()
-//            }
-//        }
     }
 
     func requestHealthKitPermission(completion: @escaping () -> Void) {
@@ -49,6 +48,7 @@ class HealthKitManager {
         HKHealthStore().requestAuthorization(toShare: nil, read: Set(dataTypes)) { [weak self] success, error in
             if let error = error {
                 Logger.traceError(message: "Failed to request authorization for health data", error: error)
+                completion()
                 return
             }
 
