@@ -29,8 +29,7 @@ class PushNotificationManager {
         loginStateCancellable =  authenticationManager.$loginState.sink { [weak self] state in
             if state == .loggedIn {
                 // When the user logs in, we want to request an APNS token from the system
-                // This will prompt the user for notification permissions on the first login
-                // If the user has already granted permission, then we will get the latest APNS token
+                // to get the latest APNS token (it might change)
                 self?.requestPushToken()
             } else if state == .notLoggedIn {
                 // TODO: unregsiter push notifications on logout
@@ -38,18 +37,44 @@ class PushNotificationManager {
         }
     }
 
-    func requestPushToken() {
+    var shouldPromptUser: Bool {
+        let group = DispatchGroup()
+
+        var shouldPrompt = false
+        group.enter()
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                shouldPrompt = true
+            default:
+                shouldPrompt = false
+            }
+
+            group.leave()
+        }
+
+        // Wait up to 1 second for the system to return the notification settings
+        _ = group.wait(timeout: .now() + 1)
+        return shouldPrompt
+    }
+
+    func promptForNotificationPermission(completion: @escaping () -> Void) {
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
-        UNUserNotificationCenter.current().requestAuthorization(options: options) { granted, error in
+        UNUserNotificationCenter.current().requestAuthorization(options: options) { [weak self] granted, error in
             if let error = error {
                 Logger.traceError(message: "Failed to request push notification authorization", error: error)
             }
 
             Logger.traceInfo(message: "Received authorization for push notifications: \(granted)")
+            self?.requestPushToken()
 
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
+            completion()
+        }
+    }
+
+    func requestPushToken() {
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
         }
     }
 
@@ -76,7 +101,6 @@ class PushNotificationManager {
             self.userDefaults.set(tokenPart, forKey: self.tokenCacheKey)
             Logger.traceInfo(message: "Successfully registered APNS token with service")
         }
-        
     }
 
     private func convertPushTokenToString(data: Data) -> String {

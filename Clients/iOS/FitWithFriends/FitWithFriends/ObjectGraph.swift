@@ -11,6 +11,7 @@ class ObjectGraph {
     static let sharedInstance = ObjectGraph()
 
     let authenticationManager: AuthenticationManager
+    let healthKitManager: HealthKitManager
     let httpConnector: HttpConnector
     let keychainUtilities: KeychainUtilities
     let pushNotificationManager: PushNotificationManager
@@ -30,6 +31,9 @@ class ObjectGraph {
 
         authenticationManager = AuthenticationManager(serviceCommunicator: serviceCommunicator,
                                                       tokenManager: tokenManager)
+
+        healthKitManager = HealthKitManager(authenticationManager: authenticationManager,
+                                           userDefaults: userDefaults)
 
         pushNotificationManager = PushNotificationManager(authenticationManager: authenticationManager,
                                                           serviceCommunicator: serviceCommunicator,

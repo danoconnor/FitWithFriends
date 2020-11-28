@@ -12,15 +12,10 @@ struct MainContentView: View {
     @ObservedObject private var viewModel = AppStateViewModel()
 
     var body: some View {
-        if !viewModel.isLoggedIn {
-            WelcomeView()
+        if viewModel.isLoggedIn {
+            LoggedInContentView()
         } else {
-            VStack {
-                Text("Logged in!")
-                Button("Logout") {
-                    ObjectGraph.sharedInstance.authenticationManager.logout()
-                }
-            }
+            WelcomeView()
         }
     }
 }
