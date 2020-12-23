@@ -38,7 +38,7 @@ class AuthenticationManager: ObservableObject {
                 completion(nil)
             case let .failure(error):
                 Logger.traceError(message: "Could not fetch token for user", error: error)
-                self?.loginState = .loggedIn
+                self?.loginState = .notLoggedIn
                 completion(nil)
             }
         }

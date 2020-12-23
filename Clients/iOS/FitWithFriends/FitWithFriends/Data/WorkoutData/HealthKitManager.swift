@@ -11,6 +11,7 @@ import HealthKit
 
 class HealthKitManager {
     private let authenticationManager: AuthenticationManager
+    private let serviceCommunicator: ServiceCommunicator
     private let userDefaults: UserDefaults
 
     private let hkHealthStore = HKHealthStore()
@@ -18,6 +19,9 @@ class HealthKitManager {
     private static let healthPromptKey = "HasPromptedForHealthPermissions"
     private static let lastUpdateKey = "LastHealthDataUpdate"
     private static let lastWorkoutAnchorKey = "LastWorkoutAnchor"
+
+    private var activitySummaryQuery: HKQuery?
+    private var workoutQuery: HKQuery?
 
     private var loginStateCancellable: AnyCancellable?
 
@@ -33,8 +37,10 @@ class HealthKitManager {
     }
 
     init(authenticationManager: AuthenticationManager,
+         serviceCommunicator: ServiceCommunicator,
          userDefaults: UserDefaults) {
         self.authenticationManager = authenticationManager
+        self.serviceCommunicator = serviceCommunicator
         self.userDefaults = userDefaults
     }
 
@@ -91,6 +97,11 @@ class HealthKitManager {
     }
 
     func registerDataQueries() {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            Logger.traceWarning(message: "Health data is not available on this device, not registering data queries")
+            return
+        }
+
         registerActivitySummaryQuery()
         registerWorkoutQuery()
     }
@@ -104,6 +115,9 @@ class HealthKitManager {
         let query = HKActivitySummaryQuery(predicate: predicate, resultsHandler: handleActivitySummaryData(query:summaries:error:))
         query.updateHandler = handleActivitySummaryData(query:summaries:error:)
         hkHealthStore.execute(query)
+
+        // Keep a reference to the query so the updateHandler is called
+        activitySummaryQuery = query
     }
 
     private func registerWorkoutQuery() {
@@ -117,6 +131,9 @@ class HealthKitManager {
         let query = HKAnchoredObjectQuery(type: .workoutType(), predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit, resultsHandler: handleWorkoutData(query:workouts:deletedObjects:anchor:error:))
         query.updateHandler = handleWorkoutData(query:workouts:deletedObjects:anchor:error:)
         hkHealthStore.execute(query)
+
+        // Keep a reference to the query so the updateHandler is called
+        workoutQuery = query
     }
 
     private func handleActivitySummaryData(query: HKQuery, summaries: [HKActivitySummary]?, error: Error?) {
@@ -130,8 +147,20 @@ class HealthKitManager {
         userDefaults.setValue(Date().timeIntervalSince1970, forKey: HealthKitManager.lastUpdateKey)
         if let summaries = summaries {
             for summary in summaries {
-                // TODO: send to service
-                print(summary.description)
+                guard let activitySummary = ActivitySummary(activitySummary: summary) else {
+                    Logger.traceWarning(message: "Could not create activity summary object")
+                    continue
+                }
+
+                Logger.traceInfo(message: "Received activity summary update: \(activitySummary.xtDictionary?.description ?? "nil")")
+                serviceCommunicator.reportActivitySummary(activitySummary: activitySummary) { error in
+                    // TODO: need some fallback to save data locally and retry in case of failure
+                    if let error = error {
+                        Logger.traceError(message: "Failed to upload activity summary", error: error)
+                    } else {
+                        Logger.traceInfo(message: "Successfully uploaded activity summary")
+                    }
+                }
             }
         }
     }
@@ -158,17 +187,25 @@ class HealthKitManager {
                     continue
                 }
 
-                // TODO: send to service
-                print(workout.description)
+                let workoutData = Workout(workout: workout)
+                Logger.traceInfo(message: "Found workout: \(workoutData.xtDictionary?.description ?? "nil")")
+                serviceCommunicator.reportWorkout(workout: workoutData) { error in
+                    // TODO: need some fallback to save workout locally and retry upload in case of failure
+                    if let error = error {
+                        Logger.traceError(message: "Failed to report workout", error: error)
+                    } else {
+                        Logger.traceInfo(message: "Workout reported successfully")
+                    }
+                }
             }
         }
     }
 
     private func getQueryDateRange() -> (startCompenents: DateComponents, endComponents: DateComponents) {
-        // Set the query end date to a month in the future so we continue to receive updates after the app has launched and is sitting in memory
+        // Set the query end date to the distant future so we continue to receive updates after the app has launched and is sitting in memory
         let calendar = Calendar.current
         let queryStartDate: Date
-        let queryEndDate = calendar.date(byAdding: .day, value: 30, to: Date())!
+        let queryEndDate = Date.distantFuture
 
         let lastUpdate = userDefaults.double(forKey: HealthKitManager.lastUpdateKey)
         if lastUpdate > 0 {
@@ -176,7 +213,7 @@ class HealthKitManager {
             queryStartDate = Date(timeIntervalSince1970: lastUpdate)
         } else {
             // If we haven't received any health data before, default to querying the last 7 days
-            queryStartDate = calendar.date(byAdding: .day, value: -7, to: queryEndDate)!
+            queryStartDate = calendar.date(byAdding: .day, value: -7, to: Date())!
         }
 
         let dateComponents: Set<Calendar.Component> = [.day, .month, .year, .era]

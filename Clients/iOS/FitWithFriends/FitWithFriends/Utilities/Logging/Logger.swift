@@ -78,6 +78,5 @@ class Logger {
                                       options: [],
                                       timestamp: Date())
         DDLog.sharedInstance.log(asynchronous: true, message: logMessage)
-
     }
 }

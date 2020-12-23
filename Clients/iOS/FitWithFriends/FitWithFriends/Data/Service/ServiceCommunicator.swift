@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HealthKit
 
 class ServiceCommunicator {
     private let httpConnector: HttpConnector
@@ -83,6 +84,44 @@ class ServiceCommunicator {
                                                 completion(nil)
                                             }
                                           })
+    }
+
+    func reportActivitySummary(activitySummary: ActivitySummary, completion: @escaping (Error?) -> Void) {
+        guard let requestBody = activitySummary.xtDictionary else {
+            Logger.traceError(message: "Failed to get dictionary for activity summary")
+            completion(HttpError.generic)
+            return
+        }
+
+        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData",
+                                          method: .post,
+                                          body: requestBody) { (result: Result<EmptyReponse, Error>) in
+            switch result {
+            case let .failure(error):
+                completion(error)
+            default:
+                completion(nil)
+            }
+        }
+    }
+
+    func reportWorkout(workout: Workout, completion: @escaping (Error?) -> Void) {
+        guard let requestBody = workout.xtDictionary else {
+            Logger.traceError(message: "Failed to get dictionary for workout")
+            completion(HttpError.generic)
+            return
+        }
+
+        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/workoutData",
+                                          method: .post,
+                                          body: requestBody) { (result: Result<EmptyReponse, Error>) in
+            switch result {
+            case let .failure(error):
+                completion(error)
+            default:
+                completion(nil)
+            }
+        }
     }
 
     /// Makes a request to the service and authenticates by providing the client ID/secret.

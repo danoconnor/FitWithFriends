@@ -33,7 +33,8 @@ class ObjectGraph {
                                                       tokenManager: tokenManager)
 
         healthKitManager = HealthKitManager(authenticationManager: authenticationManager,
-                                           userDefaults: userDefaults)
+                                            serviceCommunicator: serviceCommunicator,
+                                            userDefaults: userDefaults)
 
         pushNotificationManager = PushNotificationManager(authenticationManager: authenticationManager,
                                                           serviceCommunicator: serviceCommunicator,
