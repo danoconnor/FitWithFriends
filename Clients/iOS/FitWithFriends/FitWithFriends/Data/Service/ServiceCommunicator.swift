@@ -70,10 +70,10 @@ class ServiceCommunicator {
 
     func registerApnsToken(token: String, completion: @escaping (Error?) -> Void) {
         let requestBody: [String: String] = [
-            "apnsToken": token
+            "pushToken": token
         ]
 
-        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/pushNotifications/register",
+        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/pushNotification/register",
                                           method: .post,
                                           body: requestBody,
                                           completion: { (result: Result<EmptyReponse, Error>) in
@@ -93,7 +93,7 @@ class ServiceCommunicator {
             return
         }
 
-        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData",
+        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
                                           method: .post,
                                           body: requestBody) { (result: Result<EmptyReponse, Error>) in
             switch result {
@@ -112,7 +112,7 @@ class ServiceCommunicator {
             return
         }
 
-        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/workoutData",
+        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/workout",
                                           method: .post,
                                           body: requestBody) { (result: Result<EmptyReponse, Error>) in
             switch result {

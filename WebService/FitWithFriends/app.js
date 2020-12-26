@@ -11,6 +11,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var oauth = require('./routes/auth');
 const competitions = require('./routes/competitions');
+const pushNotification = require('./routes/pushNotification');
+const activityData = require('./routes/activityData');
 
 const oauthServer = require('./oauth/server')
 
@@ -32,6 +34,8 @@ app.use('/', routes);
 app.use('/oauth', oauth);
 app.use('/users', users);
 app.use('/competitions', oauthServer.authenticate(), competitions);
+app.use('/pushNotification', oauthServer.authenticate(), pushNotification);
+app.use('/activityData', oauthServer.authenticate(), activityData);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
