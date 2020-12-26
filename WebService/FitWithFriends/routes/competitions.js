@@ -25,6 +25,7 @@ router.post('/', function (req, res) {
     const startDate = new Date(req.body['startDate']);
     const endDate = new Date(req.body['endDate']);
     const displayName = req.body['displayName'];
+    const workoutsOnly = req.body['workoutsOnly'];
 
     if (!startDate || !endDate || !displayName) {
         res.sendStatus(400);
@@ -34,8 +35,8 @@ router.post('/', function (req, res) {
     // Generate an access code for this competition so users can be added
     const accessToken = cryptoHelpers.getRandomToken();
 
-    database.query('INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token) VALUES ($1, $2, $3, $4, $5) RETURNING competition_id',
-        [startDate, endDate, displayName, res.locals.oauth.token.user.id, accessToken])
+    database.query('INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, workouts_only) VALUES ($1, $2, $3, $4, $5, $6) RETURNING competition_id',
+        [startDate, endDate, displayName, res.locals.oauth.token.user.id, accessToken, workoutsOnly])
         .then(function (result) {
             if (!result.length) {
                 res.sendStatus(500);

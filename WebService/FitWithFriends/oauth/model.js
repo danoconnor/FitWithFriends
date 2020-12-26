@@ -20,6 +20,10 @@ module.exports.saveAuthorizationCode = function (token, client, user) {
         user.id
     ]).then(function (result) {
         return result.length ? result[0] : false; // TODO return object with client: {id: clientId} and user: {id: userId} defined
+    })
+    .catch(function (error) {
+        // TODO: log error
+        return false
     });
 };
 
@@ -39,6 +43,10 @@ module.exports.getAccessToken = function (bearerToken) {
                 accessTokenExpiresAt: token.access_token_expires_on,
                 user: { id: token.user_id }
             };
+        })
+        .catch(function (error) {
+            // TODO: log error
+            return false
         });
 };
 
@@ -61,6 +69,10 @@ module.exports.getClient = function (clientId, clientSecret) {
                 clientSecret: oAuthClient.client_secret,
                 grants: ['password', 'authorization_code'], // the list of OAuth2 grant types that should be allowed
             };
+        })
+        .catch(function (error) {
+            // TODO: log error
+            return false
         });
 };
 
@@ -97,6 +109,10 @@ module.exports.getUser = function (username, password) {
                 // Password did not match
                 return false
             }
+        })
+        .catch(function (error) {
+            // TODO: log error
+            return false
         });
 };
 

@@ -32,9 +32,11 @@
     <Content Include="app.js" />
     <None Include="FitWithFriends - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\FitWithFriends - Web Deploy.pubxml" />
+    <Content Include="routes\activityData.js" />
     <Content Include="routes\competitions.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="routes\pushNotification.js" />
     <Content Include="utilities\cryptoHelpers.js">
       <SubType>Code</SubType>
     </Content>
