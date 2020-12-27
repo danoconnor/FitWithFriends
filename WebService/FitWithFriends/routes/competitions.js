@@ -84,7 +84,8 @@ router.post('/join', function (req, res) {
             }
 
             const competitionId = result[0].competition_id;
-            database.query('INSERT INTO users_competitions VALUES ($1, $2)', [res.locals.oauth.token.user.id, competitionId])
+            database.query('INSERT INTO users_competitions VALUES ($1, $2) \
+                            ON CONFLICT (userid, competitionid) DO NOTHING', [res.locals.oauth.token.user.id, competitionId])
                 .then(function (result) {
                     res.sendStatus(200);
                 })
@@ -99,6 +100,82 @@ router.post('/join', function (req, res) {
             res.sendStatus(500);
             return;
         });
+});
+
+// Returns an overview of the given competition that contains a list of users and their current points for the competition
+router.get('/:competitionId/overview', function (req, res) {
+    // 1. Get the competition data and the users
+    Promise.all([
+        database.query('SELECT userid FROM users_competitions WHERE competitionid = $1', [req.params.competitionId]),
+        database.query('SELECT start_date, end_date, display_name, workouts_only FROM competitions WHERE competition_id = $1', [req.params.competitionId])
+        ]
+    )
+    .then(function (result) {
+        const usersCompetitionsResult = result[0];
+        const competitionsResult = result[1];
+
+        if (!usersCompetitionsResult.length || !competitionsResult.length) {
+            res.sendStatus(404);
+            return;
+        }
+
+        // 2. Check that the authenticated user is one of the members of this competition
+        if (!usersCompetitionsResult.filter(function (row) { return row.userid === res.locals.oauth.token.user.id }).length) {
+            res.sendStatus(401);
+            return;
+        }
+
+        // 3. Calculate points for the workout/activity data for all of the users in the competition in the competition date range
+        
+        const userIdList = usersCompetitionsResult.map(row => row.userid).join();
+        const competitionInfo = competitionsResult[0];
+
+        // Workout points = duration (in minutes) + calories_burned
+        // Activity points = calories goal % + exercise time goal % + move time goal % + stand time goal %
+        // Note: points for each category are capped at 100, which is enforced when the row is inserted by artificially setting the real value to match the goal when necessary
+        var query = '';
+        if (competitionInfo.workouts_only) {
+            query = 'SELECT user_id, display_name, workout_points FROM \
+                         (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
+                     INNER JOIN \
+                         (SELECT user_id, SUM((duration / 60) + calories_burned) AS workout_points \
+                         FROM workout_data \
+                         WHERE start_date >= $1 and start_date <= $2 and user_id in (' + userIdList + ') \
+                         GROUP BY user_id) AS workoutData \
+                     ON workoutData.user_id = userInfo.userid';
+        } else {
+            query = 'SELECT user_id, display_name, workout_points, activity_points FROM \
+                         (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
+                     INNER JOIN \
+                         (SELECT workoutData.user_id AS user_id, workout_points, activity_points FROM \
+                             (SELECT user_id, SUM((duration / 60) + calories_burned) AS workout_points \
+                             FROM workout_data \
+                             WHERE start_date >= $1 and start_date <= $2 and user_id in (' + userIdList + ') \
+                             GROUP BY user_id) AS workoutData \
+                         FULL OUTER JOIN \
+                             (SELECT user_id, SUM((calories_burned / calories_goal * 100) + (exercise_time / exercise_time_goal * 100) + (move_time / move_time_goal * 100) + (stand_time / stand_time_goal * 100)) AS activity_points \
+                             FROM activity_summaries \
+                             WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
+                             GROUP BY user_id) AS activitySummaryData \
+                         ON workoutData.user_id = activitySummaryData.user_id) AS pointData \
+                     ON pointData.user_id = userInfo.userid';
+        }
+
+        database.query(query, [competitionInfo.start_date, competitionInfo.end_date])
+            .then(function (result) {
+                res.json(result);
+            })
+            .catch(function (error) {
+                // TODO: log error
+                res.sendStatus(500);
+                return;
+            });
+    })
+    .catch(function (error) {
+        // TODO: log error
+        res.sendStatus(500);
+        return;
+    });
 });
 
 module.exports = router;

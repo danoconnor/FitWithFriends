@@ -5,19 +5,26 @@ const router = express.Router();
 
 router.post('/dailySummary', function (req, res) {
     const date = req.body['date'];
-    const caloriesBurned = req.body['activeCaloriesBurned'];
+    var caloriesBurned = req.body['activeCaloriesBurned'];
     const caloriesGoal = req.body['activeCaloriesGoal'];
-    const exerciseTime = req.body['exerciseTime'];
+    var exerciseTime = req.body['exerciseTime'];
     const exerciseTimeGoal = req.body['exerciseTimeGoal'];
-    const moveTime = req.body['moveTime'];
+    var moveTime = req.body['moveTime'];
     const moveTimeGoal = req.body['moveTimeGoal'];
-    const standTime = req.body['standTime'];
+    var standTime = req.body['standTime'];
     const standTimeGoal = req.body['standTimeGoal'];
 
     // TODO: Other vars may be 0 - how to check that those are present?
     if (!date) {
         res.sendStatus(400);
     }
+
+    // This is a hack to make the point calculation query easier
+    // No extra points are awarded for going over the goal in any category, so if the user is over the goal we will record the real value as equal to the goal during insertion
+    caloriesBurned = Math.min(caloriesBurned, caloriesGoal);
+    exerciseTime = Math.min(exerciseTime, exerciseTimeGoal);
+    moveTime = Math.min(moveTime, moveTimeGoal);
+    standTime = Math.min(standTime, standTimeGoal);
 
     database.query('INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, move_time, move_time_goal, stand_time, stand_time_goal) \
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) \
