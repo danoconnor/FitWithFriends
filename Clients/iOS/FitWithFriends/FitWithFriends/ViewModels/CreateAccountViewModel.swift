@@ -18,7 +18,7 @@ class CreateAccountViewModel: ObservableObject {
         }
 
         state = .inProgress
-        ObjectGraph.sharedInstance.serviceCommunicator.createUser(username: username, password: password, displayName: displayName) { [weak self] result in
+        ObjectGraph.sharedInstance.userService.createUser(username: username, password: password, displayName: displayName) { [weak self] result in
             switch result {
             case .success:
                 // TODO: do something with the returned user - store user ID?

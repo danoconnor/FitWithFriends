@@ -33,7 +33,6 @@
 		0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC0C256A170D00673133 /* DDLogFlag+Extensions.swift */; };
 		0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC12256A1BDE00673133 /* EmptyResponse.swift */; };
 		0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC16256A20A800673133 /* AuthenticationManager.swift */; };
-		0B99FC1C256A262D00673133 /* ServiceCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC1B256A262D00673133 /* ServiceCommunicator.swift */; };
 		0B99FC20256A273D00673133 /* KeychainUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC1F256A273D00673133 /* KeychainUtilities.swift */; };
 		0B99FC23256A275E00673133 /* KeychainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC22256A275E00673133 /* KeychainError.swift */; };
 		0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC26256A29A300673133 /* SecretConstants.swift */; };
@@ -46,6 +45,13 @@
 		0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADBE256AE2FB00EB1B60 /* ObjectGraph.swift */; };
 		0B9BADC4256AE44600EB1B60 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */; };
 		0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */; };
+		0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */; };
+		0BBD788D259A4A9400E08EB2 /* ServiceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */; };
+		0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */; };
+		0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7892259A4B4800E08EB2 /* UserService.swift */; };
+		0BBD7896259A4B7200E08EB2 /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */; };
+		0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */; };
+		0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */; };
 		0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D0256B3754008FE93C /* LoginView.swift */; };
 		0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */; };
 		0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29DB256B3B23008FE93C /* ViewState.swift */; };
@@ -80,7 +86,6 @@
 		0B99FC0C256A170D00673133 /* DDLogFlag+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DDLogFlag+Extensions.swift"; sourceTree = "<group>"; };
 		0B99FC12256A1BDE00673133 /* EmptyResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyResponse.swift; sourceTree = "<group>"; };
 		0B99FC16256A20A800673133 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
-		0B99FC1B256A262D00673133 /* ServiceCommunicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCommunicator.swift; sourceTree = "<group>"; };
 		0B99FC1F256A273D00673133 /* KeychainUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainUtilities.swift; sourceTree = "<group>"; };
 		0B99FC22256A275E00673133 /* KeychainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainError.swift; sourceTree = "<group>"; };
 		0B99FC26256A29A300673133 /* SecretConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretConstants.swift; sourceTree = "<group>"; };
@@ -93,6 +98,13 @@
 		0B9BADBE256AE2FB00EB1B60 /* ObjectGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectGraph.swift; sourceTree = "<group>"; };
 		0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Extension.swift"; sourceTree = "<group>"; };
+		0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverview.swift; sourceTree = "<group>"; };
+		0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceBase.swift; sourceTree = "<group>"; };
+		0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
+		0BBD7892259A4B4800E08EB2 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
+		0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
+		0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDataService.swift; sourceTree = "<group>"; };
+		0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionService.swift; sourceTree = "<group>"; };
 		0BCB29D0256B3754008FE93C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		0BCB29DB256B3B23008FE93C /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
@@ -253,7 +265,12 @@
 		0B99FC19256A250D00673133 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				0B99FC1B256A262D00673133 /* ServiceCommunicator.swift */,
+				0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */,
+				0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */,
+				0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */,
+				0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */,
+				0BBD7892259A4B4800E08EB2 /* UserService.swift */,
+				0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */,
 				0B9BADAE256AD88100EB1B60 /* RequestConstants.swift */,
 			);
 			path = Service;
@@ -274,6 +291,7 @@
 				0B99FC2D256A2CFB00673133 /* Token.swift */,
 				0B99FC30256A2E7900673133 /* User.swift */,
 				0B67532D2574686D0032835D /* Workout.swift */,
+				0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -444,11 +462,16 @@
 				0B3597782571502A006D956A /* HealthKitManager.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
 				0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */,
+				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
 				0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */,
+				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
 				0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */,
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
+				0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */,
 				0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */,
+				0BBD788D259A4A9400E08EB2 /* ServiceBase.swift in Sources */,
 				0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */,
+				0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */,
 				0B99FC31256A2E7900673133 /* User.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,
 				0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */,
@@ -457,7 +480,6 @@
 				0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */,
 				0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */,
 				0B35972C257046FC006D956A /* AppDelegate.swift in Sources */,
-				0B99FC1C256A262D00673133 /* ServiceCommunicator.swift in Sources */,
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0B99FBEB256A070F00673133 /* HttpMethod.swift in Sources */,
@@ -468,6 +490,8 @@
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,
 				0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */,
 				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
+				0BBD7896259A4B7200E08EB2 /* PushNotificationService.swift in Sources */,
+				0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */,
 				0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */,
 				0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */,
 			);

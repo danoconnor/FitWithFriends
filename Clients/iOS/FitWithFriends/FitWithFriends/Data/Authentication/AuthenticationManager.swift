@@ -17,12 +17,12 @@ class AuthenticationManager: ObservableObject {
 
     @Published var loginState = LoginState.notLoggedIn
 
-    private let serviceCommunicator: ServiceCommunicator
+    private let authenticationService: AuthenticationService
     private let tokenManager: TokenManager
 
-    init(serviceCommunicator: ServiceCommunicator,
+    init(authenticationService: AuthenticationService,
          tokenManager: TokenManager) {
-        self.serviceCommunicator = serviceCommunicator
+        self.authenticationService = authenticationService
         self.tokenManager = tokenManager
 
         setInitialLoginState()
@@ -30,7 +30,7 @@ class AuthenticationManager: ObservableObject {
 
     func login(username: String, password: String, completion: @escaping (Error?) -> Void) {
         loginState = .inProgress
-        serviceCommunicator.getToken(username: username, password: password) { [weak self] result in
+        authenticationService.getToken(username: username, password: password) { [weak self] result in
             switch result {
             case let .success(token):
                 self?.tokenManager.storeToken(token)
@@ -50,7 +50,7 @@ class AuthenticationManager: ObservableObject {
     }
 
     func refreshToken(token: Token, completion: @escaping (Error?) -> Void) {
-        serviceCommunicator.getToken(token: token) { [weak self] result in
+        authenticationService.getToken(token: token) { [weak self] result in
             switch result {
             case let .success(token):
                 self?.tokenManager.storeToken(token)

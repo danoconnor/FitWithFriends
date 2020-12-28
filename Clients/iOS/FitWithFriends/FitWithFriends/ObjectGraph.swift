@@ -10,14 +10,18 @@ import Foundation
 class ObjectGraph {
     static let sharedInstance = ObjectGraph()
 
+    let activityDataService: ActivityDataService
     let authenticationManager: AuthenticationManager
+    let authenticationService: AuthenticationService
+    let competitionService: CompetitionService
     let healthKitManager: HealthKitManager
     let httpConnector: HttpConnector
     let keychainUtilities: KeychainUtilities
     let pushNotificationManager: PushNotificationManager
-    let serviceCommunicator: ServiceCommunicator
+    let pushNotificationService: PushNotificationService
     let tokenManager: TokenManager
     let userDefaults: UserDefaults
+    let userService: UserService
 
     init() {
         httpConnector = HttpConnector()
@@ -26,18 +30,21 @@ class ObjectGraph {
 
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
 
-        serviceCommunicator = ServiceCommunicator(httpConnector: httpConnector,
-                                                  tokenManager: tokenManager)
+        activityDataService = ActivityDataService(httpConnector: httpConnector, tokenManager: tokenManager)
+        authenticationService = AuthenticationService(httpConnector: httpConnector, tokenManager: tokenManager)
+        competitionService = CompetitionService(httpConnector: httpConnector, tokenManager: tokenManager)
+        pushNotificationService = PushNotificationService(httpConnector: httpConnector, tokenManager: tokenManager)
+        userService = UserService(httpConnector: httpConnector, tokenManager: tokenManager)
 
-        authenticationManager = AuthenticationManager(serviceCommunicator: serviceCommunicator,
+        authenticationManager = AuthenticationManager(authenticationService: authenticationService,
                                                       tokenManager: tokenManager)
 
-        healthKitManager = HealthKitManager(authenticationManager: authenticationManager,
-                                            serviceCommunicator: serviceCommunicator,
+        healthKitManager = HealthKitManager(activityDataService: activityDataService,
+                                            authenticationManager: authenticationManager,
                                             userDefaults: userDefaults)
 
         pushNotificationManager = PushNotificationManager(authenticationManager: authenticationManager,
-                                                          serviceCommunicator: serviceCommunicator,
+                                                          pushNotificationService: pushNotificationService,
                                                           userDefaults: userDefaults)
     }
 }

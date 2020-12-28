@@ -10,8 +10,8 @@ import Foundation
 import HealthKit
 
 class HealthKitManager {
+    private let activityDataService: ActivityDataService
     private let authenticationManager: AuthenticationManager
-    private let serviceCommunicator: ServiceCommunicator
     private let userDefaults: UserDefaults
 
     private let hkHealthStore = HKHealthStore()
@@ -36,11 +36,11 @@ class HealthKitManager {
         return userDefaults.bool(forKey: HealthKitManager.healthPromptKey) != true
     }
 
-    init(authenticationManager: AuthenticationManager,
-         serviceCommunicator: ServiceCommunicator,
+    init(activityDataService: ActivityDataService,
+         authenticationManager: AuthenticationManager,
          userDefaults: UserDefaults) {
+        self.activityDataService = activityDataService
         self.authenticationManager = authenticationManager
-        self.serviceCommunicator = serviceCommunicator
         self.userDefaults = userDefaults
     }
 
@@ -153,7 +153,7 @@ class HealthKitManager {
                 }
 
                 Logger.traceInfo(message: "Received activity summary update: \(activitySummary.xtDictionary?.description ?? "nil")")
-                serviceCommunicator.reportActivitySummary(activitySummary: activitySummary) { error in
+                activityDataService.reportActivitySummary(activitySummary: activitySummary) { error in
                     // TODO: need some fallback to save data locally and retry in case of failure
                     if let error = error {
                         Logger.traceError(message: "Failed to upload activity summary", error: error)
@@ -189,7 +189,7 @@ class HealthKitManager {
 
                 let workoutData = Workout(workout: workout)
                 Logger.traceInfo(message: "Found workout: \(workoutData.xtDictionary?.description ?? "nil")")
-                serviceCommunicator.reportWorkout(workout: workoutData) { error in
+                activityDataService.reportWorkout(workout: workoutData) { error in
                     // TODO: need some fallback to save workout locally and retry upload in case of failure
                     if let error = error {
                         Logger.traceError(message: "Failed to report workout", error: error)

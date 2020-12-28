@@ -71,7 +71,9 @@ class HttpConnector {
 
             if let data = data {
                 do {
-                    let parsedData = try JSONDecoder().decode(T.self, from: data)
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase
+                    let parsedData = try decoder.decode(T.self, from: data)
                     completion(.success(parsedData))
                 } catch {
                     Logger.traceError(message: "Failed to parse response", error: error)

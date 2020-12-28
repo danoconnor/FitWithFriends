@@ -12,7 +12,7 @@ import UserNotifications
 
 class PushNotificationManager {
     private let authenticationManager: AuthenticationManager
-    private let serviceCommunicator: ServiceCommunicator
+    private let pushNotificationService: PushNotificationService
     private let userDefaults: UserDefaults
 
     private let tokenCacheKey = "PushToken"
@@ -20,10 +20,10 @@ class PushNotificationManager {
     private var loginStateCancellable: AnyCancellable?
 
     init(authenticationManager: AuthenticationManager,
-         serviceCommunicator: ServiceCommunicator,
+         pushNotificationService: PushNotificationService,
          userDefaults: UserDefaults) {
         self.authenticationManager = authenticationManager
-        self.serviceCommunicator = serviceCommunicator
+        self.pushNotificationService = pushNotificationService
         self.userDefaults = userDefaults
 
         loginStateCancellable =  authenticationManager.$loginState.sink { [weak self] state in
@@ -90,7 +90,7 @@ class PushNotificationManager {
             return
         }
 
-        serviceCommunicator.registerApnsToken(token: tokenString) { [weak self] error in
+        pushNotificationService.registerApnsToken(token: tokenString) { [weak self] error in
             if let error = error {
                 Logger.traceError(message: "Failed to register APNS token with service", error: error)
                 return

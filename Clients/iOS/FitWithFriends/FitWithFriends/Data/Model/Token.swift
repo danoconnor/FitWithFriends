@@ -8,9 +8,9 @@
 import Foundation
 
 class Token: Codable {
-    let access_token: String
-    let refresh_token: String
-    let expires_in: UInt
+    let accessToken: String
+    let refreshToken: String
+    let expiresIn: UInt
 
     var isAccessTokenExpired: Bool {
         // TODO: fix 
