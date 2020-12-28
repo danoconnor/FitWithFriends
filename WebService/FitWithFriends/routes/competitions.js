@@ -163,7 +163,12 @@ router.get('/:competitionId/overview', function (req, res) {
 
         database.query(query, [competitionInfo.start_date, competitionInfo.end_date])
             .then(function (result) {
-                res.json(result);
+                res.json({
+                    'competitionName': competitionInfo.display_name,
+                    'competitionStart': competitionInfo.start_date,
+                    'competitionEnd': competitionInfo.end_date,
+                    'currentResults': result
+                });
             })
             .catch(function (error) {
                 // TODO: log error
