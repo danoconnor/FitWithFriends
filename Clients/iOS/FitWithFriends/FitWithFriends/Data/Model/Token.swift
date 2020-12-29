@@ -11,6 +11,7 @@ class Token: Codable {
     let accessToken: String
     let refreshToken: String
     let expiresIn: UInt
+    let userId: UInt
 
     var isAccessTokenExpired: Bool {
         // TODO: fix 

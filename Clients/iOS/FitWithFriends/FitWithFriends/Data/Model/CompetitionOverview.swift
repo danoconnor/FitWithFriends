@@ -8,6 +8,7 @@
 import Foundation
 
 class CompetitionOverview: Codable {
+    let competitionId: UInt
     let competitionName: String
     let competitionStart: Date
     let competitionEnd: Date

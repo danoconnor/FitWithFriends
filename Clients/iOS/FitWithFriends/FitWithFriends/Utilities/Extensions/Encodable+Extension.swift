@@ -9,7 +9,15 @@ import Foundation
 
 extension Encodable {
   var xtDictionary: [String: String]? {
-    guard let data = try? JSONEncoder().encode(self) else { return nil }
-    return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: String] }
+    do {
+        let encodedData = try JSONEncoder().encode(self)
+        let jsonData = try JSONSerialization.jsonObject(with: encodedData, options: .allowFragments)
+
+        guard let anyDict = jsonData as? [String: Any] else { return nil }
+        return anyDict.mapValues { String(describing: $0) }
+    } catch {
+        Logger.traceError(message: "Failed to get dictionary for codable type \(type(of: self))", error: error)
+        return nil
+    }
   }
 }

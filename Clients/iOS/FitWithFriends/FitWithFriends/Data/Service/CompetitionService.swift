@@ -13,4 +13,10 @@ class CompetitionService: ServiceBase {
                                           method: .get,
                                           completion: completion)
     }
+
+    func getUsersCompetitions(userId: UInt, completion: @escaping (Result<[UInt], Error>) -> Void) {
+        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions",
+                                          method: .get,
+                                          completion: completion)
+    }
 }

@@ -20,6 +20,8 @@ class AuthenticationManager: ObservableObject {
     private let authenticationService: AuthenticationService
     private let tokenManager: TokenManager
 
+    var loggedInUserId: UInt?
+
     init(authenticationService: AuthenticationService,
          tokenManager: TokenManager) {
         self.authenticationService = authenticationService
@@ -34,10 +36,12 @@ class AuthenticationManager: ObservableObject {
             switch result {
             case let .success(token):
                 self?.tokenManager.storeToken(token)
+                self?.loggedInUserId = token.userId
                 self?.loginState = .loggedIn
                 completion(nil)
             case let .failure(error):
                 Logger.traceError(message: "Could not fetch token for user", error: error)
+                self?.loggedInUserId = nil
                 self?.loginState = .notLoggedIn
                 completion(nil)
             }
@@ -46,6 +50,7 @@ class AuthenticationManager: ObservableObject {
 
     func logout() {
         tokenManager.deleteAllTokens()
+        loggedInUserId = nil
         loginState = .notLoggedIn
     }
 
@@ -53,11 +58,13 @@ class AuthenticationManager: ObservableObject {
         authenticationService.getToken(token: token) { [weak self] result in
             switch result {
             case let .success(token):
+                self?.loggedInUserId = token.userId
                 self?.tokenManager.storeToken(token)
                 self?.loginState = .loggedIn
                 completion(nil)
             case let .failure(error):
                 Logger.traceError(message: "Could not refresh token", error: error)
+                self?.loggedInUserId = nil
                 self?.loginState = .notLoggedIn
                 completion(error)
             }
@@ -68,7 +75,8 @@ class AuthenticationManager: ObservableObject {
         // If we have a cached token then we are already logged in
         let cachedTokenResult = tokenManager.getCachedToken()
         switch cachedTokenResult {
-        case .success:
+        case let .success(token):
+            loggedInUserId = token.userId
             loginState = .loggedIn
         case let .failure(error):
             switch error {
@@ -76,6 +84,7 @@ class AuthenticationManager: ObservableObject {
                 loginState = .inProgress
                 refreshToken(token: token) { _ in }
             default:
+                loggedInUserId = nil
                 loginState = .notLoggedIn
             }
         }

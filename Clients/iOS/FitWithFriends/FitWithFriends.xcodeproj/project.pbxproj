@@ -52,6 +52,8 @@
 		0BBD7896259A4B7200E08EB2 /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */; };
 		0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */; };
 		0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */; };
+		0BBD78A1259A537100E08EB2 /* CompetitionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */; };
+		0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */; };
 		0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D0256B3754008FE93C /* LoginView.swift */; };
 		0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */; };
 		0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29DB256B3B23008FE93C /* ViewState.swift */; };
@@ -105,6 +107,8 @@
 		0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
 		0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDataService.swift; sourceTree = "<group>"; };
 		0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionService.swift; sourceTree = "<group>"; };
+		0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManager.swift; sourceTree = "<group>"; };
+		0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		0BCB29D0256B3754008FE93C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		0BCB29DB256B3B23008FE93C /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
@@ -158,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				0B99FC15256A208E00673133 /* Authentication */,
+				0BBD789F259A536000E08EB2 /* Competitions */,
 				0B99FC25256A290900673133 /* Model */,
 				0B35972725704640006D956A /* PushNotifications */,
 				0B99FC19256A250D00673133 /* Service */,
@@ -249,6 +254,7 @@
 			children = (
 				0B99FC0C256A170D00673133 /* DDLogFlag+Extensions.swift */,
 				0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */,
+				0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -317,6 +323,14 @@
 				0B6752D925715ED80032835D /* PermissionPromptView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0BBD789F259A536000E08EB2 /* Competitions */ = {
+			isa = PBXGroup;
+			children = (
+				0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */,
+			);
+			path = Competitions;
 			sourceTree = "<group>";
 		};
 		69208CCB1DE991CF005E8C63 /* Pods */ = {
@@ -452,6 +466,7 @@
 			files = (
 				0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */,
 				0B592C2725715B2C004F68AB /* Mutex.swift in Sources */,
+				0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */,
 				0B99FC2B256A2C5300673133 /* ErrorResponse.swift in Sources */,
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
@@ -493,6 +508,7 @@
 				0BBD7896259A4B7200E08EB2 /* PushNotificationService.swift in Sources */,
 				0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */,
 				0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */,
+				0BBD78A1259A537100E08EB2 /* CompetitionManager.swift in Sources */,
 				0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

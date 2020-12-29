@@ -107,7 +107,7 @@ router.get('/:competitionId/overview', function (req, res) {
     // 1. Get the competition data and the users
     Promise.all([
         database.query('SELECT userid FROM users_competitions WHERE competitionid = $1', [req.params.competitionId]),
-        database.query('SELECT start_date, end_date, display_name, workouts_only FROM competitions WHERE competition_id = $1', [req.params.competitionId])
+        database.query('SELECT competition_id, start_date, end_date, display_name, workouts_only FROM competitions WHERE competition_id = $1', [req.params.competitionId])
         ]
     )
     .then(function (result) {
@@ -164,6 +164,7 @@ router.get('/:competitionId/overview', function (req, res) {
         database.query(query, [competitionInfo.start_date, competitionInfo.end_date])
             .then(function (result) {
                 res.json({
+                    'competitionId': competitionInfo.competition_id,
                     'competitionName': competitionInfo.display_name,
                     'competitionStart': competitionInfo.start_date,
                     'competitionEnd': competitionInfo.end_date,
