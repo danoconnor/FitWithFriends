@@ -67,6 +67,7 @@ class HttpConnector {
             // If the caller doesn't expect any data back, then return here so we don't fail during parsing
             if T.self == EmptyReponse.self {
                 completion(.success(EmptyReponse() as! T))
+                return
             }
 
             if let data = data {

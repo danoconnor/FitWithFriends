@@ -6,13 +6,13 @@ const router = express.Router();
 router.post('/dailySummary', function (req, res) {
     const date = req.body['date'];
     var caloriesBurned = req.body['activeCaloriesBurned'];
-    const caloriesGoal = req.body['activeCaloriesGoal'];
+    var caloriesGoal = req.body['activeCaloriesGoal'];
     var exerciseTime = req.body['exerciseTime'];
-    const exerciseTimeGoal = req.body['exerciseTimeGoal'];
+    var exerciseTimeGoal = req.body['exerciseTimeGoal'];
     var moveTime = req.body['moveTime'];
-    const moveTimeGoal = req.body['moveTimeGoal'];
+    var moveTimeGoal = req.body['moveTimeGoal'];
     var standTime = req.body['standTime'];
-    const standTimeGoal = req.body['standTimeGoal'];
+    var standTimeGoal = req.body['standTimeGoal'];
 
     // TODO: Other vars may be 0 - how to check that those are present?
     if (!date) {
@@ -25,6 +25,14 @@ router.post('/dailySummary', function (req, res) {
     exerciseTime = Math.min(exerciseTime, exerciseTimeGoal);
     moveTime = Math.min(moveTime, moveTimeGoal);
     standTime = Math.min(standTime, standTimeGoal);
+
+    // Another hack to make point calculation easier
+    // The point calculation query will fail due to a divide by zero error if a goal is zero
+    // For simplicity, we'll just set any goal that is 0 to 1 instead
+    caloriesGoal = caloriesGoal > 0 ? caloriesGoal : 1;
+    exerciseTimeGoal = exerciseTimeGoal > 0 ? exerciseTimeGoal : 1;
+    moveTimeGoal = moveTimeGoal > 0 ? moveTimeGoal : 1;
+    standTimeGoal = standTimeGoal > 0 ? standTimeGoal : 1;
 
     database.query('INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, move_time, move_time_goal, stand_time, stand_time_goal) \
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) \
