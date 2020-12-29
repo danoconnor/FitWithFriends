@@ -35,7 +35,8 @@ router.post('/dailySummary', function (req, res) {
         })
         .catch(function (error) {
             // TODO: log error
-            res.sendStatus(500);
+            // res.sendStatus(500);
+            res.send(error);
             return;
         });
 });
@@ -56,7 +57,9 @@ router.post('/workout', function (req, res) {
         })
         .catch(function (error) {
             // TODO: log error
-            res.sendStatus(500);
+            // TODO: testing, remove later
+            // res.sendStatus(500);
+            res.send(error);
             return;
         });
 });

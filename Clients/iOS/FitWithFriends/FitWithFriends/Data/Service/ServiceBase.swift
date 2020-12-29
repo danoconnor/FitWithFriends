@@ -58,11 +58,12 @@ class ServiceBase {
     func makeRequestWithUserAuthentication<T: Decodable>(url: String, method: HttpMethod, body: [String: String]? = nil, completion: @escaping (Result<T, Error>) -> Void) {
         let tokenResult = tokenManager.getCachedToken()
 
-        var headers: [String: Any] = [:]
+        var headers: [String: String] = [:]
 
         switch tokenResult {
         case let .success(token):
             headers[RequestConstants.Headers.authorization] = "Bearer \(token.accessToken)"
+            httpConnector.makeRequest(url: url, headers: headers, body: body, method: method, completion: completion)
         case let .failure(error):
             switch error {
             case let .expired(token):
