@@ -26,13 +26,13 @@ class ActivitySummary: Codable {
         }
 
         date = activityDate
-        activeCaloriesBurned = activitySummary.activeEnergyBurned.doubleValue(for: .largeCalorie())
-        activeCaloriesGoal = activitySummary.activeEnergyBurnedGoal.doubleValue(for: .largeCalorie())
-        exerciseTime = activitySummary.appleExerciseTime.doubleValue(for: .minute())
-        exerciseTimeGoal = activitySummary.appleExerciseTimeGoal.doubleValue(for: .minute())
-        moveTime = activitySummary.appleMoveTime.doubleValue(for: .minute())
-        moveTimeGoal = activitySummary.appleMoveTimeGoal.doubleValue(for: .minute())
-        standTime = activitySummary.appleStandHours.doubleValue(for: .count())
-        standTimeGoal = activitySummary.appleStandHoursGoal.doubleValue(for: .count())
+        activeCaloriesBurned = round(activitySummary.activeEnergyBurned.doubleValue(for: .largeCalorie()))
+        activeCaloriesGoal = round(activitySummary.activeEnergyBurnedGoal.doubleValue(for: .largeCalorie()))
+        exerciseTime = round(activitySummary.appleExerciseTime.doubleValue(for: .minute()))
+        exerciseTimeGoal = round(activitySummary.appleExerciseTimeGoal.doubleValue(for: .minute()))
+        moveTime = round(activitySummary.appleMoveTime.doubleValue(for: .minute()))
+        moveTimeGoal = round(activitySummary.appleMoveTimeGoal.doubleValue(for: .minute()))
+        standTime = round(activitySummary.appleStandHours.doubleValue(for: .count()))
+        standTimeGoal = round(activitySummary.appleStandHoursGoal.doubleValue(for: .count()))
     }
 }

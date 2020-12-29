@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PermissionPromptView: View {
-    let permissionPromptViewModel: PermissionPromptViewModel
+    @ObservedObject var permissionPromptViewModel: PermissionPromptViewModel
 
     var body: some View {
         VStack(alignment: .leading) {

@@ -34,9 +34,7 @@ router.post('/dailySummary', function (req, res) {
             res.sendStatus(200);
         })
         .catch(function (error) {
-            // TODO: log error
-            // res.sendStatus(500);
-            res.send(error);
+            res.sendStatus(500);
             return;
         });
 });
@@ -51,15 +49,16 @@ router.post('/workout', function (req, res) {
         res.sendStatus(400);
     }
 
-    database.query('INSERT INTO workout_data(user_id, start_date, duration, calories_burned) VALUES ($1, $2, $3, $4)', [res.locals.oauth.token.user.id, startDate, duration, caloriesBurned])
+    // We will try to avoid sending duplicate data from the client, but as a backup
+    // the workout_data table has all four columns set as the primary key so duplicate data cannot be entered
+    database.query('INSERT INTO workout_data(user_id, start_date, duration, calories_burned) \
+                    VALUES ($1, $2, $3, $4) \
+                    ON CONFLICT (user_id, start_date, duration, calories_burned) DO NOTHING', [res.locals.oauth.token.user.id, startDate, duration, caloriesBurned])
         .then(function (result) {
             res.sendStatus(200);
         })
         .catch(function (error) {
-            // TODO: log error
-            // TODO: testing, remove later
-            // res.sendStatus(500);
-            res.send(error);
+            res.sendStatus(500);
             return;
         });
 });

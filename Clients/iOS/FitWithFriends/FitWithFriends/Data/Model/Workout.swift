@@ -15,7 +15,7 @@ class Workout: Codable {
 
     init(workout: HKWorkout) {
         startDate = workout.startDate
-        caloriesBurned = workout.totalEnergyBurned?.doubleValue(for: .largeCalorie()) ?? 0
-        duration = workout.duration
+        caloriesBurned = round(workout.totalEnergyBurned?.doubleValue(for: .largeCalorie()) ?? 0)
+        duration = round(workout.duration)
     }
 }
