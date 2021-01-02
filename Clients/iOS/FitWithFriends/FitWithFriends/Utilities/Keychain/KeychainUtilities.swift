@@ -118,6 +118,23 @@ public class KeychainUtilities {
         return nil
     }
 
+    func deleteAllItems() -> Error? {
+        let queryDictionary: [CFString: Any?] = [
+            kSecClass: kSecClassGenericPassword
+        ]
+
+        let status = SecItemDelete(queryDictionary as CFDictionary)
+
+        // If the item was not found, then we don't need to return an error
+        if status != errSecSuccess, status != errSecItemNotFound {
+            let error = KeychainError.generic(statusCode: status)
+            Logger.traceError(message: "Failed to delete all keychain items", error: error)
+            return error
+        }
+
+        return nil
+    }
+
     private func getAccessGroupWithPrefix(accessGroup: String) -> String {
         // Don't re-add the prefix if our caller has already added it
         if accessGroup.contains(SecretConstants.keychainPrefix) {

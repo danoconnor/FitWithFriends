@@ -38,7 +38,10 @@ class TokenManager {
             if let data = data as? Data {
                 Logger.traceInfo(message: "Found token data in keychain")
                 do {
-                    let token = try JSONDecoder().decode(Token.self, from: data)
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .formatted(DateFormatter.isoFormatter)
+
+                    let token = try decoder.decode(Token.self, from: data)
                     cachedToken = token
                     return token.isAccessTokenExpired ? .failure(TokenError.expired(token: token)) : .success(token)
                 } catch {
@@ -59,6 +62,8 @@ class TokenManager {
 
         do {
             let jsonEncoder = JSONEncoder()
+            jsonEncoder.dateEncodingStrategy = .formatted(DateFormatter.isoFormatter)
+
             let tokenJson = try jsonEncoder.encode(token)
             let keychainResult = keychainUtilities.writeKeychainItem(data: tokenJson as AnyObject,
                                                                      accessGroup: tokenKeychainGroup,
