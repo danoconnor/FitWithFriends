@@ -13,6 +13,7 @@ class ObjectGraph {
     let activityDataService: ActivityDataService
     let authenticationManager: AuthenticationManager
     let authenticationService: AuthenticationService
+    let competitionManager: CompetitionManager
     let competitionService: CompetitionService
     let healthKitManager: HealthKitManager
     let httpConnector: HttpConnector
@@ -46,5 +47,8 @@ class ObjectGraph {
         pushNotificationManager = PushNotificationManager(authenticationManager: authenticationManager,
                                                           pushNotificationService: pushNotificationService,
                                                           userDefaults: userDefaults)
+
+        competitionManager = CompetitionManager(authenticationManager: authenticationManager,
+                                                competitionService: competitionService)
     }
 }
