@@ -9,13 +9,16 @@ import Foundation
 
 class Token: Codable {
     let accessToken: String
+    let accessTokenExpiry: Date
     let refreshToken: String
-    let expiresIn: UInt
+    let refreshTokenExpiry: Date
     let userId: UInt
 
     var isAccessTokenExpired: Bool {
-        // TODO: fix 
-        // return access_token_expires_on < Date()
-        return false
+        return accessTokenExpiry < Date()
+    }
+
+    var isRefreshTokenExpired: Bool {
+        return refreshTokenExpiry < Date()
     }
 }

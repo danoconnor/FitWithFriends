@@ -72,8 +72,13 @@ class HttpConnector {
 
             if let data = data {
                 do {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+
                     let decoder = JSONDecoder()
                     decoder.keyDecodingStrategy = .convertFromSnakeCase
+                    decoder.dateDecodingStrategy = .formatted(dateFormatter)
+
                     let parsedData = try decoder.decode(T.self, from: data)
                     completion(.success(parsedData))
                 } catch {
