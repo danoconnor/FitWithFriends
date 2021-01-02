@@ -129,7 +129,6 @@ module.exports.saveToken = function (token, client, user) {
         token.refreshTokenExpiresAt,
         user.userid
     ]).then(function (result) {
-        // TODO return object with client: {id: clientId} and user: {id: userId} defined
         return {
             accessToken: token.accessToken,
             accessTokenExpiresAt: token.accessTokenExpiresAt,
@@ -138,7 +137,9 @@ module.exports.saveToken = function (token, client, user) {
             scope: token.scope,
             client: client,
             user: user,
-            userId: user.userid
+            userId: user.userid,
+            accessTokenExpiry: token.accessTokenExpiresAt,
+            refreshTokenExpiry: token.refreshTokenExpiresAt,
         }
     }).catch(function (error) {
         // TODO: log error
