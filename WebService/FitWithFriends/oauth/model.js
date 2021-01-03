@@ -65,9 +65,8 @@ module.exports.getClient = function (clientId, clientSecret) {
             }
 
             return {
-                clientId: oAuthClient.client_id,
-                clientSecret: oAuthClient.client_secret,
-                grants: ['password', 'authorization_code'], // the list of OAuth2 grant types that should be allowed
+                id: oAuthClient.client_id,
+                grants: ['password', 'refresh_token'], // the list of OAuth2 grant types that should be allowed
             };
         })
         .catch(function (error) {
@@ -83,7 +82,17 @@ module.exports.getClient = function (clientId, clientSecret) {
 module.exports.getRefreshToken = function (bearerToken) {
     return database.query('SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE refresh_token = $1', [bearerToken])
         .then(function (result) {
-            return result.length ? result[0] : false;
+            if (!result.length) {
+                return false;
+            }
+
+            const token = result[0];
+            return {
+                refreshToken: token.refresh_token,
+                refreshTokenExpiresAt: token.refresh_token_expires_on,
+                client: { id: token.client_id },
+                user: { id: token.user_id }
+            };
         });
 };
 
@@ -104,7 +113,9 @@ module.exports.getUser = function (username, password) {
             const salt = user.password_salt
             const expectedPasswordHash = cryptoHelpers.getHash(password, salt)
             if (expectedPasswordHash === user.password_hash) {
-                return user
+                return {
+                    id: user.userid
+                }
             } else {
                 // Password did not match
                 return false
@@ -124,10 +135,10 @@ module.exports.saveToken = function (token, client, user) {
     return database.query('INSERT INTO oauth_tokens(access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4, $5, $6)', [
         token.accessToken,
         token.accessTokenExpiresAt,
-        client.clientId,
+        client.id,
         token.refreshToken,
         token.refreshTokenExpiresAt,
-        user.userid
+        user.id
     ]).then(function (result) {
         return {
             accessToken: token.accessToken,
@@ -146,3 +157,13 @@ module.exports.saveToken = function (token, client, user) {
         return false
     });
 };
+
+module.exports.revokeToken = function (token) {
+    return database.query('DELETE FROM oauth_tokens WHERE refresh_token = $1', [
+        token.refreshToken
+    ]).then(function (result) {
+        return true;
+    }).catch(function (error) {
+        return false;
+    });
+}
