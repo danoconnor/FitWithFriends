@@ -148,7 +148,7 @@ module.exports.saveToken = function (token, client, user) {
             scope: token.scope,
             client: client,
             user: user,
-            userId: user.userid,
+            userId: user.id,
             accessTokenExpiry: token.accessTokenExpiresAt,
             refreshTokenExpiry: token.refreshTokenExpiresAt,
         }
