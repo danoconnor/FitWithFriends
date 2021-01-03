@@ -51,6 +51,8 @@ router.post('/workout', function (req, res) {
     const startDate = req.body['startDate'];
     const duration = req.body['duration'];
     const caloriesBurned = req.body['caloriesBurned'];
+    const activityType = req.body['activityTypeRawValue'];
+    const distance = req.body['distance'];
 
     // TODO: Other vars may be 0 - how to check that those are present?
     if (!startDate) {
@@ -59,9 +61,9 @@ router.post('/workout', function (req, res) {
 
     // We will try to avoid sending duplicate data from the client, but as a backup
     // the workout_data table has all four columns set as the primary key so duplicate data cannot be entered
-    database.query('INSERT INTO workout_data(user_id, start_date, duration, calories_burned) \
-                    VALUES ($1, $2, $3, $4) \
-                    ON CONFLICT (user_id, start_date, duration, calories_burned) DO NOTHING', [res.locals.oauth.token.user.id, startDate, duration, caloriesBurned])
+    database.query('INSERT INTO workout_data(user_id, start_date, duration, calories_burned, activity_type, distance) \
+                    VALUES ($1, $2, $3, $4, $5, $6) \
+                    ON CONFLICT (user_id, start_date, duration, calories_burned) DO NOTHING', [res.locals.oauth.token.user.id, startDate, duration, caloriesBurned, activityType, distance])
         .then(function (result) {
             res.sendStatus(200);
         })
