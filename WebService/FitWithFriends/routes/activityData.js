@@ -19,12 +19,13 @@ router.post('/dailySummary', function (req, res) {
         res.sendStatus(400);
     }
 
-    // This is a hack to make the point calculation query easier
-    // No extra points are awarded for going over the goal in any category, so if the user is over the goal we will record the real value as equal to the goal during insertion
-    caloriesBurned = Math.min(caloriesBurned, caloriesGoal);
-    exerciseTime = Math.min(exerciseTime, exerciseTimeGoal);
-    moveTime = Math.min(moveTime, moveTimeGoal);
-    standTime = Math.min(standTime, standTimeGoal);
+    // HACK HACK HACK
+    // Users will only receive credit for reaching up to 200% of their goal for each category and any progress over that is not counted
+    // We'll enforce this during insertion into the database to make the point calculation query easier
+    caloriesBurned = Math.min(caloriesBurned, caloriesGoal * 2);
+    exerciseTime = Math.min(exerciseTime, exerciseTimeGoal * 2);
+    moveTime = Math.min(moveTime, moveTimeGoal * 2);
+    standTime = Math.min(standTime, standTimeGoal * 2);
 
     // Another hack to make point calculation easier
     // The point calculation query will fail due to a divide by zero error if a goal is zero

@@ -30,6 +30,7 @@ struct CreateAccountView: View {
             TextField("Choose a username to login with", text: $username)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                .disableAutocorrection(true)
 
             SecureField("Set your password", text: $password)
                 .padding()
