@@ -13,7 +13,6 @@ public class CompetitionManager: ObservableObject {
     private let competitionService: CompetitionService
 
     private var loginStateCancellable: AnyCancellable?
-    private let competitionOverviewsQueue: DispatchQueue
 
     @Published var competitionOverviews: [UInt: CompetitionOverview]
 
@@ -23,9 +22,8 @@ public class CompetitionManager: ObservableObject {
         self.competitionService = competitionService
 
         competitionOverviews = [:]
-        competitionOverviewsQueue = DispatchQueue(label: "CompetitionOverviewsQueue")
 
-        loginStateCancellable =  authenticationManager.$loginState.sink { [weak self] state in
+        loginStateCancellable = authenticationManager.$loginState.sink { [weak self] state in
             if state == .loggedIn {
                 // When the user logs in we want to begin fetching the latest state of their competitions
                 self?.refreshCompetitionOverviews()
@@ -52,8 +50,13 @@ public class CompetitionManager: ObservableObject {
                 self.competitionService.getCompetitionOverview(competitionId: competitionId) { competitionOverviewResult in
                     switch competitionOverviewResult {
                     case let .success(overview):
-                        self.competitionOverviewsQueue.async {
+                        DispatchQueue.main.async {
                             self.competitionOverviews[competitionId] = overview
+                            
+                            // Test code
+                            for i in 1 ... 10 {
+                                self.competitionOverviews[competitionId + UInt(i)] = overview
+                            }
                         }
                     case let .failure(error):
                         Logger.traceError(message: "Failed to get overview for competition \(competitionId)", error: error)

@@ -7,12 +7,26 @@
 
 import Foundation
 
-class CompetitionOverview: Codable {
+class CompetitionOverview: Codable, Identifiable {
+    // MARK: Codable
+
     let competitionId: UInt
     let competitionName: String
     let competitionStart: Date
     let competitionEnd: Date
     let currentResults: [UserCompetitionPoints]
+
+    enum CodingKeys: String, CodingKey {
+        case competitionId
+        case competitionName
+        case competitionStart
+        case competitionEnd
+        case currentResults
+    }
+
+    // MARK: Identifiable
+
+    let id = UUID()
 }
 
 class UserCompetitionPoints: Codable {
