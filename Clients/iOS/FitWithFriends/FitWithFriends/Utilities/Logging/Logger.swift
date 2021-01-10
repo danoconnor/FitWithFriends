@@ -17,7 +17,7 @@ class Logger {
         let logFileManager = DDLogFileManagerDefault()
         logFileManager.maximumNumberOfLogFiles = 2
 
-        let fileLogger = DDFileLogger()
+        let fileLogger = DDFileLogger(logFileManager: logFileManager)
         fileLogger.logFormatter = logFormatter
         fileLogger.maximumFileSize = 3_000_000 // 3 MB
         DDLog.sharedInstance.add(fileLogger)
@@ -30,15 +30,19 @@ class Logger {
     }
 
     static func getFileLogs() -> String {
-        var logs = ""
-        let logFileManager = DDLogFileManagerDefault()
+        guard let fileLogger = DDLog.sharedInstance.allLoggers.first(where: { $0 is DDFileLogger }) as? DDFileLogger else {
+            return "No file logger registered"
+        }
 
-        for logFilePath in logFileManager.sortedLogFilePaths {
-            if let logFileData = FileManager.default.contents(atPath: logFilePath),
-                let logFileString = String(data: logFileData, encoding: .utf8) {
-                // The sorted file paths are given to us with the most recent first
-                // Our log file puts the oldest logs at the beginning of the file
-                logs = logFileString + logs
+        var logs = ""
+        fileLogger.loggerQueue.sync {
+            for logFilePath in fileLogger.logFileManager.sortedLogFilePaths {
+                if let logFileData = FileManager.default.contents(atPath: logFilePath),
+                    let logFileString = String(data: logFileData, encoding: .utf8) {
+                    // The sorted file paths are given to us with the most recent first
+                    // Our log file puts the oldest logs at the beginning of the file
+                    logs = logFileString + logs
+                }
             }
         }
 

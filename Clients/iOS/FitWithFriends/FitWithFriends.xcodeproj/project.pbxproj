@@ -44,6 +44,9 @@
 		0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADAE256AD88100EB1B60 /* RequestConstants.swift */; };
 		0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADBE256AE2FB00EB1B60 /* ObjectGraph.swift */; };
 		0B9BADC4256AE44600EB1B60 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */; };
+		0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72425ABAB4F0064CE5C /* ShakeGestureHandler.swift */; };
+		0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72725ABACD70064CE5C /* EmailUtility.swift */; };
+		0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */; };
 		0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */; };
 		0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */; };
 		0BBD788D259A4A9400E08EB2 /* ServiceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */; };
@@ -102,6 +105,9 @@
 		0B9BADAE256AD88100EB1B60 /* RequestConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestConstants.swift; sourceTree = "<group>"; };
 		0B9BADBE256AE2FB00EB1B60 /* ObjectGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectGraph.swift; sourceTree = "<group>"; };
 		0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		0BABC72425ABAB4F0064CE5C /* ShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeGestureHandler.swift; sourceTree = "<group>"; };
+		0BABC72725ABACD70064CE5C /* EmailUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUtility.swift; sourceTree = "<group>"; };
+		0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+Extensions.swift"; sourceTree = "<group>"; };
 		0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Extension.swift"; sourceTree = "<group>"; };
 		0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverview.swift; sourceTree = "<group>"; };
 		0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceBase.swift; sourceTree = "<group>"; };
@@ -251,6 +257,8 @@
 			children = (
 				0B99FBFE256A09F500673133 /* Logger.swift */,
 				0B99FC05256A0BA800673133 /* LogFormatter.swift */,
+				0BABC72425ABAB4F0064CE5C /* ShakeGestureHandler.swift */,
+				0BABC72725ABACD70064CE5C /* EmailUtility.swift */,
 			);
 			path = Logging;
 			sourceTree = "<group>";
@@ -262,6 +270,7 @@
 				0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */,
 				0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */,
 				0BBD78AF25A0335100E08EB2 /* DateFormatter+Extensions.swift */,
+				0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -536,7 +545,9 @@
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
 				0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */,
 				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
+				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
 				0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */,
+				0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */,
 				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
 				0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */,
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
@@ -552,6 +563,7 @@
 				0B99FC06256A0BA800673133 /* LogFormatter.swift in Sources */,
 				0BEF52DA25A2C93100B3D6BE /* CompetitionSummaryView.swift in Sources */,
 				0B35972925704651006D956A /* PushNotificationManager.swift in Sources */,
+				0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */,
 				0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */,
 				0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */,
 				0B35972C257046FC006D956A /* AppDelegate.swift in Sources */,

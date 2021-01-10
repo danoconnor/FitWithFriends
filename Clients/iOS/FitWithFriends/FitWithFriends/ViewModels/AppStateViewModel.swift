@@ -15,15 +15,13 @@ class AppStateViewModel: ObservableObject {
 
     init() {
         loginCancellable = ObjectGraph.sharedInstance.authenticationManager.$loginState
-            .receive(on: DispatchQueue.global())
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
-                DispatchQueue.main.async {
-                    switch value {
-                    case .loggedIn:
-                        self?.isLoggedIn = true
-                    default:
-                        self?.isLoggedIn = false
-                    }
+                switch value {
+                case .loggedIn:
+                    self?.isLoggedIn = true
+                default:
+                    self?.isLoggedIn = false
                 }
             }
     }

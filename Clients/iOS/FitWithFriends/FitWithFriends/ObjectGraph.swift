@@ -15,11 +15,13 @@ class ObjectGraph {
     let authenticationService: AuthenticationService
     let competitionManager: CompetitionManager
     let competitionService: CompetitionService
+    let emailUtility: EmailUtility
     let healthKitManager: HealthKitManager
     let httpConnector: HttpConnector
     let keychainUtilities: KeychainUtilities
     let pushNotificationManager: PushNotificationManager
     let pushNotificationService: PushNotificationService
+    let shakeGestureHandler: ShakeGestureHandler
     let tokenManager: TokenManager
     let userDefaults: UserDefaults
     let userService: UserService
@@ -28,7 +30,9 @@ class ObjectGraph {
         httpConnector = HttpConnector()
         keychainUtilities = KeychainUtilities()
         userDefaults = UserDefaults.standard
+        emailUtility = EmailUtility()
 
+        shakeGestureHandler = ShakeGestureHandler(emailUtility: emailUtility)
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
 
         activityDataService = ActivityDataService(httpConnector: httpConnector, tokenManager: tokenManager)
