@@ -40,7 +40,7 @@ public class KeychainUtilities {
 
         do {
             let unarchiver = try NSKeyedUnarchiver(forReadingFrom: returnedData)
-            let unarchivedData = unarchiver.decodeObject(forKey: account)
+            let unarchivedData = unarchiver.decodeObject()
             unarchiver.finishDecoding()
 
             guard let dataToReturn = unarchivedData else {
@@ -67,7 +67,7 @@ public class KeychainUtilities {
 
         // Transform the given object into a standard format to write to the keychain
         let archiver = NSKeyedArchiver(requiringSecureCoding: true)
-        archiver.encode(data, forKey: account)
+        archiver.encodeRootObject(data)
         archiver.finishEncoding()
         let encodedData = archiver.encodedData
 
@@ -80,7 +80,7 @@ public class KeychainUtilities {
         if status == errSecDuplicateItem, updateExistingItemIfNecessary {
             // Adding a new item failed, try to update the existing item instead
             // The second parameter is the attributes that we want to update, in this case the data attribute
-            status = SecItemUpdate(queryDictionary as CFDictionary, [kSecValueData: data] as CFDictionary)
+            status = SecItemUpdate(queryDictionary as CFDictionary, [kSecValueData: encodedData] as CFDictionary)
         }
 
         if status != errSecSuccess {

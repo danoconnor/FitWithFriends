@@ -84,8 +84,7 @@ class AuthenticationManager: ObservableObject {
                 loginState = .inProgress
                 refreshToken(token: token) { _ in }
             default:
-                loggedInUserId = nil
-                loginState = .notLoggedIn
+                logout()
             }
         }
     }
