@@ -18,11 +18,6 @@ router.post('/register', function (req, res) {
         .then(function (result) {
             res.sendStatus(200);
         })
-        .catch(function (error) {
-            // TODO: log error
-            res.sendStatus(500);
-            return;
-        });
 });
 
 module.exports = router;

@@ -15,6 +15,13 @@ struct LoggedInContentView: View {
     var body: some View {
         VStack {
             CompetitionSummaryListView()
+
+            Button(action: {
+                ObjectGraph.sharedInstance.authenticationManager.logout()
+            }, label: {
+                Text("Logout")
+            })
+            .padding()
         }
         .sheet(isPresented: $permissionPromptViewModel.shouldShowPermissionPrompt, content: {
             PermissionPromptView(permissionPromptViewModel: permissionPromptViewModel)

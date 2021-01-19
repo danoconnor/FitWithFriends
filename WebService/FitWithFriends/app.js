@@ -13,8 +13,10 @@ var oauth = require('./routes/auth');
 const competitions = require('./routes/competitions');
 const pushNotification = require('./routes/pushNotification');
 const activityData = require('./routes/activityData');
+const globalConfig = require('./utilities/globalConfig')
 
-const oauthServer = require('./oauth/server')
+const oauthServer = require('./oauth/server');
+const config = require('./utilities/globalConfig');
 
 var app = express();
 
@@ -46,25 +48,13 @@ app.use(function (req, res, next) {
 
 // error handlers
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function (err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
 app.use(function (err, req, res, next) {
     res.status(err.status || 500);
+    var errorToSend = globalConfig.sendErrorDetails ? err : {};
+
     res.render('error', {
         message: err.message,
-        error: {}
+        error: errorToSend
     });
 });
 

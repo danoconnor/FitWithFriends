@@ -26,11 +26,6 @@ router.get('/:userId', oauthServer.authenticate(), function (req, res) {
 
             res.json(result);
         })
-        .catch(function (error) {
-            // TODO: log error
-            res.sendStatus(500);
-            return;
-        });
 });
 
 // Create user endpoint
@@ -72,17 +67,7 @@ router.post('/', function (req, res) {
                         userId: result[0].userid
                     });
                 })
-                .catch(function (error) {
-                    // TODO: log error
-                    res.sendStatus(500);
-                    return;
-                });
         })
-        .catch(function (error) {
-            // TODO: log error
-            res.sendStatus(500);
-            return;
-        });
 });
 
 module.exports = router;

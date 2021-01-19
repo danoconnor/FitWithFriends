@@ -89,17 +89,7 @@ router.post('/join', function (req, res) {
                 .then(function (result) {
                     res.sendStatus(200);
                 })
-                .catch(function (error) {
-                    // TODO: log error
-                    res.sendStatus(500);
-                    return;
-                });
         })
-        .catch(function (error) {
-            // TODO: log error
-            res.sendStatus(500);
-            return;
-        });
 });
 
 // Returns an overview of the given competition that contains a list of users and their current points for the competition
@@ -171,17 +161,7 @@ router.get('/:competitionId/overview', function (req, res) {
                     'currentResults': result
                 });
             })
-            .catch(function (error) {
-                // TODO: log error
-                res.sendStatus(500);
-                return;
-            });
     })
-    .catch(function (error) {
-        // TODO: log error
-        res.sendStatus(500);
-        return;
-    });
 });
 
 module.exports = router;
