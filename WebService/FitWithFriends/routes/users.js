@@ -36,7 +36,7 @@ router.post('/', function (req, res) {
     const username = req.body['username'];
     const password = req.body['password'];
 
-    if (password.length <= 8 || username.length <= 6) {
+    if (password.length < 8 || username.length < 6) {
         res.sendStatus(400);
         return;
     }
