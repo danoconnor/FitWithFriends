@@ -30,8 +30,12 @@ class CompetitionOverview: Codable, Identifiable {
 }
 
 class UserCompetitionPoints: Codable {
-    // The user's display name
+    let userId: UInt
     let displayName: String
     let workoutPoints: Double
     let activityPoints: Double
+
+    var totalPoints: Double {
+        workoutPoints + activityPoints
+    }
 }

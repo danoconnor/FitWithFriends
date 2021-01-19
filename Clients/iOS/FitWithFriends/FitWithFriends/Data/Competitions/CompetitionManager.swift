@@ -52,11 +52,6 @@ public class CompetitionManager: ObservableObject {
                     case let .success(overview):
                         DispatchQueue.main.async {
                             self.competitionOverviews[competitionId] = overview
-                            
-                            // Test code
-                            for i in 1 ... 10 {
-                                self.competitionOverviews[competitionId + UInt(i)] = overview
-                            }
                         }
                     case let .failure(error):
                         Logger.traceError(message: "Failed to get overview for competition \(competitionId)", error: error)

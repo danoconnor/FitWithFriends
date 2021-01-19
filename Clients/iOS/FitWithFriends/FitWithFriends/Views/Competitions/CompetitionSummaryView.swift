@@ -8,40 +8,55 @@
 import SwiftUI
 
 struct CompetitionSummaryView: View {
-    //let competitionOverview: CompetitionOverview
+    let competitionSummaryViewModel: CompetitionSummaryViewModel
 
     var body: some View {
         VStack {
-            Text("Competition name")
+            Text(competitionSummaryViewModel.competitionName)
                 .font(.title2)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading)
                 .padding(.trailing)
                 .padding(.top)
 
-            Text("3rd")
-                .font(.largeTitle)
-                .background(Circle().fill(Color.green).frame(width: 200, height: 200))
+            Text(competitionSummaryViewModel.daysLeft)
+                .font(.subheadline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading)
+                .padding(.trailing)
 
-            ZStack {
-                Circle()
-                    .fill(Color.red)
-                    .padding(20)
-                    .frame(width: 200, height: 200)
+            HStack {
+                ZStack {
+                    Circle()
+                        .fill(competitionSummaryViewModel.userPositionColor)
+                        .frame(width: 50, height: 50)
 
-                Text("3rd")
-                    .font(.system(size: 75))
+                    Text(competitionSummaryViewModel.userPosition.description)
+                        .font(.largeTitle)
+                }
+
+                VStack {
+                    ForEach(competitionSummaryViewModel.leaderBoard, id: \.self) { result in
+                        HStack {
+                            Text(result)
+                            Spacer()
+                        }
+                    }
+                }
+                .padding(.leading)
             }
-
+            .padding(.top, 2)
+            .padding(.leading)
+            .padding(.trailing)
 
             Spacer()
         }
-        .background(Color.secondary)
+        .cornerRadius(/*@START_MENU_TOKEN@*/3.0/*@END_MENU_TOKEN@*/)
     }
 }
 
-struct CompetitionSummaryView_Previews: PreviewProvider {
-    static var previews: some View {
-        CompetitionSummaryView()
-    }
-}
+//struct CompetitionSummaryView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CompetitionSummaryView()
+//    }
+//}
