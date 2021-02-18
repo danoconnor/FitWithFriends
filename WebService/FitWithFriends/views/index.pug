@@ -5,4 +5,22 @@ block content
   p Welcome to #{title}
   a(href='https://oddtest.herokuapp.com') oddtest home <br><br>
   a(href='https://oddtest.herokuapp.com/odd/test.html') oddtest test
-  
+  <br><br><br><br>
+  p URL Length Test
+  input(type="number", id="url_length", value=1)
+  <br>
+  button(onclick='openCP()') Open CP
+  script.
+    function openCP() {
+      var baseUrl = "companyportal://enrollment?LocalDeviceId="
+      var urlLength = document.getElementById("url_length").value
+
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      var charactersLength = characters.length;
+      var url = baseUrl
+      for (var i = 0; i < urlLength; i++) {
+        url += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+
+      window.open(url)
+    }
