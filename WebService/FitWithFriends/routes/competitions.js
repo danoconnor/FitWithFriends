@@ -12,11 +12,6 @@ router.get('/', function (req, res) {
             const competitionIds = result.map(obj => parseInt(obj.competitionid));
             res.json(competitionIds);
         })
-        .catch(function (error) {
-            // TODO: log error
-            res.sendStatus(500);
-            return;
-        });
 });
 
 // Create new competition. The currently authenticated user will become the admin for the competition.
@@ -53,17 +48,7 @@ router.post('/', function (req, res) {
                         'accessCode': accessToken
                     });
                 })
-                .catch(function (error) {
-                    // TODO: log error
-                    res.sendStatus(500);
-                    return;
-                });
         })
-        .catch(function (error) {
-            // TODO: log error
-            res.sendStatus(500);
-            return;
-        });
 });
 
 // Join existing competition endpoint - adds the currently authenticated user to the competition that matches the given token

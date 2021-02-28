@@ -42,10 +42,6 @@ router.post('/dailySummary', function (req, res) {
         .then(function (result) {
             res.sendStatus(200);
         })
-        .catch(function (error) {
-            res.sendStatus(500);
-            return;
-        });
 });
 
 router.post('/workout', function (req, res) {
@@ -68,10 +64,6 @@ router.post('/workout', function (req, res) {
         .then(function (result) {
             res.sendStatus(200);
         })
-        .catch(function (error) {
-            res.sendStatus(500);
-            return;
-        });
 });
 
 module.exports = router;

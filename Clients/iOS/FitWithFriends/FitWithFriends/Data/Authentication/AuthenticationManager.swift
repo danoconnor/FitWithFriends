@@ -9,13 +9,17 @@ import Combine
 import Foundation
 
 class AuthenticationManager: ObservableObject {
-    enum LoginState {
+    enum LoginState: String {
         case notLoggedIn
         case inProgress
         case loggedIn
     }
 
-    @Published var loginState = LoginState.notLoggedIn
+    @Published var loginState = LoginState.notLoggedIn {
+        didSet {
+            Logger.traceInfo(message: "Login state changed: \(loginState)")
+        }
+    }
 
     private let authenticationService: AuthenticationService
     private let tokenManager: TokenManager
@@ -82,7 +86,13 @@ class AuthenticationManager: ObservableObject {
             switch error {
             case let .expired(token: token):
                 loginState = .inProgress
-                refreshToken(token: token) { _ in }
+                refreshToken(token: token) { error in
+                    if let error = error {
+                        Logger.traceError(message: "Failed to login using refresh token", error: error)
+                    } else {
+                        Logger.traceInfo(message: "Successfully logged in using refresh token")
+                    }
+                }
             default:
                 logout()
             }
