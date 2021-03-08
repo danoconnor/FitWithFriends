@@ -22,7 +22,6 @@ module.exports.saveAuthorizationCode = function (token, client, user) {
         return result.length ? result[0] : false; // TODO return object with client: {id: clientId} and user: {id: userId} defined
     })
     .catch(function (error) {
-        // TODO: log error
         return false
     });
 };
@@ -45,7 +44,6 @@ module.exports.getAccessToken = function (bearerToken) {
             };
         })
         .catch(function (error) {
-            // TODO: log error
             return false
         });
 };
@@ -70,7 +68,6 @@ module.exports.getClient = function (clientId, clientSecret) {
             };
         })
         .catch(function (error) {
-            // TODO: log error
             return false
         });
 };
@@ -93,6 +90,9 @@ module.exports.getRefreshToken = function (bearerToken) {
                 client: { id: token.client_id },
                 user: { id: token.user_id }
             };
+        })
+        .catch(function (error) {
+            return false
         });
 };
 
@@ -122,7 +122,6 @@ module.exports.getUser = function (username, password) {
             }
         })
         .catch(function (error) {
-            // TODO: log error
             return false
         });
 };
@@ -153,7 +152,6 @@ module.exports.saveToken = function (token, client, user) {
             refreshTokenExpiry: token.refreshTokenExpiresAt,
         }
     }).catch(function (error) {
-        // TODO: log error
         return false
     });
 };

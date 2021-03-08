@@ -19,35 +19,37 @@ struct CompetitionSummaryView: View {
                 .padding(.trailing)
                 .padding(.top)
 
-            Text(competitionSummaryViewModel.daysLeft)
+            Text(competitionSummaryViewModel.status)
                 .font(.subheadline)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading)
                 .padding(.trailing)
 
-            HStack {
-                ZStack {
-                    Circle()
-                        .fill(competitionSummaryViewModel.userPositionColor)
-                        .frame(width: 50, height: 50)
+            if competitionSummaryViewModel.showScoreboard {
+                HStack {
+                    ZStack {
+                        Circle()
+                            .fill(competitionSummaryViewModel.userPositionColor)
+                            .frame(width: 50, height: 50)
 
-                    Text(competitionSummaryViewModel.userPosition.description)
-                        .font(.largeTitle)
-                }
+                        Text(competitionSummaryViewModel.userPosition.description)
+                            .font(.largeTitle)
+                    }
 
-                VStack {
-                    ForEach(competitionSummaryViewModel.leaderBoard, id: \.self) { result in
-                        HStack {
-                            Text(result)
-                            Spacer()
+                    VStack {
+                        ForEach(competitionSummaryViewModel.leaderBoard, id: \.self) { result in
+                            HStack {
+                                Text(result)
+                                Spacer()
+                            }
                         }
                     }
+                    .padding(.leading)
                 }
+                .padding(.top, 2)
                 .padding(.leading)
+                .padding(.trailing)
             }
-            .padding(.top, 2)
-            .padding(.leading)
-            .padding(.trailing)
 
             Spacer()
         }

@@ -19,6 +19,8 @@
 		0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35977A25715567006D956A /* LoggedInContentView.swift */; };
 		0B592C2725715B2C004F68AB /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2625715B2C004F68AB /* Mutex.swift */; };
 		0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */; };
+		0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E66E25EB356100189702 /* CreateCompetitionView.swift */; };
+		0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */; };
 		0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6752D925715ED80032835D /* PermissionPromptView.swift */; };
 		0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B67532925745CF60032835D /* ActivitySummary.swift */; };
 		0B67532E2574686D0032835D /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B67532D2574686D0032835D /* Workout.swift */; };
@@ -67,6 +69,7 @@
 		0BEF52DA25A2C93100B3D6BE /* CompetitionSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEF52D925A2C93100B3D6BE /* CompetitionSummaryView.swift */; };
 		0BF759C525B67CD00098AE13 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0BF759C425B67CD00098AE13 /* Colors.xcassets */; };
 		0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */; };
+		0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +85,8 @@
 		0B35977A25715567006D956A /* LoggedInContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInContentView.swift; sourceTree = "<group>"; };
 		0B592C2625715B2C004F68AB /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
 		0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptViewModel.swift; sourceTree = "<group>"; };
+		0B62E66E25EB356100189702 /* CreateCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionView.swift; sourceTree = "<group>"; };
+		0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionViewModel.swift; sourceTree = "<group>"; };
 		0B6752D925715ED80032835D /* PermissionPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptView.swift; sourceTree = "<group>"; };
 		0B67532925745CF60032835D /* ActivitySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySummary.swift; sourceTree = "<group>"; };
 		0B67532D2574686D0032835D /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -132,6 +137,7 @@
 		0BEF52D925A2C93100B3D6BE /* CompetitionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionSummaryView.swift; sourceTree = "<group>"; };
 		0BF759C425B67CD00098AE13 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageSheetViewModel.swift; sourceTree = "<group>"; };
 		471E2A9E1AD1822300B03A10 /* Pods-FitWithFriends.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FitWithFriends.release.xcconfig"; path = "Target Support Files/Pods-FitWithFriends/Pods-FitWithFriends.release.xcconfig"; sourceTree = "<group>"; };
 		5B89CF2BFD681C5843F6F837 /* Pods-FitWithFriends.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FitWithFriends.debug.xcconfig"; path = "Target Support Files/Pods-FitWithFriends/Pods-FitWithFriends.debug.xcconfig"; sourceTree = "<group>"; };
 		D85632C16073505DA84F856F /* Pods_FitWithFriends.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FitWithFriends.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -382,6 +388,7 @@
 			children = (
 				0BEF52D625A2C5F400B3D6BE /* CompetitionSummaryListView.swift */,
 				0BEF52D925A2C93100B3D6BE /* CompetitionSummaryView.swift */,
+				0B62E66E25EB356100189702 /* CreateCompetitionView.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -390,6 +397,7 @@
 			isa = PBXGroup;
 			children = (
 				0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */,
+				0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -407,6 +415,7 @@
 			isa = PBXGroup;
 			children = (
 				0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */,
+				0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -559,8 +568,10 @@
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
 				0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */,
+				0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */,
 				0B359721256C731A006D956A /* MainContentView.swift in Sources */,
 				0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */,
+				0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */,
 				0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */,
 				0B3597782571502A006D956A /* HealthKitManager.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
@@ -579,6 +590,7 @@
 				0BEF52D725A2C5F400B3D6BE /* CompetitionSummaryListView.swift in Sources */,
 				0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */,
 				0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */,
+				0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */,
 				0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */,
 				0B99FC31256A2E7900673133 /* User.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,

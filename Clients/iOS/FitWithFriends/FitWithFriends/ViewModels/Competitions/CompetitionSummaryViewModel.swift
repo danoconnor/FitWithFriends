@@ -10,9 +10,10 @@ import SwiftUI
 
 class CompetitionSummaryViewModel {
     public let competitionName: String
-    public let daysLeft: String
+    public let status: String
     public let userPosition: Int
     public let userPositionColor: Color
+    public let showScoreboard: Bool
     private(set) public var leaderBoard: [String]
 
     private let competitionOverview: CompetitionOverview
@@ -22,22 +23,30 @@ class CompetitionSummaryViewModel {
 
         competitionName = competitionOverview.competitionName
 
-        let days = competitionOverview.competitionEnd.timeIntervalSince(Date()).xtDays
-        if days < 0 {
-            daysLeft = "Competition ended"
-        }
-        else if days == 0 {
-            daysLeft = "Last day!"
-        } else if days == 1 {
-            daysLeft = "1 day remaining"
+        if competitionOverview.competitionStart > Date() {
+            let days = Date().timeIntervalSince(competitionOverview.competitionStart).xtDays
+            if days <= 1 {
+                status = "Competition starts tomorrow!"
+            } else {
+                status = "Competition starts in \(days) days"
+            }
         } else {
-            daysLeft = "\(days) days remaining"
+            let days = competitionOverview.competitionEnd.timeIntervalSince(Date()).xtDays
+            if days < 0 {
+                status = "Competition ended"
+            } else if days == 0 {
+                status = "Last day!"
+            } else if days == 1 {
+                status = "1 day remaining"
+            } else {
+                status = "\(days) days remaining"
+            }
         }
 
         let orderedResults = competitionOverview.currentResults.sorted { $0.totalPoints > $1.totalPoints }
+        showScoreboard = orderedResults.count > 0
 
-        // Force unwrap here since the logged in user must be a member of any competiion shown
-        let userPositionIndex = orderedResults.firstIndex { $0.userId == authenticationManager.loggedInUserId }!
+        let userPositionIndex = orderedResults.firstIndex { $0.userId == authenticationManager.loggedInUserId } ?? orderedResults.count - 1
         userPosition = userPositionIndex + 1
 
         switch userPosition {

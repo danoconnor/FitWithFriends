@@ -11,7 +11,7 @@ struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
 
-    @ObservedObject private var viewModel = LoginViewModel()
+    @ObservedObject private var viewModel = LoginViewModel(authenticationManager: ObjectGraph.sharedInstance.authenticationManager)
 
     var body: some View {
         VStack {

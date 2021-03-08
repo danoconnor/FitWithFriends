@@ -8,13 +8,28 @@
 import SwiftUI
 
 struct LoggedInContentView: View {
-    @ObservedObject private var permissionPromptViewModel =
-        PermissionPromptViewModel(healthKitManager: ObjectGraph.sharedInstance.healthKitManager,
-                                  pushNotificationManager: ObjectGraph.sharedInstance.pushNotificationManager)
+    @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
+
+    init() {
+        homepageSheetViewModel = HomepageSheetViewModel()
+
+        // Check if we need to show the permission prompt
+        if ObjectGraph.sharedInstance.healthKitManager.shouldPromptUser ||
+            ObjectGraph.sharedInstance.pushNotificationManager.shouldPromptUser {
+            homepageSheetViewModel.updateState(sheet: .permissionPrompt, state: true)
+        }
+    }
 
     var body: some View {
         VStack {
             CompetitionSummaryListView()
+
+            Button(action: {
+                homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+            }, label: {
+                Text("New competition")
+            })
+            .padding()
 
             Button(action: {
                 ObjectGraph.sharedInstance.authenticationManager.logout()
@@ -23,8 +38,15 @@ struct LoggedInContentView: View {
             })
             .padding()
         }
-        .sheet(isPresented: $permissionPromptViewModel.shouldShowPermissionPrompt, content: {
-            PermissionPromptView(permissionPromptViewModel: permissionPromptViewModel)
+        .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
+            switch homepageSheetViewModel.sheetToShow {
+            case .createCompetition:
+                CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel)
+            case .permissionPrompt:
+                PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel)
+            default:
+                Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
+            }
         })
     }
 }

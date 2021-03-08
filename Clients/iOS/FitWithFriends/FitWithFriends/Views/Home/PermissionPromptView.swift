@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct PermissionPromptView: View {
-    @ObservedObject var permissionPromptViewModel: PermissionPromptViewModel
+    private let permissionPromptViewModel: PermissionPromptViewModel
+
+    init(homepageSheetViewModel: HomepageSheetViewModel) {
+        permissionPromptViewModel = PermissionPromptViewModel(healthKitManager: ObjectGraph.sharedInstance.healthKitManager,
+                                                              homepageSheetViewModel: homepageSheetViewModel,
+                                                              pushNotificationManager: ObjectGraph.sharedInstance.pushNotificationManager)
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -74,7 +80,7 @@ struct PermissionPromptView: View {
                     .font(.title2)
 
                     Button("Not now") {
-                        permissionPromptViewModel.shouldShowPermissionPrompt = false
+                        permissionPromptViewModel.dismiss()
                     }
                     .font(.footnote)
                     .padding(.top, 5)
@@ -88,6 +94,6 @@ struct PermissionPromptView: View {
 
 struct PermissionPromptView_Previews: PreviewProvider {
     static var previews: some View {
-        PermissionPromptView(permissionPromptViewModel: PermissionPromptViewModel(healthKitManager: ObjectGraph.sharedInstance.healthKitManager, pushNotificationManager: ObjectGraph.sharedInstance.pushNotificationManager))
+        PermissionPromptView(homepageSheetViewModel: HomepageSheetViewModel())
     }
 }

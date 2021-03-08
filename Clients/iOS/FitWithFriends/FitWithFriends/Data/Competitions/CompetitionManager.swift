@@ -31,6 +31,22 @@ public class CompetitionManager: ObservableObject {
         }
     }
 
+    func createCompetition(startDate: Date, endDate: Date, competitionName: String, workoutsOnly: Bool, completion: @escaping (Error?) -> Void) {
+        competitionService.createCompetition(startDate: startDate,
+                                             endDate: endDate,
+                                             competitionName: competitionName,
+                                             workoutsOnly: workoutsOnly) { [weak self] result in
+            if let error = result.xtError {
+                Logger.traceError(message: "Failed to create competition", error: error)
+            } else {
+                Logger.traceInfo(message: "Successfully created competition")
+            }
+
+            self?.refreshCompetitionOverviews()
+            completion(result.xtError)
+        }
+    }
+
     private func refreshCompetitionOverviews() {
         guard let loggedInUserId = authenticationManager.loggedInUserId else {
             Logger.traceWarning(message: "Tried to refresh competition overviews without a logged in user ID")

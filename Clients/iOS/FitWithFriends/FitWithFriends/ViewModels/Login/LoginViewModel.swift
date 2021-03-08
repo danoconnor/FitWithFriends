@@ -11,9 +11,15 @@ import Foundation
 class LoginViewModel: ObservableObject {
     @Published var state: ViewOperationState = .notStarted
 
+    private let authenticationManager: AuthenticationManager
+
+    init(authenticationManager: AuthenticationManager) {
+        self.authenticationManager = authenticationManager
+    }
+
     func login(username: String, password: String) {
         setState(.inProgress)
-        ObjectGraph.sharedInstance.authenticationManager.login(username: username, password: password) { [weak self] error in
+        authenticationManager.login(username: username, password: password) { [weak self] error in
             if let error = error {
                 Logger.traceError(message: "Login failed", error: error)
                 self?.setState(.failed(errorMessage: "Login failed. Please try again"))
