@@ -7,7 +7,20 @@
 
 import Foundation
 
-enum TokenError: Error {
+enum TokenError: LocalizedError, CustomStringConvertible {
     case expired(token: Token)
     case notFound
+
+    var errorDescription: String? {
+        return description
+    }
+
+    var description: String {
+        switch self {
+        case .expired:
+            return "Expired token"
+        case .notFound:
+            return "Token not found"
+        }
+    }
 }

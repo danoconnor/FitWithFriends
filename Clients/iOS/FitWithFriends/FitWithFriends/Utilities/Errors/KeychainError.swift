@@ -7,12 +7,16 @@
 
 import Foundation
 
-public enum KeychainError: LocalizedError {
+enum KeychainError: LocalizedError, CustomStringConvertible {
     case valueNotFound(key: String)
     case keyAlreadyExists(key: String)
     case generic(statusCode: OSStatus)
     case couldNotParseKeychainData
-    case couldNotFormatDataForKeychain
+    case encodingError(innerError: Error)
+
+    public var errorDescription: String? {
+        return description
+    }
 
     public var message: String {
         return description
@@ -28,8 +32,8 @@ public enum KeychainError: LocalizedError {
             return "Generic error with OSStatus code \(statusCode)"
         case .couldNotParseKeychainData:
             return "Could not parse keychain data"
-        case .couldNotFormatDataForKeychain:
-            return "Could not format data for keychain"
+        case let .encodingError(innerError):
+            return "Could not encode data. Inner error: \(innerError.localizedDescription)"
         }
     }
 }

@@ -24,58 +24,37 @@ class TokenManager {
         // Use the in-memory token cache for performance
         if let token = cachedToken {
             Logger.traceInfo(message: "Found token in memory cache")
-            return token.isAccessTokenExpired ? .failure(TokenError.expired(token: token)) : .success(token)
+            return token.isAccessTokenExpired ? .failure(.expired(token: token)) : .success(token)
         }
 
         // If we don't have a token in memory, check the keychain
         Logger.traceInfo(message: "Searching for token in keychain")
-        let keychainResult = keychainUtilities.getKeychainItem(accessGroup: tokenKeychainGroup,
-                                                               service: tokenKeychainService,
-                                                               account: tokenKeychainAccount)
+        let keychainResult: Result<Token, KeychainError> = keychainUtilities.getKeychainItem(accessGroup: tokenKeychainGroup,
+                                                                                             service: tokenKeychainService,
+                                                                                             account: tokenKeychainAccount)
 
         switch keychainResult {
-        case let .success(data):
-            if let data = data as? Data {
-                Logger.traceInfo(message: "Found token data in keychain")
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.dateDecodingStrategy = .formatted(DateFormatter.isoFormatter)
-
-                    let token = try decoder.decode(Token.self, from: data)
-                    cachedToken = token
-                    return token.isAccessTokenExpired ? .failure(TokenError.expired(token: token)) : .success(token)
-                } catch {
-                    Logger.traceError(message: "Got token data from keychain but failed to deserialize it", error: error)
-                    fallthrough
-                }
-            } else {
-                fallthrough
-            }
+        case let .success(token):
+            Logger.traceInfo(message: "Found token data in keychain")
+            cachedToken = token
+            return token.isAccessTokenExpired ? .failure(.expired(token: token)) : .success(token)
         case .failure:
             Logger.traceInfo(message: "No token found in keychain")
-            return .failure(TokenError.notFound)
+            return .failure(.notFound)
         }
     }
 
     func storeToken(_ token: Token) {
         cachedToken = token
 
-        do {
-            let jsonEncoder = JSONEncoder()
-            jsonEncoder.dateEncodingStrategy = .formatted(DateFormatter.isoFormatter)
+        let keychainResult = keychainUtilities.writeKeychainItem(token,
+                                                                 accessGroup: tokenKeychainGroup,
+                                                                 service: tokenKeychainService,
+                                                                 account: tokenKeychainAccount,
+                                                                 updateExistingItemIfNecessary: true)
 
-            let tokenJson = try jsonEncoder.encode(token)
-            let keychainResult = keychainUtilities.writeKeychainItem(data: tokenJson as AnyObject,
-                                                                     accessGroup: tokenKeychainGroup,
-                                                                     service: tokenKeychainService,
-                                                                     account: tokenKeychainAccount,
-                                                                     updateExistingItemIfNecessary: true)
-
-            if let error = keychainResult {
-                Logger.traceError(message: "Could not save token to keychain", error: error)
-            }
-        } catch {
-            Logger.traceError(message: "Failed to serialize token for keychain storage", error: error)
+        if let error = keychainResult {
+            Logger.traceError(message: "Could not save token to keychain", error: error)
         }
     }
 

@@ -10,10 +10,7 @@ import Foundation
 extension Encodable {
   var xtDictionary: [String: String]? {
     do {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        
-        let encodedData = try encoder.encode(self)
+        let encodedData = try JSONEncoder.fwfDefaultEncoder.encode(self)
         let jsonData = try JSONSerialization.jsonObject(with: encodedData, options: .allowFragments)
 
         guard let anyDict = jsonData as? [String: Any] else { return nil }

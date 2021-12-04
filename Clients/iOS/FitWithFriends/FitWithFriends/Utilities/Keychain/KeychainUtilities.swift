@@ -8,7 +8,7 @@
 import Foundation
 
 public class KeychainUtilities {
-    func getKeychainItem(accessGroup: String, service: String, account: String) -> Result<AnyObject, KeychainError> {
+    func getKeychainItem<T: Codable>(accessGroup: String, service: String, account: String) -> Result<T, KeychainError> {
         let queryDictionary: [CFString: Any?] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
@@ -39,24 +39,17 @@ public class KeychainUtilities {
         }
 
         do {
-            let unarchiver = try NSKeyedUnarchiver(forReadingFrom: returnedData)
-            let unarchivedData = unarchiver.decodeObject()
-            unarchiver.finishDecoding()
-
-            guard let dataToReturn = unarchivedData else {
-                let error = KeychainError.couldNotParseKeychainData
-                Logger.traceError(message: "Could not retrieve data from unarchiver", error: error)
-                return .failure(error)
-            }
-
-            return .success(dataToReturn as AnyObject)
+            // Objects are converted to JSON when writing to the keychain so we'll treat the retuned data as JSON here
+            let decodedObject = try JSONDecoder.fwfDefaultDecoder.decode(T.self, from: returnedData)
+            return .success(decodedObject)
         } catch {
+            print(error.localizedDescription)
             Logger.traceError(message: "Failed to unarchive data returned from keychain", error: error)
-            return .failure(.couldNotParseKeychainData)
+            return .failure(.encodingError(innerError: error))
         }
     }
 
-    func writeKeychainItem(data: AnyObject, accessGroup: String, service: String, account: String, updateExistingItemIfNecessary: Bool) -> KeychainError? {
+    func writeKeychainItem<T: Codable>(_ item: T, accessGroup: String, service: String, account: String, updateExistingItemIfNecessary: Bool) -> KeychainError? {
         // The dictionary that lets us find the target entry
         let queryDictionary: [CFString: Any?] = [
             kSecClass: kSecClassGenericPassword,
@@ -65,22 +58,24 @@ public class KeychainUtilities {
             kSecAttrAccessGroup: getAccessGroupWithPrefix(accessGroup: accessGroup)
         ]
 
-        // Transform the given object into a standard format to write to the keychain
-        let archiver = NSKeyedArchiver(requiringSecureCoding: true)
-        archiver.encodeRootObject(data)
-        archiver.finishEncoding()
-        let encodedData = archiver.encodedData
+        // Convert all keychain items to JSON
+        let jsonData: Data
+        do {
+            jsonData = try JSONEncoder.fwfDefaultEncoder.encode(item)
+        } catch {
+            return .encodingError(innerError: error)
+        }
 
         // Dictionary to use to create a new keychain item
         var addItemDictionary = queryDictionary
-        addItemDictionary[kSecValueData] = encodedData
+        addItemDictionary[kSecValueData] = jsonData
 
         var status = SecItemAdd(addItemDictionary as CFDictionary, nil)
 
         if status == errSecDuplicateItem, updateExistingItemIfNecessary {
             // Adding a new item failed, try to update the existing item instead
             // The second parameter is the attributes that we want to update, in this case the data attribute
-            status = SecItemUpdate(queryDictionary as CFDictionary, [kSecValueData: encodedData] as CFDictionary)
+            status = SecItemUpdate(queryDictionary as CFDictionary, [kSecValueData: jsonData] as CFDictionary)
         }
 
         if status != errSecSuccess {
@@ -118,8 +113,9 @@ public class KeychainUtilities {
         return nil
     }
 
-    func deleteAllItems() -> Error? {
+    func deleteAllItems(in accessGroup: String) -> Error? {
         let queryDictionary: [CFString: Any?] = [
+            kSecAttrAccessGroup: getAccessGroupWithPrefix(accessGroup: accessGroup),
             kSecClass: kSecClassGenericPassword
         ]
 

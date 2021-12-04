@@ -7,13 +7,17 @@
 
 import Foundation
 
-enum HttpError: LocalizedError {
+enum HttpError: LocalizedError, CustomStringConvertible {
     case invalidUrl(url: String)
     case serverError(code: Int)
     case clientError(code: Int)
     case generic
 
     var errorDescription: String? {
+        return description
+    }
+
+    var description: String {
         switch self {
         case let .invalidUrl(url: url):
             return "Invalid url: \(url)"

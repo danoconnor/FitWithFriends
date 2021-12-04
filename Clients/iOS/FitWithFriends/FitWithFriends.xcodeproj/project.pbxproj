@@ -24,6 +24,8 @@
 		0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6752D925715ED80032835D /* PermissionPromptView.swift */; };
 		0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B67532925745CF60032835D /* ActivitySummary.swift */; };
 		0B67532E2574686D0032835D /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B67532D2574686D0032835D /* Workout.swift */; };
+		0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D1275C22E100F78480 /* JSONEncoder+Extension.swift */; };
+		0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */; };
 		0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */; };
 		0B99FBD2256A016900673133 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B99FBD1256A016900673133 /* Assets.xcassets */; };
 		0B99FBD5256A016900673133 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B99FBD4256A016900673133 /* Preview Assets.xcassets */; };
@@ -90,6 +92,8 @@
 		0B6752D925715ED80032835D /* PermissionPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptView.swift; sourceTree = "<group>"; };
 		0B67532925745CF60032835D /* ActivitySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySummary.swift; sourceTree = "<group>"; };
 		0B67532D2574686D0032835D /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
+		0B8445D1275C22E100F78480 /* JSONEncoder+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONEncoder+Extension.swift"; sourceTree = "<group>"; };
+		0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONDecoder+Extension.swift"; sourceTree = "<group>"; };
 		0B99FBCA256A016900673133 /* FitWithFriends.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitWithFriends.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitWithFriendsApp.swift; sourceTree = "<group>"; };
 		0B99FBD1256A016900673133 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -288,6 +292,8 @@
 				0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */,
 				0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */,
 				0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */,
+				0B8445D1275C22E100F78480 /* JSONEncoder+Extension.swift */,
+				0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -578,6 +584,7 @@
 				0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */,
 				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
 				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
+				0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */,
 				0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */,
 				0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */,
 				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
@@ -610,6 +617,7 @@
 				0B99FC20256A273D00673133 /* KeychainUtilities.swift in Sources */,
 				0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */,
 				0B359724256C7357006D956A /* AppStateViewModel.swift in Sources */,
+				0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */,
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,
 				0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */,
 				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
@@ -749,7 +757,7 @@
 				CODE_SIGN_ENTITLEMENTS = FitWithFriends/FitWithFriends.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FitWithFriends/Preview Content\"";
-				DEVELOPMENT_TEAM = 3T983VBXV5;
+				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -773,7 +781,7 @@
 				CODE_SIGN_ENTITLEMENTS = FitWithFriends/FitWithFriends.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"FitWithFriends/Preview Content\"";
-				DEVELOPMENT_TEAM = 3T983VBXV5;
+				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
