@@ -8,7 +8,20 @@
 import SwiftUI
 
 struct CompetitionSummaryView: View {
-    let competitionSummaryViewModel: CompetitionSummaryViewModel
+    private let authenticationManager: AuthenticationManager
+    private let competitionOverview: CompetitionOverview
+
+    private let competitionSummaryViewModel: CompetitionSummaryViewModel
+
+    @State var showDetailsSheet = false
+
+    init(authenticationManager: AuthenticationManager, competitionOverview: CompetitionOverview) {
+        self.authenticationManager = authenticationManager
+        self.competitionOverview = competitionOverview
+
+        self.competitionSummaryViewModel = CompetitionSummaryViewModel(authenticationManager: authenticationManager,
+                                                                       competitionOverview: competitionOverview)
+    }
 
     var body: some View {
         VStack {
@@ -30,7 +43,7 @@ struct CompetitionSummaryView: View {
                     ZStack {
                         Circle()
                             .fill(competitionSummaryViewModel.userPositionColor)
-                            .frame(width: 50, height: 50)
+                            .frame(width: 40, height: 40)
 
                         Text(competitionSummaryViewModel.userPosition.description)
                             .font(.largeTitle)
@@ -54,6 +67,13 @@ struct CompetitionSummaryView: View {
             Spacer()
         }
         .cornerRadius(/*@START_MENU_TOKEN@*/3.0/*@END_MENU_TOKEN@*/)
+        .onTapGesture {
+            showDetailsSheet = true
+        }
+        .sheet(isPresented: $showDetailsSheet, content: {
+            CompetitionDetailView(authenticationManager: authenticationManager,
+                                  competitionOverview: competitionOverview)
+        })
     }
 }
 

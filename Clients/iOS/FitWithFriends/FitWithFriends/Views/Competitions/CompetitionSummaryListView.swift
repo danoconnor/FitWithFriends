@@ -20,12 +20,11 @@ struct CompetitionSummaryListView: View {
     var body: some View {
         let overviews = competitionsManager.competitionOverviews
             .map { $0.1 }
-            .sorted { $0.competitionStart < $1.competitionStart }
+            .sorted { $0.competitionStart > $1.competitionStart }
 
         List(overviews) { overview in
-            let overviewVM = CompetitionSummaryViewModel(authenticationManager: ObjectGraph.sharedInstance.authenticationManager,
-                                                         competitionOverview: overview)
-            CompetitionSummaryView(competitionSummaryViewModel: overviewVM)
+            CompetitionSummaryView(authenticationManager: ObjectGraph.sharedInstance.authenticationManager,
+                                   competitionOverview: overview)
         }
     }
 }

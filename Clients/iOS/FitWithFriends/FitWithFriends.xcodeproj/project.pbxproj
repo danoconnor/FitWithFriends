@@ -26,6 +26,9 @@
 		0B67532E2574686D0032835D /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B67532D2574686D0032835D /* Workout.swift */; };
 		0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D1275C22E100F78480 /* JSONEncoder+Extension.swift */; };
 		0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */; };
+		0B8445D6275C414300F78480 /* CompetitionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D5275C414300F78480 /* CompetitionDetailView.swift */; };
+		0B8445D8275C43FA00F78480 /* CompetitionDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D7275C43FA00F78480 /* CompetitionDetailViewModel.swift */; };
+		0B8445E1275C464500F78480 /* LoginState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445E0275C464500F78480 /* LoginState.swift */; };
 		0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */; };
 		0B99FBD2256A016900673133 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B99FBD1256A016900673133 /* Assets.xcassets */; };
 		0B99FBD5256A016900673133 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B99FBD4256A016900673133 /* Preview Assets.xcassets */; };
@@ -94,6 +97,9 @@
 		0B67532D2574686D0032835D /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		0B8445D1275C22E100F78480 /* JSONEncoder+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONEncoder+Extension.swift"; sourceTree = "<group>"; };
 		0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONDecoder+Extension.swift"; sourceTree = "<group>"; };
+		0B8445D5275C414300F78480 /* CompetitionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDetailView.swift; sourceTree = "<group>"; };
+		0B8445D7275C43FA00F78480 /* CompetitionDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDetailViewModel.swift; sourceTree = "<group>"; };
+		0B8445E0275C464500F78480 /* LoginState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginState.swift; sourceTree = "<group>"; };
 		0B99FBCA256A016900673133 /* FitWithFriends.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitWithFriends.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitWithFriendsApp.swift; sourceTree = "<group>"; };
 		0B99FBD1256A016900673133 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -303,6 +309,7 @@
 			children = (
 				0B99FC16256A20A800673133 /* AuthenticationManager.swift */,
 				0B99FC33256A3BA600673133 /* TokenManager.swift */,
+				0B8445E0275C464500F78480 /* LoginState.swift */,
 			);
 			path = Authentication;
 			sourceTree = "<group>";
@@ -395,6 +402,7 @@
 				0BEF52D625A2C5F400B3D6BE /* CompetitionSummaryListView.swift */,
 				0BEF52D925A2C93100B3D6BE /* CompetitionSummaryView.swift */,
 				0B62E66E25EB356100189702 /* CreateCompetitionView.swift */,
+				0B8445D5275C414300F78480 /* CompetitionDetailView.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -422,6 +430,7 @@
 			children = (
 				0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */,
 				0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */,
+				0B8445D7275C43FA00F78480 /* CompetitionDetailViewModel.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -589,12 +598,14 @@
 				0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */,
 				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
 				0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */,
+				0B8445D6275C414300F78480 /* CompetitionDetailView.swift in Sources */,
 				0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */,
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
 				0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */,
 				0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */,
 				0BBD788D259A4A9400E08EB2 /* ServiceBase.swift in Sources */,
 				0BEF52D725A2C5F400B3D6BE /* CompetitionSummaryListView.swift in Sources */,
+				0B8445E1275C464500F78480 /* LoginState.swift in Sources */,
 				0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */,
 				0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */,
 				0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */,
@@ -609,6 +620,7 @@
 				0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */,
 				0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */,
 				0B35972C257046FC006D956A /* AppDelegate.swift in Sources */,
+				0B8445D8275C43FA00F78480 /* CompetitionDetailViewModel.swift in Sources */,
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0BD42FF225B664CE00968D87 /* CompetitionSummaryViewModel.swift in Sources */,

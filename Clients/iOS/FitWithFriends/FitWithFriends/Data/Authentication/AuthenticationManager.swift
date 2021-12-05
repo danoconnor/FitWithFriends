@@ -9,12 +9,6 @@ import Combine
 import Foundation
 
 class AuthenticationManager: ObservableObject {
-    enum LoginState: String {
-        case notLoggedIn
-        case inProgress
-        case loggedIn
-    }
-
     @Published var loginState = LoginState.notLoggedIn {
         didSet {
             Logger.traceInfo(message: "Login state changed: \(loginState)")
