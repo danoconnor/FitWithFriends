@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    let objectGraph: IObjectGraph
+
     @State private var createAccountViewShown = false
     @State private var loginViewShown = false
 
@@ -26,7 +28,7 @@ struct WelcomeView: View {
             .font(.title2)
             .padding()
             .sheet(isPresented: $loginViewShown, content: {
-                LoginView()
+                LoginView(objectGraph: objectGraph)
             })
 
             Button ("Create Account") {
@@ -35,7 +37,7 @@ struct WelcomeView: View {
             .font(.footnote)
             .padding()
             .sheet(isPresented: $createAccountViewShown, content: {
-                CreateAccountView()
+                CreateAccountView(objectGraph: objectGraph)
             })
 
             Spacer()
@@ -45,6 +47,6 @@ struct WelcomeView: View {
 
 struct WelcomeView_Previews: PreviewProvider {
     static var previews: some View {
-        WelcomeView()
+        WelcomeView(objectGraph: MockObjectGraph())
     }
 }

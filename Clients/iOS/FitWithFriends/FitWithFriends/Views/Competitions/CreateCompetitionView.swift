@@ -15,9 +15,9 @@ struct CreateCompetitionView: View {
     @State var competitionName = ""
     @State var workoutsOnly = false
 
-    init(homepageSheetViewModel: HomepageSheetViewModel) {
-        viewModel = CreateCompetitionViewModel(authenticationManager: ObjectGraph.sharedInstance.authenticationManager,
-                                               competitionManager: ObjectGraph.sharedInstance.competitionManager,
+    init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
+        viewModel = CreateCompetitionViewModel(authenticationManager: objectGraph.authenticationManager,
+                                               competitionManager: objectGraph.competitionManager,
                                                homepageSheetViewModel: homepageSheetViewModel)
     }
 
@@ -77,6 +77,7 @@ struct CreateCompetitionView: View {
 
 struct CreateCompetitionView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateCompetitionView(homepageSheetViewModel: HomepageSheetViewModel())
+        CreateCompetitionView(homepageSheetViewModel: HomepageSheetViewModel(healthKitManager: MockHealthKitManager()),
+        objectGraph: MockObjectGraph())
     }
 }

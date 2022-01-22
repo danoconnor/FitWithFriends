@@ -7,9 +7,7 @@
 
 import Foundation
 
-class ObjectGraph {
-    static let sharedInstance = ObjectGraph()
-
+class ObjectGraph: IObjectGraph {
     let activityDataService: ActivityDataService
     let authenticationManager: AuthenticationManager
     let authenticationService: AuthenticationService

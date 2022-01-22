@@ -13,7 +13,7 @@ extension UIWindow {
         super.motionEnded(motion, with: event)
 
         if motion == .motionShake {
-            ObjectGraph.sharedInstance.shakeGestureHandler.handleShakeGesture()
+            FitWithFriendsApp.objectGraph.shakeGestureHandler.handleShakeGesture()
         }
     }
 }

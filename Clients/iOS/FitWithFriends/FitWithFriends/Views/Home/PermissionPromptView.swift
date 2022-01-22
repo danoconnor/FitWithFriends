@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct PermissionPromptView: View {
+    private let objectGraph: IObjectGraph
     private let permissionPromptViewModel: PermissionPromptViewModel
 
-    init(homepageSheetViewModel: HomepageSheetViewModel) {
-        permissionPromptViewModel = PermissionPromptViewModel(healthKitManager: ObjectGraph.sharedInstance.healthKitManager,
-                                                              homepageSheetViewModel: homepageSheetViewModel,
-                                                              pushNotificationManager: ObjectGraph.sharedInstance.pushNotificationManager)
+    init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
+        self.objectGraph = objectGraph
+        permissionPromptViewModel = PermissionPromptViewModel(healthKitManager: objectGraph.healthKitManager,
+                                                              homepageSheetViewModel: homepageSheetViewModel)
     }
 
     var body: some View {
@@ -44,25 +45,6 @@ struct PermissionPromptView: View {
                         Text ("We take your privacy seriously and do not share your data with any 3rd parties or advertisers. Only you and the people in your competition group will have access to it.")
                     }
                     .padding()
-
-                    Section {
-                        HStack {
-                            if permissionPromptViewModel.shouldPromptForNotifications {
-                                Text("2.")
-                                    .font(.title2)
-                            } else {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.green)
-                            }
-
-                            Text("Push notifications (optional)")
-                                .font(.title2)
-                        }
-
-                        Text("If you choose to grant access to push notifications, we send you updates about your competitions.")
-                    }
-                    .padding()
                 }
             }
 
@@ -73,8 +55,6 @@ struct PermissionPromptView: View {
                     Button("Next") {
                         if permissionPromptViewModel.shouldPromptForHealth {
                             permissionPromptViewModel.requestHealthPermission()
-                        } else if permissionPromptViewModel.shouldPromptForNotifications {
-                            permissionPromptViewModel.requestNotificationPermission()
                         }
                     }
                     .font(.title2)
@@ -94,6 +74,7 @@ struct PermissionPromptView: View {
 
 struct PermissionPromptView_Previews: PreviewProvider {
     static var previews: some View {
-        PermissionPromptView(homepageSheetViewModel: HomepageSheetViewModel())
+        PermissionPromptView(homepageSheetViewModel: HomepageSheetViewModel(healthKitManager: MockHealthKitManager()),
+                             objectGraph: MockObjectGraph())
     }
 }

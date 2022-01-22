@@ -26,6 +26,12 @@ class HomepageSheetViewModel: ObservableObject {
         .createCompetition: false
     ]
 
+    init(healthKitManager: HealthKitManager) {
+        if healthKitManager.shouldPromptUser {
+            updateState(sheet: .permissionPrompt, state: true)
+        }
+    }
+
     func updateState(sheet: HomepageSheet, state: Bool) {
         stateQueue.sync {
             homepageSheetState[sheet] = state

@@ -11,6 +11,12 @@ import Foundation
 class CreateAccountViewModel: ObservableObject {
     @Published var state: ViewOperationState = .notStarted
 
+    private let userService: UserService
+
+    init(userService: UserService) {
+        self.userService = userService
+    }
+
     func createAccount(username: String, password: String, passwordConfirmation: String, displayName: String) {
         if let errorMessage = validateInput(username: username, password: password, passwordConfirmation: passwordConfirmation, displayName: displayName) {
             state = .failed(errorMessage: errorMessage)
@@ -18,7 +24,7 @@ class CreateAccountViewModel: ObservableObject {
         }
 
         state = .inProgress
-        ObjectGraph.sharedInstance.userService.createUser(username: username, password: password, displayName: displayName) { [weak self] result in
+        userService.createUser(username: username, password: password, displayName: displayName) { [weak self] result in
             switch result {
             case .success:
                 // TODO: do something with the returned user - store user ID?

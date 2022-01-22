@@ -17,10 +17,10 @@ extension AppDelegate: UIApplicationDelegate {
         // Apple's docs suggest that we register our queries in didFinishLaunchingWithOptions so that they will be executed
         // properly when the app is launched in the background
         // https://developer.apple.com/documentation/healthkit/hkobserverquery/executing_observer_queries
-        ObjectGraph.sharedInstance.healthKitManager.registerDataQueries()
+        FitWithFriendsApp.objectGraph.healthKitManager.registerDataQueries()
 
         // Always register for background health data updates, if available
-        ObjectGraph.sharedInstance.healthKitManager.registerForBackgroundUpdates()
+        FitWithFriendsApp.objectGraph.healthKitManager.registerForBackgroundUpdates()
 
         return true
     }
@@ -37,11 +37,12 @@ extension AppDelegate: UIApplicationDelegate {
         Logger.traceInfo(message: "------------------------------ applicationWillTerminate ------------------------------")
     }
 
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        ObjectGraph.sharedInstance.pushNotificationManager.registerPushTokenIfNecessary(deviceToken)
-    }
-
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        Logger.traceError(message: "Failed to register for remote notifications", error: error)
-    }
+    // TODO: disabling push notifications support for now, will re-add later
+//    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+//        ObjectGraph.sharedInstance.pushNotificationManager.registerPushTokenIfNecessary(deviceToken)
+//    }
+//
+//    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+//        Logger.traceError(message: "Failed to register for remote notifications", error: error)
+//    }
 }

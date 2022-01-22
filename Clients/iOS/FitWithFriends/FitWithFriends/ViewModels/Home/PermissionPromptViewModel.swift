@@ -11,13 +11,6 @@ import Foundation
 class PermissionPromptViewModel: ObservableObject {
     private let healthKitManager: HealthKitManager
     private let homepageSheetViewModel: HomepageSheetViewModel
-    private let pushNotificationManager: PushNotificationManager
-
-    @Published private(set) var shouldPromptForNotifications: Bool {
-        didSet {
-            updateShouldShowPromptValue()
-        }
-    }
 
     @Published private(set) var shouldPromptForHealth: Bool {
         didSet {
@@ -26,24 +19,13 @@ class PermissionPromptViewModel: ObservableObject {
     }
 
     init(healthKitManager: HealthKitManager,
-         homepageSheetViewModel: HomepageSheetViewModel,
-         pushNotificationManager: PushNotificationManager) {
+         homepageSheetViewModel: HomepageSheetViewModel) {
         self.healthKitManager = healthKitManager
         self.homepageSheetViewModel = homepageSheetViewModel
-        self.pushNotificationManager = pushNotificationManager
 
-        shouldPromptForNotifications = pushNotificationManager.shouldPromptUser
         shouldPromptForHealth = healthKitManager.shouldPromptUser
 
         updateShouldShowPromptValue()
-    }
-
-    func requestNotificationPermission() {
-        pushNotificationManager.promptForNotificationPermission { [weak self] in
-            DispatchQueue.main.async {
-                self?.shouldPromptForNotifications = false
-            }
-        }
     }
 
     func requestHealthPermission() {
@@ -60,8 +42,7 @@ class PermissionPromptViewModel: ObservableObject {
 
     private func updateShouldShowPromptValue() {
         DispatchQueue.main.async {
-            let shouldShowPrompt = self.shouldPromptForHealth || self.shouldPromptForNotifications
-            self.homepageSheetViewModel.updateState(sheet: .permissionPrompt, state: shouldShowPrompt)
+            self.homepageSheetViewModel.updateState(sheet: .permissionPrompt, state: self.shouldPromptForHealth)
         }
     }
 }

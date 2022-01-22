@@ -8,12 +8,19 @@
 import SwiftUI
 
 struct CreateAccountView: View {
+    private let objectGraph: IObjectGraph
+
     @State private var username = ""
     @State private var password = ""
     @State private var passwordConfirmation = ""
     @State private var displayName = ""
 
-    @ObservedObject private var viewModel = CreateAccountViewModel()
+    @ObservedObject private var viewModel: CreateAccountViewModel
+
+    init(objectGraph: IObjectGraph) {
+        self.objectGraph = objectGraph
+        viewModel = CreateAccountViewModel(userService: objectGraph.userService)
+    }
 
     var body: some View {
         VStack {
@@ -74,6 +81,6 @@ struct CreateAccountView: View {
 
 struct CreateAccountView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateAccountView()
+        CreateAccountView(objectGraph: MockObjectGraph())
     }
 }

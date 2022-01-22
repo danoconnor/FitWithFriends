@@ -113,7 +113,7 @@ public class KeychainUtilities {
         return nil
     }
 
-    func deleteAllItems(in accessGroup: String) -> Error? {
+    func deleteAllItems(in accessGroup: String) -> KeychainError? {
         let queryDictionary: [CFString: Any?] = [
             kSecAttrAccessGroup: getAccessGroupWithPrefix(accessGroup: accessGroup),
             kSecClass: kSecClassGenericPassword

@@ -42,7 +42,7 @@ class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
         }
     }
 
-    func getRootViewController() -> UIViewController? {
+    private func getRootViewController() -> UIViewController? {
         return UIApplication.shared.windows.first?.rootViewController
     }
 }

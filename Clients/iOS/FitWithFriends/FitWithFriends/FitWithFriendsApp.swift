@@ -11,13 +11,15 @@ import SwiftUI
 struct FitWithFriendsApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
+    static let objectGraph: IObjectGraph = ObjectGraph()
+
     init() {
         Logger.setupLogging()
     }
 
     var body: some Scene {
         WindowGroup {
-            MainContentView()
+            MainContentView(objectGraph: FitWithFriendsApp.objectGraph)
         }
     }
 }

@@ -9,19 +9,36 @@ import Combine
 import SwiftUI
 
 struct MainContentView: View {
-    @ObservedObject private var viewModel = AppStateViewModel()
+    let objectGraph: IObjectGraph
+
+    @ObservedObject private var viewModel: AppStateViewModel
+
+    init(objectGraph: IObjectGraph) {
+        self.objectGraph = objectGraph
+        viewModel = AppStateViewModel(authenticationManager: objectGraph.authenticationManager)
+    }
 
     var body: some View {
         if viewModel.isLoggedIn {
-            LoggedInContentView()
+            LoggedInContentView(objectGraph: objectGraph)
         } else {
-            WelcomeView()
+            WelcomeView(objectGraph: objectGraph)
         }
     }
 }
 
 struct MainContentView_Previews: PreviewProvider {
+    static var loggedInObjectGraph: IObjectGraph {
+        let authenticationManager = MockAuthenticationManager()
+        authenticationManager.loginState = .loggedIn
+        let loggedInObjectGraph = MockObjectGraph()
+        loggedInObjectGraph.authenticationManager = authenticationManager
+
+        return loggedInObjectGraph
+    }
+
     static var previews: some View {
-        MainContentView()
+        MainContentView(objectGraph: MockObjectGraph())
+        MainContentView(objectGraph: MainContentView_Previews.loggedInObjectGraph)
     }
 }

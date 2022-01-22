@@ -8,22 +8,17 @@
 import SwiftUI
 
 struct LoggedInContentView: View {
+    private let objectGraph: IObjectGraph
+
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
 
-    init() {
-        homepageSheetViewModel = HomepageSheetViewModel()
-
-        // Check if we need to show the permission prompt
-        if ObjectGraph.sharedInstance.healthKitManager.shouldPromptUser ||
-            ObjectGraph.sharedInstance.pushNotificationManager.shouldPromptUser {
-            homepageSheetViewModel.updateState(sheet: .permissionPrompt, state: true)
-        }
+    init(objectGraph: IObjectGraph) {
+        self.objectGraph = objectGraph
+        homepageSheetViewModel = HomepageSheetViewModel(healthKitManager: objectGraph.healthKitManager)
     }
 
     var body: some View {
         VStack {
-            CompetitionSummaryListView()
-
             Button(action: {
                 homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
             }, label: {
@@ -32,7 +27,7 @@ struct LoggedInContentView: View {
             .padding()
 
             Button(action: {
-                ObjectGraph.sharedInstance.authenticationManager.logout()
+                objectGraph.authenticationManager.logout()
             }, label: {
                 Text("Logout")
             })
@@ -41,9 +36,9 @@ struct LoggedInContentView: View {
         .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
             switch homepageSheetViewModel.sheetToShow {
             case .createCompetition:
-                CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel)
+                CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
             case .permissionPrompt:
-                PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel)
+                PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
             default:
                 Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
             }
@@ -53,6 +48,6 @@ struct LoggedInContentView: View {
 
 struct LoggedInContentView_Previews: PreviewProvider {
     static var previews: some View {
-        LoggedInContentView()
+        LoggedInContentView(objectGraph: MockObjectGraph())
     }
 }

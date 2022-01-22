@@ -8,10 +8,17 @@
 import SwiftUI
 
 struct LoginView: View {
+    let objectGraph: IObjectGraph
+
     @State private var username = ""
     @State private var password = ""
 
-    @ObservedObject private var viewModel = LoginViewModel(authenticationManager: ObjectGraph.sharedInstance.authenticationManager)
+    @ObservedObject private var viewModel: LoginViewModel
+
+    init(objectGraph: IObjectGraph) {
+        self.objectGraph = objectGraph
+        viewModel = LoginViewModel(authenticationManager: objectGraph.authenticationManager)
+    }
 
     var body: some View {
         VStack {
@@ -59,6 +66,6 @@ struct LoginView: View {
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView(objectGraph: MockObjectGraph())
     }
 }
