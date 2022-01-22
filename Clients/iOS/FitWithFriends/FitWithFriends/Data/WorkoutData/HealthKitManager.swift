@@ -87,13 +87,14 @@ class HealthKitManager {
             Logger.traceInfo(message: "Enabled background delivery for activity summary: \(success)")
         }
 
-        hkHealthStore.enableBackgroundDelivery(for: .workoutType(), frequency: .immediate) { success, error in
-            if let error = error {
-                Logger.traceError(message: "Failed to enable background delivery for workouts", error: error)
-            }
-
-            Logger.traceInfo(message: "Enabled background delivery for workouts: \(success)")
-        }
+        // TODO: we don't care about workouts for now, will add later
+//        hkHealthStore.enableBackgroundDelivery(for: .workoutType(), frequency: .immediate) { success, error in
+//            if let error = error {
+//                Logger.traceError(message: "Failed to enable background delivery for workouts", error: error)
+//            }
+//
+//            Logger.traceInfo(message: "Enabled background delivery for workouts: \(success)")
+//        }
     }
 
     func registerDataQueries() {
@@ -103,7 +104,9 @@ class HealthKitManager {
         }
 
         registerActivitySummaryQuery()
-        registerWorkoutQuery()
+
+        // TODO: we don't care about workouts for now, will add later
+        // registerWorkoutQuery()
     }
 
     private func registerActivitySummaryQuery() {

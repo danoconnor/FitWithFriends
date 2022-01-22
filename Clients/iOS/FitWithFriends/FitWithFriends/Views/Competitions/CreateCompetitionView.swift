@@ -66,8 +66,7 @@ struct CreateCompetitionView: View {
             Button("Create") {
                 viewModel.createCompetition(competitionName: competitionName,
                                             startDate: startDate,
-                                            endDate: endDate,
-                                            workoutsOnly: workoutsOnly)
+                                            endDate: endDate)
             }
             .font(.title2)
             .padding()

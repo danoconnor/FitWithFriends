@@ -31,11 +31,10 @@ public class CompetitionManager: ObservableObject {
         }
     }
 
-    func createCompetition(startDate: Date, endDate: Date, competitionName: String, workoutsOnly: Bool, completion: @escaping (Error?) -> Void) {
+    func createCompetition(startDate: Date, endDate: Date, competitionName: String, completion: @escaping (Error?) -> Void) {
         competitionService.createCompetition(startDate: startDate,
                                              endDate: endDate,
-                                             competitionName: competitionName,
-                                             workoutsOnly: workoutsOnly) { [weak self] result in
+                                             competitionName: competitionName) { [weak self] result in
             if let error = result.xtError {
                 Logger.traceError(message: "Failed to create competition", error: error)
             } else {

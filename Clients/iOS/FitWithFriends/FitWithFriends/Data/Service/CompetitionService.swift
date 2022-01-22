@@ -20,14 +20,13 @@ class CompetitionService: ServiceBase {
                                           completion: completion)
     }
 
-    func createCompetition(startDate: Date, endDate: Date, competitionName: String, workoutsOnly: Bool, completion: @escaping (Result<EmptyReponse, Error>) -> Void) {
+    func createCompetition(startDate: Date, endDate: Date, competitionName: String, completion: @escaping (Result<EmptyReponse, Error>) -> Void) {
         let dateFormatter = ISO8601DateFormatter()
 
         let requestBody: [String: String] = [
             "startDate": dateFormatter.string(from: startDate),
             "endDate": dateFormatter.string(from: endDate),
-            "displayName": competitionName,
-            "workoutsOnly" : workoutsOnly.description
+            "displayName": competitionName
         ]
 
         makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions",

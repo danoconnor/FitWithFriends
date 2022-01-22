@@ -23,7 +23,7 @@ class CreateCompetitionViewModel: ObservableObject {
         self.homepageSheetViewModel = homepageSheetViewModel
     }
 
-    func createCompetition(competitionName: String, startDate: Date, endDate: Date, workoutsOnly: Bool) {
+    func createCompetition(competitionName: String, startDate: Date, endDate: Date) {
         guard competitionName.count > 0 else {
             state = .failed(errorMessage: "Please enter a competition name")
             return
@@ -31,8 +31,7 @@ class CreateCompetitionViewModel: ObservableObject {
 
         competitionManager.createCompetition(startDate: startDate,
                                              endDate: endDate,
-                                             competitionName: competitionName,
-                                             workoutsOnly: workoutsOnly) { [weak self] error in
+                                             competitionName: competitionName) { [weak self] error in
             DispatchQueue.main.async {
                 if let error = error {
                     self?.state = .failed(errorMessage: error.localizedDescription)
