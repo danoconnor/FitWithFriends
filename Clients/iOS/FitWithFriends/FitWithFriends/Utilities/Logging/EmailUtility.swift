@@ -9,7 +9,7 @@ import Foundation
 import MessageUI
 
 class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
-    private var isShowingEmailView = false
+    private var emailViewController: MFMailComposeViewController?
 
     func sendEmailWithTextAttachement(subject: String, body: String, to: String, attachmentText: String, attachementFileName: String){
         guard MFMailComposeViewController.canSendMail() else {
@@ -17,28 +17,28 @@ class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
             return
         }
 
-        let picker = MFMailComposeViewController()
+        guard emailViewController == nil else {
+            Logger.traceWarning(message: "Already presenting email view")
+            return
+        }
 
-        picker.setSubject(subject)
-        picker.setMessageBody(body, isHTML: true)
-        picker.setToRecipients([to])
-        picker.mailComposeDelegate = self
-        picker.addAttachmentData(attachmentText.data(using: .utf8)!, mimeType: "text", fileName: attachementFileName)
+        let mailController = MFMailComposeViewController()
+        emailViewController = mailController
+
+        mailController.setSubject(subject)
+        mailController.setMessageBody(body, isHTML: true)
+        mailController.setToRecipients([to])
+        mailController.mailComposeDelegate = self
+        mailController.addAttachmentData(attachmentText.data(using: .utf8)!, mimeType: "text", fileName: attachementFileName)
 
         DispatchQueue.main.async { [weak self] in
-            guard self?.isShowingEmailView == false else {
-                Logger.traceWarning(message: "Already presenting email view")
-                return
-            }
-
-            self?.isShowingEmailView = true
-            self?.getRootViewController()?.present(picker, animated: true, completion: nil)
+            self?.getRootViewController()?.present(mailController, animated: true, completion: nil)
         }
     }
 
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        getRootViewController()?.dismiss(animated: true) { [weak self] in
-            self?.isShowingEmailView = false
+        emailViewController?.dismiss(animated: true) { [weak self] in
+            self?.emailViewController = nil
         }
     }
 
