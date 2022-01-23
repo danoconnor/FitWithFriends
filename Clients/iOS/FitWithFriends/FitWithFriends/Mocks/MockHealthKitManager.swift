@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HealthKit
 
 class MockHealthKitManager: HealthKitManager {
     var return_shouldPromptUser = false
@@ -26,4 +27,13 @@ class MockHealthKitManager: HealthKitManager {
     override func registerDataQueries() {}
 
     override func registerForBackgroundUpdates() {}
+
+    var return_currentActivitySummary: HKActivitySummary?
+    override func getCurrentActivitySummary(completion: @escaping (HKActivitySummary?) -> Void) {
+        completion(return_currentActivitySummary)
+
+        //        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+//            completion(self?.return_currentActivitySummary)
+//        }
+    }
 }

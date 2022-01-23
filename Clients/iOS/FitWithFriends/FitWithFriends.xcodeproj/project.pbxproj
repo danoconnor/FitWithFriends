@@ -32,6 +32,11 @@
 		0B47A23D279CB69400C2970E /* MockEmailUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A23C279CB69400C2970E /* MockEmailUtility.swift */; };
 		0B47A23F279CB6D600C2970E /* MockHealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A23E279CB6D600C2970E /* MockHealthKitManager.swift */; };
 		0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */; };
+		0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A243279DDF1300C2970E /* ActivityRingView.swift */; };
+		0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A245279DE17B00C2970E /* TodaySummaryView.swift */; };
+		0B47A248279DE1FA00C2970E /* TodaySummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A247279DE1FA00C2970E /* TodaySummaryViewModel.swift */; };
+		0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */; };
+		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
 		0B592C2725715B2C004F68AB /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2625715B2C004F68AB /* Mutex.swift */; };
 		0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */; };
 		0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E66E25EB356100189702 /* CreateCompetitionView.swift */; };
@@ -114,6 +119,11 @@
 		0B47A23C279CB69400C2970E /* MockEmailUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEmailUtility.swift; sourceTree = "<group>"; };
 		0B47A23E279CB6D600C2970E /* MockHealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockHealthKitManager.swift; sourceTree = "<group>"; };
 		0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockShakeGestureHandler.swift; sourceTree = "<group>"; };
+		0B47A243279DDF1300C2970E /* ActivityRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRingView.swift; sourceTree = "<group>"; };
+		0B47A245279DE17B00C2970E /* TodaySummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryView.swift; sourceTree = "<group>"; };
+		0B47A247279DE1FA00C2970E /* TodaySummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryViewModel.swift; sourceTree = "<group>"; };
+		0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKActivitySummary+Extensions.swift"; sourceTree = "<group>"; };
+		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
 		0B592C2625715B2C004F68AB /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
 		0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptViewModel.swift; sourceTree = "<group>"; };
 		0B62E66E25EB356100189702 /* CreateCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionView.swift; sourceTree = "<group>"; };
@@ -340,6 +350,7 @@
 				0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */,
 				0B8445D1275C22E100F78480 /* JSONEncoder+Extension.swift */,
 				0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */,
+				0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -440,6 +451,9 @@
 			isa = PBXGroup;
 			children = (
 				0B62E66E25EB356100189702 /* CreateCompetitionView.swift */,
+				0B47A243279DDF1300C2970E /* ActivityRingView.swift */,
+				0B47A245279DE17B00C2970E /* TodaySummaryView.swift */,
+				0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -468,6 +482,7 @@
 				0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */,
 				0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */,
 				0B8445D7275C43FA00F78480 /* CompetitionDetailViewModel.swift */,
+				0B47A247279DE1FA00C2970E /* TodaySummaryViewModel.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -587,6 +602,7 @@
 				0B47A22F279CADBC00C2970E /* MockHttpConnector.swift in Sources */,
 				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
 				0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */,
+				0B47A248279DE1FA00C2970E /* TodaySummaryViewModel.swift in Sources */,
 				0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */,
 				0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */,
 				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
@@ -596,6 +612,8 @@
 				0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */,
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
 				0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */,
+				0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */,
+				0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */,
 				0B47A231279CB12600C2970E /* MockUserService.swift in Sources */,
 				0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */,
 				0BBD788D259A4A9400E08EB2 /* ServiceBase.swift in Sources */,
@@ -608,6 +626,7 @@
 				0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,
 				0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */,
+				0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */,
 				0B99FC06256A0BA800673133 /* LogFormatter.swift in Sources */,
 				0B35972925704651006D956A /* PushNotificationManager.swift in Sources */,
 				0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */,
@@ -618,6 +637,7 @@
 				0B8445D8275C43FA00F78480 /* CompetitionDetailViewModel.swift in Sources */,
 				0B47A22B279CAC1E00C2970E /* MockTokenManager.swift in Sources */,
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
+				0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */,
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0BD42FF225B664CE00968D87 /* CompetitionSummaryViewModel.swift in Sources */,
 				0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */,

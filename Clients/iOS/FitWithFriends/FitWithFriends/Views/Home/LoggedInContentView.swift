@@ -5,6 +5,7 @@
 //  Created by Dan O'Connor on 11/27/20.
 //
 
+import HealthKitUI
 import SwiftUI
 
 struct LoggedInContentView: View {
@@ -19,6 +20,8 @@ struct LoggedInContentView: View {
 
     var body: some View {
         VStack {
+            TodaySummaryView(objectGraph: objectGraph)
+
             Button(action: {
                 homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
             }, label: {

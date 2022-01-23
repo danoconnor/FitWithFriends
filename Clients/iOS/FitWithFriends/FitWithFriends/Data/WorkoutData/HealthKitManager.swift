@@ -109,6 +109,32 @@ class HealthKitManager {
         // registerWorkoutQuery()
     }
 
+    func getCurrentActivitySummary(completion: @escaping (HKActivitySummary?) -> Void) {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            Logger.traceWarning(message: "Health data is not available on this device, can't query current activity summary")
+            completion(nil)
+            return
+        }
+
+        let calendar = Calendar.current
+        var today = calendar.dateComponents([.day, .month, .year, .era], from: Date())
+        today.calendar = calendar
+
+        let predicate = HKQuery.predicateForActivitySummary(with: today)
+
+        let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, error in
+            if let error = error {
+                Logger.traceError(message: "Failed to get activity summary", error: error)
+                completion(nil)
+            }
+
+            let summary = summaries?.first { $0.dateComponents(for: calendar) == today }
+            completion(summary)
+        }
+
+        hkHealthStore.execute(query)
+    }
+
     private func registerActivitySummaryQuery() {
         let dateRange = getQueryDateRange()
         let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: dateRange.startCompenents,

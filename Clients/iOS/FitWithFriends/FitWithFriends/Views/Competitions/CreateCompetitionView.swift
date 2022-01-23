@@ -13,7 +13,6 @@ struct CreateCompetitionView: View {
     @State var startDate = Date().addingTimeInterval(TimeInterval.xtDays(1))
     @State var endDate = Date().addingTimeInterval(TimeInterval.xtDays(8))
     @State var competitionName = ""
-    @State var workoutsOnly = false
 
     init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
         viewModel = CreateCompetitionViewModel(authenticationManager: objectGraph.authenticationManager,
@@ -41,9 +40,6 @@ struct CreateCompetitionView: View {
             DatePicker("End date",
                        selection: $endDate,
                        displayedComponents: .date)
-                .padding()
-
-            Toggle("Only workouts count for points", isOn: $workoutsOnly)
                 .padding()
 
             Spacer()
