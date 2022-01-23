@@ -15,11 +15,11 @@ class Logger {
         let logFormatter = LogFormatter()
 
         let logFileManager = DDLogFileManagerDefault()
-        logFileManager.maximumNumberOfLogFiles = 2
+        logFileManager.maximumNumberOfLogFiles = 5
 
         let fileLogger = DDFileLogger(logFileManager: logFileManager)
         fileLogger.logFormatter = logFormatter
-        fileLogger.maximumFileSize = 5_000_000 // 5 MB
+        fileLogger.maximumFileSize = 1_000_000 // 1 MB
         DDLog.sharedInstance.add(fileLogger)
 
         #if DEBUG
