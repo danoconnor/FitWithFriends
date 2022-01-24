@@ -12,40 +12,57 @@ struct LoggedInContentView: View {
     private let objectGraph: IObjectGraph
 
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
+    @ObservedObject private var homepageViewModel: HomepageViewModel
 
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
         homepageSheetViewModel = HomepageSheetViewModel(healthKitManager: objectGraph.healthKitManager)
+        homepageViewModel = HomepageViewModel(competitionManager: objectGraph.competitionManager,
+                                              healthKitManager: objectGraph.healthKitManager)
     }
 
     var body: some View {
-        VStack {
-            TodaySummaryView(objectGraph: objectGraph)
+        ScrollView {
+            VStack {
+                if let activitySummary = homepageViewModel.todayActivitySummary {
+                    TodaySummaryView(activitySummary: activitySummary)
+                        .cornerRadius(10)
+                        .padding()
+                }
 
-            Button(action: {
-                homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-            }, label: {
-                Text("New competition")
-            })
-            .padding()
+                if let currentCompetition = homepageViewModel.currentCompetition {
+                    CompetitionDetailView(objectGraph: objectGraph, competitionOverview: currentCompetition)
+                        .cornerRadius(10)
+                        .padding()
+                }
 
-            Button(action: {
-                objectGraph.authenticationManager.logout()
-            }, label: {
-                Text("Logout")
-            })
-            .padding()
-        }
-        .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
-            switch homepageSheetViewModel.sheetToShow {
-            case .createCompetition:
-                CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
-            case .permissionPrompt:
-                PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
-            default:
-                Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
+                Spacer()
+
+                Button(action: {
+                    homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+                }, label: {
+                    Text("New competition")
+                })
+                .padding()
+
+                Button(action: {
+                    objectGraph.authenticationManager.logout()
+                }, label: {
+                    Text("Logout")
+                })
+                .padding()
             }
-        })
+            .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
+                switch homepageSheetViewModel.sheetToShow {
+                case .createCompetition:
+                    CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
+                case .permissionPrompt:
+                    PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
+                default:
+                    Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
+                }
+            })
+        }
     }
 }
 

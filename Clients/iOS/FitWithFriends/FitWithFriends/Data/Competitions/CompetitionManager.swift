@@ -14,7 +14,7 @@ public class CompetitionManager: ObservableObject {
 
     private var loginStateCancellable: AnyCancellable?
 
-    @Published var competitionOverviews: [UInt: CompetitionOverview]
+    @Published private(set) var competitionOverviews: [UInt: CompetitionOverview]
 
     init(authenticationManager: AuthenticationManager,
          competitionService: CompetitionService) {

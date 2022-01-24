@@ -34,10 +34,11 @@
 		0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */; };
 		0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A243279DDF1300C2970E /* ActivityRingView.swift */; };
 		0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A245279DE17B00C2970E /* TodaySummaryView.swift */; };
-		0B47A248279DE1FA00C2970E /* TodaySummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A247279DE1FA00C2970E /* TodaySummaryViewModel.swift */; };
+		0B47A248279DE1FA00C2970E /* HomepageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */; };
 		0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */; };
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
-		0B592C2725715B2C004F68AB /* Mutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2625715B2C004F68AB /* Mutex.swift */; };
+		0B47A252279E424300C2970E /* CompetitionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A251279E424300C2970E /* CompetitionDetailView.swift */; };
+		0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */; };
 		0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */; };
 		0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E66E25EB356100189702 /* CreateCompetitionView.swift */; };
 		0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */; };
@@ -121,10 +122,11 @@
 		0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockShakeGestureHandler.swift; sourceTree = "<group>"; };
 		0B47A243279DDF1300C2970E /* ActivityRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRingView.swift; sourceTree = "<group>"; };
 		0B47A245279DE17B00C2970E /* TodaySummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryView.swift; sourceTree = "<group>"; };
-		0B47A247279DE1FA00C2970E /* TodaySummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryViewModel.swift; sourceTree = "<group>"; };
+		0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageViewModel.swift; sourceTree = "<group>"; };
 		0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKActivitySummary+Extensions.swift"; sourceTree = "<group>"; };
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
-		0B592C2625715B2C004F68AB /* Mutex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutex.swift; sourceTree = "<group>"; };
+		0B47A251279E424300C2970E /* CompetitionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDetailView.swift; sourceTree = "<group>"; };
+		0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionResultView.swift; sourceTree = "<group>"; };
 		0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptViewModel.swift; sourceTree = "<group>"; };
 		0B62E66E25EB356100189702 /* CreateCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionView.swift; sourceTree = "<group>"; };
 		0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionViewModel.swift; sourceTree = "<group>"; };
@@ -311,7 +313,6 @@
 				0B99FC0B256A170000673133 /* Extensions */,
 				0B99FBFA256A096200673133 /* Logging */,
 				0B99FBE3256A048500673133 /* Networking */,
-				0B592C2625715B2C004F68AB /* Mutex.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -454,6 +455,8 @@
 				0B47A243279DDF1300C2970E /* ActivityRingView.swift */,
 				0B47A245279DE17B00C2970E /* TodaySummaryView.swift */,
 				0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */,
+				0B47A251279E424300C2970E /* CompetitionDetailView.swift */,
+				0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -461,6 +464,7 @@
 		0BBD78BC25A282EC00E08EB2 /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */,
 				0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */,
 				0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */,
 			);
@@ -482,7 +486,6 @@
 				0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */,
 				0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */,
 				0B8445D7275C43FA00F78480 /* CompetitionDetailViewModel.swift */,
-				0B47A247279DE1FA00C2970E /* TodaySummaryViewModel.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -581,7 +584,6 @@
 			files = (
 				0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */,
 				0BBD78B025A0335100E08EB2 /* DateFormatter+Extensions.swift in Sources */,
-				0B592C2725715B2C004F68AB /* Mutex.swift in Sources */,
 				0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */,
 				0B99FC2B256A2C5300673133 /* ErrorResponse.swift in Sources */,
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
@@ -592,6 +594,7 @@
 				0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */,
 				0B47A23B279CB5B200C2970E /* MockCompetitionService.swift in Sources */,
 				0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */,
+				0B47A252279E424300C2970E /* CompetitionDetailView.swift in Sources */,
 				0B47A229279CAB6E00C2970E /* MockAuthenticationService.swift in Sources */,
 				0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */,
 				0B3597782571502A006D956A /* HealthKitManager.swift in Sources */,
@@ -602,7 +605,7 @@
 				0B47A22F279CADBC00C2970E /* MockHttpConnector.swift in Sources */,
 				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
 				0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */,
-				0B47A248279DE1FA00C2970E /* TodaySummaryViewModel.swift in Sources */,
+				0B47A248279DE1FA00C2970E /* HomepageViewModel.swift in Sources */,
 				0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */,
 				0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */,
 				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
@@ -641,6 +644,7 @@
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0BD42FF225B664CE00968D87 /* CompetitionSummaryViewModel.swift in Sources */,
 				0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */,
+				0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */,
 				0B99FBEB256A070F00673133 /* HttpMethod.swift in Sources */,
 				0B9BADC4256AE44600EB1B60 /* WelcomeView.swift in Sources */,
 				0B99FC20256A273D00673133 /* KeychainUtilities.swift in Sources */,
