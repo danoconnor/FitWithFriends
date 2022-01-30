@@ -11,6 +11,8 @@ class ServiceBase {
     private let httpConnector: HttpConnector
     private let tokenManager: TokenManager
 
+    private static let refreshTokenQueue = DispatchQueue(label: "RefreshTokenQueue")
+
     init(httpConnector: HttpConnector,
          tokenManager: TokenManager) {
         self.httpConnector = httpConnector
@@ -19,24 +21,44 @@ class ServiceBase {
 
     /// Gets a new access token using the refresh token
     func getToken(token: Token, completion: @escaping (Result<Token, Error>) -> Void) {
-        Logger.traceInfo(message: "Requesting new access token using refresh token")
+        ServiceBase.refreshTokenQueue.async { [weak self] in
+            // Sometimes there are multiple concurrent calls to refresh the token,
+            // which can invalidate previously issued tokens
+            // We use the DispatchQueue to prevent concurrent calls, so check here if we
+            // have already gotten a new, valid token
+            if let currentToken = self?.tokenManager.getCachedToken().xtSuccess,
+               !currentToken.isAccessTokenExpired {
+                Logger.traceInfo(message: "Tried to refresh token, but already have a valid token in the cache")
+                completion(.success(currentToken))
+                return
+            }
 
-        let requestBody: [String: String] = [
-            RequestConstants.Body.grantType: RequestConstants.Body.refreshTokenGrant,
-            RequestConstants.Body.refreshToken: token.refreshToken
-        ]
+            Logger.traceInfo(message: "Requesting new access token using refresh token")
 
-        makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
-                                            method: .post,
-                                            body: requestBody,
-                                            completion: { (result: Result<Token, Error>) in
-                                                switch result {
-                                                case let .success(token):
-                                                    completion(.success(token))
-                                                case let .failure(error):
-                                                    completion(.failure(error))
-                                                }
-                                            })
+            let requestBody: [String: String] = [
+                RequestConstants.Body.grantType: RequestConstants.Body.refreshTokenGrant,
+                RequestConstants.Body.refreshToken: token.refreshToken
+            ]
+
+            let semaphore = DispatchSemaphore(value: 0)
+            self?.makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
+                                                method: .post,
+                                                body: requestBody,
+                                                completion: { (result: Result<Token, Error>) in
+                                                    switch result {
+                                                    case let .success(token):
+                                                        completion(.success(token))
+                                                    case let .failure(error):
+                                                        completion(.failure(error))
+                                                    }
+
+                                                    semaphore.signal()
+                                                })
+
+            // Wait for the current request to complete before we move on to the next one
+            // We don't want concurrent token refresh requests
+            _ = semaphore.wait(timeout: .distantFuture)
+        }
     }
 
     /// Makes a request to the service and authenticates by providing the client ID/secret.
