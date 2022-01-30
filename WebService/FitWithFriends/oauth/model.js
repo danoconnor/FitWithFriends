@@ -157,8 +157,8 @@ module.exports.saveToken = function (token, client, user) {
 };
 
 module.exports.revokeToken = function (token) {
-    return database.query('DELETE FROM oauth_tokens WHERE refresh_token = $1', [
-        token.refreshToken
+    return database.query('DELETE FROM oauth_tokens WHERE access_token = $1', [
+        token.accessToken
     ]).then(function (result) {
         return true;
     }).catch(function (error) {
