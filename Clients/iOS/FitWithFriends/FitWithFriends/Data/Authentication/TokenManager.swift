@@ -10,7 +10,12 @@ import Foundation
 class TokenManager {
     private let keychainUtilities: KeychainUtilities
 
-    private var cachedToken: Token?
+    private var _token: Token?
+    private let tokenQueue = DispatchQueue(label: "TokenManagerQueue")
+    private var cachedToken: Token? {
+        get { return tokenQueue.sync { _token } }
+        set { tokenQueue.sync { _token = newValue } }
+    }
 
     private let tokenKeychainGroup = "com.danoconnor.FitWithFriends"
     private let tokenKeychainService = "com.danoconnor.FitWithFriends"
