@@ -61,7 +61,7 @@ router.post('/join', function (req, res) {
     }
 
     // Find matching competition and validate access token
-    database.query('SELECT competition_id from competitions WHERE access_token = $1', accessToken)
+    database.query('SELECT competition_id FROM competitions WHERE access_token = $1', accessToken)
         .then(function (result) {
             if (!result.length) {
                 res.sendStatus(404);
@@ -69,12 +69,44 @@ router.post('/join', function (req, res) {
             }
 
             const competitionId = result[0].competition_id;
-            database.query('INSERT INTO users_competitions VALUES ($1, $2) \
-                            ON CONFLICT (userid, competitionid) DO NOTHING', [res.locals.oauth.token.user.id, competitionId])
+
+            // TODO: remove when multiple competitions are supported
+            // Check that the user has not already joined a competition yet
+            database.query('SELECT COUNT(competitionid) FROM users_competitions WHERE userid = $1', res.locals.oauth.token.user.id)
                 .then(function (result) {
-                    res.sendStatus(200);
+                    if (!result.length || result[0].count > 0) {
+                        res.sendStatus(400);
+                        return;
+                    }
+
+                    // Add the user to the competition
+                    database.query('INSERT INTO users_competitions VALUES ($1, $2) \
+                            ON CONFLICT (userid, competitionid) DO NOTHING', [res.locals.oauth.token.user.id, competitionId])
+                        .then(function (result) {
+                            res.sendStatus(200);
+                        })
                 })
         })
+});
+
+// Leave competition endpoint
+// Expects a userId and a competitionId in the request body
+// The user will be removed from the competition if the currently authenticated user matches the user to remove
+// OR the currently authenticated user is the admin of the competition
+router.post('/leave', function (req, res) {
+    const targetUserId = req.body['userId'];
+    const competitionId = req.body['competitionId'];
+    if (!targetUserId || !competitionId) {
+        res.sendStatus(400);
+        return;
+    }
+
+    if (targetUserId === res.locals.oauth.token.user.id) {
+        selfRemoveUser(req, res, targetUserId, competitionId);
+    } else {
+        // This func will validate that the current user is the admin of the competition
+        adminRemoveUser(req, res, targetUserId, competitionId);
+    }
 });
 
 // Returns an overview of the given competition that contains a list of users and their current points for the competition
@@ -150,3 +182,35 @@ router.get('/:competitionId/overview', function (req, res) {
 });
 
 module.exports = router;
+
+// Helper functions
+
+// Called when the admin of the competition is removing another user from the competition
+function adminRemoveUser(req, res, targetUserId, competitionId) {
+    // Need to check that the current user is the admin of the competition
+    database.query('SELECT COUNT(competition_id) FROM competitions WHERE admin_user_id = $1 AND competition_id = $2', [res.locals.oauth.token.user.id, competitionId])
+        .then(function (result) {
+            if (!result.length || result[0].count != 1) {
+                res.sendStatus(401);
+                return;
+            }
+
+            database.query('DELETE FROM users_competitions WHERE userid = $1 AND competitionid = $2', [targetUserId, competitionId])
+                .then(function (result) {
+                    res.sendStatus(200);
+                })
+        })
+}
+
+// Called when a user is trying to remove theirself from the competition
+function selfRemoveUser(req, res, targetUserId, competitionId) {
+    if (targetUserId !== res.locals.oauth.token.user.id) {
+        res.sendStatus(401);
+        return;
+    }
+
+    database.query('DELETE FROM users_competitions WHERE userid = $1 AND competitionid = $2', [res.locals.oauth.token.user.id, competitionId])
+        .then(function (result) {
+            res.sendStatus(200);
+        })
+}

@@ -53,7 +53,7 @@ module.exports.getAccessToken = function (bearerToken) {
  */
 
 module.exports.getClient = function (clientId, clientSecret) {
-    return database.query('SELECT client_id, client_secret, redirect_uri FROM oauth_clients WHERE client_id = $1', [clientId])
+    return database.query('SELECT client_id, client_secret, redirect_uri FROM oauth_clients WHERE client_id = $1 AND clientSecret = $2', [clientId, clientSecret])
         .then(function (result) {
             if (!result.length) { return false }
             var oAuthClient = result[0];
