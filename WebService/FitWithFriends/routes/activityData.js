@@ -3,48 +3,58 @@ const database = require('../utilities/database');
 const express = require('express');
 const router = express.Router();
 
+// Users can only score a maximum of 600 points per day
+const maxPointsPerDay = 600;
+
 router.post('/dailySummary', function (req, res) {
     const date = req.body['date'];
-    var caloriesBurned = req.body['activeCaloriesBurned'];
-    var caloriesGoal = req.body['activeCaloriesGoal'];
-    var exerciseTime = req.body['exerciseTime'];
-    var exerciseTimeGoal = req.body['exerciseTimeGoal'];
-    var moveTime = req.body['moveTime'];
-    var moveTimeGoal = req.body['moveTimeGoal'];
-    var standTime = req.body['standTime'];
-    var standTimeGoal = req.body['standTimeGoal'];
+    const caloriesBurned = req.body['activeCaloriesBurned'];
+    const caloriesGoal = req.body['activeCaloriesGoal'];
+    const exerciseTime = req.body['exerciseTime'];
+    const exerciseTimeGoal = req.body['exerciseTimeGoal'];
+    const standTime = req.body['standTime'];
+    const standTimeGoal = req.body['standTimeGoal'];
 
     // TODO: Other vars may be 0 - how to check that those are present?
     if (!date) {
         res.sendStatus(400);
     }
 
-    // HACK HACK HACK
-    // Users will only receive credit for reaching up to 200% of their goal for each category and any progress over that is not counted
-    // We'll enforce this during insertion into the database to make the point calculation query easier
-    caloriesBurned = Math.min(caloriesBurned, caloriesGoal * 2);
-    exerciseTime = Math.min(exerciseTime, exerciseTimeGoal * 2);
-    moveTime = Math.min(moveTime, moveTimeGoal * 2);
-    standTime = Math.min(standTime, standTimeGoal * 2);
+    var caloriePoints = 0;
+    var exercisePoints = 0;
+    var standPoints = 0;
 
-    // Another hack to make point calculation easier
-    // The point calculation query will fail due to a divide by zero error if a goal is zero
-    // For simplicity, we'll just set any goal that is 0 to 1 instead
-    caloriesGoal = caloriesGoal > 0 ? caloriesGoal : 1;
-    exerciseTimeGoal = exerciseTimeGoal > 0 ? exerciseTimeGoal : 1;
-    moveTimeGoal = moveTimeGoal > 0 ? moveTimeGoal : 1;
-    standTimeGoal = standTimeGoal > 0 ? standTimeGoal : 1;
+    // Avoid divide-by-zero errors
+    if (caloriesGoal > 0) {
+        caloriePoints = caloriesBurned / caloriesGoal * 100;
+    }
 
-    database.query('INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, move_time, move_time_goal, stand_time, stand_time_goal) \
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) \
-                    ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, move_time = EXCLUDED.move_time, move_time_goal = EXCLUDED.move_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal', 
-                    [res.locals.oauth.token.user.id, date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, moveTime, moveTimeGoal, standTime, standTimeGoal])
+    if (exerciseTimeGoal > 0) {
+        exercisePoints = exerciseTime / exerciseTimeGoal * 100;
+    }
+
+    if (standTimeGoal > 0) {
+        standPoints = standTime / standTimeGoal * 100;
+    }
+
+    // Make sure users don't score more than the maximum amount of points per day
+    const dailyPoints = Math.min(caloriePoints + exercisePoints + standPoints, maxPointsPerDay);
+
+    database.query('INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, daily_points) \
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) \
+                    ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal, daily_points = EXCLUDED.daily_points', 
+                    [res.locals.oauth.token.user.id, date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal, dailyPoints])
         .then(function (result) {
             res.sendStatus(200);
         })
 });
 
 router.post('/workout', function (req, res) {
+    // TODO: For the MVR we are limiting activity data to only the daily summaries
+    // We will re-enable the workout data in the future
+    res.sendStatus(404);
+    return;
+    
     const startDate = req.body['startDate'];
     const duration = req.body['duration'];
     const caloriesBurned = req.body['caloriesBurned'];

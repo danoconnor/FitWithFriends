@@ -44,7 +44,7 @@ class UserCompetitionPoints: Codable, Identifiable {
     let userId: UInt
     let displayName: String
     let totalPoints: Double
-    let pointsToday: Double
+    let pointsToday: Double?
 
     enum CodingKeys: String, CodingKey {
         case userId

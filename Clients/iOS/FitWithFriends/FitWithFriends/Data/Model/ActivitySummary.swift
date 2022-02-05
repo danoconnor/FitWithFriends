@@ -14,8 +14,6 @@ class ActivitySummary: Codable {
     let activeCaloriesGoal: Double
     let exerciseTime: Double
     let exerciseTimeGoal: Double
-    let moveTime: Double
-    let moveTimeGoal: Double
     let standTime: Double
     let standTimeGoal: Double
 
@@ -30,8 +28,6 @@ class ActivitySummary: Codable {
         activeCaloriesGoal = round(activitySummary.activeEnergyBurnedGoal.doubleValue(for: .largeCalorie()))
         exerciseTime = round(activitySummary.appleExerciseTime.doubleValue(for: .minute()))
         exerciseTimeGoal = round(activitySummary.appleExerciseTimeGoal.doubleValue(for: .minute()))
-        moveTime = round(activitySummary.appleMoveTime.doubleValue(for: .minute()))
-        moveTimeGoal = round(activitySummary.appleMoveTimeGoal.doubleValue(for: .minute()))
         standTime = round(activitySummary.appleStandHours.doubleValue(for: .count()))
         standTimeGoal = round(activitySummary.appleStandHoursGoal.doubleValue(for: .count()))
     }
