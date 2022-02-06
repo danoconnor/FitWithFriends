@@ -26,7 +26,9 @@ class CompetitionDetailViewModel {
         results = currentResults
 
         // Find the user's current position in the results
-        let userPosition = currentResults.firstIndex { $0.userId == authenticationManager.loggedInUserId } ?? -1 + 1
+        let userPositionZeroIndex = currentResults.firstIndex { $0.userId == authenticationManager.loggedInUserId } ?? -1
+        let userPosition = userPositionZeroIndex + 1
+        
         let userPositionString: String
         if userPosition > 3 {
             userPositionString = "th"
@@ -38,6 +40,8 @@ class CompetitionDetailViewModel {
             userPositionString = "st"
         }
 
-        userPositionDescription = "You're in \(userPosition)\(userPositionString)"
+        let userPositionPrefix = Date() > competitionOverview.competitionEnd ? "You finished in" : "You're in"
+
+        userPositionDescription = "\(userPositionPrefix) \(userPosition)\(userPositionString)"
     }
 }

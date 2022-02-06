@@ -148,7 +148,7 @@ router.get('/:competitionId/overview', function (req, res) {
         let currentDate = new Date();
         if (currentDate >= competitionInfo.start_date && currentDate <= competitionInfo.end_date) {
             queryParams = [competitionInfo.start_date, competitionInfo.end_date, currentDate];
-            query = 'SELECT user_id, display_name, activity_points FROM \
+            query = 'SELECT user_id, display_name, activity_points, daily_points FROM \
                         (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
                         INNER JOIN \
                             (SELECT user_id, SUM(daily_points) AS activity_points \
