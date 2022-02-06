@@ -4,7 +4,6 @@ const router = express.Router();
 const database = require('../utilities/database');
 const cryptoHelpers = require('../utilities/cryptoHelpers');
 
-
 // Returns the competitionIds that the currently authenticated user is a member of
 router.get('/', function (req, res) {
     database.query('SELECT competitionid from users_competitions WHERE userid = $1', [res.locals.oauth.token.user.id])
@@ -113,9 +112,8 @@ router.get('/:competitionId/overview', function (req, res) {
     // 1. Get the competition data and the users
     Promise.all([
         database.query('SELECT userid FROM users_competitions WHERE competitionid = $1', [req.params.competitionId]),
-        database.query('SELECT competition_id, start_date, end_date, display_name, workouts_only FROM competitions WHERE competition_id = $1', [req.params.competitionId])
-        ]
-    )
+        database.query('SELECT competition_id, start_date, end_date, display_name FROM competitions WHERE competition_id = $1', [req.params.competitionId])
+    ])
     .then(function (result) {
         if (result.length < 2) {
             res.sendStatus(500);
@@ -137,40 +135,40 @@ router.get('/:competitionId/overview', function (req, res) {
         }
 
         // 3. Calculate points for the activity data for all of the users in the competition in the competition date range
-        
+
         const userIdList = usersCompetitionsResult.map(row => row.userid).join();
         const competitionInfo = competitionsResult[0];
 
         var query = '';
         var queryParams = [];
-        
+
         // If the competition is currently active, then include each user's activity points so far today in the results
         let currentDate = new Date();
         if (currentDate >= competitionInfo.start_date && currentDate <= competitionInfo.end_date) {
             queryParams = [competitionInfo.start_date, competitionInfo.end_date, currentDate];
-            query = 'SELECT user_id, display_name, activity_points, daily_points FROM \
-                        (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
-                        INNER JOIN \
-                            (SELECT user_id, SUM(daily_points) AS activity_points \
+            query = 'SELECT activitySummaryData.user_id, display_name, activity_points, daily_points FROM \
+                    (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
+                    INNER JOIN \
+                        (SELECT user_id, SUM(daily_points) AS activity_points \
+                        FROM activity_summaries \
+                        WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
+                        GROUP BY user_id) AS activitySummaryData \
+                        FULL OUTER JOIN \
+                            (SELECT user_id, daily_points \
                             FROM activity_summaries \
-                            WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
-                            GROUP BY user_id) AS activitySummaryData \
-                            FULL OUTER JOIN \
-                                SELECT user_id, daily_points \
-                                FROM activity_summaries \
-                                WHERE date = $3 and user_id in (' + userIdList + ') \
-                                ON activitySummaryData.user_id = today_points.user_id \
-                        ON activitySummaryData.user_id = userInfo.userid';
+                            WHERE date = $3 and user_id in (' + userIdList + ')) AS today_points \
+                            ON activitySummaryData.user_id = today_points.user_id \
+                    ON activitySummaryData.user_id = userInfo.userid';
         } else {
             queryParams = [competitionInfo.start_date, competitionInfo.end_date];
             query = 'SELECT user_id, display_name, activity_points FROM \
-                        (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
-                        INNER JOIN \
-                            (SELECT user_id, SUM(daily_points) AS activity_points \
-                            FROM activity_summaries \
-                            WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
-                            GROUP BY user_id) AS activitySummaryData \
-                        ON activitySummaryData.user_id = userInfo.userid';
+                    (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
+                    INNER JOIN \
+                        (SELECT user_id, SUM(daily_points) AS activity_points \
+                        FROM activity_summaries \
+                        WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
+                        GROUP BY user_id) AS activitySummaryData \
+                    ON activitySummaryData.user_id = userInfo.userid';
         }
 
         database.query(query, queryParams)
@@ -183,6 +181,16 @@ router.get('/:competitionId/overview', function (req, res) {
                     'currentResults': result
                 });
             })
+            .catch(function (error) {
+                const errorMessage = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
+                res.send(errorMessage);
+                res.send(500);
+            })
+    })
+    .catch(function (error) {
+        const errorMessage = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
+        res.send(errorMessage);
+        res.send(500);
     })
 });
 
