@@ -1,5 +1,4 @@
 'use strict';
-const debug = require('debug');
 const express = require('express');
 const router = express.Router();
 const database = require('../utilities/database');
@@ -183,12 +182,14 @@ router.get('/:competitionId/overview', function (req, res) {
                 });
             })
             .catch(function (error) {
-                debug('Error getting competitionId ' + req.params.competitionId + '. Error: ' + error);
+                const errorMessage = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
+                res.send(errorMessage);
                 res.send(500);
             })
     })
     .catch(function (error) {
-        debug('Error getting competitionId ' + req.params.competitionId + '. Error: ' + error);
+        const errorMessage = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
+        res.send(errorMessage);
         res.send(500);
     })
 });
