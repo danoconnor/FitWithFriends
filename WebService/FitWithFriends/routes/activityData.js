@@ -7,7 +7,7 @@ const router = express.Router();
 const maxPointsPerDay = 600;
 
 router.post('/dailySummary', function (req, res) {
-    const date = req.body['date'];
+    const dateStr = req.body['date'];
     const caloriesBurned = req.body['activeCaloriesBurned'];
     const caloriesGoal = req.body['activeCaloriesGoal'];
     const exerciseTime = req.body['exerciseTime'];
@@ -16,8 +16,15 @@ router.post('/dailySummary', function (req, res) {
     const standTimeGoal = req.body['standTimeGoal'];
 
     // TODO: Other vars may be 0 - how to check that those are present?
+    if (!dateStr) {
+        res.sendStatus(400);
+        return;
+    }
+
+    const date = new Date(dateStr);
     if (!date) {
         res.sendStatus(400);
+        return;
     }
 
     var caloriePoints = 0;
@@ -42,11 +49,14 @@ router.post('/dailySummary', function (req, res) {
 
     database.query('INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, daily_points) \
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) \
-                    ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal, daily_points = EXCLUDED.daily_points', 
-                    [res.locals.oauth.token.user.id, date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal, dailyPoints])
+                    ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal, daily_points = EXCLUDED.daily_points',
+                    [res.locals.oauth.token.user.id, date.toUTCString(), caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal, dailyPoints])
         .then(function (result) {
             res.sendStatus(200);
         })
+        .catch(function (error) {
+            next(error);
+        });
 });
 
 router.post('/workout', function (req, res) {
@@ -74,6 +84,9 @@ router.post('/workout', function (req, res) {
         .then(function (result) {
             res.sendStatus(200);
         })
+        .catch(function (error) {
+            next(error);
+        });
 });
 
 module.exports = router;

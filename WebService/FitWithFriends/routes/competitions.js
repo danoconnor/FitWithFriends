@@ -146,7 +146,7 @@ router.get('/:competitionId/overview', function (req, res) {
         let currentDate = new Date();
         if (currentDate >= competitionInfo.start_date && currentDate <= competitionInfo.end_date) {
             queryParams = [competitionInfo.start_date, competitionInfo.end_date, currentDate];
-            query = 'SELECT activitySummaryData.user_idd, display_name, activity_points, daily_points FROM \
+            query = 'SELECT activitySummaryData.user_id, display_name, activity_points, daily_points FROM \
                     (SELECT userid, display_name FROM users WHERE userid in (' + userIdList + ')) AS userInfo \
                     INNER JOIN \
                         (SELECT user_id, SUM(daily_points) AS activity_points \
@@ -188,9 +188,9 @@ router.get('/:competitionId/overview', function (req, res) {
             })
     })
     .catch(function (error) {
-        const errorMessage = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
-        res.send(errorMessage);
-        res.send(500);
+        error.status = 500;
+        error.message = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
+        res.sendStatus(error.status);
     })
 });
 
@@ -212,6 +212,12 @@ function adminRemoveUser(req, res, targetUserId, competitionId) {
                 .then(function (result) {
                     res.sendStatus(200);
                 })
+                .catch(function (error) {
+                    next(error);
+                })
+        })
+        .catch(function (error) {
+            next(error);
         })
 }
 

@@ -5,11 +5,6 @@ const database = require('../utilities/database');
 const cryptoHelpers = require('../utilities/cryptoHelpers');
 const oauthServer = require('../oauth/server');
 
-/* GET users listing. */
-router.get('/',  function (req, res) {
-    res.send('respond with a resource');
-});
-
 router.get('/:userId', oauthServer.authenticate(), function (req, res) {
     if (res.locals.oauth.token.user.id !== req.params.userId) {
         // Authenticated user does not match requested user
@@ -26,6 +21,9 @@ router.get('/:userId', oauthServer.authenticate(), function (req, res) {
 
             res.json(result);
         })
+        .catch(function (error) {
+            next(error);
+        });
 });
 
 // Create user endpoint
@@ -41,8 +39,11 @@ router.post('/', function (req, res) {
         return;
     }
 
+    // Usernames are not case-sensitive and are always stored in the db as lowercase
+    const lowercaseUsername = username.toLowerCase();
+
     // Make sure that the username does not already exist
-    database.query('SELECT username from users WHERE username = $1', [username])
+    database.query('SELECT username from users WHERE username = $1', [lowercaseUsername])
         .then(function (result) {
             if (result.length > 0) {
                 // Username is taken
@@ -55,7 +56,7 @@ router.post('/', function (req, res) {
             const salt = cryptoHelpers.getRandomString();
             const passwordHash = cryptoHelpers.getHash(password, salt);
 
-            database.query('INSERT INTO users(username, password_hash, password_salt, display_name) VALUES ($1, $2, $3, $4) RETURNING userid', [username, passwordHash, salt, displayName])
+            database.query('INSERT INTO users(username, password_hash, password_salt, display_name) VALUES ($1, $2, $3, $4) RETURNING userid', [lowercaseUsername, passwordHash, salt, displayName])
                 .then(function (result) {
                     // Expect the new user's userId to be returned so we can provide it to the client
                     if (!result.length) {
@@ -67,7 +68,13 @@ router.post('/', function (req, res) {
                         userId: result[0].userid
                     });
                 })
+                .catch(function (error) {
+                    next(error);
+                });
         })
+        .catch(function (error) {
+            next(error);
+        });
 });
 
 module.exports = router;
