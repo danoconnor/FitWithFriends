@@ -188,9 +188,9 @@ router.get('/:competitionId/overview', function (req, res) {
             })
     })
     .catch(function (error) {
-        const errorMessage = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
-        res.send(errorMessage);
-        res.send(500);
+        error.status = 500;
+        error.message = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
+        res.sendStatus(error.status);
     })
 });
 
@@ -212,6 +212,12 @@ function adminRemoveUser(req, res, targetUserId, competitionId) {
                 .then(function (result) {
                     res.sendStatus(200);
                 })
+                .catch(function (error) {
+                    next(error);
+                })
+        })
+        .catch(function (error) {
+            next(error);
         })
 }
 

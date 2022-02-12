@@ -101,8 +101,11 @@ module.exports.getRefreshToken = function (bearerToken) {
  */
 
 module.exports.getUser = function (username, password) {
+    // Usernames are not case-sensitive and are always stored in the db as lowercase
+    const lowercaseUsername = username.toLowerCase();
+
     // Lookup user by username so we can get the salt, then check that password hash matches
-    return database.query('SELECT * FROM users WHERE username = $1', [username])
+    return database.query('SELECT * FROM users WHERE username = $1', [lowercaseUsername])
         .then(function (result) {
             const user = result.length ? result[0] : false;
             if (!user) {
@@ -114,7 +117,9 @@ module.exports.getUser = function (username, password) {
             const expectedPasswordHash = cryptoHelpers.getHash(password, salt)
             if (expectedPasswordHash === user.password_hash) {
                 return {
-                    id: user.userid
+                    // user.userid should be a number (BigInt) value, but is coming back as a string in some cases, which messes with client JSON parsing
+                    // Manually convert it to a string here to simplify things
+                    id: parseInt(user.userid)
                 }
             } else {
                 // Password did not match
