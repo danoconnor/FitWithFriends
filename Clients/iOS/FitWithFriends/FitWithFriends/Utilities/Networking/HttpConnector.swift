@@ -79,7 +79,7 @@ class HttpConnector {
                     let parsedData = try decoder.decode(T.self, from: data)
                     completion(.success(parsedData))
                 } catch {
-                    Logger.traceError(message: "Failed to parse response of type \(T.self)", error: error)
+                    Logger.traceError(message: "Failed to parse response of type \(T.self) from data \(String(data: data, encoding: .utf8) ?? "nil")", error: error)
                     completion(.failure(error))
                 }
             }

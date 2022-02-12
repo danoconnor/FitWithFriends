@@ -49,8 +49,8 @@ class UserCompetitionPoints: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case userId
         case displayName
-        case totalPoints
-        case pointsToday
+        case totalPoints = "activityPoints"
+        case pointsToday = "dailyPoints"
     }
 
     // MARK: Identifiable
