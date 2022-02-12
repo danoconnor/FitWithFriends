@@ -52,7 +52,7 @@ class Logger {
     static func traceError(message: String, error: Error? = nil, file: String = #file, functionName: String = #function, line: UInt = #line) {
         var messageToLog = message
         if let error = error {
-            messageToLog.append(" Error: \(error.localizedDescription)")
+            messageToLog.append(" Error: \(error.localizedDescription) (\(error.xtDebugDescription))")
         }
 
         trace(.error, message: messageToLog, file: file, functionName: functionName, line: line)
