@@ -35,16 +35,10 @@ class MockHealthKitManager: HealthKitManager {
         }
     }
 
-    override func registerDataQueries() {}
-
-    override func registerForBackgroundUpdates() {}
+    override func setupQueries() {}
 
     var return_currentActivitySummary: HKActivitySummary?
     override func getCurrentActivitySummary(completion: @escaping (HKActivitySummary?) -> Void) {
         completion(return_currentActivitySummary)
-
-        //        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-//            completion(self?.return_currentActivitySummary)
-//        }
     }
 }

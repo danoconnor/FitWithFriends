@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import HealthKit
+import UIKit
 
 class HealthKitManager {
     private let activityDataService: ActivityDataService
@@ -18,10 +19,10 @@ class HealthKitManager {
 
     private static let healthPromptKey = "HasPromptedForHealthPermissions"
     private static let lastUpdateKey = "LastHealthDataUpdate"
-    private static let lastWorkoutAnchorKey = "LastWorkoutAnchor"
 
-    private var activitySummaryQuery: HKQuery?
-    private var workoutQuery: HKQuery?
+    private static let backgroundTaskTimeout: TimeInterval = 60 // 60 seconds
+
+    private var observerQuery: HKQuery?
 
     private var loginStateCancellable: AnyCancellable?
 
@@ -52,7 +53,10 @@ class HealthKitManager {
 
         let dataTypes: [HKObjectType] = [
             .workoutType(),
-            .activitySummaryType()
+            .activitySummaryType(),
+            HKQuantityType(.activeEnergyBurned),
+            HKQuantityType(.appleExerciseTime),
+            HKQuantityType(.appleStandTime)
         ]
 
         hkHealthStore.requestAuthorization(toShare: nil, read: Set(dataTypes)) { [weak self] success, error in
@@ -66,47 +70,16 @@ class HealthKitManager {
 
             if success {
                 self?.userDefaults.set(true, forKey: HealthKitManager.healthPromptKey)
-                self?.registerForBackgroundUpdates()
+                self?.setupQueries()
             }
 
             completion()
         }
     }
 
-    func registerForBackgroundUpdates() {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            Logger.traceWarning(message: "Health data is not available on this device, not registering for background updates")
-            return
-        }
-
-        hkHealthStore.enableBackgroundDelivery(for: .activitySummaryType(), frequency: .hourly) { success, error in
-            if let error = error {
-                Logger.traceError(message: "Failed to enable background delivery for activity summary", error: error)
-            }
-
-            Logger.traceInfo(message: "Enabled background delivery for activity summary: \(success)")
-        }
-
-        // TODO: we don't care about workouts for now, will add later
-//        hkHealthStore.enableBackgroundDelivery(for: .workoutType(), frequency: .immediate) { success, error in
-//            if let error = error {
-//                Logger.traceError(message: "Failed to enable background delivery for workouts", error: error)
-//            }
-//
-//            Logger.traceInfo(message: "Enabled background delivery for workouts: \(success)")
-//        }
-    }
-
-    func registerDataQueries() {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            Logger.traceWarning(message: "Health data is not available on this device, not registering data queries")
-            return
-        }
-
-        registerActivitySummaryQuery()
-
-        // TODO: we don't care about workouts for now, will add later
-        // registerWorkoutQuery()
+    func setupQueries() {
+        registerObserverQueries()
+        registerForBackgroundUpdates()
     }
 
     func getCurrentActivitySummary(completion: @escaping (HKActivitySummary?) -> Void) {
@@ -135,99 +108,117 @@ class HealthKitManager {
         hkHealthStore.execute(query)
     }
 
-    private func registerActivitySummaryQuery() {
+    /// Register for hourly background updates for calorie, exercise, and stand data
+    private func registerForBackgroundUpdates() {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            Logger.traceWarning(message: "Health data is not available on this device, not registering for background updates")
+            return
+        }
+
+        let backgroundQuantityTypes = [
+            HKQuantityType(.activeEnergyBurned),
+            HKQuantityType(.appleExerciseTime),
+            HKQuantityType(.appleStandTime)
+        ]
+
+        for quantityType in backgroundQuantityTypes {
+            hkHealthStore.enableBackgroundDelivery(for: quantityType,
+                                                      frequency: .hourly) { success, error in
+                if let error = error {
+                    Logger.traceError(message: "Failed to enable background delivery for \(quantityType)", error: error)
+                }
+
+                Logger.traceInfo(message: "Enabled background delivery for \(quantityType): \(success)")
+            }
+        }
+    }
+
+    /// Sets up a query that will execute when the calorie, exercise, or stand data is updated
+    /// It will only execute max once an hour and only if the device is unlocked
+    private func registerObserverQueries() {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            Logger.traceWarning(message: "Health data is not available on this device, not registering data queries")
+            return
+        }
+
+        let queryDescriptors = [
+            HKQueryDescriptor(sampleType: HKQuantityType(.activeEnergyBurned), predicate: nil),
+            HKQueryDescriptor(sampleType: HKQuantityType(.appleExerciseTime), predicate: nil),
+            HKQueryDescriptor(sampleType: HKQuantityType(.appleStandTime), predicate: nil)
+        ]
+
+        let query = HKObserverQuery(queryDescriptors: queryDescriptors,
+                                    updateHandler: observerQueryUpdateHandler(query:samples:completion:error:))
+        hkHealthStore.execute(query)
+
+        // Hold a reference to the query so it continues to be updated while the app is in memory
+        observerQuery = query
+    }
+
+    /// This function will be called when iOS wakes our app up in the background to report updates
+    /// iOS will only tell us that data has changed (via the samples param) but we need to go query for that data separately
+    /// This func will query the daily activity summaries that happened since the last update and report them to the service
+    private func observerQueryUpdateHandler(query: HKObserverQuery, samples: Set<HKSampleType>?, completion: @escaping HKObserverQueryCompletionHandler, error: Error?) {
+        if let error = error {
+            Logger.traceError(message: "Error in observer query", error: error)
+            completion()
+            return
+        }
+
+        // Get the activity summaries to report to the service
         let dateRange = getQueryDateRange()
         let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: dateRange.startCompenents,
                                           end: dateRange.endComponents)
 
-        Logger.traceInfo(message: "Executing activity summary query for dates \(dateRange.startCompenents.description) to \(dateRange.endComponents.description)")
-        let query = HKActivitySummaryQuery(predicate: predicate, resultsHandler: handleActivitySummaryData(query:summaries:error:))
-        query.updateHandler = handleActivitySummaryData(query:summaries:error:)
-        hkHealthStore.execute(query)
+        let dateRangeDescription = "\(dateRange.startCompenents.date?.description ?? "nil") to \(dateRange.endComponents.date?.description ?? "nil")"
+        Logger.traceInfo(message: "Executing activity summary query for dates \(dateRangeDescription)")
+        let activitySummaryQuery = HKActivitySummaryQuery(predicate: predicate) { [weak self] _, summaries, error in
+            guard let summaries = summaries else {
+                Logger.traceError(message: "Failed to get activity summaries from observer update", error: error)
+                completion()
+                return
+            }
 
-        // Keep a reference to the query so the updateHandler is called
-        activitySummaryQuery = query
-    }
+            let dispatchGroup = DispatchGroup()
+            var reportActivitySummarySuccess = true
 
-    private func registerWorkoutQuery() {
-        var anchor: HKQueryAnchor?
-        if let previousAnchorData = userDefaults.data(forKey: HealthKitManager.lastWorkoutAnchorKey),
-           let unarchiver = try? NSKeyedUnarchiver(forReadingFrom: previousAnchorData),
-           let previousAnchor = unarchiver.decodeObject() as? HKQueryAnchor {
-            anchor = previousAnchor
-        }
-
-        let query = HKAnchoredObjectQuery(type: .workoutType(), predicate: nil, anchor: anchor, limit: HKObjectQueryNoLimit, resultsHandler: handleWorkoutData(query:workouts:deletedObjects:anchor:error:))
-        query.updateHandler = handleWorkoutData(query:workouts:deletedObjects:anchor:error:)
-        hkHealthStore.execute(query)
-
-        // Keep a reference to the query so the updateHandler is called
-        workoutQuery = query
-    }
-
-    private func handleActivitySummaryData(query: HKQuery, summaries: [HKActivitySummary]?, error: Error?) {
-        if let error = error {
-            Logger.traceError(message: "Error when querying activity summary data", error: error)
-            return
-        }
-
-        Logger.traceInfo(message: "Received activity summary update with \(summaries?.count ?? 0) new summaries")
-
-        userDefaults.setValue(Date().timeIntervalSince1970, forKey: HealthKitManager.lastUpdateKey)
-        if let summaries = summaries {
             for summary in summaries {
                 guard let activitySummary = ActivitySummary(activitySummary: summary) else {
                     Logger.traceWarning(message: "Could not create activity summary object")
                     continue
                 }
 
-                Logger.traceInfo(message: "Received activity summary update: \(activitySummary.xtDictionary?.description ?? "nil")")
-                activityDataService.reportActivitySummary(activitySummary: activitySummary) { error in
-                    // TODO: need some fallback to save data locally and retry in case of failure
-                    if let error = error {
-                        Logger.traceError(message: "Failed to upload activity summary", error: error)
-                    } else {
-                        Logger.traceInfo(message: "Successfully uploaded activity summary")
+                let activitySummaryDescritpion = activitySummary.xtDictionary?.description ?? "nil"
+                Logger.traceInfo(message: "Received activity summary update: \(activitySummaryDescritpion)")
+
+                dispatchGroup.enter()
+                self?.activityDataService.reportActivitySummary(activitySummary: activitySummary) { reportActivitySummaryError in
+                    if let reportActivitySummaryError = reportActivitySummaryError {
+                        Logger.traceError(message: "Failed to report activity summary: \(activitySummaryDescritpion)", error: reportActivitySummaryError)
+                        reportActivitySummarySuccess = false
                     }
+
+                    dispatchGroup.leave()
                 }
             }
-        }
-    }
 
-    private func handleWorkoutData(query: HKAnchoredObjectQuery, workouts: [HKSample]?, deletedObjects: [HKDeletedObject]?, anchor: HKQueryAnchor?, error: Error?) {
-        if let error = error {
-            Logger.traceError(message: "Error when querying workout data", error: error)
-            return
-        }
-
-        Logger.traceInfo(message: "Received workout update with \(workouts?.count ?? 0) new workouts")
-
-        if let anchor = anchor {
-            let archiver = NSKeyedArchiver(requiringSecureCoding: true)
-            archiver.encode(anchor)
-
-            userDefaults.setValue(archiver.encodedData, forKey: HealthKitManager.lastWorkoutAnchorKey)
-        }
-
-        if let workouts = workouts {
-            for workoutSample in workouts {
-                guard let workout = workoutSample as? HKWorkout else {
-                    Logger.traceWarning(message: "Sample was not a workout type, it was \(type(of: workoutSample))")
-                    continue
-                }
-
-                let workoutData = Workout(workout: workout)
-                Logger.traceInfo(message: "Found workout: \(workoutData.xtDictionary?.description ?? "nil")")
-                activityDataService.reportWorkout(workout: workoutData) { error in
-                    // TODO: need some fallback to save workout locally and retry upload in case of failure
-                    if let error = error {
-                        Logger.traceError(message: "Failed to report workout", error: error)
-                    } else {
-                        Logger.traceInfo(message: "Workout reported successfully")
-                    }
-                }
+            let dispatchGroupResult = dispatchGroup.wait(timeout: .now() + HealthKitManager.backgroundTaskTimeout)
+            if dispatchGroupResult != .success {
+                Logger.traceError(message: "Dispatch group timed out")
+                reportActivitySummarySuccess = false
             }
+
+            if reportActivitySummarySuccess {
+                // If we successfully reported all new activity summaries,
+                // then save a new anchor date so we don't report them again
+                self?.userDefaults.setValue(Date().timeIntervalSince1970, forKey: HealthKitManager.lastUpdateKey)
+            }
+
+            Logger.traceInfo(message: "Finished observer query update for dates \(dateRangeDescription). Summary count: \(summaries.count). Result: \(reportActivitySummarySuccess)")
+            completion()
         }
+
+        hkHealthStore.execute(activitySummaryQuery)
     }
 
     private func getQueryDateRange() -> (startCompenents: DateComponents, endComponents: DateComponents) {

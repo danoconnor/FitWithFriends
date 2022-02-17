@@ -17,10 +17,7 @@ extension AppDelegate: UIApplicationDelegate {
         // Apple's docs suggest that we register our queries in didFinishLaunchingWithOptions so that they will be executed
         // properly when the app is launched in the background
         // https://developer.apple.com/documentation/healthkit/hkobserverquery/executing_observer_queries
-        FitWithFriendsApp.objectGraph.healthKitManager.registerDataQueries()
-
-        // Always register for background health data updates, if available
-        FitWithFriendsApp.objectGraph.healthKitManager.registerForBackgroundUpdates()
+        FitWithFriendsApp.objectGraph.healthKitManager.setupQueries()
 
         return true
     }
