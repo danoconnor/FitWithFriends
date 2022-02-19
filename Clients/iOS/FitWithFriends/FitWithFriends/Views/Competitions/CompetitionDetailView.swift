@@ -32,9 +32,7 @@ struct CompetitionDetailView: View {
             ForEach(0 ..< viewModel.results.count) {
                 UserCompetitionResultView(position: $0 + 1, result: viewModel.results[$0])
             }
-            .padding(.leading)
-            .padding(.trailing)
-            .padding(.top)
+            .padding()
         }
         .background(Color.secondarySystemBackground)
     }

@@ -39,7 +39,6 @@ struct UserCompetitionResultView: View {
             Spacer()
 
             Text("\(Int(result.totalPoints)) (\(Int(result.pointsToday ?? 0)))")
-                .padding(.trailing)
                 .padding(.leading)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

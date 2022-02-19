@@ -13,49 +13,14 @@ class HomepageViewModel: ObservableObject {
     private let competitionManager: CompetitionManager
     private let healthKitManager: HealthKitManager
 
-    var todayActivitySummary: ActivitySummary? {
-        didSet {
-            guard let summary = todayActivitySummary else { return }
-
-            var list = listItems.filter { $0 is CompetitionOverview }
-
-            // The activity summary is always first in the list
-            list.insert(summary, at: 0)
-
-            listItems = list
-        }
-    }
-
-    private var currentCompetitions: [CompetitionOverview]? {
-        didSet {
-            guard let competitions = currentCompetitions else { return }
-
-            var list: [IdentifiableBase]
-            if let firstItem = listItems.first, firstItem is ActivitySummary {
-                // Remove all existing competitions from the list and re-add the new data
-                list = listItems.filter { $0 is ActivitySummary }
-                list.insert(contentsOf: competitions, at: 1)
-            } else {
-                list = []
-                list.insert(contentsOf: competitions, at: 0)
-            }
-
-            listItems = list
-        }
-    }
-
-    /// Holds the list of items that the homepage should display
-    /// This will start with the current activity summary, if available,
-    /// followed by all of the available competition overviews
-    @Published var listItems: [IdentifiableBase]
+    @Published var todayActivitySummary: ActivitySummary?
+    @Published var currentCompetitions: [CompetitionOverview]?
 
     private var competitionLoadListener: AnyCancellable?
 
     init(competitionManager: CompetitionManager, healthKitManager: HealthKitManager) {
         self.competitionManager = competitionManager
         self.healthKitManager = healthKitManager
-
-        listItems = []
 
         // Fire and forget the activity summary refresh
         let _ = Task { await self.refreshTodayActivitySummary() }
