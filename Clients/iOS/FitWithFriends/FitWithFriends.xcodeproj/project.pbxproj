@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */; };
 		0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7494256AE65F00821775 /* CreateAccountView.swift */; };
 		0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */; };
 		0B359721256C731A006D956A /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359720256C731A006D956A /* MainContentView.swift */; };
@@ -96,6 +97,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdateDelegate.swift; sourceTree = "<group>"; };
 		0B2D7494256AE65F00821775 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
 		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				0B3597772571502A006D956A /* HealthKitManager.swift */,
+				0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */,
 			);
 			path = WorkoutData;
 			sourceTree = "<group>";
@@ -613,6 +616,7 @@
 				0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */,
 				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
 				0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */,
+				0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */,
 				0B47A23D279CB69400C2970E /* MockEmailUtility.swift in Sources */,
 				0B47A23F279CB6D600C2970E /* MockHealthKitManager.swift in Sources */,
 				0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */,

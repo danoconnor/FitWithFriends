@@ -52,6 +52,8 @@ public class CompetitionManager: ObservableObject {
             return
         }
 
+        Logger.traceInfo(message: "Starting competition overview refresh")
+
         // Get the competitions that the user is a part of, then fetch the overviews for those competitions
         competitionService.getUsersCompetitions(userId: loggedInUserId) { [weak self] usersCompetitionResult in
             guard let competitionIds = usersCompetitionResult.xtSuccess else {
@@ -74,5 +76,13 @@ public class CompetitionManager: ObservableObject {
                 }
             }
         }
+    }
+}
+
+extension CompetitionManager: ActivityUpdateDelegate {
+    func activityDataUpdated() {
+        // When we have new activity data in the service, re-fetch the competition data
+        // so it is up-to-date
+        refreshCompetitionOverviews()
     }
 }

@@ -42,15 +42,16 @@ class ObjectGraph: IObjectGraph {
         authenticationManager = AuthenticationManager(authenticationService: authenticationService,
                                                       tokenManager: tokenManager)
 
-        healthKitManager = HealthKitManager(activityDataService: activityDataService,
-                                            authenticationManager: authenticationManager,
-                                            userDefaults: userDefaults)
-
         pushNotificationManager = PushNotificationManager(authenticationManager: authenticationManager,
                                                           pushNotificationService: pushNotificationService,
                                                           userDefaults: userDefaults)
 
         competitionManager = CompetitionManager(authenticationManager: authenticationManager,
                                                 competitionService: competitionService)
+
+        healthKitManager = HealthKitManager(activityDataService: activityDataService,
+                                            activityUpdateDelegate: competitionManager,
+                                            authenticationManager: authenticationManager,
+                                            userDefaults: userDefaults)
     }
 }

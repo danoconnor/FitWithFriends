@@ -15,7 +15,10 @@ class MockHealthKitManager: HealthKitManager {
     }
 
     init() {
-        super.init(activityDataService: MockActivityDataService(), authenticationManager: MockAuthenticationManager(), userDefaults: UserDefaults.standard)
+        super.init(activityDataService: MockActivityDataService(),
+                   activityUpdateDelegate: MockCompetitionManager(),
+                   authenticationManager: MockAuthenticationManager(),
+                   userDefaults: UserDefaults.standard)
 
         // Default to returning some activity data
         let activitySummary = HKActivitySummary()

@@ -12,10 +12,12 @@ import UIKit
 
 class HealthKitManager {
     private let activityDataService: ActivityDataService
+    private let activityUpdateDelegate: ActivityUpdateDelegate
     private let authenticationManager: AuthenticationManager
     private let userDefaults: UserDefaults
 
     private let hkHealthStore = HKHealthStore()
+    private let activitySummaryQueue = DispatchQueue(label: "ActivitySummaryQueue")
 
     private static let healthPromptKey = "HasPromptedForHealthPermissions"
     private static let lastUpdateKey = "LastHealthDataUpdate"
@@ -38,11 +40,22 @@ class HealthKitManager {
     }
 
     init(activityDataService: ActivityDataService,
+         activityUpdateDelegate: ActivityUpdateDelegate,
          authenticationManager: AuthenticationManager,
          userDefaults: UserDefaults) {
         self.activityDataService = activityDataService
+        self.activityUpdateDelegate = activityUpdateDelegate
         self.authenticationManager = authenticationManager
         self.userDefaults = userDefaults
+
+        loginStateCancellable = authenticationManager.$loginState.sink { [weak self] state in
+            if state == .loggedIn {
+                // Report the activity summaries when the user logs in
+                self?.activitySummaryQueue.async {
+                    self?.reportActivitySummaries(completion: nil)
+                }
+            }
+        }
     }
 
     func requestHealthKitPermission(completion: @escaping () -> Void) {
@@ -158,10 +171,25 @@ class HealthKitManager {
     /// This function will be called when iOS wakes our app up in the background to report updates
     /// iOS will only tell us that data has changed (via the samples param) but we need to go query for that data separately
     /// This func will query the daily activity summaries that happened since the last update and report them to the service
-    private func observerQueryUpdateHandler(query: HKObserverQuery, samples: Set<HKSampleType>?, completion: @escaping HKObserverQueryCompletionHandler, error: Error?) {
+    private func observerQueryUpdateHandler(query: HKObserverQuery,
+                                            samples: Set<HKSampleType>?,
+                                            completion: @escaping HKObserverQueryCompletionHandler,
+                                            error: Error?) {
         if let error = error {
             Logger.traceError(message: "Error in observer query", error: error)
             completion()
+            return
+        }
+
+        activitySummaryQueue.async { [weak self] in
+            self?.reportActivitySummaries(completion: completion)
+        }
+    }
+
+    private func reportActivitySummaries(completion: HKObserverQueryCompletionHandler?) {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            Logger.traceWarning(message: "Health data is not available on this device, not querying activity summaries")
+            completion?()
             return
         }
 
@@ -175,7 +203,7 @@ class HealthKitManager {
         let activitySummaryQuery = HKActivitySummaryQuery(predicate: predicate) { [weak self] _, summaries, error in
             guard let summaries = summaries else {
                 Logger.traceError(message: "Failed to get activity summaries from observer update", error: error)
-                completion()
+                completion?()
                 return
             }
 
@@ -212,10 +240,11 @@ class HealthKitManager {
                 // If we successfully reported all new activity summaries,
                 // then save a new anchor date so we don't report them again
                 self?.userDefaults.setValue(Date().timeIntervalSince1970, forKey: HealthKitManager.lastUpdateKey)
+                self?.activityUpdateDelegate.activityDataUpdated()
             }
 
             Logger.traceInfo(message: "Finished observer query update for dates \(dateRangeDescription). Summary count: \(summaries.count). Result: \(reportActivitySummarySuccess)")
-            completion()
+            completion?()
         }
 
         hkHealthStore.execute(activitySummaryQuery)
