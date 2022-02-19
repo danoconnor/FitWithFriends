@@ -24,8 +24,11 @@ class MockCompetitionManager: CompetitionManager {
             UserCompetitionPoints(userId: 2, name: "Test user 2", total: 425, today: 75),
             UserCompetitionPoints(userId: 3, name: "Test user 3", total: 100, today: 0)
         ]
+        
         return_competitionOverviews = [
-            0: CompetitionOverview(start: Date(), end: Date().addingTimeInterval(TimeInterval.xtDays(7)), currentResults: results)
+            0: CompetitionOverview(start: Date(), end: Date().addingTimeInterval(TimeInterval.xtDays(7)), currentResults: results),
+            1: CompetitionOverview(start: Date(), end: Date().addingTimeInterval(TimeInterval.xtDays(7)), currentResults: results),
+            2: CompetitionOverview(start: Date(), end: Date().addingTimeInterval(TimeInterval.xtDays(7)), currentResults: results),
         ]
     }
 

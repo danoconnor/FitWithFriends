@@ -46,33 +46,46 @@ public class CompetitionManager: ObservableObject {
         }
     }
 
-    private func refreshCompetitionOverviews() {
-        guard let loggedInUserId = authenticationManager.loggedInUserId else {
-            Logger.traceWarning(message: "Tried to refresh competition overviews without a logged in user ID")
-            return
-        }
+    func refreshCompetitionOverviews(completion: (() -> Void)? = nil) {
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
 
-        Logger.traceInfo(message: "Starting competition overview refresh")
-
-        // Get the competitions that the user is a part of, then fetch the overviews for those competitions
-        competitionService.getUsersCompetitions(userId: loggedInUserId) { [weak self] usersCompetitionResult in
-            guard let competitionIds = usersCompetitionResult.xtSuccess else {
-                Logger.traceError(message: "Failed to fetch competitions for user \(loggedInUserId)", error: usersCompetitionResult.xtError)
+            guard let loggedInUserId = self.authenticationManager.loggedInUserId else {
+                Logger.traceWarning(message: "Tried to refresh competition overviews without a logged in user ID")
                 return
             }
 
-            guard let self = self else { return }
+            Logger.traceInfo(message: "Starting competition overview refresh")
 
-            for competitionId in competitionIds {
-                self.competitionService.getCompetitionOverview(competitionId: competitionId) { competitionOverviewResult in
-                    switch competitionOverviewResult {
-                    case let .success(overview):
-                        DispatchQueue.main.async {
-                            self.competitionOverviews[competitionId] = overview
+            // Get the competitions that the user is a part of, then fetch the overviews for those competitions
+            self.competitionService.getUsersCompetitions(userId: loggedInUserId) { usersCompetitionResult in
+                guard let competitionIds = usersCompetitionResult.xtSuccess else {
+                    Logger.traceError(message: "Failed to fetch competitions for user \(loggedInUserId)", error: usersCompetitionResult.xtError)
+                    return
+                }
+
+                let dispatchGroup = DispatchGroup()
+                let updateQueue = DispatchQueue(label: "RefreshCompetitionQueue")
+                var refreshedData: [UInt: CompetitionOverview] = [:]
+
+                for competitionId in competitionIds {
+                    dispatchGroup.enter()
+                    self.competitionService.getCompetitionOverview(competitionId: competitionId) { competitionOverviewResult in
+                        switch competitionOverviewResult {
+                        case let .success(overview):
+                            updateQueue.sync {
+                                refreshedData[overview.competitionId] = overview
+                            }
+                        case let .failure(error):
+                            Logger.traceError(message: "Failed to get overview for competition \(competitionId)", error: error)
                         }
-                    case let .failure(error):
-                        Logger.traceError(message: "Failed to get overview for competition \(competitionId)", error: error)
+
+                        dispatchGroup.leave()
                     }
+                }
+
+                dispatchGroup.notify(queue: .main) {
+                    self.competitionOverviews = refreshedData
                 }
             }
         }

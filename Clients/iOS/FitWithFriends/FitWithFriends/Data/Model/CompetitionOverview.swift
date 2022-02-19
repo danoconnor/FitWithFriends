@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CompetitionOverview: Codable, Identifiable {
+class CompetitionOverview: IdentifiableBase, Codable {
     // MARK: Codable
 
     let competitionId: UInt
@@ -23,10 +23,6 @@ class CompetitionOverview: Codable, Identifiable {
         case competitionEnd
         case currentResults
     }
-
-    // MARK: Identifiable
-
-    let id = UUID()
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
     init(id: UInt = 0, name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = []) {

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */; };
+		0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */; };
 		0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7494256AE65F00821775 /* CreateAccountView.swift */; };
 		0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */; };
 		0B359721256C731A006D956A /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359720256C731A006D956A /* MainContentView.swift */; };
@@ -98,6 +99,7 @@
 
 /* Begin PBXFileReference section */
 		0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdateDelegate.swift; sourceTree = "<group>"; };
+		0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableBase.swift; sourceTree = "<group>"; };
 		0B2D7494256AE65F00821775 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
 		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
@@ -402,6 +404,7 @@
 				0B99FC2D256A2CFB00673133 /* Token.swift */,
 				0B67532D2574686D0032835D /* Workout.swift */,
 				0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */,
+				0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -661,6 +664,7 @@
 				0B47A233279CB24200C2970E /* MockObjectGraph.swift in Sources */,
 				0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */,
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,
+				0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */,
 				0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */,
 				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
 				0BBD7896259A4B7200E08EB2 /* PushNotificationService.swift in Sources */,

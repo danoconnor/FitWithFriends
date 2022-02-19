@@ -22,47 +22,46 @@ struct LoggedInContentView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack {
-                if let activitySummary = homepageViewModel.todayActivitySummary {
+        VStack {
+            List(homepageViewModel.listItems) {
+                if let activitySummary = $0 as? ActivitySummary {
                     TodaySummaryView(activitySummary: activitySummary)
-                        .cornerRadius(10)
-                        .padding()
+                } else if let competition = $0 as? CompetitionOverview {
+                    CompetitionDetailView(objectGraph: objectGraph,
+                                          competitionOverview: competition)
                 }
-
-                if let currentCompetition = homepageViewModel.currentCompetition {
-                    CompetitionDetailView(objectGraph: objectGraph, competitionOverview: currentCompetition)
-                        .cornerRadius(10)
-                        .padding()
-                }
-
-                Spacer()
-
-                Button(action: {
-                    homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-                }, label: {
-                    Text("New competition")
-                })
-                .padding()
-
-                Button(action: {
-                    objectGraph.authenticationManager.logout()
-                }, label: {
-                    Text("Logout")
-                })
-                .padding()
             }
-            .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
-                switch homepageSheetViewModel.sheetToShow {
-                case .createCompetition:
-                    CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
-                case .permissionPrompt:
-                    PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
-                default:
-                    Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
-                }
+            .refreshable {
+                await homepageViewModel.refreshData()
+            }
+            .listStyle(.inset)
+
+            Spacer()
+
+            Button(action: {
+                homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+            }, label: {
+                Text("New competition")
             })
+            .padding()
+
+            Button(action: {
+                objectGraph.authenticationManager.logout()
+            }, label: {
+                Text("Logout")
+            })
+            .padding()
         }
+        .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
+            switch homepageSheetViewModel.sheetToShow {
+            case .createCompetition:
+                CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
+            case .permissionPrompt:
+                PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
+            default:
+                Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
+            }
+        })
     }
 }
 
