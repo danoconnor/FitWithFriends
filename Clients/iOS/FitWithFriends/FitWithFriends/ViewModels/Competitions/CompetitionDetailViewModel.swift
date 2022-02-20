@@ -13,6 +13,7 @@ class CompetitionDetailViewModel {
 
     let competitionName: String
     let userPositionDescription: String
+    let competitionDatesDescription: String
     let results: [UserCompetitionPoints]
 
     init(authenticationManager: AuthenticationManager,
@@ -24,6 +25,14 @@ class CompetitionDetailViewModel {
 
         let currentResults = competitionOverview.currentResults.sorted { $0.totalPoints > $1.totalPoints }
         results = currentResults
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+
+        let startString = dateFormatter.string(from: competitionOverview.competitionStart)
+        let endString = dateFormatter.string(from: competitionOverview.competitionEnd)
+        competitionDatesDescription = "\(startString) - \(endString)"
 
         // Find the user's current position in the results
         let userPositionZeroIndex = currentResults.firstIndex { $0.userId == authenticationManager.loggedInUserId } ?? -1

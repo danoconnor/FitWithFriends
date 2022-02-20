@@ -14,9 +14,9 @@ class ActivityDataService: ServiceBase {
             return HttpError.generic
         }
 
-        let result: Result<ActivitySummary, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
-                                                                                             method: .post,
-                                                                                             body: requestBody)
+        let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
+                                                                                           method: .post,
+                                                                                           body: requestBody)
         return result.xtError
     }
 

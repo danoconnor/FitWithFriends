@@ -22,15 +22,14 @@ struct UserCompetitionResultView: View {
 
     var body: some View {
         HStack {
-            Group {
+            // TODO: how to handle different text sizes?
+            ZStack {
+                Circle()
+                    .frame(width: 40, height: 40)
+                    .foregroundColor(positionBackgroundColor)
+
                 Text(position.description)
-                    .padding(.leading)
-                    .padding(.bottom, 10)
-                    .padding(.top, 10)
-                    .padding(.trailing)
             }
-            .background(positionBackgroundColor)
-            .cornerRadius(100)
 
             Text(result.displayName)
                 .padding(.leading)

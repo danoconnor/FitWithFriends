@@ -23,14 +23,26 @@ struct CompetitionDetailView: View {
                 .padding(.top)
                 .font(.title)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text(viewModel.userPositionDescription)
-                .padding(.leading)
-                .padding(.trailing)
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack {
+                Text(viewModel.userPositionDescription)
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .padding(.bottom)
+                    .font(.subheadline)
 
-            ForEach(0 ..< viewModel.results.count) {
-                UserCompetitionResultView(position: $0 + 1, result: viewModel.results[$0])
+                Spacer()
+
+                Text(viewModel.competitionDatesDescription)
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .padding(.bottom)
+                    .font(.subheadline)
+            }
+
+            VStack {
+                ForEach(0 ..< viewModel.results.count) {
+                    UserCompetitionResultView(position: $0 + 1, result: viewModel.results[$0])
+                }
             }
             .padding()
         }

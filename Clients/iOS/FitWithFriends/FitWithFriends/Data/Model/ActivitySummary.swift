@@ -51,7 +51,7 @@ extension ActivitySummary {
     /// This is an estimate of the points that this activity summary will provide
     /// The real source of truth comes from the service in the CompetitionOverview entity
     var competitionPoints: Double {
-        let caloriePoints = activeCaloriesBurned / activeCaloriesBurned * 100
+        let caloriePoints = activeCaloriesBurned / activeCaloriesGoal * 100
         let exercisePoints = exerciseTime / exerciseTimeGoal * 100
         let standPoints = standTime / standTimeGoal * 100
         let totalPoints = caloriePoints + exercisePoints + standPoints
