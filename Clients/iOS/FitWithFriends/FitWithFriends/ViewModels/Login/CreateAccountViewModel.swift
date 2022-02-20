@@ -24,14 +24,18 @@ class CreateAccountViewModel: ObservableObject {
         }
 
         state = .inProgress
-        userService.createUser(username: username, password: password, displayName: displayName) { [weak self] result in
+        Task.detached { [weak self] in
+            guard let self = self else { return }
+
+            let result = await self.userService.createUser(username: username, password: password, displayName: displayName)
+
             switch result {
             case .success:
                 // TODO: do something with the returned user - store user ID?
-                self?.setState(.success)
+                self.setState(.success)
             case let .failure(error):
                 Logger.traceError(message: "Failed to create new user", error: error)
-                self?.setState(.failed(errorMessage: "Could not create user"))
+                self.setState(.failed(errorMessage: "Could not create user"))
             }
         }
     }

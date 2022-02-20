@@ -23,7 +23,7 @@ class HomepageViewModel: ObservableObject {
         self.healthKitManager = healthKitManager
 
         // Fire and forget the activity summary refresh
-        let _ = Task { await self.refreshTodayActivitySummary() }
+        Task.detached { await self.refreshTodayActivitySummary() }
 
         // Need to hold a reference to this, otherwise the sink callback will never be invoked
         competitionLoadListener = competitionManager.$competitionOverviews.sink { [weak self] newValue in

@@ -9,16 +9,15 @@ import Foundation
 
 class AuthenticationService: ServiceBase {
     /// Gets a token using the user's credentials
-    func getToken(username: String, password: String, completion: @escaping (Result<Token, Error>) -> Void) {
+    func getToken(username: String, password: String) async -> Result<Token, Error> {
         let requestBody: [String: String] = [
             "username": username,
             "password": password,
             RequestConstants.Body.grantType: RequestConstants.Body.passwordGrant
         ]
 
-        makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
-                                            method: .post,
-                                            body: requestBody,
-                                            completion: completion)
+        return await makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
+                                                         method: .post,
+                                                         body: requestBody)
     }
 }

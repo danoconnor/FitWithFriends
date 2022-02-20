@@ -12,20 +12,22 @@ class MockAuthenticationManager: AuthenticationManager {
         super.init(authenticationService: MockAuthenticationService(), tokenManager: MockTokenManager())
     }
 
-    var shouldFailLogin = false
-    var userToLogin: UInt = 0
-    override func login(username: String, password: String, completion: @escaping (Error?) -> Void) {
-        loginState = .inProgress
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            guard let self = self else { return }
+    var return_error: Error?
 
-            if self.shouldFailLogin {
-                self.loginState = .notLoggedIn
-            } else {
-                self.loggedInUserId = self.userToLogin
-                self.loginState = .loggedIn
-            }
+    var userToLogin: UInt = 0
+    override func login(username: String, password: String) async -> Error? {
+        loginState = .inProgress
+
+        await MockUtilities.delayOneSecond()
+
+        if return_error != nil {
+            loginState = .notLoggedIn
+        } else {
+            loggedInUserId = userToLogin
+            loginState = .loggedIn
         }
+
+        return return_error
     }
 
     override func logout() {
@@ -33,10 +35,8 @@ class MockAuthenticationManager: AuthenticationManager {
         self.loggedInUserId = nil
     }
 
-    var return_refreshTokenError: Error?
-    override func refreshToken(token: Token, completion: @escaping (Error?) -> Void) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            completion(self?.return_refreshTokenError)
-        }
+    override func refreshToken(token: Token) async -> Error? {
+        await MockUtilities.delayOneSecond()
+        return return_error
     }
 }

@@ -14,15 +14,13 @@ class MockAuthenticationService: AuthenticationService {
 
     var return_token: Token?
     var return_error: Error?
-    override func getToken(token: Token, completion: @escaping (Result<Token, Error>) -> Void) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            guard let self = self else { return }
+    override func getToken(token: Token) async -> Result<Token, Error> {
+        await MockUtilities.delayOneSecond()
 
-            if let token = self.return_token {
-                completion(.success(token))
-            } else {
-                completion(.failure(self.return_error ?? HttpError.generic))
-            }
+        if let token = return_token {
+            return .success(token)
+        } else {
+            return .failure(self.return_error ?? HttpError.generic)
         }
     }
 }

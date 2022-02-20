@@ -18,10 +18,4 @@ class MockActivityDataService: ActivityDataService {
             completion(self?.return_error)
         }
     }
-
-    override func reportWorkout(workout: Workout, completion: @escaping (Error?) -> Void) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            completion(self?.return_error)
-        }
-    }
 }

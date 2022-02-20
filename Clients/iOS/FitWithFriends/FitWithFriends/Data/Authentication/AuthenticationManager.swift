@@ -28,22 +28,22 @@ class AuthenticationManager: ObservableObject {
         setInitialLoginState()
     }
 
-    func login(username: String, password: String, completion: @escaping (Error?) -> Void) {
+    func login(username: String, password: String) async -> Error? {
         loginState = .inProgress
-        authenticationService.getToken(username: username, password: password) { [weak self] result in
-            switch result {
-            case let .success(token):
-                self?.tokenManager.storeToken(token)
-                self?.loggedInUserId = token.userId
-                self?.loginState = .loggedIn
-                completion(nil)
-            case let .failure(error):
-                Logger.traceError(message: "Could not fetch token for user", error: error)
-                self?.loggedInUserId = nil
-                self?.loginState = .notLoggedIn
-                completion(nil)
-            }
+        let result: Result<Token, Error> = await authenticationService.getToken(username: username, password: password)
+
+        switch result {
+        case let .success(token):
+            tokenManager.storeToken(token)
+            loggedInUserId = token.userId
+            loginState = .loggedIn
+        case let .failure(error):
+            Logger.traceError(message: "Could not fetch token for user", error: error)
+            loggedInUserId = nil
+            loginState = .notLoggedIn
         }
+
+        return result.xtError
     }
 
     func logout() {
@@ -52,21 +52,22 @@ class AuthenticationManager: ObservableObject {
         loginState = .notLoggedIn
     }
 
-    func refreshToken(token: Token, completion: @escaping (Error?) -> Void) {
-        authenticationService.getToken(token: token) { [weak self] result in
-            switch result {
-            case let .success(token):
-                self?.loggedInUserId = token.userId
-                self?.tokenManager.storeToken(token)
-                self?.loginState = .loggedIn
-                completion(nil)
-            case let .failure(error):
-                Logger.traceError(message: "Could not refresh token", error: error)
-                self?.loggedInUserId = nil
-                self?.loginState = .notLoggedIn
-                completion(error)
-            }
+    func refreshToken(token: Token) async -> Error? {
+        let result: Result<Token, Error> = await authenticationService.getToken(token: token)
+
+        switch result {
+        case let .success(token):
+            Logger.traceInfo(message: "Successfully refreshed token")
+            loggedInUserId = token.userId
+            tokenManager.storeToken(token)
+            loginState = .loggedIn
+        case let .failure(error):
+            Logger.traceError(message: "Could not refresh token", error: error)
+            loggedInUserId = nil
+            loginState = .notLoggedIn
         }
+
+        return result.xtError
     }
 
     private func setInitialLoginState() {
@@ -80,12 +81,8 @@ class AuthenticationManager: ObservableObject {
             switch error {
             case let .expired(token: token):
                 loginState = .inProgress
-                refreshToken(token: token) { error in
-                    if let error = error {
-                        Logger.traceError(message: "Failed to login using refresh token", error: error)
-                    } else {
-                        Logger.traceInfo(message: "Successfully logged in using refresh token")
-                    }
+                Task.detached {
+                    await self.refreshToken(token: token)
                 }
             default:
                 logout()

@@ -8,10 +8,9 @@
 import Foundation
 
 class HttpConnector {
-    func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: String]? = nil, method: HttpMethod, completion: @escaping (Result<T, Error>) -> Void) {
+    func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: String]? = nil, method: HttpMethod) async -> Result<T, Error> {
         guard let urlObj = URL(string: url) else {
-            completion(.failure(HttpError.invalidUrl(url: url)))
-            return
+            return .failure(HttpError.invalidUrl(url: url))
         }
 
         var request = URLRequest(url: urlObj)
@@ -33,16 +32,12 @@ class HttpConnector {
             }
         }
 
-        let dataTask = URLSession.shared.dataTask(with: request) { data, urlResponse, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request, delegate: nil)
 
-            guard let httpResponse = urlResponse as? HTTPURLResponse else {
+            guard let httpResponse = response as? HTTPURLResponse else {
                 Logger.traceError(message: "Response was not HTTPURLResponse")
-                completion(.failure(HttpError.generic))
-                return
+                return .failure(HttpError.generic)
             }
 
             guard (200 ... 299).contains(httpResponse.statusCode) else {
@@ -54,37 +49,32 @@ class HttpConnector {
                 }
 
                 var message: String?
-                if let responseData = data,
-                   let responseString = String(data: responseData, encoding: .utf8) {
+                if let responseString = String(data: data, encoding: .utf8) {
                     message = responseString
                 }
 
                 Logger.traceError(message: "Received HTTP error. \(message ?? "")", error: error)
-                completion(.failure(error))
-                return
+                return .failure(error)
             }
 
             // If the caller doesn't expect any data back, then return here so we don't fail during parsing
-            if T.self == EmptyReponse.self {
-                completion(.success(EmptyReponse() as! T))
-                return
+            if T.self == EmptyResponse.self {
+                return .success(EmptyResponse() as! T)
             }
 
-            if let data = data {
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    decoder.dateDecodingStrategy = .formatted(DateFormatter.isoFormatter)
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                decoder.dateDecodingStrategy = .formatted(DateFormatter.isoFormatter)
 
-                    let parsedData = try decoder.decode(T.self, from: data)
-                    completion(.success(parsedData))
-                } catch {
-                    Logger.traceError(message: "Failed to parse response of type \(T.self) from data \(String(data: data, encoding: .utf8) ?? "nil")", error: error)
-                    completion(.failure(error))
-                }
+                let parsedData = try decoder.decode(T.self, from: data)
+                return .success(parsedData)
+            } catch {
+                Logger.traceError(message: "Failed to parse response of type \(T.self) from data \(String(data: data, encoding: .utf8) ?? "nil")", error: error)
+                return .failure(error)
             }
+        } catch {
+            return .failure(error)
         }
-
-        dataTask.resume()
     }
 }

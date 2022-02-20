@@ -17,8 +17,6 @@ class ObjectGraph: IObjectGraph {
     let healthKitManager: HealthKitManager
     let httpConnector: HttpConnector
     let keychainUtilities: KeychainUtilities
-    let pushNotificationManager: PushNotificationManager
-    let pushNotificationService: PushNotificationService
     let shakeGestureHandler: ShakeGestureHandler
     let tokenManager: TokenManager
     let userDefaults: UserDefaults
@@ -36,15 +34,10 @@ class ObjectGraph: IObjectGraph {
         activityDataService = ActivityDataService(httpConnector: httpConnector, tokenManager: tokenManager)
         authenticationService = AuthenticationService(httpConnector: httpConnector, tokenManager: tokenManager)
         competitionService = CompetitionService(httpConnector: httpConnector, tokenManager: tokenManager)
-        pushNotificationService = PushNotificationService(httpConnector: httpConnector, tokenManager: tokenManager)
         userService = UserService(httpConnector: httpConnector, tokenManager: tokenManager)
 
         authenticationManager = AuthenticationManager(authenticationService: authenticationService,
                                                       tokenManager: tokenManager)
-
-        pushNotificationManager = PushNotificationManager(authenticationManager: authenticationManager,
-                                                          pushNotificationService: pushNotificationService,
-                                                          userDefaults: userDefaults)
 
         competitionManager = CompetitionManager(authenticationManager: authenticationManager,
                                                 competitionService: competitionService)

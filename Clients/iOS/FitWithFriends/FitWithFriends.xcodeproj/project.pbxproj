@@ -13,11 +13,11 @@
 		0B1CBEB427C1A5020008C72A /* FramePreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB327C1A5020008C72A /* FramePreferenceKey.swift */; };
 		0B1CBEB627C1A5480008C72A /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB527C1A5480008C72A /* ActivityIndicator.swift */; };
 		0B1CBEB827C1A5660008C72A /* RefreshableScrollViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB727C1A5660008C72A /* RefreshableScrollViewModel.swift */; };
+		0B1CBEBA27C1C0CC0008C72A /* MockUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */; };
 		0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7494256AE65F00821775 /* CreateAccountView.swift */; };
 		0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */; };
 		0B359721256C731A006D956A /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359720256C731A006D956A /* MainContentView.swift */; };
 		0B359724256C7357006D956A /* AppStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359723256C7357006D956A /* AppStateViewModel.swift */; };
-		0B35972925704651006D956A /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35972825704651006D956A /* PushNotificationManager.swift */; };
 		0B35972C257046FC006D956A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35972B257046FC006D956A /* AppDelegate.swift */; };
 		0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B35977325714E7D006D956A /* HealthKit.framework */; };
 		0B3597782571502A006D956A /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3597772571502A006D956A /* HealthKitManager.swift */; };
@@ -85,7 +85,6 @@
 		0BBD788D259A4A9400E08EB2 /* ServiceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */; };
 		0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */; };
 		0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7892259A4B4800E08EB2 /* UserService.swift */; };
-		0BBD7896259A4B7200E08EB2 /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */; };
 		0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */; };
 		0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */; };
 		0BBD78A1259A537100E08EB2 /* CompetitionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */; };
@@ -108,12 +107,12 @@
 		0B1CBEB327C1A5020008C72A /* FramePreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramePreferenceKey.swift; sourceTree = "<group>"; };
 		0B1CBEB527C1A5480008C72A /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
 		0B1CBEB727C1A5660008C72A /* RefreshableScrollViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshableScrollViewModel.swift; sourceTree = "<group>"; };
+		0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUtilities.swift; sourceTree = "<group>"; };
 		0B2D7494256AE65F00821775 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
 		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
 		0B359720256C731A006D956A /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		0B359723256C7357006D956A /* AppStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateViewModel.swift; sourceTree = "<group>"; };
-		0B35972825704651006D956A /* PushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManager.swift; sourceTree = "<group>"; };
 		0B35972B257046FC006D956A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0B35977325714E7D006D956A /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		0B3597772571502A006D956A /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
@@ -182,7 +181,6 @@
 		0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceBase.swift; sourceTree = "<group>"; };
 		0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		0BBD7892259A4B4800E08EB2 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
-		0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
 		0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDataService.swift; sourceTree = "<group>"; };
 		0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionService.swift; sourceTree = "<group>"; };
 		0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManager.swift; sourceTree = "<group>"; };
@@ -242,14 +240,6 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		0B35972725704640006D956A /* PushNotifications */ = {
-			isa = PBXGroup;
-			children = (
-				0B35972825704651006D956A /* PushNotificationManager.swift */,
-			);
-			path = PushNotifications;
-			sourceTree = "<group>";
-		};
 		0B35977625715018006D956A /* WorkoutData */ = {
 			isa = PBXGroup;
 			children = (
@@ -265,7 +255,6 @@
 				0B99FC15256A208E00673133 /* Authentication */,
 				0BBD789F259A536000E08EB2 /* Competitions */,
 				0B99FC25256A290900673133 /* Model */,
-				0B35972725704640006D956A /* PushNotifications */,
 				0B99FC19256A250D00673133 /* Service */,
 				0B35977625715018006D956A /* WorkoutData */,
 			);
@@ -288,6 +277,7 @@
 				0B47A23C279CB69400C2970E /* MockEmailUtility.swift */,
 				0B47A23E279CB6D600C2970E /* MockHealthKitManager.swift */,
 				0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */,
+				0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -407,7 +397,6 @@
 				0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */,
 				0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */,
 				0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */,
-				0BBD7895259A4B7200E08EB2 /* PushNotificationService.swift */,
 				0BBD7892259A4B4800E08EB2 /* UserService.swift */,
 				0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */,
 				0B9BADAE256AD88100EB1B60 /* RequestConstants.swift */,
@@ -673,7 +662,6 @@
 				0B9058C927B0844800AE1712 /* Error+Extensions.swift in Sources */,
 				0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */,
 				0B99FC06256A0BA800673133 /* LogFormatter.swift in Sources */,
-				0B35972925704651006D956A /* PushNotificationManager.swift in Sources */,
 				0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */,
 				0B1CBEB627C1A5480008C72A /* ActivityIndicator.swift in Sources */,
 				0B47A222279C90EC00C2970E /* User.swift in Sources */,
@@ -699,10 +687,10 @@
 				0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */,
 				0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */,
 				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
-				0BBD7896259A4B7200E08EB2 /* PushNotificationService.swift in Sources */,
 				0B47A235279CB2ED00C2970E /* IObjectGraph.swift in Sources */,
 				0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */,
 				0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */,
+				0B1CBEBA27C1C0CC0008C72A /* MockUtilities.swift in Sources */,
 				0BBD78A1259A537100E08EB2 /* CompetitionManager.swift in Sources */,
 				0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */,
 				0B47A227279CA8EF00C2970E /* MockAuthenticationManager.swift in Sources */,

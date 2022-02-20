@@ -32,9 +32,8 @@ class MockCompetitionManager: CompetitionManager {
         ]
     }
 
-    override func createCompetition(startDate: Date, endDate: Date, competitionName: String, completion: @escaping (Error?) -> Void) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            completion(self?.return_error)
-        }
+    override func createCompetition(startDate: Date, endDate: Date, competitionName: String) async -> Error? {
+        await MockUtilities.delayOneSecond()
+        return return_error
     }
 }

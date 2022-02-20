@@ -15,24 +15,24 @@ class MockCompetitionService: CompetitionService {
     }
 
     var return_competitionOverview: CompetitionOverview?
-    override func getCompetitionOverview(competitionId: UInt, completion: @escaping (Result<CompetitionOverview, Error>) -> Void) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            if let overview = self?.return_competitionOverview {
-                completion(.success(overview))
-            } else {
-                completion(.failure(self?.return_error ?? HttpError.generic))
-            }
+    override func getCompetitionOverview(competitionId: UInt) async -> Result<CompetitionOverview, Error> {
+        await MockUtilities.delayOneSecond()
+
+        if let competitionOverview = return_competitionOverview {
+            return .success(competitionOverview)
+        } else {
+            return .failure(return_error ?? HttpError.generic)
         }
     }
 
     var return_usersCompetitions: [UInt]?
-    override func getUsersCompetitions(userId: UInt, completion: @escaping (Result<[UInt], Error>) -> Void) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
-            if let competitions = self?.return_usersCompetitions {
-                completion(.success(competitions))
-            } else {
-                completion(.failure(self?.return_error ?? HttpError.generic))
-            }
+    override func getUsersCompetitions(userId: UInt) async -> Result<[UInt], Error> {
+        await MockUtilities.delayOneSecond()
+
+        if let competitions = return_usersCompetitions {
+            return .success(competitions)
+        } else {
+            return .failure(return_error ?? HttpError.generic)
         }
     }
 }

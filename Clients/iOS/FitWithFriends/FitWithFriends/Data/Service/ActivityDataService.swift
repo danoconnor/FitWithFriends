@@ -8,41 +8,24 @@
 import Foundation
 
 class ActivityDataService: ServiceBase {
-    func reportActivitySummary(activitySummary: ActivitySummary, completion: @escaping (Error?) -> Void) {
+    func reportActivitySummary(activitySummary: ActivitySummary) async -> Error? {
         guard let requestBody = activitySummary.xtDictionary else {
             Logger.traceError(message: "Failed to get dictionary for activity summary")
-            completion(HttpError.generic)
-            return
+            return HttpError.generic
         }
 
-        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
-                                          method: .post,
-                                          body: requestBody) { (result: Result<EmptyReponse, Error>) in
-            switch result {
-            case let .failure(error):
-                completion(error)
-            default:
-                completion(nil)
-            }
-        }
+        let result: Result<ActivitySummary, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
+                                                                                             method: .post,
+                                                                                             body: requestBody)
+        return result.xtError
     }
 
-    func reportWorkout(workout: Workout, completion: @escaping (Error?) -> Void) {
-        guard let requestBody = workout.xtDictionary else {
-            Logger.traceError(message: "Failed to get dictionary for workout")
-            completion(HttpError.generic)
-            return
-        }
-
-        makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/workout",
-                                          method: .post,
-                                          body: requestBody) { (result: Result<EmptyReponse, Error>) in
-            switch result {
-            case let .failure(error):
-                completion(error)
-            default:
-                completion(nil)
-            }
+    /// Apple's HealthKit APIs still use the completion block architecture, so add this wrapper to make things work smoothly
+    func reportActivitySummary(activitySummary: ActivitySummary, completion: @escaping (Error?) -> Void) {
+        Task.detached { [weak self] in
+            guard let self = self else { return }
+            let error = await self.reportActivitySummary(activitySummary: activitySummary)
+            completion(error)
         }
     }
 }

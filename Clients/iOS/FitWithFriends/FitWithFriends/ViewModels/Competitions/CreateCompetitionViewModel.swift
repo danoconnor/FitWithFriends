@@ -29,15 +29,19 @@ class CreateCompetitionViewModel: ObservableObject {
             return
         }
 
-        competitionManager.createCompetition(startDate: startDate,
-                                             endDate: endDate,
-                                             competitionName: competitionName) { [weak self] error in
-            DispatchQueue.main.async {
+        Task.detached { [weak self] in
+            guard let self = self else { return }
+
+            let error = await self.competitionManager.createCompetition(startDate: startDate,
+                                                                        endDate: endDate,
+                                                                        competitionName: competitionName)
+
+            await MainActor.run {
                 if let error = error {
-                    self?.state = .failed(errorMessage: error.localizedDescription)
+                    self.state = .failed(errorMessage: error.localizedDescription)
                 } else {
-                    self?.state = .success
-                    self?.homepageSheetViewModel.updateState(sheet: .createCompetition, state: false)
+                    self.state = .success
+                    self.homepageSheetViewModel.updateState(sheet: .createCompetition, state: false)
                 }
             }
         }
