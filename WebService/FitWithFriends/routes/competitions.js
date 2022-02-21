@@ -245,16 +245,17 @@ router.post('/description', function (req, res) {
 // Returns the competition access token for the given competition ID
 // The authenticated user must be the admin of the competition to receive this data
 router.get('/:competitionId/adminDetail', function (req, res) {
-    database.query('SELECT access_token FROM competitions WHERE competition_id = $1 AND admin_user_id = $2', [req.params.competitionId, res.locals.oauth.token.user.id])
+    database.query('SELECT competition_id, access_token FROM competitions WHERE competition_id = $1 AND admin_user_id = $2', [req.params.competitionId, res.locals.oauth.token.user.id])
         .then(function (result) {
             if (!result.length) {
                 res.sendStatus(404);
                 return;
             }
 
-            const competitionAccessToken = result[0].access_token;
+            const competitionInfo = result[0];
             res.json({
-                'competitionAccessToken': competitionAccessToken
+                'competitionAccessToken': competitionInfo.access_token,
+                'competitionId': competitionInfo.competition_id
             });
         })
         .catch(function (error) {
