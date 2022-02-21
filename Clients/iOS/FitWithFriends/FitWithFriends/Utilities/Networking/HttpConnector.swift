@@ -33,6 +33,7 @@ class HttpConnector {
         }
 
         do {
+            Logger.traceInfo(message: "Making request with URL \(urlObj.absoluteString)")
             let (data, response) = try await URLSession.shared.data(for: request, delegate: nil)
 
             guard let httpResponse = response as? HTTPURLResponse else {

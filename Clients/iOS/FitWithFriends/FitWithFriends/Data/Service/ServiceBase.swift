@@ -11,7 +11,7 @@ class ServiceBase {
     private let httpConnector: HttpConnector
     private let tokenManager: TokenManager
 
-    private static let refreshTokenQueue = DispatchQueue(label: "RefreshTokenQueue")
+    private static var activeRefreshTokenTask: Task<Result<Token, Error>, Error>?
 
     init(httpConnector: HttpConnector,
          tokenManager: TokenManager) {
@@ -21,28 +21,43 @@ class ServiceBase {
 
     /// Gets a new access token using the refresh token
     func getToken(token: Token) async -> Result<Token, Error> {
-        dispatchPrecondition(condition: .onQueue(ServiceBase.refreshTokenQueue))
-
         // Sometimes there are multiple concurrent calls to refresh the token,
-        // which can invalidate previously issued tokens
-        // We use the DispatchQueue to prevent concurrent calls, so check here if we
-        // have already gotten a new, valid token
-        if let currentToken = self.tokenManager.getCachedToken().xtSuccess,
-           !currentToken.isAccessTokenExpired {
-            Logger.traceInfo(message: "Tried to refresh token, but already have a valid token in the cache")
-            return .success(currentToken)
+        // which can invalidate previously issued tokens.
+        // Make sure there is only one refresh token task at a time
+        if let existingTask = ServiceBase.activeRefreshTokenTask {
+            do {
+                Logger.traceInfo(message: "There is an existing refresh token task, waiting for results")
+                return try await existingTask.value
+            } catch {
+                Logger.traceError(message: "Failed to wait for existing refresh token task", error: error)
+                return .failure(error)
+            }
         }
 
-        Logger.traceInfo(message: "Requesting new access token using refresh token")
+        let task = Task<Result<Token, Error>, Error> {
+            Logger.traceInfo(message: "Requesting new access token using refresh token")
 
-        let requestBody: [String: String] = [
-            RequestConstants.Body.grantType: RequestConstants.Body.refreshTokenGrant,
-            RequestConstants.Body.refreshToken: token.refreshToken
-        ]
+            let requestBody: [String: String] = [
+                RequestConstants.Body.grantType: RequestConstants.Body.refreshTokenGrant,
+                RequestConstants.Body.refreshToken: token.refreshToken
+            ]
 
-        return await self.makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
-                                                              method: .post,
-                                                              body: requestBody)
+            let result: Result<Token, Error> = await self.makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
+                                                                                              method: .post,
+                                                                                              body: requestBody)
+
+            ServiceBase.activeRefreshTokenTask = nil
+            return result
+        }
+
+        ServiceBase.activeRefreshTokenTask = task
+
+        do {
+            return try await task.value
+        } catch {
+            Logger.traceError(message: "Failed to wait for refresh token task", error: error)
+            return .failure(error)
+        }
     }
 
     /// Makes a request to the service and authenticates by providing the client ID/secret.
