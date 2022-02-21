@@ -16,7 +16,8 @@ struct LoggedInContentView: View {
 
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
-        homepageSheetViewModel = HomepageSheetViewModel(healthKitManager: objectGraph.healthKitManager)
+        homepageSheetViewModel = HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
+                                                        healthKitManager: objectGraph.healthKitManager)
         homepageViewModel = HomepageViewModel(competitionManager: objectGraph.competitionManager,
                                               healthKitManager: objectGraph.healthKitManager)
     }

@@ -73,7 +73,8 @@ struct CreateCompetitionView: View {
 
 struct CreateCompetitionView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateCompetitionView(homepageSheetViewModel: HomepageSheetViewModel(healthKitManager: MockHealthKitManager()),
+        CreateCompetitionView(homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(),
+                                                                             healthKitManager: MockHealthKitManager()),
         objectGraph: MockObjectGraph())
     }
 }

@@ -90,13 +90,26 @@ public class CompetitionManager: ObservableObject {
                 guard let result = result else { continue }
                 results[result.0] = result.1
             }
-            
+
             return results
         }
 
         await MainActor.run {
             self.competitionOverviews = refreshedData
         }
+    }
+
+    func joinCompetition(competitionToken: String) async -> Error? {
+        return await competitionService.joinCompetition(competitionToken: competitionToken)
+    }
+
+    func leaveCompetition(competitionId: UInt) async -> Error? {
+        guard let currentUserId = authenticationManager.loggedInUserId else {
+            Logger.traceWarning(message: "Tried to leave competition with no logged in user")
+            return TokenError.notFound
+        }
+
+        return await competitionService.removeUserFromCompetition(userId: currentUserId, competitionId: competitionId)
     }
 }
 

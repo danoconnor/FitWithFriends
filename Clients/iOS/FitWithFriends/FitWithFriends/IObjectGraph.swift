@@ -9,6 +9,7 @@ import Foundation
 
 protocol IObjectGraph {
     var activityDataService: ActivityDataService { get }
+    var appProtocolHandler: AppProtocolHandler { get }
     var authenticationManager: AuthenticationManager { get }
     var authenticationService: AuthenticationService { get }
     var competitionManager: CompetitionManager { get }

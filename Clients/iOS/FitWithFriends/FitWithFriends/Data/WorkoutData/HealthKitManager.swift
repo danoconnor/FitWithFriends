@@ -181,6 +181,7 @@ class HealthKitManager {
             return
         }
 
+        Logger.traceInfo(message: "Received observer query update")
         activitySummaryQueue.async { [weak self] in
             self?.reportActivitySummaries(completion: completion)
         }

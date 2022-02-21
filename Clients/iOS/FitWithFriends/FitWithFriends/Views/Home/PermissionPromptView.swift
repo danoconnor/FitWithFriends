@@ -74,7 +74,8 @@ struct PermissionPromptView: View {
 
 struct PermissionPromptView_Previews: PreviewProvider {
     static var previews: some View {
-        PermissionPromptView(homepageSheetViewModel: HomepageSheetViewModel(healthKitManager: MockHealthKitManager()),
+        PermissionPromptView(homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(),
+                                                                            healthKitManager: MockHealthKitManager()),
                              objectGraph: MockObjectGraph())
     }
 }

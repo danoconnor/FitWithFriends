@@ -32,4 +32,27 @@ class CompetitionService: ServiceBase {
                                                                                            body: requestBody)
         return result.xtError
     }
+
+    func joinCompetition(competitionToken: String) async -> Error? {
+        let requestBody: [String: String] = [
+            "accessToken": competitionToken
+        ]
+
+        let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/join",
+                                                                                           method: .post,
+                                                                                           body: requestBody)
+        return result.xtError
+    }
+
+    func removeUserFromCompetition(userId: UInt, competitionId: UInt) async -> Error? {
+        let requestBody: [String: String] = [
+            "competitionId": competitionId.description,
+            "userId": userId.description
+        ]
+
+        let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/leave",
+                                                                                           method: .post,
+                                                                                           body: requestBody)
+        return result.xtError
+    }
 }

@@ -9,6 +9,7 @@ import Foundation
 
 class MockObjectGraph: IObjectGraph {
     var activityDataService: ActivityDataService
+    var appProtocolHandler: AppProtocolHandler
     var authenticationManager: AuthenticationManager
     var authenticationService: AuthenticationService
     var competitionManager: CompetitionManager
@@ -24,6 +25,7 @@ class MockObjectGraph: IObjectGraph {
 
     init() {
         activityDataService = MockActivityDataService()
+        appProtocolHandler = MockAppProtocolHandler()
         authenticationManager = MockAuthenticationManager()
         authenticationService = MockAuthenticationService()
         competitionManager = MockCompetitionManager()

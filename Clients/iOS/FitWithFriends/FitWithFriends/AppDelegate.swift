@@ -34,12 +34,9 @@ extension AppDelegate: UIApplicationDelegate {
         Logger.traceInfo(message: "------------------------------ applicationWillTerminate ------------------------------")
     }
 
-    // TODO: disabling push notifications support for now, will re-add later
-//    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-//        ObjectGraph.sharedInstance.pushNotificationManager.registerPushTokenIfNecessary(deviceToken)
-//    }
-//
-//    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-//        Logger.traceError(message: "Failed to register for remote notifications", error: error)
-//    }
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        Logger.traceInfo(message: "Application launched with url \(url.absoluteString)")
+
+        return FitWithFriendsApp.objectGraph.appProtocolHandler.handleProtocol(url: url)
+    }
 }

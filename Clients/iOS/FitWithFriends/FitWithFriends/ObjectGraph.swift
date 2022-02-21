@@ -9,6 +9,7 @@ import Foundation
 
 class ObjectGraph: IObjectGraph {
     let activityDataService: ActivityDataService
+    let appProtocolHandler: AppProtocolHandler
     let authenticationManager: AuthenticationManager
     let authenticationService: AuthenticationService
     let competitionManager: CompetitionManager
@@ -23,6 +24,7 @@ class ObjectGraph: IObjectGraph {
     let userService: UserService
 
     init() {
+        appProtocolHandler = AppProtocolHandler()
         httpConnector = HttpConnector()
         keychainUtilities = KeychainUtilities()
         userDefaults = UserDefaults.standard
