@@ -50,16 +50,17 @@ router.post('/', function (req, res) {
 });
 
 // Join existing competition endpoint - adds the currently authenticated user to the competition that matches the given token
-// Expects a competition access token in the request body
+// Expects a competition ID and competition access token in the request body
 router.post('/join', function (req, res) {
     const accessToken = req.body['accessToken'];
-    if (!accessToken) {
+    const competitionId = req.body['competitionId'];
+    if (!accessToken || !competitionId) {
         res.sendStatus(400);
         return;
     }
 
     // Find matching competition and validate access token
-    database.query('SELECT competition_id FROM competitions WHERE access_token = $1', accessToken)
+    database.query('SELECT competition_id FROM competitions WHERE access_token = $1 AND competition_id = $2', [accessToken, competitionId])
         .then(function (result) {
             if (!result.length) {
                 res.sendStatus(404);
@@ -108,6 +109,7 @@ router.post('/leave', function (req, res) {
 });
 
 // Returns an overview of the given competition that contains a list of users and their current points for the competition
+// The user must be a member of this competition in order to receive the data
 router.get('/:competitionId/overview', function (req, res) {
     // 1. Get the competition data and the users
     Promise.all([
@@ -192,6 +194,74 @@ router.get('/:competitionId/overview', function (req, res) {
         error.message = 'Error getting competitionId ' + req.params.competitionId + '. Error: ' + error;
         res.sendStatus(error.status);
     })
+});
+
+// Returns a description of the competition containing the name, dates, and number of members of the competition
+// The user does not need to be a member of the competition to get this info but they do need to have the competition access token
+router.post('/description', function (req, res) {
+    const competitionId = req.body['competitionId'];
+    const competitionToken = req.body['competitionAccessToken'];
+
+    if (!competitionId || !competitionToken) {
+        res.sendStatus(400);
+        return;
+    }
+
+    Promise.all([
+        database.query('SELECT COUNT(userid) FROM users_competitions WHERE competitionid = $1', [competitionId]),
+        database.query('SELECT start_date, end_date, display_name FROM competitions WHERE competition_id = $1 AND access_token = $2', [competitionId, competitionToken])
+    ])
+        .then(function (result) {
+            if (result.length < 2) {
+                res.sendStatus(500);
+                return;
+            }
+
+            const usersCompetitionsResult = result[0];
+            const competitionsResult = result[1];
+
+            if (!usersCompetitionsResult.length || !competitionsResult.length) {
+                res.sendStatus(404);
+                return;
+            }
+
+            const competitionInfo = competitionsResult[0];
+            const numMembers = usersCompetitionsResult[0].count;
+
+            res.json({
+                'competitionName': competitionInfo.display_name,
+                'competitionStart': competitionInfo.start_date,
+                'competitionEnd': competitionInfo.end_date,
+                'numMembers': numMembers
+            });
+        })
+        .catch(function (error) {
+            error.status = 500;
+            error.message = 'Error getting details for ' + competitionId + '. Error: ' + error;
+            res.sendStatus(error.status);
+        });
+});
+
+// Returns the competition access token for the given competition ID
+// The authenticated user must be the admin of the competition to receive this data
+router.get('/:competitionId/adminDetail', function (req, res) {
+    database.query('SELECT access_token FROM competitions WHERE competition_id = $1 AND admin_user_id = $2', [req.params.competitionId, res.locals.oauth.token.user.id])
+        .then(function (result) {
+            if (!result.length) {
+                res.sendStatus(404);
+                return;
+            }
+
+            const competitionAccessToken = result[0].access_token;
+            res.json({
+                'competitionAccessToken': competitionAccessToken
+            });
+        })
+        .catch(function (error) {
+            error.status = 500;
+            error.message = 'Error getting getting admin details for ' + req.params.competitionId + '. Error: ' + error;
+            res.sendStatus(error.status);
+        });
 });
 
 module.exports = router;
