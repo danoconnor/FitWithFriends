@@ -114,7 +114,7 @@ router.get('/:competitionId/overview', function (req, res) {
     // 1. Get the competition data and the users
     Promise.all([
         database.query('SELECT userid FROM users_competitions WHERE competitionid = $1', [req.params.competitionId]),
-        database.query('SELECT competition_id, start_date, end_date, display_name FROM competitions WHERE competition_id = $1', [req.params.competitionId])
+        database.query('SELECT competition_id, start_date, end_date, display_name, admin_user_id FROM competitions WHERE competition_id = $1', [req.params.competitionId])
     ])
     .then(function (result) {
         if (result.length < 2) {
@@ -140,6 +140,7 @@ router.get('/:competitionId/overview', function (req, res) {
 
         const userIdList = usersCompetitionsResult.map(row => row.userid).join();
         const competitionInfo = competitionsResult[0];
+        const isUserAdmin = res.locals.oauth.token.user.id === competitionInfo.admin_user_id;
 
         var query = '';
         var queryParams = [];
@@ -180,6 +181,7 @@ router.get('/:competitionId/overview', function (req, res) {
                     'competitionName': competitionInfo.display_name,
                     'competitionStart': competitionInfo.start_date,
                     'competitionEnd': competitionInfo.end_date,
+                    'isUserAdmin': isUserAdmin,
                     'currentResults': result
                 });
             })
