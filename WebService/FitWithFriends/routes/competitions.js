@@ -73,10 +73,13 @@ router.post('/join', function (req, res) {
             // Check that the user has not already joined a competition yet
             database.query('SELECT COUNT(competitionid) FROM users_competitions WHERE userid = $1', res.locals.oauth.token.user.id)
                 .then(function (result) {
-                    if (!result.length || result[0].count > 0) {
-                        res.sendStatus(400);
-                        return;
-                    }
+
+                    // TODO: re-add a check for how many existing competitions the user is a part of
+                    // should check that there is only 1 active competition at a time
+                    //if (!result.length || result[0].count > 0) {
+                    //    res.sendStatus(400);
+                    //    return;
+                    //}
 
                     // Add the user to the competition
                     database.query('INSERT INTO users_competitions VALUES ($1, $2) \
