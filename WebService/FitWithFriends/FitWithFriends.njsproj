@@ -51,6 +51,7 @@
     <Content Include="utilities\database.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="utilities\errorHelpers.js" />
     <Content Include="views\index.pug" />
     <Content Include="views\layout.pug" />
     <Content Include="views\error.pug" />
