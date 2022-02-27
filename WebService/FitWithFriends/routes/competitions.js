@@ -1,4 +1,5 @@
 'use strict';
+
 const express = require('express');
 const router = express.Router();
 const database = require('../utilities/database');
@@ -148,8 +149,12 @@ router.get('/:competitionId/overview', function (req, res) {
         var query = '';
         var queryParams = [];
 
+        // Need to make sure this date is in the timezone of the competition
+        // TODO: get IANA timezone from database
+        let currentDateStr = new Date().toLocaleDateString('en-US', { timeZone: 'America/New_York' });
+        let currentDate = new Date(currentDateStr);
+
         // If the competition is currently active, then include each user's activity points so far today in the results
-        let currentDate = new Date();
         if (currentDate >= competitionInfo.start_date && currentDate <= competitionInfo.end_date) {
             queryParams = [competitionInfo.start_date, competitionInfo.end_date, currentDate];
             query = 'SELECT activitySummaryData.user_id, display_name, activity_points, daily_points FROM \
