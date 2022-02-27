@@ -249,7 +249,7 @@ router.post('/description', function (req, res) {
                         'competitionStart': competitionInfo.start_date,
                         'competitionEnd': competitionInfo.end_date,
                         'numMembers': parseInt(numMembers),
-                        'admin_name': adminName
+                        'adminName': adminName
                     });
                 })
                 .catch(function (error) {
