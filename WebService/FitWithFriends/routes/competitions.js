@@ -215,7 +215,7 @@ router.post('/description', function (req, res) {
 
     Promise.all([
         database.query('SELECT COUNT(userid) FROM users_competitions WHERE competitionid = $1', [competitionId]),
-        database.query('SELECT start_date, end_date, display_name FROM competitions WHERE competition_id = $1 AND access_token = $2', [competitionId, competitionToken])
+        database.query('SELECT start_date, end_date, display_name, admin_user_id FROM competitions WHERE competition_id = $1 AND access_token = $2', [competitionId, competitionToken])
     ])
         .then(function (result) {
             if (result.length < 2) {
@@ -234,12 +234,29 @@ router.post('/description', function (req, res) {
             const competitionInfo = competitionsResult[0];
             const numMembers = usersCompetitionsResult[0].count;
 
-            res.json({
-                'competitionName': competitionInfo.display_name,
-                'competitionStart': competitionInfo.start_date,
-                'competitionEnd': competitionInfo.end_date,
-                'numMembers': parseInt(numMembers)
-            });
+            // Find the display name of the competition admin so we can include it in the response
+            database.query('SELECT display_name FROM users WHERE userId = $1', [competitionInfo.admin_user_id])
+                .then(function (result) {
+                    if (!result.length) {
+                        res.sendStatus(500);
+                        return;
+                    }
+
+                    const adminName = result[0].display_name;
+
+                    res.json({
+                        'competitionName': competitionInfo.display_name,
+                        'competitionStart': competitionInfo.start_date,
+                        'competitionEnd': competitionInfo.end_date,
+                        'numMembers': parseInt(numMembers),
+                        'admin_name': adminName
+                    });
+                })
+                .catch(function (error) {
+                    error.status = 500;
+                    error.message = 'Error getting admin user details for ' + competitionId + '. Error: ' + error;
+                    res.sendStatus(error.status);
+                });
         })
         .catch(function (error) {
             error.status = 500;
