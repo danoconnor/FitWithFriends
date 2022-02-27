@@ -16,21 +16,26 @@ class CompetitionOverview: IdentifiableBase, Codable {
     let competitionEnd: Date
     let currentResults: [UserCompetitionPoints]
 
+    /// If the current user is the admin of the competition
+    let isUserAdmin: Bool
+
     enum CodingKeys: String, CodingKey {
         case competitionId
         case competitionName
         case competitionStart
         case competitionEnd
         case currentResults
+        case isUserAdmin
     }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
-    init(id: UInt = 0, name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = []) {
+    init(id: UInt = 0, name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false) {
         competitionId = id
         competitionName = name
         competitionStart = start
         competitionEnd = end
         self.currentResults = currentResults
+        self.isUserAdmin = isUserAdmin
     }
 }
 

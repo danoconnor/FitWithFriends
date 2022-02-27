@@ -47,6 +47,8 @@ class AuthenticationManager: ObservableObject {
     }
 
     func logout() {
+        Logger.traceInfo(message: "Logging out")
+
         tokenManager.deleteAllTokens()
         loggedInUserId = nil
         loginState = .notLoggedIn
