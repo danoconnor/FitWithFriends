@@ -33,10 +33,4 @@ extension AppDelegate: UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         Logger.traceInfo(message: "------------------------------ applicationWillTerminate ------------------------------")
     }
-
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        Logger.traceInfo(message: "Application launched with url \(url.absoluteString)")
-
-        return FitWithFriendsApp.objectGraph.appProtocolHandler.handleProtocol(url: url)
-    }
 }

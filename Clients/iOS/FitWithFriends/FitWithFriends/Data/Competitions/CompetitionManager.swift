@@ -99,8 +99,8 @@ public class CompetitionManager: ObservableObject {
         }
     }
 
-    func joinCompetition(competitionToken: String) async -> Error? {
-        return await competitionService.joinCompetition(competitionToken: competitionToken)
+    func joinCompetition(competitionId: UInt, competitionToken: String) async -> Error? {
+        return await competitionService.joinCompetition(competitionId: competitionId, competitionToken: competitionToken)
     }
 
     func leaveCompetition(competitionId: UInt) async -> Error? {
@@ -110,6 +110,14 @@ public class CompetitionManager: ObservableObject {
         }
 
         return await competitionService.removeUserFromCompetition(userId: currentUserId, competitionId: competitionId)
+    }
+
+    func getCompetitionDescription(for competitionId: UInt, competitionToken: String) async -> Result<CompetitionDescription, Error> {
+        return await competitionService.getCompetitionDetails(competitionId: competitionId, competitionToken: competitionToken)
+    }
+
+    func getCompetitionAdminDetail(for competitionId: UInt) async -> Result<CompetitionAdminDetails, Error> {
+        return await competitionService.getCompetitionAdminDetails(competitionId: competitionId)
     }
 }
 

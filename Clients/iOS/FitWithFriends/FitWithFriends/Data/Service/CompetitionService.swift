@@ -33,9 +33,10 @@ class CompetitionService: ServiceBase {
         return result.xtError
     }
 
-    func joinCompetition(competitionToken: String) async -> Error? {
+    func joinCompetition(competitionId: UInt, competitionToken: String) async -> Error? {
         let requestBody: [String: String] = [
-            "accessToken": competitionToken
+            "accessToken": competitionToken,
+            "competitionId": competitionId.description
         ]
 
         let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/join",
@@ -54,5 +55,21 @@ class CompetitionService: ServiceBase {
                                                                                            method: .post,
                                                                                            body: requestBody)
         return result.xtError
+    }
+
+    func getCompetitionDetails(competitionId: UInt, competitionToken: String) async -> Result<CompetitionDescription, Error> {
+        let requestBody: [String: String] = [
+            "competitionId": competitionId.description,
+            "competitionAccessToken": competitionToken
+        ]
+
+        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/description",
+                                                       method: .post,
+                                                       body: requestBody)
+    }
+
+    func getCompetitionAdminDetails(competitionId: UInt) async -> Result<CompetitionAdminDetails, Error> {
+        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.description)/adminDetail",
+                                                       method: .get)
     }
 }

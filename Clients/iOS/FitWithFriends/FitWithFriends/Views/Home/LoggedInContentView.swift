@@ -61,9 +61,14 @@ struct LoggedInContentView: View {
             .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
                 switch homepageSheetViewModel.sheetToShow {
                 case .createCompetition:
-                    CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
+                    CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
+                                          objectGraph: objectGraph)
                 case .permissionPrompt:
-                    PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel, objectGraph: objectGraph)
+                    PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel,
+                                         objectGraph: objectGraph)
+                case .joinCompetition:
+                    JoinCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
+                                        objectGraph: objectGraph)
                 default:
                     Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                 }

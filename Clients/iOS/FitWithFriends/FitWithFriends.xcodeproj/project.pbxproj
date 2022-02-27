@@ -17,6 +17,10 @@
 		0B1CBEBF27C3090B0008C72A /* AppProtocolHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEBE27C3090B0008C72A /* AppProtocolHandler.swift */; };
 		0B1CBEC327C309B20008C72A /* JoinCompetitionProtocolData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEC227C309B20008C72A /* JoinCompetitionProtocolData.swift */; };
 		0B1CBEC527C30F390008C72A /* MockAppProtocolHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEC427C30F390008C72A /* MockAppProtocolHandler.swift */; };
+		0B1CBECA27C3F3B80008C72A /* CompetitionDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEC927C3F3B80008C72A /* CompetitionDescription.swift */; };
+		0B1CBECC27C3F51C0008C72A /* CompetitionAdminDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */; };
+		0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */; };
+		0B1CBED027C3F7C50008C72A /* JoinCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */; };
 		0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7494256AE65F00821775 /* CreateAccountView.swift */; };
 		0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */; };
 		0B359721256C731A006D956A /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359720256C731A006D956A /* MainContentView.swift */; };
@@ -114,6 +118,10 @@
 		0B1CBEBE27C3090B0008C72A /* AppProtocolHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProtocolHandler.swift; sourceTree = "<group>"; };
 		0B1CBEC227C309B20008C72A /* JoinCompetitionProtocolData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionProtocolData.swift; sourceTree = "<group>"; };
 		0B1CBEC427C30F390008C72A /* MockAppProtocolHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppProtocolHandler.swift; sourceTree = "<group>"; };
+		0B1CBEC927C3F3B80008C72A /* CompetitionDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDescription.swift; sourceTree = "<group>"; };
+		0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionAdminDetails.swift; sourceTree = "<group>"; };
+		0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionView.swift; sourceTree = "<group>"; };
+		0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionViewModel.swift; sourceTree = "<group>"; };
 		0B2D7494256AE65F00821775 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
 		0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
 		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
@@ -241,6 +249,16 @@
 				0B1CBEC227C309B20008C72A /* JoinCompetitionProtocolData.swift */,
 			);
 			path = AppProtocol;
+			sourceTree = "<group>";
+		};
+		0B1CBEC827C3F3A90008C72A /* Competitions */ = {
+			isa = PBXGroup;
+			children = (
+				0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */,
+				0B1CBEC927C3F3B80008C72A /* CompetitionDescription.swift */,
+				0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */,
+			);
+			path = Competitions;
 			sourceTree = "<group>";
 		};
 		0B2D7497256AE6B700821775 /* ViewModels */ = {
@@ -432,11 +450,11 @@
 		0B99FC25256A290900673133 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				0B1CBEC827C3F3A90008C72A /* Competitions */,
 				0B47A221279C90EB00C2970E /* User.swift */,
 				0B67532925745CF60032835D /* ActivitySummary.swift */,
 				0B99FC2D256A2CFB00673133 /* Token.swift */,
 				0B67532D2574686D0032835D /* Workout.swift */,
-				0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */,
 				0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */,
 			);
 			path = Model;
@@ -500,6 +518,7 @@
 				0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */,
 				0B47A251279E424300C2970E /* CompetitionDetailView.swift */,
 				0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */,
+				0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -529,6 +548,7 @@
 				0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */,
 				0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */,
 				0B8445D7275C43FA00F78480 /* CompetitionDetailViewModel.swift */,
+				0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -639,6 +659,7 @@
 				0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */,
 				0B47A252279E424300C2970E /* CompetitionDetailView.swift in Sources */,
 				0B47A229279CAB6E00C2970E /* MockAuthenticationService.swift in Sources */,
+				0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */,
 				0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */,
 				0B3597782571502A006D956A /* HealthKitManager.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
@@ -648,6 +669,7 @@
 				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
 				0B47A22F279CADBC00C2970E /* MockHttpConnector.swift in Sources */,
 				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
+				0B1CBECC27C3F51C0008C72A /* CompetitionAdminDetails.swift in Sources */,
 				0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */,
 				0B47A248279DE1FA00C2970E /* HomepageViewModel.swift in Sources */,
 				0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */,
@@ -681,11 +703,13 @@
 				0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */,
 				0B9058C927B0844800AE1712 /* Error+Extensions.swift in Sources */,
 				0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */,
+				0B1CBECA27C3F3B80008C72A /* CompetitionDescription.swift in Sources */,
 				0B99FC06256A0BA800673133 /* LogFormatter.swift in Sources */,
 				0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */,
 				0B1CBEB627C1A5480008C72A /* ActivityIndicator.swift in Sources */,
 				0B47A222279C90EC00C2970E /* User.swift in Sources */,
 				0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */,
+				0B1CBED027C3F7C50008C72A /* JoinCompetitionViewModel.swift in Sources */,
 				0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */,
 				0B35972C257046FC006D956A /* AppDelegate.swift in Sources */,
 				0B8445D8275C43FA00F78480 /* CompetitionDetailViewModel.swift in Sources */,

@@ -24,5 +24,7 @@ struct ActivityRingView: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: HKActivityRingView, context: Context) {}
+    func updateUIView(_ uiView: HKActivityRingView, context: Context) {
+        uiView.activitySummary = activitySummary
+    }
 }
