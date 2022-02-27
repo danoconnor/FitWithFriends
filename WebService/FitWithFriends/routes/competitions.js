@@ -73,10 +73,13 @@ router.post('/join', function (req, res) {
             // Check that the user has not already joined a competition yet
             database.query('SELECT COUNT(competitionid) FROM users_competitions WHERE userid = $1', res.locals.oauth.token.user.id)
                 .then(function (result) {
-                    if (!result.length || result[0].count > 0) {
-                        res.sendStatus(400);
-                        return;
-                    }
+
+                    // TODO: re-add a check for how many existing competitions the user is a part of
+                    // should check that there is only 1 active competition at a time
+                    //if (!result.length || result[0].count > 0) {
+                    //    res.sendStatus(400);
+                    //    return;
+                    //}
 
                     // Add the user to the competition
                     database.query('INSERT INTO users_competitions VALUES ($1, $2) \
@@ -114,7 +117,7 @@ router.get('/:competitionId/overview', function (req, res) {
     // 1. Get the competition data and the users
     Promise.all([
         database.query('SELECT userid FROM users_competitions WHERE competitionid = $1', [req.params.competitionId]),
-        database.query('SELECT competition_id, start_date, end_date, display_name FROM competitions WHERE competition_id = $1', [req.params.competitionId])
+        database.query('SELECT competition_id, start_date, end_date, display_name, admin_user_id FROM competitions WHERE competition_id = $1', [req.params.competitionId])
     ])
     .then(function (result) {
         if (result.length < 2) {
@@ -140,6 +143,7 @@ router.get('/:competitionId/overview', function (req, res) {
 
         const userIdList = usersCompetitionsResult.map(row => row.userid).join();
         const competitionInfo = competitionsResult[0];
+        const isUserAdmin = res.locals.oauth.token.user.id === competitionInfo.admin_user_id;
 
         var query = '';
         var queryParams = [];
@@ -180,6 +184,7 @@ router.get('/:competitionId/overview', function (req, res) {
                     'competitionName': competitionInfo.display_name,
                     'competitionStart': competitionInfo.start_date,
                     'competitionEnd': competitionInfo.end_date,
+                    'isUserAdmin': isUserAdmin,
                     'currentResults': result
                 });
             })
@@ -198,6 +203,7 @@ router.get('/:competitionId/overview', function (req, res) {
 
 // Returns a description of the competition containing the name, dates, and number of members of the competition
 // The user does not need to be a member of the competition to get this info but they do need to have the competition access token
+// Expects a competitionId and competitionAccessToken in the request body
 router.post('/description', function (req, res) {
     const competitionId = req.body['competitionId'];
     const competitionToken = req.body['competitionAccessToken'];
@@ -209,7 +215,7 @@ router.post('/description', function (req, res) {
 
     Promise.all([
         database.query('SELECT COUNT(userid) FROM users_competitions WHERE competitionid = $1', [competitionId]),
-        database.query('SELECT start_date, end_date, display_name FROM competitions WHERE competition_id = $1 AND access_token = $2', [competitionId, competitionToken])
+        database.query('SELECT start_date, end_date, display_name, admin_user_id FROM competitions WHERE competition_id = $1 AND access_token = $2', [competitionId, competitionToken])
     ])
         .then(function (result) {
             if (result.length < 2) {
@@ -228,12 +234,29 @@ router.post('/description', function (req, res) {
             const competitionInfo = competitionsResult[0];
             const numMembers = usersCompetitionsResult[0].count;
 
-            res.json({
-                'competitionName': competitionInfo.display_name,
-                'competitionStart': competitionInfo.start_date,
-                'competitionEnd': competitionInfo.end_date,
-                'numMembers': numMembers
-            });
+            // Find the display name of the competition admin so we can include it in the response
+            database.query('SELECT display_name FROM users WHERE userId = $1', [competitionInfo.admin_user_id])
+                .then(function (result) {
+                    if (!result.length) {
+                        res.sendStatus(500);
+                        return;
+                    }
+
+                    const adminName = result[0].display_name;
+
+                    res.json({
+                        'competitionName': competitionInfo.display_name,
+                        'competitionStart': competitionInfo.start_date,
+                        'competitionEnd': competitionInfo.end_date,
+                        'numMembers': parseInt(numMembers),
+                        'adminName': adminName
+                    });
+                })
+                .catch(function (error) {
+                    error.status = 500;
+                    error.message = 'Error getting admin user details for ' + competitionId + '. Error: ' + error;
+                    res.sendStatus(error.status);
+                });
         })
         .catch(function (error) {
             error.status = 500;
