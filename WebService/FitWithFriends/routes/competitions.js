@@ -200,6 +200,7 @@ router.get('/:competitionId/overview', function (req, res) {
 
 // Returns a description of the competition containing the name, dates, and number of members of the competition
 // The user does not need to be a member of the competition to get this info but they do need to have the competition access token
+// Expects a competitionId and competitionAccessToken in the request body
 router.post('/description', function (req, res) {
     const competitionId = req.body['competitionId'];
     const competitionToken = req.body['competitionAccessToken'];
@@ -234,7 +235,7 @@ router.post('/description', function (req, res) {
                 'competitionName': competitionInfo.display_name,
                 'competitionStart': competitionInfo.start_date,
                 'competitionEnd': competitionInfo.end_date,
-                'numMembers': numMembers
+                'numMembers': parseInt(numMembers)
             });
         })
         .catch(function (error) {
