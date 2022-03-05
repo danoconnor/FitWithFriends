@@ -9,7 +9,7 @@ router.get('/apple-app-site-association', function (req, res) {
             'details': [
                 {
                     'appID': 'U7MJ9CBUMD.com.danoconnor.FitWithFriends',
-                    'paths': ['/joinCompetition/']
+                    'paths': ['*']
                 }
             ]
         }
