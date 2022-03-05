@@ -37,6 +37,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="routes\pushNotification.js" />
+    <Content Include="routes\wellKnown.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="utilities\cryptoHelpers.js">
       <SubType>Code</SubType>
     </Content>
@@ -53,6 +56,9 @@
     </Content>
     <Content Include="utilities\errorHelpers.js" />
     <Content Include="views\index.pug" />
+    <Content Include="views\joinCompetition.pug">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\layout.pug" />
     <Content Include="views\error.pug" />
   </ItemGroup>
