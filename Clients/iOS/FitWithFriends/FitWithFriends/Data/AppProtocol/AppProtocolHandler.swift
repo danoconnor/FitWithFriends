@@ -22,28 +22,54 @@ class AppProtocolHandler: ObservableObject {
     /// Takes the appropriate actions to handle the given protocol
     /// Returns true if the protocol was handled, false otherwise
     func handleProtocol(url: URL) -> Bool {
-        guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let host = urlComponents.host?.lowercased() else {
+        guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return false
         }
 
         var newProtocolData: AppProtocolData?
-        switch host {
-        case AppProtocolAction.joinCompetition.rawValue:
-            newProtocolData = JoinCompetitionProtocolData(urlComponents: urlComponents)
-        default:
-            Logger.traceWarning(message: "Could not handle protocol: \(url.absoluteString)")
+
+        // First try to parse this as a normal app deeplink in the form
+        // fitwithfriends://<action>?queryParams
+        // In this case the URL host will be the deeplink action
+        if let host = urlComponents.host {
+            newProtocolData = getProtocolData(from: host, with: urlComponents)
+        }
+
+        // We were not able to parse the protocol by the host
+        // This is likely an associated domains link in the form
+        // https://<server base URL>/<action>?queryParams
+        // In this case, the path will be the deeplink action
+        if newProtocolData == nil {
+            // The path will be something like "/joinCompetition", so remove the slash when parsing
+            var path = urlComponents.path
+            path.removeAll { $0 == "/" }
+
+            newProtocolData = getProtocolData(from: path, with: urlComponents)
         }
 
         DispatchQueue.main.async {
             self.protocolData = newProtocolData
         }
 
-        return newProtocolData != nil
+        let handled = newProtocolData != nil
+        if !handled {
+            Logger.traceWarning(message: "Could not handle URL \(url)")
+        }
+
+        return handled
     }
 
     func clearProtocolData() {
         Logger.traceInfo(message: "Clearing protocol data")
         protocolData = nil
+    }
+
+    private func getProtocolData(from action: String, with urlComponents: URLComponents) -> AppProtocolData? {
+        switch action.lowercased() {
+        case AppProtocolAction.joinCompetition.rawValue:
+            return JoinCompetitionProtocolData(urlComponents: urlComponents)
+        default:
+            return nil
+        }
     }
 }
