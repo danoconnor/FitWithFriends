@@ -21,7 +21,7 @@ router.get('/joinCompetition', function (req, res) {
 
     // TODO: Need the actual app store ID
     const appStoreUrl = 'itms-apps://itunes.apple.com/app/apple-store/id983156458';
-    const appDeeplink = 'fitwithfriends://competitionToken=' + competitionToken + '&competitionId=' + competitionID;
+    const appDeeplink = 'fitwithfriends://joinCompetition?competitionToken=' + competitionToken + '&competitionId=' + competitionID;
 
     res.render('joinCompetition', {
         title: 'Fit With Friends',
