@@ -33,6 +33,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Lowercase all query params so we don't need to worry about casing
+app.use(function (req, res, next) {
+    for (var key in req.query) {
+        req.query[key.toLowerCase()] = req.query[key];
+    }
+    next();
+});
+
 app.use('/', routes);
 app.use('/oauth', oauth);
 app.use('/users', users);
