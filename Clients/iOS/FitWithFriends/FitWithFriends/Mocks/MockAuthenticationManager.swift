@@ -12,6 +12,12 @@ class MockAuthenticationManager: AuthenticationManager {
         super.init(authenticationService: MockAuthenticationService(), tokenManager: MockTokenManager())
     }
 
+    var return_loggedInUserId: UInt? = 0
+    override var loggedInUserId: UInt? {
+        get { return return_loggedInUserId }
+        set {}
+    }
+
     var return_error: Error?
 
     var userToLogin: UInt = 0

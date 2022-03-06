@@ -45,8 +45,16 @@ class JoinCompetitionProtocolData: AppProtocolData {
     }
 
     /// Expected url: fitwithfriends://joincompetition?competitionToken=COMPETITIONTOKEN&competitionId=10
-    static func createUrl(competitionId: UInt, competitionToken: String) -> URL {
+    static func createAppProtocolUrl(competitionId: UInt, competitionToken: String) -> URL {
         let url = "\(SecretConstants.baseAppProtocol)://\(action.rawValue)?\(JoinCompetitionProtocolData.competitionTokenKey)=\(competitionToken)&\(JoinCompetitionProtocolData.competitionIdKey)=\(competitionId.description)"
+        return URL(string: url)!
+    }
+
+    /// Expected url: https://<service base>/joincompetition?competitionToken=COMPETITIONTOKEN&competitionId=10
+    /// Associated domains should cause this website URL to open in the app, if the app is installed on the device
+    /// If the app is not installed, then the webpage will load and prompt the user to download the app from the App Store
+    static func createWebsiteUrl(competitionId: UInt, competitionToken: String) -> URL {
+        let url = "\(SecretConstants.serviceBaseUrl)/\(action.rawValue)?\(JoinCompetitionProtocolData.competitionTokenKey)=\(competitionToken)&\(JoinCompetitionProtocolData.competitionIdKey)=\(competitionId.description)"
         return URL(string: url)!
     }
 }

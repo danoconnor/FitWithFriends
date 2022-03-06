@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct UserCompetitionResultView: View {
-    let position: Int
-    let result: UserCompetitionPoints
+    let result: UserPosition
 
     private var positionBackgroundColor: Color {
-        switch position {
+        switch result.position {
         case 1: return Color.gold
         case 2: return Color.silver
         case 3: return Color.bronze
@@ -28,16 +27,16 @@ struct UserCompetitionResultView: View {
                     .frame(width: 40, height: 40)
                     .foregroundColor(positionBackgroundColor)
 
-                Text(position.description)
+                Text(result.position.description)
             }
 
-            Text(result.displayName)
+            Text(result.userCompetitionPoints.displayName)
                 .padding(.leading)
                 .padding(.trailing)
 
             Spacer()
 
-            Text("\(Int(result.totalPoints)) (\(Int(result.pointsToday ?? 0)))")
+            Text("\(Int(result.userCompetitionPoints.totalPoints)) (\(Int(result.userCompetitionPoints.pointsToday ?? 0)))")
                 .padding(.leading)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -46,6 +45,6 @@ struct UserCompetitionResultView: View {
 
 struct UserCompetitionResultView_Previews: PreviewProvider {
     static var previews: some View {
-        UserCompetitionResultView(position: 1, result: UserCompetitionPoints())
+        UserCompetitionResultView(result: UserPosition(userCompetitionPoints: UserCompetitionPoints(), position: 1))
     }
 }

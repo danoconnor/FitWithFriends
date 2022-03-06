@@ -43,6 +43,6 @@ class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
     }
 
     private func getRootViewController() -> UIViewController? {
-        return UIApplication.shared.windows.first?.rootViewController
+        return UIApplication.shared.keyWindow?.rootViewController
     }
 }

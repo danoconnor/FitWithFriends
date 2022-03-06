@@ -112,6 +112,10 @@ public class CompetitionManager: ObservableObject {
         return await competitionService.removeUserFromCompetition(userId: currentUserId, competitionId: competitionId)
     }
 
+    func removeUserFromCompetition(competitionId: UInt, targetUser: UInt) async -> Error? {
+        return await competitionService.removeUserFromCompetition(userId: targetUser, competitionId: competitionId)
+    }
+
     func getCompetitionDescription(for competitionId: UInt, competitionToken: String) async -> Result<CompetitionDescription, Error> {
         return await competitionService.getCompetitionDetails(competitionId: competitionId, competitionToken: competitionToken)
     }

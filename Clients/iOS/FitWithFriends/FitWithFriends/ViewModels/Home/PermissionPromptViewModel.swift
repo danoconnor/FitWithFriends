@@ -28,6 +28,11 @@ class PermissionPromptViewModel: ObservableObject {
         updateShouldShowPromptValue()
     }
 
+    deinit {
+        // Make sure we reset the homepageSheet state when we leave the page
+        homepageSheetViewModel.updateState(sheet: .permissionPrompt, state: false)
+    }
+
     func requestHealthPermission() {
         healthKitManager.requestHealthKitPermission { [weak self] in
             DispatchQueue.main.async {

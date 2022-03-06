@@ -1,0 +1,143 @@
+//
+//  CompetitionDetailView.swift
+//  FitWithFriends
+//
+//  Created by Dan O'Connor on 1/23/22.
+//
+
+import Combine
+import SwiftUI
+
+struct CompetitionOverviewView: View {
+    private let showAllDetails: Bool
+
+    private let competitionOverview: CompetitionOverview
+    private let homepageSheetViewModel: HomepageSheetViewModel
+    @ObservedObject private var viewModel: CompetitionOverviewViewModel
+
+    @State private var actionInProgress = false
+
+    init(objectGraph: IObjectGraph, competitionOverview: CompetitionOverview, homepageSheetViewModel: HomepageSheetViewModel, showAllDetails: Bool) {
+        self.competitionOverview = competitionOverview
+        self.homepageSheetViewModel = homepageSheetViewModel
+        self.showAllDetails = showAllDetails
+        viewModel = CompetitionOverviewViewModel(authenticationManager: objectGraph.authenticationManager,
+                                                 competitionManager: objectGraph.competitionManager,
+                                                 competitionOverview: competitionOverview,
+                                                 showAllDetails: showAllDetails)
+    }
+
+    var body: some View {
+        VStack {
+            HStack(alignment: .center) {
+                Text(viewModel.competitionName)
+                    .font(.title)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .padding(.top)
+                    .onTapGesture {
+                        if !self.showAllDetails {
+                            self.homepageSheetViewModel.updateState(sheet: .competitionDetails,
+                                                                    state: true,
+                                                                    contextData: self.competitionOverview)
+                        }
+                    }
+                
+
+                Spacer()
+
+                Menu {
+                    ForEach(viewModel.availableActions, id: \.self) { action in
+                        Button(action.description) {
+                            self.actionInProgress = true
+                            Task.detached {
+                                await self.viewModel.performAction(action)
+
+                                await MainActor.run {
+                                    self.actionInProgress = false
+                                }
+                            }
+                        }
+                        .disabled(actionInProgress)
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.title2)
+                        .foregroundColor(.blue)
+                        .padding(.leading)
+                        .padding(.trailing)
+                        .padding(.top)
+                }
+            }
+
+            HStack {
+                Text(viewModel.userPositionDescription)
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .padding(.bottom)
+                    .font(.subheadline)
+
+                Spacer()
+
+                Text(viewModel.competitionDatesDescription)
+                    .padding(.leading)
+                    .padding(.trailing)
+                    .padding(.bottom)
+                    .font(.subheadline)
+            }
+
+            VStack {
+                ForEach(0 ..< viewModel.results.count) { position in
+                    let result = viewModel.results[position]
+                    UserCompetitionResultView(result: result)
+                        .contextMenu {
+                            let availableActions = self.viewModel.getUserContextMenuActions(for: result.userCompetitionPoints.userId)
+
+                            ForEach(availableActions, id: \.self) { action in
+                                Button(action.description) {
+                                    Task.detached {
+                                        await self.viewModel.performAction(action)
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
+            .padding()
+        }
+        .background(showAllDetails ? Color.systemBackground : Color.secondarySystemBackground)
+        .sheet(isPresented: $viewModel.shouldShowSheet, content: {
+            if let shareUrl = viewModel.shareUrl {
+                ShareSheet(url: shareUrl)
+            }
+        })
+    }
+}
+
+struct CompetitionOverviewView_Previews: PreviewProvider {
+    private static var competitionOverview: CompetitionOverview {
+        let results = [
+            UserCompetitionPoints(userId: 0, name: "Test user 0", total: 400, today: 110),
+            UserCompetitionPoints(userId: 1, name: "Test user 1", total: 300, today: 125),
+            UserCompetitionPoints(userId: 2, name: "Test user 2", total: 425, today: 75),
+            UserCompetitionPoints(userId: 3, name: "Test user 3", total: 100, today: 0),
+            UserCompetitionPoints(userId: 4, name: "Test user 4", total: 50, today: 0),
+            UserCompetitionPoints(userId: 5, name: "Test user 5", total: 10, today: 10)
+        ]
+
+        return CompetitionOverview(start: Date(),
+                                   end: Date().addingTimeInterval(TimeInterval.xtDays(7)),
+                                   currentResults: results)
+    }
+
+    static var previews: some View {
+        CompetitionOverviewView(objectGraph: MockObjectGraph(),
+                                competitionOverview: competitionOverview, homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
+                                showAllDetails: true)
+
+        CompetitionOverviewView(objectGraph: MockObjectGraph(),
+                                competitionOverview: competitionOverview, homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
+                                showAllDetails: false)
+    }
+}

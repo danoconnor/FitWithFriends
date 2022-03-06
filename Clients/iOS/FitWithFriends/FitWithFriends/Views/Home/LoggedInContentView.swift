@@ -34,9 +34,11 @@ struct LoggedInContentView: View {
                 }
 
                 if let competitions = homepageViewModel.currentCompetitions {
-                    ForEach(competitions) {
-                        CompetitionDetailView(objectGraph: objectGraph,
-                                              competitionOverview: $0)
+                    ForEach(competitions) { competitionOverview in
+                        CompetitionOverviewView(objectGraph: objectGraph,
+                                                competitionOverview: competitionOverview,
+                                                homepageSheetViewModel: homepageSheetViewModel,
+                                                showAllDetails: false)
                             .cornerRadius(10)
                             .padding()
                     }
@@ -69,6 +71,23 @@ struct LoggedInContentView: View {
                 case .joinCompetition:
                     JoinCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
                                         objectGraph: objectGraph)
+                case .competitionDetails:
+                    if let competitionOverview = homepageSheetViewModel.sheetContextData as? CompetitionOverview {
+//                        VStack {
+//                            CompetitionOverviewView(objectGraph: objectGraph,
+//                                                    competitionOverview: competitionOverview,
+//                                                    homepageSheetViewModel: homepageSheetViewModel,
+//                                                    showAllDetails: true)
+//                                .padding()
+//
+//                            Spacer()
+//                        }
+                        CompetitionDetailView(competitionOverview: competitionOverview,
+                                              homepageSheetViewModel: homepageSheetViewModel,
+                                              objectGraph: objectGraph)
+                    } else {
+                        Text("Error showing competition details")
+                    }
                 default:
                     Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                 }

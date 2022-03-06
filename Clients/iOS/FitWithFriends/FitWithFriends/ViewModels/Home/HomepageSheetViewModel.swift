@@ -9,26 +9,31 @@ import Combine
 import Foundation
 
 class HomepageSheetViewModel: ObservableObject {
+    typealias HomepageSheetState = (shouldShow: Bool, contextData: Any?)
+
     // Order is important - sheets listed first will be given precedence over those listed later
     enum HomepageSheet: String, CaseIterable {
         case permissionPrompt
         case joinCompetition
         case createCompetition
+        case competitionDetails
 
         case none
     }
 
     @Published var shouldShowSheet = false
     var sheetToShow: HomepageSheet = .none
+    var sheetContextData: Any?
 
     private let stateQueue = DispatchQueue(label: "HomepageSheetStateQueue")
     private var appProtocolCancellable: AnyCancellable?
 
     /// Order is important, it will decide the priority order for sheets to be shown
-    private var homepageSheetState: [HomepageSheet: Bool] = [
-        .permissionPrompt: false,
-        .joinCompetition: false,
-        .createCompetition: false
+    private var homepageSheetState: [HomepageSheet: HomepageSheetState] = [
+        .permissionPrompt: (shouldShow: false, contextData: nil),
+        .joinCompetition: (shouldShow: false, contextData: nil),
+        .createCompetition: (shouldShow: false, contextData: nil),
+        .competitionDetails: (shouldShow: false, contextData: nil),
     ]
 
     init(appProtocolHandler: AppProtocolHandler, healthKitManager: HealthKitManager) {
@@ -44,14 +49,15 @@ class HomepageSheetViewModel: ObservableObject {
         }
     }
 
-    func updateState(sheet: HomepageSheet, state: Bool) {
+    func updateState(sheet: HomepageSheet, state: Bool, contextData: Any? = nil) {
         stateQueue.sync {
-            homepageSheetState[sheet] = state
+            homepageSheetState[sheet] = (shouldShow: state, contextData: contextData)
 
             var foundSheetToShow = false
             for sheet in HomepageSheet.allCases {
-                if homepageSheetState[sheet] == true {
+                if homepageSheetState[sheet]?.shouldShow == true {
                     sheetToShow = sheet
+                    sheetContextData = homepageSheetState[sheet]?.contextData
                     foundSheetToShow = true
                     break
                 }

@@ -68,6 +68,9 @@ struct CreateCompetitionView: View {
             .padding()
             .disabled(viewModel.state == .inProgress || competitionName.count == 0)
         }
+        .onDisappear {
+
+        }
     }
 }
 
