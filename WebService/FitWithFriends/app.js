@@ -13,6 +13,7 @@ var oauth = require('./routes/auth');
 const competitions = require('./routes/competitions');
 const pushNotification = require('./routes/pushNotification');
 const activityData = require('./routes/activityData');
+const wellKnown = require('./routes/wellKnown');
 const globalConfig = require('./utilities/globalConfig')
 
 const oauthServer = require('./oauth/server');
@@ -32,12 +33,21 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Lowercase all query params so we don't need to worry about casing
+app.use(function (req, res, next) {
+    for (var key in req.query) {
+        req.query[key.toLowerCase()] = req.query[key];
+    }
+    next();
+});
+
 app.use('/', routes);
 app.use('/oauth', oauth);
 app.use('/users', users);
 app.use('/competitions', oauthServer.authenticate(), competitions);
 app.use('/pushNotification', oauthServer.authenticate(), pushNotification);
 app.use('/activityData', oauthServer.authenticate(), activityData);
+app.use('/.well-known', wellKnown);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
