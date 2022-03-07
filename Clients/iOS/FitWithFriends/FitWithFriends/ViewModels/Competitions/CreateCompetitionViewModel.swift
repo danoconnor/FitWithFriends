@@ -23,11 +23,6 @@ class CreateCompetitionViewModel: ObservableObject {
         self.homepageSheetViewModel = homepageSheetViewModel
     }
 
-    deinit {
-        // Make sure we reset the homepageSheet state when we leave the page
-        homepageSheetViewModel.updateState(sheet: .createCompetition, state: false)
-    }
-
     func createCompetition(competitionName: String, startDate: Date, endDate: Date) {
         guard competitionName.count > 0 else {
             state = .failed(errorMessage: "Please enter a competition name")

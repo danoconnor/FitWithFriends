@@ -68,4 +68,8 @@ class HomepageSheetViewModel: ObservableObject {
             }
         }
     }
+
+    func dismissCurrentSheet() {
+        updateState(sheet: sheetToShow, state: false)
+    }
 }

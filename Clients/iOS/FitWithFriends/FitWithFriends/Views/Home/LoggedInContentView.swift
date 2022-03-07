@@ -11,6 +11,8 @@ import SwiftUI
 struct LoggedInContentView: View {
     private let objectGraph: IObjectGraph
 
+    private var lastShownSheet: HomepageSheetViewModel.HomepageSheet?
+
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
     @ObservedObject private var homepageViewModel: HomepageViewModel
 
@@ -60,7 +62,9 @@ struct LoggedInContentView: View {
                 })
                 .padding()
             }
-            .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, content: {
+            .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
+                homepageSheetViewModel.dismissCurrentSheet()
+            }, content: {
                 switch homepageSheetViewModel.sheetToShow {
                 case .createCompetition:
                     CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
@@ -73,15 +77,6 @@ struct LoggedInContentView: View {
                                         objectGraph: objectGraph)
                 case .competitionDetails:
                     if let competitionOverview = homepageSheetViewModel.sheetContextData as? CompetitionOverview {
-//                        VStack {
-//                            CompetitionOverviewView(objectGraph: objectGraph,
-//                                                    competitionOverview: competitionOverview,
-//                                                    homepageSheetViewModel: homepageSheetViewModel,
-//                                                    showAllDetails: true)
-//                                .padding()
-//
-//                            Spacer()
-//                        }
                         CompetitionDetailView(competitionOverview: competitionOverview,
                                               homepageSheetViewModel: homepageSheetViewModel,
                                               objectGraph: objectGraph)

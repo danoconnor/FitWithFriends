@@ -15,8 +15,4 @@ class CompetitionDetailViewModel {
         self.competitionManager = competitionManager
         self.homepageSheetViewModel = homepageSheetViewModel
     }
-
-    deinit {
-        homepageSheetViewModel.updateState(sheet: .competitionDetails, state: false)
-    }
 }

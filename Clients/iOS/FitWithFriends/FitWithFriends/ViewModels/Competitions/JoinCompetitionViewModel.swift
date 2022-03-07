@@ -68,11 +68,6 @@ class JoinCompetitionViewModel: ObservableObject {
         }
     }
 
-    deinit {
-        // Make sure we reset the homepageSheet state when we leave the page
-        homepageSheetViewModel.updateState(sheet: .joinCompetition, state: false)
-    }
-
     func joinCompetition() async -> Error? {
         guard let joinCompetitionProtocolData = appProtocolHandler.protocolData as? JoinCompetitionProtocolData else {
             Logger.traceError(message: "Could not get join competition data from protocol handler", error: nil)
