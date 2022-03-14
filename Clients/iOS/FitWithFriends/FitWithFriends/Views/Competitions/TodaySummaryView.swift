@@ -9,15 +9,39 @@ import SwiftUI
 import HealthKit
 
 struct TodaySummaryView: View {
-    let activitySummary: ActivitySummary
+    private let activitySummary: ActivitySummary
+    private let todaySummaryViewModel: TodaySummaryViewModel
+
+    init(activitySummary: ActivitySummary, homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
+        self.activitySummary = activitySummary
+        todaySummaryViewModel = TodaySummaryViewModel(authenticationManager: objectGraph.authenticationManager,
+                                                      homepageSheetViewModel: homepageSheetViewModel)
+    }
 
     var body: some View {
         VStack {
-            HStack {
+            HStack(alignment: .center) {
                 Text("\(Int(activitySummary.competitionPoints)) points so far today!")
                     .padding()
                     .font(.title3)
                 Spacer()
+
+                Menu {
+                    Button("Logout") {
+                        self.todaySummaryViewModel.logout()
+                    }
+
+                    Button("About") {
+                        todaySummaryViewModel.showAbout()
+                    }
+                } label: {
+                    VStack {
+                        Image(systemName: "gearshape")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                            .padding()
+                    }
+                }
             }
 
             HStack {
@@ -73,6 +97,8 @@ struct TodaySummaryView_Previews: PreviewProvider {
     }
 
     static var previews: some View {
-        TodaySummaryView(activitySummary: activitySummary)
+        TodaySummaryView(activitySummary: activitySummary,
+        homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
+        objectGraph: MockObjectGraph())
     }
 }

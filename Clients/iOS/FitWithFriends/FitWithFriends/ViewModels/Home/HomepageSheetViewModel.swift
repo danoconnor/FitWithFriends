@@ -17,6 +17,7 @@ class HomepageSheetViewModel: ObservableObject {
         case joinCompetition
         case createCompetition
         case competitionDetails
+        case about
 
         case none
     }

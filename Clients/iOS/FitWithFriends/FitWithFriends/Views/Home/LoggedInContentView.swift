@@ -28,7 +28,9 @@ struct LoggedInContentView: View {
         RefreshableScrollView {
             VStack {
                 if let activitySummary = homepageViewModel.todayActivitySummary {
-                    TodaySummaryView(activitySummary: activitySummary)
+                    TodaySummaryView(activitySummary: activitySummary,
+                                     homepageSheetViewModel: homepageSheetViewModel,
+                                     objectGraph: objectGraph)
                         .cornerRadius(10)
                         .padding(.top)
                         .padding(.leading)
@@ -42,25 +44,29 @@ struct LoggedInContentView: View {
                                                 homepageSheetViewModel: homepageSheetViewModel,
                                                 showAllDetails: false)
                             .cornerRadius(10)
-                            .padding()
+                            .padding(.top)
+                            .padding(.leading)
+                            .padding(.trailing)
                     }
                 }
 
+                HStack {
+                    Spacer()
+
+                    Button(action: {
+                        homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+                    }, label: {
+                        Text("Create new competition")
+                    })
+                    .padding()
+
+                    Spacer()
+                }
+                .background(Color.secondarySystemBackground)
+                .cornerRadius(10)
+                .padding()
+
                 Spacer()
-
-                Button(action: {
-                    homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-                }, label: {
-                    Text("New competition")
-                })
-                .padding()
-
-                Button(action: {
-                    objectGraph.authenticationManager.logout()
-                }, label: {
-                    Text("Logout")
-                })
-                .padding()
             }
             .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
                 homepageSheetViewModel.dismissCurrentSheet()
