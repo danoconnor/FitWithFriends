@@ -87,7 +87,9 @@ class AuthenticationManager: ObservableObject {
                     await self.refreshToken(token: token)
                 }
             default:
-                logout()
+                Logger.traceInfo(message: "User is not logged in")
+                loggedInUserId = nil
+                loginState = .notLoggedIn
             }
         }
     }
