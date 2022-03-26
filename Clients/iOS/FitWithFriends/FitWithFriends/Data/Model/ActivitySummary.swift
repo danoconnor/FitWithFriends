@@ -29,6 +29,20 @@ class ActivitySummary: IdentifiableBase, Codable {
         case standTimeGoal
     }
 
+    /// Creates an empty activity summary for the given date
+    init(date: Date) {
+        self.date = date
+
+        activeCaloriesBurned = 0
+        activeCaloriesGoal = 0
+        exerciseTime = 0
+        exerciseTimeGoal = 0
+        standTime = 0
+        standTimeGoal = 0
+
+        activitySummary = nil
+    }
+
     init?(activitySummary: HKActivitySummary) {
         guard let activityDate = activitySummary.dateComponents(for: Calendar.current).date else {
             Logger.traceError(message: "Tried to initialize ActivitySummary without valid date")

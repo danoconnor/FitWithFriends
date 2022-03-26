@@ -44,13 +44,18 @@ class HomepageViewModel: ObservableObject {
     private func refreshTodayActivitySummary() async {
         return await withCheckedContinuation { continuation in
             healthKitManager.getCurrentActivitySummary { summary in
-                guard let summary = summary else {
-                    continuation.resume()
-                    return
+                let activitySummary: ActivitySummary?
+                if let summary = summary {
+                    activitySummary = ActivitySummary(activitySummary: summary)
+                } else {
+                    // Couldn't get the activity summary for today
+                    // This may be expected if there is no data for today yet, or
+                    // if the user has not given access to the health data
+                    activitySummary = ActivitySummary(date: Date())
                 }
 
                 DispatchQueue.main.async {
-                    self.todayActivitySummary = ActivitySummary(activitySummary: summary)
+                    self.todayActivitySummary = activitySummary
                     continuation.resume()
                 }
             }
