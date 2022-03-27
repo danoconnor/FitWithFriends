@@ -40,6 +40,9 @@
     <Content Include="routes\wellKnown.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="utilities\appleIdAuthenticationHelpers.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="utilities\cryptoHelpers.js">
       <SubType>Code</SubType>
     </Content>

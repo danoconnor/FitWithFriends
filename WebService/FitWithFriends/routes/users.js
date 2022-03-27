@@ -1,6 +1,8 @@
 'use strict';
+const errorHelpers = require('../utilities/errorHelpers');
 const express = require('express');
 const router = express.Router();
+const appleIdAuthenticationHelpers = require('../utilities/appleIdAuthenticationHelpers');
 const database = require('../utilities/database');
 const cryptoHelpers = require('../utilities/cryptoHelpers');
 const oauthServer = require('../oauth/server');
@@ -23,6 +25,47 @@ router.get('/:userId', oauthServer.authenticate(), function (req, res) {
         })
         .catch(function (error) {
             next(error);
+        });
+});
+
+// Creates a user from a Sign-in with Apple
+// The body should have the userId, firstName, lastName, idToken, and authorizationCode
+// that were provided by Sign-in with Apple
+router.post('/userFromAppleID', function (req, res) {
+    const userId = req.body['userId'];
+    const firstName = req.body['firstName'];
+    const lastName = req.body['lastName'];
+    const idToken = req.body['idToken'];
+    const authorizationCode = req.body['authorizationCode'];
+
+    // Validate input
+    if (!userId || !userId.length ||
+        !firstName || !firstName.length ||
+        !lastName || !lastName.length ||
+        !idToken || !idToken.length ||
+        !authorizationCode || !authorizationCode.length) {
+        errorHelpers.handleError(null, 400, 'Missing required parameter', res);
+        return
+    }
+
+    // Validate authentication
+    appleIdAuthenticationHelpers.validateIdToken(userId, idToken, authorizationCode)
+        .then(isValid => {
+            if (!isValid) {
+                errorHelpers.handleError(null, 401, 'User token is not valid', res);
+                return;
+            }
+
+            database.query('INSERT INTO users(userId, firstName, lastName) VALUES ($1, $2, $3)', [userId, firstName, lastName])
+                .then(result => {
+                    res.sendStatus(200);
+                })
+                .catch(function (error) {
+                    errorHelpers.handleError(error, 500, 'Unexpected error while trying to create a new user', res)
+                });
+        })
+        .catch(error => {
+            errorHelpers.handleError(error, 500, 'Unexpected error when trying to validate token', res);
         });
 });
 
