@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 import UIKit
 
+/// A wrapper around UIActivityViewController
+/// Used for sharing a URL to external apps
 struct ShareSheet: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIActivityViewController
 

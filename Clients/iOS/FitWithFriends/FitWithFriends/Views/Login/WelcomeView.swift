@@ -8,36 +8,50 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    let objectGraph: IObjectGraph
+    private let objectGraph: IObjectGraph
+    @ObservedObject private var viewModel: WelcomeViewModel
 
     @State private var createAccountViewShown = false
     @State private var loginViewShown = false
 
+    init(objectGraph: IObjectGraph) {
+        self.objectGraph = objectGraph
+        viewModel = WelcomeViewModel(authenticationManager: objectGraph.authenticationManager)
+    }
+
     var body: some View {
         VStack {
+            if viewModel.state.isFailed {
+                HStack {
+                    Image(systemName: "exclamationmark.circle")
+                        .padding(.leading)
+
+                    Text(viewModel.state.errorMessage)
+                        .padding()
+
+                    Spacer()
+                }
+                .background(Color.red)
+                .padding()
+            }
+
             Spacer()
 
             Text("Fit With Friends")
-                .font(.title)
+                .font(.largeTitle)
 
             Spacer()
 
-            Button("Login") {
-                loginViewShown = true
-            }
-            .font(.title2)
+            Button( action: {
+                self.viewModel.login()
+            }, label: {
+                SignInWithAppleButton()
+                    .frame(height: 60)
+                    .cornerRadius(16)
+            })
             .padding()
             .sheet(isPresented: $loginViewShown, content: {
                 LoginView(objectGraph: objectGraph)
-            })
-
-            Button ("Create Account") {
-                createAccountViewShown = true
-            }
-            .font(.footnote)
-            .padding()
-            .sheet(isPresented: $createAccountViewShown, content: {
-                CreateAccountView(objectGraph: objectGraph)
             })
 
             Spacer()

@@ -49,11 +49,14 @@ class HealthKitManager {
         self.userDefaults = userDefaults
 
         loginStateCancellable = authenticationManager.$loginState.sink { [weak self] state in
-            if state == .loggedIn {
+            switch state {
+            case .loggedIn:
                 // Report the activity summaries when the user logs in
                 self?.activitySummaryQueue.async {
                     self?.reportActivitySummaries(completion: nil)
                 }
+            default:
+                break
             }
         }
     }

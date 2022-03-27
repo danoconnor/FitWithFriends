@@ -21,8 +21,6 @@
 		0B1CBECC27C3F51C0008C72A /* CompetitionAdminDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */; };
 		0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */; };
 		0B1CBED027C3F7C50008C72A /* JoinCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */; };
-		0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7494256AE65F00821775 /* CreateAccountView.swift */; };
-		0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */; };
 		0B359721256C731A006D956A /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359720256C731A006D956A /* MainContentView.swift */; };
 		0B359724256C7357006D956A /* AppStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359723256C7357006D956A /* AppStateViewModel.swift */; };
 		0B35972C257046FC006D956A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35972B257046FC006D956A /* AppDelegate.swift */; };
@@ -52,6 +50,9 @@
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
 		0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A251279E424300C2970E /* CompetitionOverviewView.swift */; };
 		0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */; };
+		0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */; };
+		0B50BA4127EFEB410066134D /* AppleAuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */; };
+		0B50BA4327F012C50066134D /* MockAppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4227F012C50066134D /* MockAppleAuthenticationManager.swift */; };
 		0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */; };
 		0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E66E25EB356100189702 /* CreateCompetitionView.swift */; };
 		0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */; };
@@ -63,6 +64,8 @@
 		0B8445D8275C43FA00F78480 /* CompetitionOverviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D7275C43FA00F78480 /* CompetitionOverviewViewModel.swift */; };
 		0B8445E1275C464500F78480 /* LoginState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445E0275C464500F78480 /* LoginState.swift */; };
 		0B8D65E027DB06D300934E18 /* TodaySummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D65DF27DB06D300934E18 /* TodaySummaryViewModel.swift */; };
+		0B8D65E227DEDBD500934E18 /* SignInWithAppleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */; };
+		0B8D65E427DEE1A000934E18 /* WelcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D65E327DEE1A000934E18 /* WelcomeViewModel.swift */; };
 		0B9058C927B0844800AE1712 /* Error+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9058C827B0844800AE1712 /* Error+Extensions.swift */; };
 		0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */; };
 		0B99FBD2256A016900673133 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B99FBD1256A016900673133 /* Assets.xcassets */; };
@@ -98,8 +101,6 @@
 		0BBD78A1259A537100E08EB2 /* CompetitionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */; };
 		0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */; };
 		0BBD78B025A0335100E08EB2 /* DateFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78AF25A0335100E08EB2 /* DateFormatter+Extensions.swift */; };
-		0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D0256B3754008FE93C /* LoginView.swift */; };
-		0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */; };
 		0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29DB256B3B23008FE93C /* ViewState.swift */; };
 		0BD42FF225B664CE00968D87 /* CompetitionSummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */; };
 		0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */; };
@@ -128,8 +129,6 @@
 		0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionAdminDetails.swift; sourceTree = "<group>"; };
 		0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionView.swift; sourceTree = "<group>"; };
 		0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionViewModel.swift; sourceTree = "<group>"; };
-		0B2D7494256AE65F00821775 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
-		0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountViewModel.swift; sourceTree = "<group>"; };
 		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
 		0B359720256C731A006D956A /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		0B359723256C7357006D956A /* AppStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateViewModel.swift; sourceTree = "<group>"; };
@@ -159,6 +158,9 @@
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
 		0B47A251279E424300C2970E /* CompetitionOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverviewView.swift; sourceTree = "<group>"; };
 		0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionResultView.swift; sourceTree = "<group>"; };
+		0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationManager.swift; sourceTree = "<group>"; };
+		0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationError.swift; sourceTree = "<group>"; };
+		0B50BA4227F012C50066134D /* MockAppleAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppleAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptViewModel.swift; sourceTree = "<group>"; };
 		0B62E66E25EB356100189702 /* CreateCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionView.swift; sourceTree = "<group>"; };
 		0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionViewModel.swift; sourceTree = "<group>"; };
@@ -170,6 +172,8 @@
 		0B8445D7275C43FA00F78480 /* CompetitionOverviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverviewViewModel.swift; sourceTree = "<group>"; };
 		0B8445E0275C464500F78480 /* LoginState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginState.swift; sourceTree = "<group>"; };
 		0B8D65DF27DB06D300934E18 /* TodaySummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryViewModel.swift; sourceTree = "<group>"; };
+		0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInWithAppleButton.swift; sourceTree = "<group>"; };
+		0B8D65E327DEE1A000934E18 /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
 		0B9058C827B0844800AE1712 /* Error+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Extensions.swift"; sourceTree = "<group>"; };
 		0B99FBCA256A016900673133 /* FitWithFriends.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitWithFriends.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitWithFriendsApp.swift; sourceTree = "<group>"; };
@@ -207,8 +211,6 @@
 		0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManager.swift; sourceTree = "<group>"; };
 		0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		0BBD78AF25A0335100E08EB2 /* DateFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extensions.swift"; sourceTree = "<group>"; };
-		0BCB29D0256B3754008FE93C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		0BCB29DB256B3B23008FE93C /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionSummaryViewModel.swift; sourceTree = "<group>"; };
 		0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 			children = (
 				0B1CBEB227C1A4EF0008C72A /* RefreshableScrollView */,
 				0BD8B5C327D52011009BA5F2 /* ShareSheet.swift */,
+				0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */,
 			);
 			path = "Custom Views";
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */,
 				0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */,
 				0B1CBEC427C30F390008C72A /* MockAppProtocolHandler.swift */,
+				0B50BA4227F012C50066134D /* MockAppleAuthenticationManager.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -436,6 +440,7 @@
 				0B99FC16256A20A800673133 /* AuthenticationManager.swift */,
 				0B99FC33256A3BA600673133 /* TokenManager.swift */,
 				0B8445E0275C464500F78480 /* LoginState.swift */,
+				0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */,
 			);
 			path = Authentication;
 			sourceTree = "<group>";
@@ -480,6 +485,7 @@
 				0B99FBE7256A068700673133 /* HttpError.swift */,
 				0B99FC22256A275E00673133 /* KeychainError.swift */,
 				0B99FC37256A3DFC00673133 /* TokenError.swift */,
+				0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */,
 			);
 			path = Errors;
 			sourceTree = "<group>";
@@ -508,8 +514,6 @@
 			isa = PBXGroup;
 			children = (
 				0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */,
-				0B2D7494256AE65F00821775 /* CreateAccountView.swift */,
-				0BCB29D0256B3754008FE93C /* LoginView.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -552,8 +556,7 @@
 		0BBD78BD25A282F200E08EB2 /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				0B2D7498256AE6C900821775 /* CreateAccountViewModel.swift */,
-				0BCB29D8256B3A84008FE93C /* LoginViewModel.swift */,
+				0B8D65E327DEE1A000934E18 /* WelcomeViewModel.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -663,10 +666,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B2D7495256AE65F00821775 /* CreateAccountView.swift in Sources */,
+				0B8D65E227DEDBD500934E18 /* SignInWithAppleButton.swift in Sources */,
 				0BBD78B025A0335100E08EB2 /* DateFormatter+Extensions.swift in Sources */,
 				0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */,
 				0B99FC2B256A2C5300673133 /* ErrorResponse.swift in Sources */,
+				0B50BA4127EFEB410066134D /* AppleAuthenticationError.swift in Sources */,
+				0B50BA4327F012C50066134D /* MockAppleAuthenticationManager.swift in Sources */,
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
 				0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */,
@@ -679,9 +684,9 @@
 				0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */,
 				0B47A229279CAB6E00C2970E /* MockAuthenticationService.swift in Sources */,
 				0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */,
-				0BCB29D1256B3754008FE93C /* LoginView.swift in Sources */,
 				0B3597782571502A006D956A /* HealthKitManager.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
+				0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */,
 				0B47A22D279CACB600C2970E /* MockKeychainUtilities.swift in Sources */,
 				0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */,
 				0B1CBEB127C1A4AD0008C72A /* RefreshableScrollView.swift in Sources */,
@@ -705,6 +710,7 @@
 				0B1CBEC327C309B20008C72A /* JoinCompetitionProtocolData.swift in Sources */,
 				0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */,
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
+				0B8D65E427DEE1A000934E18 /* WelcomeViewModel.swift in Sources */,
 				0B1CBEB827C1A5660008C72A /* RefreshableScrollViewModel.swift in Sources */,
 				0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */,
 				0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */,
@@ -721,7 +727,6 @@
 				0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */,
 				0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,
-				0BCB29D9256B3A84008FE93C /* LoginViewModel.swift in Sources */,
 				0B9058C927B0844800AE1712 /* Error+Extensions.swift in Sources */,
 				0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */,
 				0B1CBECA27C3F3B80008C72A /* CompetitionDescription.swift in Sources */,
@@ -751,7 +756,6 @@
 				0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */,
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,
 				0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */,
-				0B2D7499256AE6C900821775 /* CreateAccountViewModel.swift in Sources */,
 				0BD8B5BF27D42C92009BA5F2 /* CompetitionDetailView.swift in Sources */,
 				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
 				0B47A235279CB2ED00C2970E /* IObjectGraph.swift in Sources */,

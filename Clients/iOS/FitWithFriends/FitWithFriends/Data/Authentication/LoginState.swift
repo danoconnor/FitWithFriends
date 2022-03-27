@@ -7,8 +7,8 @@
 
 import Foundation
 
-enum LoginState: String {
-    case notLoggedIn
+enum LoginState {
+    case notLoggedIn(Error?)
     case inProgress
     case loggedIn
 }

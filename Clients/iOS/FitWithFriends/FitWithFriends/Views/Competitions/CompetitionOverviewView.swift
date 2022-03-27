@@ -88,7 +88,7 @@ struct CompetitionOverviewView: View {
             }
 
             VStack {
-                ForEach(0 ..< viewModel.results.count) { position in
+                ForEach(0 ..< viewModel.results.count, id: \.self) { position in
                     let result = viewModel.results[position]
                     UserCompetitionResultView(result: result)
                         .contextMenu {

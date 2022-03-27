@@ -14,7 +14,7 @@ class MockUserService: UserService {
 
     var return_user: User?
     var return_error: Error?
-    override func createUser(username: String, password: String, displayName: String) async -> Result<User, Error> {
+    override func createUser(firstName: String, lastName: String, userId: String) async -> Result<User, Error> {
         await MockUtilities.delayOneSecond()
 
         if let user = return_user {

@@ -20,4 +20,17 @@ class AuthenticationService: ServiceBase {
                                                          method: .post,
                                                          body: requestBody)
     }
+
+    func getTokenFromAppleId(userId: String, idToken: String, authorizationCode: String) async -> Result<Token, Error> {
+        let requestBody: [String: String] = [
+            "userId": userId,
+            "idToken": idToken,
+            "authorizationCode": authorizationCode,
+            RequestConstants.Body.grantType: RequestConstants.Body.passwordGrant
+        ]
+
+        return await makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
+                                                         method: .post,
+                                                         body: requestBody)
+    }
 }

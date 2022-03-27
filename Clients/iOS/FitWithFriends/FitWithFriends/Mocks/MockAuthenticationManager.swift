@@ -5,11 +5,14 @@
 //  Created by Dan O'Connor on 1/22/22.
 //
 
+import AuthenticationServices
 import Foundation
 
 class MockAuthenticationManager: AuthenticationManager {
     init() {
-        super.init(authenticationService: MockAuthenticationService(), tokenManager: MockTokenManager())
+        super.init(appleAuthenticationManager: MockAppleAuthenticationManager(),
+                   authenticationService: MockAuthenticationService(),
+                   tokenManager: MockTokenManager())
     }
 
     var return_loggedInUserId: UInt? = 0
@@ -21,23 +24,17 @@ class MockAuthenticationManager: AuthenticationManager {
     var return_error: Error?
 
     var userToLogin: UInt = 0
-    override func login(username: String, password: String) async -> Error? {
+    override func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
         loginState = .inProgress
 
-        await MockUtilities.delayOneSecond()
-
-        if return_error != nil {
-            loginState = .notLoggedIn
-        } else {
-            loggedInUserId = userToLogin
-            loginState = .loggedIn
+        Task.detached {
+            await MockUtilities.delayOneSecond()
+            // authenticationCompleted(result: .success(Token()))
         }
-
-        return return_error
     }
 
     override func logout() {
-        self.loginState = .notLoggedIn
+        self.loginState = .notLoggedIn(nil)
         self.loggedInUserId = nil
     }
 

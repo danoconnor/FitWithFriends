@@ -24,12 +24,15 @@ public class CompetitionManager: ObservableObject {
         competitionOverviews = [:]
 
         loginStateCancellable = authenticationManager.$loginState.sink { [weak self] state in
-            if state == .loggedIn {
+            switch state {
+            case .loggedIn:
                 // When the user logs in we want to begin fetching the latest state of their competitions
                 guard let self = self else { return }
                 Task.detached {
                     await self.refreshCompetitionOverviews()
                 }
+            default:
+                break
             }
         }
     }

@@ -9,6 +9,7 @@ import Foundation
 
 class ObjectGraph: IObjectGraph {
     let activityDataService: ActivityDataService
+    let appleAuthenticationManager: AppleAuthenticationManager
     let appProtocolHandler: AppProtocolHandler
     let authenticationManager: AuthenticationManager
     let authenticationService: AuthenticationService
@@ -38,8 +39,13 @@ class ObjectGraph: IObjectGraph {
         competitionService = CompetitionService(httpConnector: httpConnector, tokenManager: tokenManager)
         userService = UserService(httpConnector: httpConnector, tokenManager: tokenManager)
 
-        authenticationManager = AuthenticationManager(authenticationService: authenticationService,
+        appleAuthenticationManager = AppleAuthenticationManager(authenticationService: authenticationService,
+                                                                keychainUtilities: keychainUtilities,
+                                                                userService: userService)
+        authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,
+                                                      authenticationService: authenticationService,
                                                       tokenManager: tokenManager)
+        appleAuthenticationManager.authenticationDelegate = authenticationManager
 
         competitionManager = CompetitionManager(authenticationManager: authenticationManager,
                                                 competitionService: competitionService)
