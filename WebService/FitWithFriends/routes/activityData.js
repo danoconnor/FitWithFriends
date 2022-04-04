@@ -1,5 +1,6 @@
 'use strict';
 const database = require('../utilities/database');
+const errorHelpers = require('../utilities/errorHelpers');
 const express = require('express');
 const router = express.Router();
 
@@ -15,15 +16,19 @@ router.post('/dailySummary', function (req, res) {
     const standTime = req.body['standTime'];
     const standTimeGoal = req.body['standTimeGoal'];
 
+    // Prefix the value with \x so the database will treat it as a hex value
+    const userId = res.locals.oauth.token.user.id;
+    const sqlHexUserId = '\\x' + userId;
+
     // TODO: Other vars may be 0 - how to check that those are present?
     if (!dateStr) {
-        res.sendStatus(400);
+        errorHelpers.handleError(null, 400, 'Missing required parameter date', res);
         return;
     }
 
     const date = new Date(dateStr);
     if (!date) {
-        res.sendStatus(400);
+        errorHelpers.handleError(null, 400, 'Could not parse date', res);
         return;
     }
 
@@ -50,42 +55,12 @@ router.post('/dailySummary', function (req, res) {
     database.query('INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, daily_points) \
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) \
                     ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal, daily_points = EXCLUDED.daily_points',
-                    [res.locals.oauth.token.user.id, date.toUTCString(), caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal, dailyPoints])
+                    [sqlHexUserId, date.toUTCString(), caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal, dailyPoints])
         .then(function (result) {
             res.sendStatus(200);
         })
         .catch(function (error) {
-            next(error);
-        });
-});
-
-router.post('/workout', function (req, res) {
-    // TODO: For the MVR we are limiting activity data to only the daily summaries
-    // We will re-enable the workout data in the future
-    res.sendStatus(404);
-    return;
-    
-    const startDate = req.body['startDate'];
-    const duration = req.body['duration'];
-    const caloriesBurned = req.body['caloriesBurned'];
-    const activityType = req.body['activityTypeRawValue'];
-    const distance = req.body['distance'];
-
-    // TODO: Other vars may be 0 - how to check that those are present?
-    if (!startDate) {
-        res.sendStatus(400);
-    }
-
-    // We will try to avoid sending duplicate data from the client, but as a backup
-    // the workout_data table has all four columns set as the primary key so duplicate data cannot be entered
-    database.query('INSERT INTO workout_data(user_id, start_date, duration, calories_burned, activity_type, distance) \
-                    VALUES ($1, $2, $3, $4, $5, $6) \
-                    ON CONFLICT (user_id, start_date, duration, calories_burned) DO NOTHING', [res.locals.oauth.token.user.id, startDate, duration, caloriesBurned, activityType, distance])
-        .then(function (result) {
-            res.sendStatus(200);
-        })
-        .catch(function (error) {
-            next(error);
+            errorHelpers.handleError(error, 500, 'Unexpected error inserting data into database', res);
         });
 });
 
