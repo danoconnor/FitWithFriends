@@ -10,6 +10,9 @@
     "name": ""
   },
   "dependencies": {
+    "@azure/identity": "^2.0.4",
+    "@azure/keyvault-keys": "^4.4.0",
+    "@azure/keyvault-secrets": "^4.4.0",
     "body-parser": "^1.15.0",
     "cookie-parser": "^1.4.0",
     "debug": "^2.2.0",
@@ -22,7 +25,8 @@
     "pg-native": "^3.0.0",
     "pg-promise": "^10.7.3",
     "pug": "^2.0.0-beta6",
-    "serve-favicon": "^2.3.0"
+    "serve-favicon": "^2.3.0",
+    "uuid": "^8.3.2"
   },
   "engines": {
     "node": "~6.10.x"
