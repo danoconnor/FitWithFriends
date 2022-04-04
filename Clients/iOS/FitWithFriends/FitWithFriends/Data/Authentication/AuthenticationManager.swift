@@ -20,7 +20,7 @@ class AuthenticationManager: ObservableObject {
     private let authenticationService: AuthenticationService
     private let tokenManager: TokenManager
 
-    var loggedInUserId: UInt?
+    var loggedInUserId: String?
 
     init(appleAuthenticationManager: AppleAuthenticationManager,
          authenticationService: AuthenticationService,
@@ -72,7 +72,6 @@ class AuthenticationManager: ObservableObject {
             return
         }
 
-        // TODO: check Apple credential state to make sure user hasn't unlinked their Apple account from this app
         // If we have a cached token then we are already logged in
         let cachedTokenResult = tokenManager.getCachedToken()
         switch cachedTokenResult {

@@ -51,7 +51,8 @@ struct WelcomeView: View {
             })
             .padding()
             .sheet(isPresented: $loginViewShown, content: {
-                LoginView(objectGraph: objectGraph)
+                // LoginView(objectGraph: objectGraph)
+                Text("TODO")
             })
 
             Spacer()

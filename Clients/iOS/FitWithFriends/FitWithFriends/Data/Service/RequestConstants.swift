@@ -17,7 +17,7 @@ struct RequestConstants {
         static let clientSecret = "client_secret"
 
         static let grantType = "grant_type"
-        static let passwordGrant = "password"
+        static let appleIdTokenGrant = "apple_id_token"
         static let refreshTokenGrant = "refresh_token"
 
         static let accessToken = "access_token"

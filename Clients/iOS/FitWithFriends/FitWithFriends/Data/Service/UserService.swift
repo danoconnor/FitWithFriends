@@ -9,27 +9,20 @@ import Foundation
 
 class UserService: ServiceBase {
     /// Creates a new user with the given credentials/user info. Will return an error if the username already exists
-    // TODO: delete
-    func createUser(username: String, password: String, displayName: String) async -> Result<User, Error> {
-        let requestBody: [String: String] = [
-            "username": username,
-            "password": password,
-            "displayName": displayName
-        ]
-
-        return await makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/users",
-                                                         method: .post,
-                                                         body: requestBody)
-    }
-
-    func createUser(firstName: String, lastName: String, userId: String) async -> Result<User, Error> {
+    func createUser(firstName: String,
+                    lastName: String,
+                    userId: String,
+                    idToken: String,
+                    authorizationCode: String) async -> Result<User, Error> {
         let requestBody: [String: String] = [
             "firstName": firstName,
             "lastName": lastName,
-            "userId": userId
+            "userId": userId,
+            "idToken": idToken,
+            "authorizationCode": authorizationCode
         ]
 
-        return await makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/users",
+        return await makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/users/userFromAppleID",
                                                          method: .post,
                                                          body: requestBody)
     }

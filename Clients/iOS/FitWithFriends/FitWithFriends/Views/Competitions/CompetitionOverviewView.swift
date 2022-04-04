@@ -118,12 +118,12 @@ struct CompetitionOverviewView: View {
 struct CompetitionOverviewView_Previews: PreviewProvider {
     private static var competitionOverview: CompetitionOverview {
         let results = [
-            UserCompetitionPoints(userId: 0, name: "Test user 0", total: 400, today: 110),
-            UserCompetitionPoints(userId: 1, name: "Test user 1", total: 300, today: 125),
-            UserCompetitionPoints(userId: 2, name: "Test user 2", total: 425, today: 75),
-            UserCompetitionPoints(userId: 3, name: "Test user 3", total: 100, today: 0),
-            UserCompetitionPoints(userId: 4, name: "Test user 4", total: 50, today: 0),
-            UserCompetitionPoints(userId: 5, name: "Test user 5", total: 10, today: 10)
+            UserCompetitionPoints(userId: "user_0", firstName: "Test", lastName: "User 0", total: 400, today: 110),
+            UserCompetitionPoints(userId: "user_1", firstName: "Test", lastName: "User 1", total: 300, today: 125),
+            UserCompetitionPoints(userId: "user_2", firstName: "Test", lastName: "User 2", total: 425, today: 75),
+            UserCompetitionPoints(userId: "user_3", firstName: "Test", lastName: "User 3", total: 100, today: 0),
+            UserCompetitionPoints(userId: "user_4", firstName: "Test", lastName: "User 4", total: 50, today: 0),
+            UserCompetitionPoints(userId: "user_5", firstName: "Test", lastName: "User 5", total: 10, today: 10)
         ]
 
         return CompetitionOverview(start: Date(),

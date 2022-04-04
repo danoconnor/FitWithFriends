@@ -14,7 +14,7 @@ class JoinCompetitionProtocolData: AppProtocolData {
     private static let competitionTokenKey = "competitiontoken"
     private static let competitionIdKey = "competitionid"
 
-    let competitionId: UInt
+    let competitionId: UUID
     let competitionToken: String
 
     /// Expected url: fitwithfriends://joincompetition?competitionToken=COMPETITIONTOKEN&competitionId=10
@@ -23,12 +23,12 @@ class JoinCompetitionProtocolData: AppProtocolData {
             return nil
         }
 
-        var id: UInt?
+        var id: UUID?
         var token: String?
         for queryItem in queryItems {
             switch queryItem.name.lowercased() {
             case JoinCompetitionProtocolData.competitionIdKey:
-                id = UInt(queryItem.value ?? "")
+                id = UUID(uuidString: queryItem.value ?? "")
             case JoinCompetitionProtocolData.competitionTokenKey:
                 token = queryItem.value
             default:
@@ -45,7 +45,7 @@ class JoinCompetitionProtocolData: AppProtocolData {
     }
 
     /// Expected url: fitwithfriends://joincompetition?competitionToken=COMPETITIONTOKEN&competitionId=10
-    static func createAppProtocolUrl(competitionId: UInt, competitionToken: String) -> URL {
+    static func createAppProtocolUrl(competitionId: UUID, competitionToken: String) -> URL {
         let url = "\(SecretConstants.baseAppProtocol)://\(action.rawValue)?\(JoinCompetitionProtocolData.competitionTokenKey)=\(competitionToken)&\(JoinCompetitionProtocolData.competitionIdKey)=\(competitionId.description)"
         return URL(string: url)!
     }
@@ -53,7 +53,7 @@ class JoinCompetitionProtocolData: AppProtocolData {
     /// Expected url: https://<service base>/joincompetition?competitionToken=COMPETITIONTOKEN&competitionId=10
     /// Associated domains should cause this website URL to open in the app, if the app is installed on the device
     /// If the app is not installed, then the webpage will load and prompt the user to download the app from the App Store
-    static func createWebsiteUrl(competitionId: UInt, competitionToken: String) -> URL {
+    static func createWebsiteUrl(competitionId: UUID, competitionToken: String) -> URL {
         let url = "\(SecretConstants.serviceBaseUrl)/\(action.rawValue)?\(JoinCompetitionProtocolData.competitionTokenKey)=\(competitionToken)&\(JoinCompetitionProtocolData.competitionIdKey)=\(competitionId.description)"
         return URL(string: url)!
     }

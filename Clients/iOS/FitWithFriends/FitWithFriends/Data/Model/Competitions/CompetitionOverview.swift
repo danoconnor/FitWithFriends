@@ -10,7 +10,7 @@ import Foundation
 class CompetitionOverview: IdentifiableBase, Codable {
     // MARK: Codable
 
-    let competitionId: UInt
+    let competitionId: UUID
     let competitionName: String
     let competitionStart: Date
     let competitionEnd: Date
@@ -29,7 +29,7 @@ class CompetitionOverview: IdentifiableBase, Codable {
     }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
-    init(id: UInt = 0, name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false) {
+    init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false) {
         competitionId = id
         competitionName = name
         competitionStart = start
@@ -42,14 +42,20 @@ class CompetitionOverview: IdentifiableBase, Codable {
 class UserCompetitionPoints: Codable, Identifiable {
     // MARK: Codable
 
-    let userId: UInt
-    let displayName: String
+    let userId: String
+    let firstName: String
+    let lastName: String
     let totalPoints: Double
     let pointsToday: Double?
 
+    var displayName: String {
+        firstName + " " + lastName
+    }
+
     enum CodingKeys: String, CodingKey {
         case userId
-        case displayName
+        case firstName
+        case lastName
         case totalPoints = "activityPoints"
         case pointsToday = "dailyPoints"
     }
@@ -59,9 +65,10 @@ class UserCompetitionPoints: Codable, Identifiable {
     let id = UUID()
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
-    init(userId: UInt = 0, name: String = "Test user", total: Double = 0, today: Double = 0) {
+    init(userId: String = "user_id", firstName: String = "Test", lastName: String = "User", total: Double = 0, today: Double = 0) {
         self.userId = userId
-        displayName = name
+        self.firstName = firstName
+        self.lastName = lastName
         totalPoints = total
         pointsToday = today
     }

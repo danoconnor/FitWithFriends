@@ -14,7 +14,7 @@ public class CompetitionManager: ObservableObject {
 
     private var loginStateCancellable: AnyCancellable?
 
-    @Published private(set) var competitionOverviews: [UInt: CompetitionOverview]
+    @Published private(set) var competitionOverviews: [UUID: CompetitionOverview]
 
     init(authenticationManager: AuthenticationManager,
          competitionService: CompetitionService) {
@@ -73,7 +73,7 @@ public class CompetitionManager: ObservableObject {
             return
         }
 
-        let refreshedData = await withTaskGroup(of: (UInt, CompetitionOverview)?.self, returning: [UInt: CompetitionOverview].self) { group in
+        let refreshedData = await withTaskGroup(of: (UUID, CompetitionOverview)?.self, returning: [UUID: CompetitionOverview].self) { group in
             for competitionId in competitionIds {
                 group.addTask {
                     let overviewResult = await self.competitionService.getCompetitionOverview(competitionId: competitionId)
@@ -88,7 +88,7 @@ public class CompetitionManager: ObservableObject {
                 }
             }
 
-            var results = [UInt: CompetitionOverview]()
+            var results = [UUID: CompetitionOverview]()
             for await result in group {
                 guard let result = result else { continue }
                 results[result.0] = result.1
@@ -102,11 +102,11 @@ public class CompetitionManager: ObservableObject {
         }
     }
 
-    func joinCompetition(competitionId: UInt, competitionToken: String) async -> Error? {
+    func joinCompetition(competitionId: UUID, competitionToken: String) async -> Error? {
         return await competitionService.joinCompetition(competitionId: competitionId, competitionToken: competitionToken)
     }
 
-    func leaveCompetition(competitionId: UInt) async -> Error? {
+    func leaveCompetition(competitionId: UUID) async -> Error? {
         guard let currentUserId = authenticationManager.loggedInUserId else {
             Logger.traceWarning(message: "Tried to leave competition with no logged in user")
             return TokenError.notFound
@@ -115,15 +115,15 @@ public class CompetitionManager: ObservableObject {
         return await competitionService.removeUserFromCompetition(userId: currentUserId, competitionId: competitionId)
     }
 
-    func removeUserFromCompetition(competitionId: UInt, targetUser: UInt) async -> Error? {
+    func removeUserFromCompetition(competitionId: UUID, targetUser: String) async -> Error? {
         return await competitionService.removeUserFromCompetition(userId: targetUser, competitionId: competitionId)
     }
 
-    func getCompetitionDescription(for competitionId: UInt, competitionToken: String) async -> Result<CompetitionDescription, Error> {
+    func getCompetitionDescription(for competitionId: UUID, competitionToken: String) async -> Result<CompetitionDescription, Error> {
         return await competitionService.getCompetitionDetails(competitionId: competitionId, competitionToken: competitionToken)
     }
 
-    func getCompetitionAdminDetail(for competitionId: UInt) async -> Result<CompetitionAdminDetails, Error> {
+    func getCompetitionAdminDetail(for competitionId: UUID) async -> Result<CompetitionAdminDetails, Error> {
         return await competitionService.getCompetitionAdminDetails(competitionId: competitionId)
     }
 }

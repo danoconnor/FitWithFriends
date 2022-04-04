@@ -15,7 +15,7 @@ class MockCompetitionService: CompetitionService {
     }
 
     var return_competitionOverview: CompetitionOverview?
-    override func getCompetitionOverview(competitionId: UInt) async -> Result<CompetitionOverview, Error> {
+    override func getCompetitionOverview(competitionId: UUID) async -> Result<CompetitionOverview, Error> {
         await MockUtilities.delayOneSecond()
 
         if let competitionOverview = return_competitionOverview {
@@ -25,8 +25,8 @@ class MockCompetitionService: CompetitionService {
         }
     }
 
-    var return_usersCompetitions: [UInt]?
-    override func getUsersCompetitions(userId: UInt) async -> Result<[UInt], Error> {
+    var return_usersCompetitions: [UUID]?
+    override func getUsersCompetitions(userId: String) async -> Result<[UUID], Error> {
         await MockUtilities.delayOneSecond()
 
         if let competitions = return_usersCompetitions {
