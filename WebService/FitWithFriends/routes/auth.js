@@ -20,7 +20,7 @@ router.post('/token', (req, res, next) => {
 }));
 
 router.get('/test', (req, res) => {
-    signWithAzureKeyvault('some data to sign', signingAlgorithm)
+    signWithAzureKeyvault('some data to sign', 'RS256')
         .then(result => {
             const signature = Buffer.from(result.result).toString('base64')
                 .replace(/=/g, '')
