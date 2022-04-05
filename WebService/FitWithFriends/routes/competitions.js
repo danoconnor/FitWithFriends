@@ -190,7 +190,7 @@ router.get('/:competitionId/overview', function (req, res) {
 
             const userIdList = usersCompetitionsResult.map(row => '\'\\x' + Buffer.from(row.user_id).toString('hex') + '\'').join();
             const competitionInfo = competitionsResult[0];
-            const isUserAdmin = res.locals.oauth.token.user.id === competitionInfo.admin_user_id;
+            const isUserAdmin = res.locals.oauth.token.user.id === Buffer.from(competitionInfo.admin_user_id).toString('hex');
 
             var query = '';
             var queryParams = [];

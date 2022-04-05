@@ -13,7 +13,6 @@ router.post('/token', (req, res, next) => {
     extendedGrantTypes: {
         'apple_id_token': AppleIdTokenGrant // An id token acquired by the Sign-In With Apple process
     }
-}))
-
+}));
 
 module.exports = router
