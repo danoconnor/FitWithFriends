@@ -12,7 +12,7 @@ class CompetitionOverviewViewModel: ObservableObject {
     enum CompetitionAction: CustomStringConvertible, Hashable {
         case leave
         case share
-        case removeUser(UInt)
+        case removeUser(String)
 
         var description: String {
             switch self {
@@ -119,7 +119,7 @@ class CompetitionOverviewViewModel: ObservableObject {
         }
     }
 
-    func getUserContextMenuActions(for userId: UInt) -> [CompetitionAction] {
+    func getUserContextMenuActions(for userId: String) -> [CompetitionAction] {
         var actions = [CompetitionAction]()
 
         // Allow the admin user to remove other users from the competition via the context menu
@@ -139,7 +139,7 @@ class CompetitionOverviewViewModel: ObservableObject {
         await competitionManager.refreshCompetitionOverviews()
     }
 
-    private func removeUser(userId: UInt) async {
+    private func removeUser(userId: String) async {
         let error = await competitionManager.removeUserFromCompetition(competitionId: competitionOverview.competitionId, targetUser: userId)
         if error != nil {
             Logger.traceError(message: "Failed to remove user \(userId) from competition \(competitionOverview.competitionId)", error: error)

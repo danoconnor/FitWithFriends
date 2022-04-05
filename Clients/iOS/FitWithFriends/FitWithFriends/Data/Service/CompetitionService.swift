@@ -8,12 +8,12 @@
 import Foundation
 
 class CompetitionService: ServiceBase {
-    func getCompetitionOverview(competitionId: UInt) async -> Result<CompetitionOverview, Error> {
-        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId)/overview",
+    func getCompetitionOverview(competitionId: UUID) async -> Result<CompetitionOverview, Error> {
+        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/overview",
                                                        method: .get)
     }
 
-    func getUsersCompetitions(userId: UInt) async -> Result<[UInt], Error> {
+    func getUsersCompetitions(userId: String) async -> Result<[UUID], Error> {
         return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions",
                                                        method: .get)
     }
@@ -24,7 +24,8 @@ class CompetitionService: ServiceBase {
         let requestBody: [String: String] = [
             "startDate": dateFormatter.string(from: startDate),
             "endDate": dateFormatter.string(from: endDate),
-            "displayName": competitionName
+            "displayName": competitionName,
+            "ianaTimezone": TimeZone.current.identifier
         ]
 
         let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions",
@@ -33,10 +34,10 @@ class CompetitionService: ServiceBase {
         return result.xtError
     }
 
-    func joinCompetition(competitionId: UInt, competitionToken: String) async -> Error? {
+    func joinCompetition(competitionId: UUID, competitionToken: String) async -> Error? {
         let requestBody: [String: String] = [
             "accessToken": competitionToken,
-            "competitionId": competitionId.description
+            "competitionId": competitionId.uuidString
         ]
 
         let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/join",
@@ -45,9 +46,9 @@ class CompetitionService: ServiceBase {
         return result.xtError
     }
 
-    func removeUserFromCompetition(userId: UInt, competitionId: UInt) async -> Error? {
+    func removeUserFromCompetition(userId: String, competitionId: UUID) async -> Error? {
         let requestBody: [String: String] = [
-            "competitionId": competitionId.description,
+            "competitionId": competitionId.uuidString,
             "userId": userId.description
         ]
 
@@ -57,9 +58,9 @@ class CompetitionService: ServiceBase {
         return result.xtError
     }
 
-    func getCompetitionDetails(competitionId: UInt, competitionToken: String) async -> Result<CompetitionDescription, Error> {
+    func getCompetitionDetails(competitionId: UUID, competitionToken: String) async -> Result<CompetitionDescription, Error> {
         let requestBody: [String: String] = [
-            "competitionId": competitionId.description,
+            "competitionId": competitionId.uuidString,
             "competitionAccessToken": competitionToken
         ]
 
@@ -68,8 +69,8 @@ class CompetitionService: ServiceBase {
                                                        body: requestBody)
     }
 
-    func getCompetitionAdminDetails(competitionId: UInt) async -> Result<CompetitionAdminDetails, Error> {
-        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.description)/adminDetail",
+    func getCompetitionAdminDetails(competitionId: UUID) async -> Result<CompetitionAdminDetails, Error> {
+        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/adminDetail",
                                                        method: .get)
     }
 }

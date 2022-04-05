@@ -12,7 +12,7 @@ class Token: Codable {
     let accessTokenExpiry: Date
     let refreshToken: String
     let refreshTokenExpiry: Date
-    let userId: UInt
+    let userId: String
 
     var isAccessTokenExpired: Bool {
         return accessTokenExpiry < Date()

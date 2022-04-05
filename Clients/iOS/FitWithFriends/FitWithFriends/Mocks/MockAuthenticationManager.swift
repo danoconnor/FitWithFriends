@@ -15,8 +15,8 @@ class MockAuthenticationManager: AuthenticationManager {
                    tokenManager: MockTokenManager())
     }
 
-    var return_loggedInUserId: UInt? = 0
-    override var loggedInUserId: UInt? {
+    var return_loggedInUserId: String?
+    override var loggedInUserId: String? {
         get { return return_loggedInUserId }
         set {}
     }
