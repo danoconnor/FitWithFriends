@@ -12,15 +12,10 @@ class MockUserService: UserService {
         super.init(httpConnector: MockHttpConnector(), tokenManager: MockTokenManager())
     }
 
-    var return_user: User?
     var return_error: Error?
-    override func createUser(firstName: String, lastName: String, userId: String, idToken: String, authorizationCode: String) async -> Result<User, Error> {
+    override func createUser(firstName: String, lastName: String, userId: String, idToken: String, authorizationCode: String) async -> Error? {
         await MockUtilities.delayOneSecond()
 
-        if let user = return_user {
-            return .success(user)
-        } else {
-            return .failure(return_error ?? HttpError.generic)
-        }
+        return return_error
     }
 }
