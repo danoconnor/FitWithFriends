@@ -160,7 +160,7 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
                                                             idToken: idToken,
                                                             authorizationCode: authorizationCode)
 
-        if let createUserError = createUserResult.xtError {
+        if let createUserError = createUserResult {
             // Don't throw if there is an error creating the user,
             // it's possible that the user already exists so we should continue
             // and attempt to get a token
