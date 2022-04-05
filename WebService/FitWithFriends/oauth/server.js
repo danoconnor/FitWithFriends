@@ -8,5 +8,6 @@ module.exports = new OAuthServer({
     accessTokenLifetime:  60 * 60, // 1 hour
     refreshTokenLifetime: 60 * 60 * 24 * 365, // 1 year
     allowEmptyState: true,
-    allowExtendedTokenAttributes: true
+    allowExtendedTokenAttributes: true,
+    alwaysIssueNewRefreshToken: false
 })

@@ -292,7 +292,8 @@ router.post('/description', function (req, res) {
             const numMembers = usersCompetitionsResult[0].count;
 
             // Find the display name of the competition admin so we can include it in the response
-            database.query('SELECT first_name, last_name FROM users WHERE user_id = $1', ['\\x' + competitionInfo.admin_user_id])
+            // Don't need to use \x with admin_user_id because it comes from the previous query and is already in hex format
+            database.query('SELECT first_name, last_name FROM users WHERE user_id = $1', [competitionInfo.admin_user_id])
                 .then(function (result) {
                     if (!result.length) {
                         errorHelpers.handleError(null, 500, 'Unexpected failure when looking up admin user info', res);
