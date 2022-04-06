@@ -5,7 +5,6 @@ const cryptoHelpers = require('../utilities/cryptoHelpers');
 const database = require('../utilities/database');
 const jwt = require('jsonwebtoken');
 const util = require('util');
-const fs = require('fs');
 
 const tokenIssuer = 'com.danoconnor.fitwithfriends';
 
@@ -107,8 +106,22 @@ module.exports.getRefreshToken = function (bearerToken) {
  */
 
 module.exports.saveToken = function (token, client, user) {
+    // Our OAuth system reuses the same refresh token until it expires (or is otherwise revoked)
+    // Since we only store the refresh token in the database, we don't need to do anything if the
+    // refresh token hasn't changed
+    if (!token.refreshToken) {
+        return {
+            accessToken: token.accessToken,
+            accessTokenExpiresAt: token.accessTokenExpiresAt,
+            accessTokenExpiry: token.accessTokenExpiresAt,
+            client: client.id,
+            user: user.id,
+            scope: token.scope
+        }
+    }
+
     // Prefix the value with \x so the database will treat it as a hex value
-    const sqlHexUserId = '\\x' + user;
+    const sqlHexUserId = '\\x' + user.id;
 
     return database.query('INSERT INTO oauth_tokens(client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)', [
         client.id,
@@ -122,9 +135,9 @@ module.exports.saveToken = function (token, client, user) {
             refreshToken: token.refreshToken,
             refreshTokenExpiresAt: token.refreshTokenExpiresAt,
             scope: token.scope,
-            client: client,
-            user: user,
-            userId: user,
+            client: client.id,
+            user: user.id,
+            userId: user.id,
             accessTokenExpiry: token.accessTokenExpiresAt,
             refreshTokenExpiry: token.refreshTokenExpiresAt,
         }
@@ -151,6 +164,9 @@ module.exports.revokeToken = function (token) {
  */
 
 module.exports.generateAccessToken = function (client, user, scope) {
+    // We manually create the access token, instead of using the jsonwebtoken library,
+    // because we want to use Azure Keyvault to sign the token so that
+    // the private key never leaves the vault
     const now = Math.floor(Date.now() / 1000);
     const payload = {
         iat: now,
