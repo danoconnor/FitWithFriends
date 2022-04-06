@@ -50,6 +50,14 @@ class TokenManager {
     }
 
     func storeToken(_ token: Token) {
+        // When we use the refresh token to get a new access token,
+        // the server won't return the refresh token in the response.
+        // In that case, re-use the previously known refresh token
+        if token.refreshToken == nil {
+            token.refreshToken = cachedToken?.refreshToken
+            token.refreshTokenExpiry = cachedToken?.refreshTokenExpiry
+        }
+
         cachedToken = token
 
         let keychainResult = keychainUtilities.writeKeychainItem(token,

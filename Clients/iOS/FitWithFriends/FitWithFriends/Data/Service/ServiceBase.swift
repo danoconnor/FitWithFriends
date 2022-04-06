@@ -21,6 +21,10 @@ class ServiceBase {
 
     /// Gets a new access token using the refresh token
     func getToken(token: Token) async -> Result<Token, Error> {
+        guard let refreshToken = token.refreshToken else {
+            return .failure(TokenError.notFound)
+        }
+
         // Sometimes there are multiple concurrent calls to refresh the token,
         // which can invalidate previously issued tokens.
         // Make sure there is only one refresh token task at a time
@@ -39,7 +43,7 @@ class ServiceBase {
 
             let requestBody: [String: String] = [
                 RequestConstants.Body.grantType: RequestConstants.Body.refreshTokenGrant,
-                RequestConstants.Body.refreshToken: token.refreshToken
+                RequestConstants.Body.refreshToken: refreshToken
             ]
 
             let result: Result<Token, Error> = await self.makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
