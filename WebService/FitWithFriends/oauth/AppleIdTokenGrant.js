@@ -61,7 +61,7 @@ AppleIdTokenGrant.prototype.handle = function (request, client) {
             // which leaves only valid hex chars remaining
             const hexUserId = userId.replace(/\./g, '');
 
-            return this.saveToken(hexUserId, client, scope);
+            return this.saveToken({ id: hexUserId }, client, scope);
         })
 }
 
