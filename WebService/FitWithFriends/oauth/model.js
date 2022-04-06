@@ -17,7 +17,7 @@ getPublicKeyFromAzureKeyvault();
 
 module.exports.saveAuthorizationCode = function (token, client, user) {
     // Prefix the value with \x so the database will treat it as a hex value
-    const sqlHexUserId = '\\x' + user;
+    const sqlHexUserId = '\\x' + user.id;
 
     database.query('INSERT INTO oauth_tokens(client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)', [
         client.id,
@@ -116,6 +116,7 @@ module.exports.saveToken = function (token, client, user) {
             accessTokenExpiry: token.accessTokenExpiresAt,
             client: client.id,
             user: user.id,
+            userId: user.id,
             scope: token.scope
         }
     }
@@ -172,7 +173,7 @@ module.exports.generateAccessToken = function (client, user, scope) {
         iat: now,
         nbf: now,
         exp: now + (60 * 60), // Valid for 1hr
-        sub: user,
+        sub: user.id,
         iss: tokenIssuer,
         aud: scope,
         client: client.id
