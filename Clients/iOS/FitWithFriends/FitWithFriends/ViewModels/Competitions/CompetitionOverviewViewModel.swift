@@ -103,9 +103,12 @@ class CompetitionOverviewViewModel: ObservableObject {
             results.append(UserPosition(userCompetitionPoints: allResults[userPositionZeroIndex], position: UInt(userPosition)))
         }
 
-        let userPositionPrefix = Date() > competitionOverview.competitionEnd ? "You finished in" : "You're in"
-
-        userPositionDescription = "\(userPositionPrefix) \(userPosition)\(userPositionString)"
+        if competitionOverview.hasCompetitionStarted && userPosition > 0 {
+            let userPositionPrefix = Date() > competitionOverview.competitionEnd ? "You finished in" : "You're in"
+            userPositionDescription = "\(userPositionPrefix) \(userPosition)\(userPositionString)"
+        } else {
+            userPositionDescription = "Competition hasn't started"
+        }
     }
 
     func performAction(_ action: CompetitionAction) async {
