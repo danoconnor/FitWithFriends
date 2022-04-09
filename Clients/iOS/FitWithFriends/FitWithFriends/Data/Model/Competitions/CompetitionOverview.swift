@@ -94,13 +94,11 @@ class CompetitionOverview: IdentifiableBase, Codable, Comparable {
     }
 }
 
-class UserCompetitionPoints: Codable, Identifiable {
-    // MARK: Codable
-
+class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
     let userId: String
     let firstName: String
     let lastName: String
-    let totalPoints: Double
+    let totalPoints: Double?
     let pointsToday: Double?
 
     var displayName: String {
@@ -115,10 +113,6 @@ class UserCompetitionPoints: Codable, Identifiable {
         case pointsToday = "dailyPoints"
     }
 
-    // MARK: Identifiable
-
-    let id = UUID()
-
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
     init(userId: String = "user_id", firstName: String = "Test", lastName: String = "User", total: Double = 0, today: Double = 0) {
         self.userId = userId
@@ -126,5 +120,30 @@ class UserCompetitionPoints: Codable, Identifiable {
         self.lastName = lastName
         totalPoints = total
         pointsToday = today
+    }
+
+    static func == (lhs: UserCompetitionPoints, rhs: UserCompetitionPoints) -> Bool {
+        return lhs.userId == rhs.userId
+    }
+
+    static func < (lhs: UserCompetitionPoints, rhs: UserCompetitionPoints) -> Bool {
+        let lhsPoints = lhs.totalPoints ?? 0
+        let rhsPoints = rhs.totalPoints ?? 0
+
+        // If one or both sides have points, order by highest points first
+        if lhs.totalPoints != nil || rhs.totalPoints != nil {
+            if lhsPoints != rhsPoints {
+                return lhsPoints > rhsPoints
+            }
+
+            // If total points are equal, use points today as a tiebreaker
+            if lhs.pointsToday != rhs.pointsToday {
+                return (lhs.pointsToday ?? 0) > (rhs.pointsToday ?? 0)
+            }
+        }
+
+        // Default to ordering by name if there are no points,
+        // or the total points and points today are both equal
+        return lhs.displayName > rhs.displayName
     }
 }

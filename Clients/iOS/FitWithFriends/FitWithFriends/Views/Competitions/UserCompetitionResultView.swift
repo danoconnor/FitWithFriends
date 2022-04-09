@@ -36,8 +36,10 @@ struct UserCompetitionResultView: View {
 
             Spacer()
 
-            Text("\(Int(result.userCompetitionPoints.totalPoints)) (\(Int(result.userCompetitionPoints.pointsToday ?? 0)))")
-                .padding(.leading)
+            if let totalPoints = result.userCompetitionPoints.totalPoints {
+                Text("\(Int(totalPoints)) (\(Int(result.userCompetitionPoints.pointsToday ?? 0)))")
+                    .padding(.leading)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
