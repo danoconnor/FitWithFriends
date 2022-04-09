@@ -126,6 +126,10 @@ public class CompetitionManager: ObservableObject {
     func getCompetitionAdminDetail(for competitionId: UUID) async -> Result<CompetitionAdminDetails, Error> {
         return await competitionService.getCompetitionAdminDetails(competitionId: competitionId)
     }
+
+    func deleteCompetition(competitionId: UUID) async -> Error? {
+        return await competitionService.deleteCompetition(competitionId: competitionId)
+    }
 }
 
 extension CompetitionManager: ActivityUpdateDelegate {

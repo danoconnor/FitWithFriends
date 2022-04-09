@@ -11,6 +11,10 @@ struct UserCompetitionResultView: View {
     let result: UserPosition
 
     private var positionBackgroundColor: Color {
+        guard result.shouldShowPosition else {
+            return Color.clear
+        }
+
         switch result.position {
         case 1: return Color.gold
         case 2: return Color.silver
@@ -27,7 +31,9 @@ struct UserCompetitionResultView: View {
                     .frame(width: 40, height: 40)
                     .foregroundColor(positionBackgroundColor)
 
-                Text(result.position.description)
+                if result.shouldShowPosition {
+                    Text(result.position.description)
+                }
             }
 
             Text(result.userCompetitionPoints.displayName)

@@ -9,13 +9,16 @@ import Combine
 import Foundation
 
 class CompetitionOverviewViewModel: ObservableObject {
-    enum CompetitionAction: CustomStringConvertible, Hashable {
+    enum CompetitionAction: CustomStringConvertible, Hashable, Comparable {
+        case deleteCompetition
         case leave
         case share
         case removeUser(String)
 
         var description: String {
             switch self {
+            case .deleteCompetition:
+                return "Delete competition"
             case .leave:
                 return "Leave competition"
             case .share:
@@ -42,6 +45,10 @@ class CompetitionOverviewViewModel: ObservableObject {
     @Published var shouldShowSheet = false
     var shareUrl: URL?
 
+    // Currently we only show an alert for one case: to confirm that the user
+    // wants to delete the competition.
+    @Published var shouldShowAlert = false
+
     init(authenticationManager: AuthenticationManager,
          competitionManager: CompetitionManager,
          competitionOverview: CompetitionOverview,
@@ -57,10 +64,9 @@ class CompetitionOverviewViewModel: ObservableObject {
             // If the user is the competition admin,
             // then they can generate a link to share the competition with others
             // and allow them to join
-            availableActions = [.share]
+            availableActions = [.share, .deleteCompetition]
         } else {
             // Only allow non-admins to leave the competition
-            // TODO: need some way for the admin to leave/disband the competition
             availableActions = [.leave]
         }
 
@@ -113,6 +119,10 @@ class CompetitionOverviewViewModel: ObservableObject {
 
     func performAction(_ action: CompetitionAction) async {
         switch action {
+        case .deleteCompetition:
+            await MainActor.run {
+                self.shouldShowAlert = true
+            }
         case .leave:
             await leaveCompetition()
         case .share:
@@ -131,6 +141,17 @@ class CompetitionOverviewViewModel: ObservableObject {
         }
 
         return actions
+    }
+
+    /// Once the user has confirmed the deletion via the alert, the view will call this func to actually
+    /// perform the deletion
+    func deleteCompetitionConfirmed() async {
+        let error = await competitionManager.deleteCompetition(competitionId: competitionOverview.competitionId)
+        if let error = error {
+            Logger.traceError(message: "Failed to delete competition \(competitionOverview.competitionId)", error: error)
+        }
+
+        await competitionManager.refreshCompetitionOverviews()
     }
 
     private func leaveCompetition() async {

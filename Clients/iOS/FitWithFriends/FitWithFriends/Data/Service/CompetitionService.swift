@@ -69,8 +69,22 @@ class CompetitionService: ServiceBase {
                                                        body: requestBody)
     }
 
+    /// The user must be the admin of the competition, otherwise the request will be rejected
     func getCompetitionAdminDetails(competitionId: UUID) async -> Result<CompetitionAdminDetails, Error> {
         return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/adminDetail",
                                                        method: .get)
+    }
+
+    /// The user must be the admin of the competition, otherwise the request will be rejected
+    func deleteCompetition(competitionId: UUID) async -> Error? {
+        let requestBody: [String: String] = [
+            "competitionId": competitionId.uuidString
+        ]
+
+        let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/delete",
+                                                                                           method: .post,
+                                                                                           body: requestBody)
+
+        return result.xtError
     }
 }

@@ -52,6 +52,14 @@ class HomepageSheetViewModel: ObservableObject {
 
     func updateState(sheet: HomepageSheet, state: Bool, contextData: Any? = nil) {
         stateQueue.sync {
+            // Check if this update is changing anything
+            let currentState = homepageSheetState[sheet]
+            guard currentState?.shouldShow != state else {
+                // If we haven't changed the state of the sheet, then no need to do an update
+                // TODO: check if contextData has changed
+                return
+            }
+
             homepageSheetState[sheet] = (shouldShow: state, contextData: contextData)
 
             var foundSheetToShow = false

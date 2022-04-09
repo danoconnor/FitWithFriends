@@ -48,7 +48,7 @@ struct CompetitionOverviewView: View {
                 Spacer()
 
                 Menu {
-                    ForEach(viewModel.availableActions, id: \.self) { action in
+                    ForEach(viewModel.availableActions.sorted(), id: \.self) { action in
                         Button(action.description) {
                             self.actionInProgress = true
                             Task.detached {
@@ -112,6 +112,23 @@ struct CompetitionOverviewView: View {
                 ShareSheet(url: shareUrl)
             }
         })
+        .alert(isPresented: $viewModel.shouldShowAlert) {
+            // We currently only have one case where we show an alert:
+            // when we want to confirm that the user wants to delete
+            // a competition
+            let titleText = Text("Are you sure?")
+            let bodyText = Text("This will permanently delete the competition for all users.")
+            let confirmButton: Alert.Button = .destructive(Text("Confirm")) {
+                Task.detached {
+                    await self.viewModel.deleteCompetitionConfirmed()
+                }
+            }
+
+            return Alert(title: titleText,
+                         message: bodyText,
+                         primaryButton: .cancel(),
+                         secondaryButton: confirmButton)
+        }
     }
 }
 
