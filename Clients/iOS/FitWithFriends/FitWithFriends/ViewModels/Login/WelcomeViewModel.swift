@@ -49,4 +49,3 @@ extension WelcomeViewModel: ASAuthorizationControllerPresentationContextProvidin
         return UIApplication.shared.keyWindow ?? UIWindow()
     }
 }
-

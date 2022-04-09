@@ -29,6 +29,7 @@ class HomepageViewModel: ObservableObject {
         competitionLoadListener = competitionManager.$competitionOverviews.sink { [weak self] newValue in
             DispatchQueue.main.async {
                 self?.currentCompetitions = newValue.map { $0.value }
+                    .sorted { $0 < $1 }
             }
         }
     }

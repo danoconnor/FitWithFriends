@@ -11,9 +11,6 @@ struct WelcomeView: View {
     private let objectGraph: IObjectGraph
     @ObservedObject private var viewModel: WelcomeViewModel
 
-    @State private var createAccountViewShown = false
-    @State private var loginViewShown = false
-
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
         viewModel = WelcomeViewModel(authenticationManager: objectGraph.authenticationManager)
@@ -42,7 +39,7 @@ struct WelcomeView: View {
 
             Spacer()
 
-            Button( action: {
+            Button(action: {
                 self.viewModel.login()
             }, label: {
                 SignInWithAppleButton()
@@ -50,10 +47,6 @@ struct WelcomeView: View {
                     .cornerRadius(16)
             })
             .padding()
-            .sheet(isPresented: $loginViewShown, content: {
-                // LoginView(objectGraph: objectGraph)
-                Text("TODO")
-            })
 
             Spacer()
         }
