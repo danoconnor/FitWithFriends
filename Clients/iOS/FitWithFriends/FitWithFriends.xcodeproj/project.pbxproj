@@ -102,7 +102,6 @@
 		0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */; };
 		0BBD78B025A0335100E08EB2 /* DateFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78AF25A0335100E08EB2 /* DateFormatter+Extensions.swift */; };
 		0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29DB256B3B23008FE93C /* ViewState.swift */; };
-		0BD42FF225B664CE00968D87 /* CompetitionSummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */; };
 		0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */; };
 		0BD8B5B927D419E5009BA5F2 /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */; };
 		0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5BA27D41F2E009BA5F2 /* UserPosition.swift */; };
@@ -212,7 +211,6 @@
 		0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		0BBD78AF25A0335100E08EB2 /* DateFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extensions.swift"; sourceTree = "<group>"; };
 		0BCB29DB256B3B23008FE93C /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
-		0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionSummaryViewModel.swift; sourceTree = "<group>"; };
 		0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
 		0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
 		0BD8B5BA27D41F2E009BA5F2 /* UserPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPosition.swift; sourceTree = "<group>"; };
@@ -564,7 +562,6 @@
 		0BBD78BE25A282F600E08EB2 /* Competitions */ = {
 			isa = PBXGroup;
 			children = (
-				0BD42FF125B664CE00968D87 /* CompetitionSummaryViewModel.swift */,
 				0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */,
 				0B8445D7275C43FA00F78480 /* CompetitionOverviewViewModel.swift */,
 				0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */,
@@ -744,7 +741,6 @@
 				0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */,
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0BD8B5BD27D42C79009BA5F2 /* CompetitionDetailViewModel.swift in Sources */,
-				0BD42FF225B664CE00968D87 /* CompetitionSummaryViewModel.swift in Sources */,
 				0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */,
 				0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */,
 				0B99FBEB256A070F00673133 /* HttpMethod.swift in Sources */,

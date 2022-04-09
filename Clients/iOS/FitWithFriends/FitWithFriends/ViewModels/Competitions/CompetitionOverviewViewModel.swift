@@ -64,7 +64,7 @@ class CompetitionOverviewViewModel: ObservableObject {
             availableActions = [.leave]
         }
 
-        let allResults = competitionOverview.currentResults.sorted { $0.totalPoints > $1.totalPoints }
+        let allResults = competitionOverview.currentResults.sorted()
 
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
