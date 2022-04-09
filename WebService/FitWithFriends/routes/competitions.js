@@ -109,7 +109,7 @@ router.post('/join', function (req, res) {
 
             // TODO: remove when multiple competitions are supported
             // Check that the user has not already joined a competition yet
-            database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE userid = $1', sqlHexUserId)
+            database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE user_id = $1', sqlHexUserId)
                 .then(function (result) {
 
                     // TODO: re-add a check for how many existing competitions the user is a part of
