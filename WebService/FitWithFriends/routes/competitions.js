@@ -202,14 +202,14 @@ router.get('/:competitionId/overview', function (req, res) {
             // If the competition is currently active, then include each user's activity points so far today in the results
             if (currentDate >= competitionInfo.start_date && currentDate <= competitionInfo.end_date) {
                 queryParams = [competitionInfo.start_date, competitionInfo.end_date, currentDate];
-                query = 'SELECT activitySummaryData.user_id, first_name, last_name, activity_points, daily_points FROM \
+                query = 'SELECT userInfo.user_id, first_name, last_name, activity_points, daily_points FROM \
                     (SELECT user_id, first_name, last_name FROM users WHERE user_id in (' + userIdList + ')) AS userInfo \
-                    INNER JOIN \
+                    LEFT OUTER JOIN \
                         (SELECT user_id, SUM(daily_points) AS activity_points \
                         FROM activity_summaries \
                         WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
                         GROUP BY user_id) AS activitySummaryData \
-                        FULL OUTER JOIN \
+                        LEFT OUTER JOIN \
                             (SELECT user_id, daily_points \
                             FROM activity_summaries \
                             WHERE date = $3 and user_id in (' + userIdList + ')) AS today_points \
@@ -217,9 +217,9 @@ router.get('/:competitionId/overview', function (req, res) {
                     ON activitySummaryData.user_id = userInfo.user_id';
             } else {
                 queryParams = [competitionInfo.start_date, competitionInfo.end_date];
-                query = 'SELECT activitySummaryData.user_id, first_name, last_name, activity_points FROM \
+                query = 'SELECT userInfo.user_id, first_name, last_name, activity_points FROM \
                     (SELECT user_id, first_name, last_name FROM users WHERE user_id in (' + userIdList + ')) AS userInfo \
-                    INNER JOIN \
+                    LEFT OUTER JOIN \
                         (SELECT user_id, SUM(daily_points) AS activity_points \
                         FROM activity_summaries \
                         WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
