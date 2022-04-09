@@ -325,7 +325,7 @@ router.get('/:competitionId/adminDetail', function (req, res) {
     database.query('SELECT competition_id, access_token FROM competitions WHERE competition_id = $1 AND admin_user_id = $2', [req.params.competitionId, '\\x' + res.locals.oauth.token.user.id])
         .then(function (result) {
             if (!result.length) {
-                errorHelpers.handleError(error, 404, 'Competition not found or user is not admin', res);
+                errorHelpers.handleError(error, 401, 'Competition not found or user is not admin', res);
                 return;
             }
 
@@ -334,6 +334,36 @@ router.get('/:competitionId/adminDetail', function (req, res) {
                 'competitionAccessToken': competitionInfo.access_token,
                 'competitionId': competitionInfo.competition_id
             });
+        })
+        .catch(function (error) {
+            errorHelpers.handleError(error, 500, 'Error getting competition admin info', res);
+        });
+});
+
+// Deletes the given competition
+// The authenticated user must the admin of the competition to perform this action
+// The request body should have the competitionId to delete
+router.post('/delete', function (req, res) {
+    const competitionId = req.body['competitionId'];
+    if (!competitionId) {
+        errorHelpers.handleError(null, 400, 'Missing required parameter competitionId', res);
+    }
+
+    // Confirm that the authenticated user is the admin
+    database.query('SELECT competition_id, access_token FROM competitions WHERE competition_id = $1 AND admin_user_id = $2', [competitionId, '\\x' + res.locals.oauth.token.user.id])
+        .then(function (result) {
+            if (!result.length) {
+                errorHelpers.handleError(error, 401, 'Competition not found or user is not admin', res);
+                return;
+            }
+
+            database.query('DELETE FROM competitions WHERE competition_id = $1', [competitionId])
+                .then(function (result) {
+                    res.sendStatus(200);
+                })
+                .catch(function (error) {
+                    errorHelpers.handleError(error, 500, 'Error deleting competition', res);
+                });
         })
         .catch(function (error) {
             errorHelpers.handleError(error, 500, 'Error getting competition admin info', res);
