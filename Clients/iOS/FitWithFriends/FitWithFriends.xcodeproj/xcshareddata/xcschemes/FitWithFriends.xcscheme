@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0B99FBC9256A016900673133"
-               BuildableName = "FitWithFriends.app"
+               BuildableName = "Fit with Friends.app"
                BlueprintName = "FitWithFriends"
                ReferencedContainer = "container:FitWithFriends.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B99FBC9256A016900673133"
-            BuildableName = "FitWithFriends.app"
+            BuildableName = "Fit with Friends.app"
             BlueprintName = "FitWithFriends"
             ReferencedContainer = "container:FitWithFriends.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0B99FBC9256A016900673133"
-            BuildableName = "FitWithFriends.app"
+            BuildableName = "Fit with Friends.app"
             BlueprintName = "FitWithFriends"
             ReferencedContainer = "container:FitWithFriends.xcodeproj">
          </BuildableReference>

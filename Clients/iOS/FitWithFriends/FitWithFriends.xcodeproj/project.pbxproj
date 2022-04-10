@@ -174,7 +174,7 @@
 		0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInWithAppleButton.swift; sourceTree = "<group>"; };
 		0B8D65E327DEE1A000934E18 /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
 		0B9058C827B0844800AE1712 /* Error+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Extensions.swift"; sourceTree = "<group>"; };
-		0B99FBCA256A016900673133 /* FitWithFriends.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitWithFriends.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B99FBCA256A016900673133 /* Fit with Friends.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Fit with Friends.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitWithFriendsApp.swift; sourceTree = "<group>"; };
 		0B99FBD1256A016900673133 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0B99FBD4256A016900673133 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -344,7 +344,7 @@
 		0B99FBCB256A016900673133 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B99FBCA256A016900673133 /* FitWithFriends.app */,
+				0B99FBCA256A016900673133 /* Fit with Friends.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -607,7 +607,7 @@
 				0B47A21F279C893100C2970E /* CocoaLumberjackSwift */,
 			);
 			productName = FitWithFriends;
-			productReference = 0B99FBCA256A016900673133 /* FitWithFriends.app */;
+			productReference = 0B99FBCA256A016900673133 /* Fit with Friends.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -901,7 +901,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.danoconnor.FitWithFriends;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Fit with Friends";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -924,7 +924,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.danoconnor.FitWithFriends;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Fit with Friends";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
