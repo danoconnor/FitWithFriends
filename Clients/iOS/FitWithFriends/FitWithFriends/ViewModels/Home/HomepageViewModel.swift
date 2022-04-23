@@ -10,6 +10,7 @@ import Foundation
 import HealthKit
 
 class HomepageViewModel: ObservableObject {
+    private let authenticationManager: AuthenticationManager
     private let competitionManager: CompetitionManager
     private let healthKitManager: HealthKitManager
 
@@ -18,7 +19,8 @@ class HomepageViewModel: ObservableObject {
 
     private var competitionLoadListener: AnyCancellable?
 
-    init(competitionManager: CompetitionManager, healthKitManager: HealthKitManager) {
+    init(authenticationManager: AuthenticationManager, competitionManager: CompetitionManager, healthKitManager: HealthKitManager) {
+        self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager
         self.healthKitManager = healthKitManager
 
@@ -40,6 +42,10 @@ class HomepageViewModel: ObservableObject {
 
         await activitySummaryTask.value
         await competitionTask.value
+    }
+
+    func logout() {
+        authenticationManager.logout()
     }
 
     private func refreshTodayActivitySummary() async {

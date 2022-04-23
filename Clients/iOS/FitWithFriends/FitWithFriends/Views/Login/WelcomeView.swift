@@ -50,7 +50,12 @@ struct WelcomeView: View {
 
             Spacer()
         }
-        .sheet(isPresented: $viewModel.shouldShowFirstLaunchView) {
+        .background(Color("FwFBrandingColor"))
+        .sheet(isPresented: $viewModel.shouldShowFirstLaunchView, onDismiss: {
+            // If the user swipes down to dismiss the view, instead of using the button,
+            // then make sure we mark the view as completed
+            viewModel.dismissFirstLaunchView()
+        }) {
             FirstLaunchWelcomeView(welcomeViewModel: viewModel)
         }
     }

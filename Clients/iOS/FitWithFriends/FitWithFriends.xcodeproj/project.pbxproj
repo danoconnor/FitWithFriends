@@ -11,6 +11,7 @@
 		0B0B4138281446890053541A /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4137281446890053541A /* AboutView.swift */; };
 		0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413C281453E30053541A /* AboutCompetitionsView.swift */; };
 		0B0B414028145CE80053541A /* AboutHealthDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413F28145CE80053541A /* AboutHealthDataView.swift */; };
+		0B0B4142281499BF0053541A /* NavigationBarColorModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */; };
 		0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */; };
 		0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */; };
 		0B1CBEB127C1A4AD0008C72A /* RefreshableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB027C1A4AD0008C72A /* RefreshableScrollView.swift */; };
@@ -67,7 +68,6 @@
 		0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */; };
 		0B8445D8275C43FA00F78480 /* CompetitionOverviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445D7275C43FA00F78480 /* CompetitionOverviewViewModel.swift */; };
 		0B8445E1275C464500F78480 /* LoginState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8445E0275C464500F78480 /* LoginState.swift */; };
-		0B8D65E027DB06D300934E18 /* TodaySummaryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D65DF27DB06D300934E18 /* TodaySummaryViewModel.swift */; };
 		0B8D65E227DEDBD500934E18 /* SignInWithAppleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */; };
 		0B8D65E427DEE1A000934E18 /* WelcomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8D65E327DEE1A000934E18 /* WelcomeViewModel.swift */; };
 		0B9058C927B0844800AE1712 /* Error+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9058C827B0844800AE1712 /* Error+Extensions.swift */; };
@@ -122,6 +122,7 @@
 		0B0B4137281446890053541A /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		0B0B413C281453E30053541A /* AboutCompetitionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutCompetitionsView.swift; sourceTree = "<group>"; };
 		0B0B413F28145CE80053541A /* AboutHealthDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutHealthDataView.swift; sourceTree = "<group>"; };
+		0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarColorModifier.swift; sourceTree = "<group>"; };
 		0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdateDelegate.swift; sourceTree = "<group>"; };
 		0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableBase.swift; sourceTree = "<group>"; };
 		0B1CBEB027C1A4AD0008C72A /* RefreshableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshableScrollView.swift; sourceTree = "<group>"; };
@@ -178,7 +179,6 @@
 		0B8445D3275C239300F78480 /* JSONDecoder+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONDecoder+Extension.swift"; sourceTree = "<group>"; };
 		0B8445D7275C43FA00F78480 /* CompetitionOverviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverviewViewModel.swift; sourceTree = "<group>"; };
 		0B8445E0275C464500F78480 /* LoginState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginState.swift; sourceTree = "<group>"; };
-		0B8D65DF27DB06D300934E18 /* TodaySummaryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryViewModel.swift; sourceTree = "<group>"; };
 		0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInWithAppleButton.swift; sourceTree = "<group>"; };
 		0B8D65E327DEE1A000934E18 /* WelcomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewModel.swift; sourceTree = "<group>"; };
 		0B9058C827B0844800AE1712 /* Error+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Extensions.swift"; sourceTree = "<group>"; };
@@ -259,6 +259,7 @@
 				0B1CBEB227C1A4EF0008C72A /* RefreshableScrollView */,
 				0BD8B5C327D52011009BA5F2 /* ShareSheet.swift */,
 				0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */,
+				0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */,
 			);
 			path = "Custom Views";
 			sourceTree = "<group>";
@@ -566,7 +567,6 @@
 				0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */,
 				0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */,
 				0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */,
-				0B8D65DF27DB06D300934E18 /* TodaySummaryViewModel.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -697,7 +697,6 @@
 				0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */,
 				0B47A23B279CB5B200C2970E /* MockCompetitionService.swift in Sources */,
 				0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */,
-				0B8D65E027DB06D300934E18 /* TodaySummaryViewModel.swift in Sources */,
 				0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */,
 				0B47A229279CAB6E00C2970E /* MockAuthenticationService.swift in Sources */,
 				0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */,
@@ -759,6 +758,7 @@
 				0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */,
 				0B35972C257046FC006D956A /* AppDelegate.swift in Sources */,
 				0B8445D8275C43FA00F78480 /* CompetitionOverviewViewModel.swift in Sources */,
+				0B0B4142281499BF0053541A /* NavigationBarColorModifier.swift in Sources */,
 				0B47A22B279CAC1E00C2970E /* MockTokenManager.swift in Sources */,
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
 				0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */,

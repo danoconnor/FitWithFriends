@@ -10,39 +10,17 @@ import HealthKit
 
 struct TodaySummaryView: View {
     private let activitySummary: ActivitySummary
-    private let todaySummaryViewModel: TodaySummaryViewModel
 
     init(activitySummary: ActivitySummary, homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
         self.activitySummary = activitySummary
-        todaySummaryViewModel = TodaySummaryViewModel(authenticationManager: objectGraph.authenticationManager,
-                                                      homepageSheetViewModel: homepageSheetViewModel)
     }
 
     var body: some View {
         VStack {
-            HStack(alignment: .center) {
-                Text("\(Int(activitySummary.competitionPoints)) points so far today!")
-                    .padding()
-                    .font(.title3)
-                Spacer()
-
-                Menu {
-                    Button("Logout") {
-                        self.todaySummaryViewModel.logout()
-                    }
-
-                    Button("About") {
-                        todaySummaryViewModel.showAbout()
-                    }
-                } label: {
-                    VStack {
-                        Image(systemName: "gearshape")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                            .padding()
-                    }
-                }
-            }
+            Text("\(Int(activitySummary.competitionPoints)) points so far today!")
+                .padding()
+                .font(.title3)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack {
                 VStack {

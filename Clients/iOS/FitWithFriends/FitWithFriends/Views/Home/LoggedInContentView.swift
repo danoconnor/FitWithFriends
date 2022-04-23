@@ -9,6 +9,8 @@ import HealthKitUI
 import SwiftUI
 
 struct LoggedInContentView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     private let objectGraph: IObjectGraph
 
     private var lastShownSheet: HomepageSheetViewModel.HomepageSheet?
@@ -20,83 +22,108 @@ struct LoggedInContentView: View {
         self.objectGraph = objectGraph
         homepageSheetViewModel = HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
                                                         healthKitManager: objectGraph.healthKitManager)
-        homepageViewModel = HomepageViewModel(competitionManager: objectGraph.competitionManager,
+        homepageViewModel = HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
+                                              competitionManager: objectGraph.competitionManager,
+
                                               healthKitManager: objectGraph.healthKitManager)
     }
 
     var body: some View {
-        RefreshableScrollView {
-            VStack {
-                if let activitySummary = homepageViewModel.todayActivitySummary {
-                    TodaySummaryView(activitySummary: activitySummary,
-                                     homepageSheetViewModel: homepageSheetViewModel,
-                                     objectGraph: objectGraph)
-                        .cornerRadius(10)
-                        .padding(.top)
-                        .padding(.leading)
-                        .padding(.trailing)
-                }
-
-                if let competitions = homepageViewModel.currentCompetitions {
-                    ForEach(competitions) { competitionOverview in
-                        CompetitionOverviewView(objectGraph: objectGraph,
-                                                competitionOverview: competitionOverview,
-                                                homepageSheetViewModel: homepageSheetViewModel,
-                                                showAllDetails: false)
+        NavigationView {
+            RefreshableScrollView {
+                VStack {
+                    if let activitySummary = homepageViewModel.todayActivitySummary {
+                        TodaySummaryView(activitySummary: activitySummary,
+                                         homepageSheetViewModel: homepageSheetViewModel,
+                                         objectGraph: objectGraph)
                             .cornerRadius(10)
                             .padding(.top)
                             .padding(.leading)
                             .padding(.trailing)
                     }
-                }
 
-                HStack {
-                    Spacer()
+                    if let competitions = homepageViewModel.currentCompetitions {
+                        ForEach(competitions) { competitionOverview in
+                            CompetitionOverviewView(objectGraph: objectGraph,
+                                                    competitionOverview: competitionOverview,
+                                                    homepageSheetViewModel: homepageSheetViewModel,
+                                                    showAllDetails: false)
+                                .cornerRadius(10)
+                                .padding(.top)
+                                .padding(.leading)
+                                .padding(.trailing)
+                        }
+                    }
 
-                    Button(action: {
-                        homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-                    }, label: {
-                        Text("Create new competition")
-                    })
+                    HStack {
+                        Spacer()
+
+                        Button(action: {
+                            homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+                        }, label: {
+                            Text("Create new competition")
+                        })
+                        .padding()
+
+                        Spacer()
+                    }
+                    .background(Color.secondarySystemBackground)
+                    .cornerRadius(10)
                     .padding()
 
                     Spacer()
                 }
-                .background(Color.secondarySystemBackground)
-                .cornerRadius(10)
-                .padding()
-
-                Spacer()
-            }
-            .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
-                homepageSheetViewModel.dismissCurrentSheet()
-            }, content: {
-                switch homepageSheetViewModel.sheetToShow {
-                case .createCompetition:
-                    CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
-                                          objectGraph: objectGraph)
-                case .permissionPrompt:
-                    PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel,
-                                         objectGraph: objectGraph)
-                case .joinCompetition:
-                    JoinCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
-                                        objectGraph: objectGraph)
-                case .competitionDetails:
-                    if let competitionOverview = homepageSheetViewModel.sheetContextData as? CompetitionOverview {
-                        CompetitionDetailView(competitionOverview: competitionOverview,
-                                              homepageSheetViewModel: homepageSheetViewModel,
+                .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
+                    homepageSheetViewModel.dismissCurrentSheet()
+                }, content: {
+                    switch homepageSheetViewModel.sheetToShow {
+                    case .createCompetition:
+                        CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
                                               objectGraph: objectGraph)
-                    } else {
-                        Text("Error showing competition details")
+                    case .permissionPrompt:
+                        PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel,
+                                             objectGraph: objectGraph)
+                    case .joinCompetition:
+                        JoinCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
+                                            objectGraph: objectGraph)
+                    case .competitionDetails:
+                        if let competitionOverview = homepageSheetViewModel.sheetContextData as? CompetitionOverview {
+                            CompetitionDetailView(competitionOverview: competitionOverview,
+                                                  homepageSheetViewModel: homepageSheetViewModel,
+                                                  objectGraph: objectGraph)
+                        } else {
+                            Text("Error showing competition details")
+                        }
+                    case .about:
+                        AboutView(emailUtility: objectGraph.emailUtility)
+                    default:
+                        Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                     }
-                case .about:
-                    AboutView(emailUtility: objectGraph.emailUtility)
-                default:
-                    Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
+                })
+            } onRefresh: {
+                await homepageViewModel.refreshData()
+            }
+            .navigationTitle("Fit with Friends")
+            .navigationBarColor(backgroundColor: UIColor(named: "FwFBrandingColor"))
+            .toolbar {
+                Menu {
+                    Button("Logout") {
+                        self.homepageViewModel.logout()
+                    }
+
+                    Button("About") {
+                        self.homepageSheetViewModel.updateState(sheet: .about,
+                                                                state: true)
+                    }
+                } label: {
+                    VStack {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title3)
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                            .padding()
+                    }
                 }
-            })
-        } onRefresh: {
-            await homepageViewModel.refreshData()
+            }
         }
     }
 }

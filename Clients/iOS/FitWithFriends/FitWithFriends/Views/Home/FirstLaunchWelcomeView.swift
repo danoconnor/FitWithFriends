@@ -14,14 +14,22 @@ struct FirstLaunchWelcomeView: View {
         VStack(alignment: .leading) {
             ScrollView {
                 VStack {
-                    Text("Welcome to Fit with Friends!")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(.top)
-                        .padding(.leading)
-                        .padding(.trailing)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .multilineTextAlignment(.center)
+                    HStack {
+                        Spacer()
+
+                        Text("Welcome to Fit with Friends!")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .padding(.top, 32)
+                            .padding(.leading)
+                            .padding(.trailing)
+                            .padding(.bottom)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .multilineTextAlignment(.center)
+
+                        Spacer()
+                    }
+                    .background(Color("FwFBrandingColor"))
 
 
                     Text("This app allows you to compete in fitness competitions with groups of friends. You earn points by closing your Apple activity rings each day. You can earn up to 600 points per day, so get out there and get active!")
