@@ -10,7 +10,10 @@ import Combine
 import Foundation
 
 class WelcomeViewModel: NSObject, ObservableObject {
+    private static let firstLaunchUserDefaultKey =  "HasShownFirstLaunch"
+
     @Published var state: ViewOperationState = .notStarted
+    @Published var shouldShowFirstLaunchView: Bool
 
     private let authenticationManager: AuthenticationManager
 
@@ -18,6 +21,7 @@ class WelcomeViewModel: NSObject, ObservableObject {
 
     init(authenticationManager: AuthenticationManager) {
         self.authenticationManager = authenticationManager
+        shouldShowFirstLaunchView = !UserDefaults.standard.bool(forKey: WelcomeViewModel.firstLaunchUserDefaultKey)
         super.init()
 
         loginStateCancellable = authenticationManager.$loginState.sink { [weak self] loginState in
@@ -37,6 +41,11 @@ class WelcomeViewModel: NSObject, ObservableObject {
         authenticationManager.beginLogin(with: self)
     }
 
+    func dismissFirstLaunchView() {
+        UserDefaults.standard.set(true, forKey: WelcomeViewModel.firstLaunchUserDefaultKey)
+        shouldShowFirstLaunchView = false
+    }
+
     private func setState(_ newState: ViewOperationState) {
         DispatchQueue.main.async { [weak self] in
             self?.state = newState
@@ -46,6 +55,6 @@ class WelcomeViewModel: NSObject, ObservableObject {
 
 extension WelcomeViewModel: ASAuthorizationControllerPresentationContextProviding {
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return UIApplication.shared.keyWindow ?? UIWindow()
+        return UIApplication.shared.activeKeyWindow ?? UIWindow()
     }
 }

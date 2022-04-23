@@ -29,6 +29,10 @@ class Logger {
         #endif
     }
 
+    static func flushLog() {
+        DDLog.sharedInstance.flushLog()
+    }
+
     static func getFileLogs() -> String {
         guard let fileLogger = DDLog.sharedInstance.allLoggers.first(where: { $0 is DDFileLogger }) as? DDFileLogger else {
             return "No file logger registered"

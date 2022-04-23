@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 extension UIApplication {
-    var keyWindow: UIWindow? {
+    var activeKeyWindow: UIWindow? {
         // From https://stackoverflow.com/questions/68387187/how-to-use-uiwindowscene-windows-on-ios-15
         return connectedScenes
             // Keep only active scenes, onscreen and visible to the user

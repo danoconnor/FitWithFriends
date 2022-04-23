@@ -18,56 +18,52 @@ struct PermissionPromptView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("We need a couple permissions to get started")
-                .font(.title)
-                .padding()
+        NavigationView {
+            VStack(alignment: .leading) {
+                ScrollView {
+                    VStack {
+                        Text("Please grant access to all requested permissions on the next screen")
+                            .font(.title2)
+                            .padding(.leading)
+                            .padding(.trailing)
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-            ScrollView {
-                VStack(alignment: .leading) {
-                    Section {
-                        HStack {
-                            if permissionPromptViewModel.shouldPromptForHealth {
-                                Text("1.")
-                                    .font(.title2)
-                            } else {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.green)
-                            }
 
-                            Text("Health data")
-                                .font(.title2)
-                        }
+                        Text("We need to access your activity and workout data in order to count it towards your competition points. If you don't grant access, then your workout data recorded from this device will not earn you points.")
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Text("We need to access your activity and workout data in order to count it towards your competition points.")
+                        Text("We take your privacy seriously and do not share your data with any 3rd parties or advertisers. Only you and the people in your competition group will have access to it.")
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Text ("We take your privacy seriously and do not share your data with any 3rd parties or advertisers. Only you and the people in your competition group will have access to it.")
+                        Text("If you wish to change your mind later, you can make changes in the iOS Settings app > Privacy > Health > Fit with Friends.")
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .padding()
                 }
-            }
 
-            Spacer()
+                Spacer()
 
-            Section {
-                VStack(alignment: .center) {
-                    Button("Next") {
-                        if permissionPromptViewModel.shouldPromptForHealth {
+                Section {
+                    VStack(alignment: .center) {
+                        Button("Next") {
                             permissionPromptViewModel.requestHealthPermission()
                         }
-                    }
-                    .font(.title2)
+                        .font(.title)
+                        .buttonStyle(.borderedProminent)
 
-                    Button("Not now") {
-                        permissionPromptViewModel.dismiss()
+                        Button("Not now") {
+                            permissionPromptViewModel.dismiss()
+                        }
+                        .font(.footnote)
+                        .padding(.top, 5)
                     }
-                    .font(.footnote)
-                    .padding(.top, 5)
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
+                .padding()
             }
-            .padding()
+            .navigationTitle("Setup health data access")
         }
     }
 }

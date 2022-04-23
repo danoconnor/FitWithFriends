@@ -11,6 +11,18 @@ import MessageUI
 class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
     private var emailViewController: MFMailComposeViewController?
 
+    func sendLogEmail() {
+        Logger.traceInfo(message: "Sending log email")
+        Logger.flushLog()
+
+        let logs = Logger.getFileLogs()
+        sendEmailWithTextAttachement(subject: "FitWithFriends log file",
+                                     body: "Log file is attached",
+                                     to: SecretConstants.supportEmail,
+                                     attachmentText: logs,
+                                     attachementFileName: "FitWithFriends_Logs.txt")
+    }
+
     func sendEmailWithTextAttachement(subject: String, body: String, to: String, attachmentText: String, attachementFileName: String){
         guard MFMailComposeViewController.canSendMail() else {
             Logger.traceWarning(message: "Cannot send email")
@@ -43,6 +55,12 @@ class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
     }
 
     private func getRootViewController() -> UIViewController? {
-        return UIApplication.shared.keyWindow?.rootViewController
+        guard let rootViewController = UIApplication.shared.activeKeyWindow?.rootViewController else {
+            Logger.traceWarning(message: "Couldn't find root view controller")
+            return nil
+        }
+
+        // Try to find the view controller that is on top right now
+        return rootViewController.presentedViewController ?? rootViewController
     }
 }

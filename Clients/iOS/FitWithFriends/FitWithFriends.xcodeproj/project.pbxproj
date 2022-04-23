@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B0B413428143D4A0053541A /* FirstLaunchWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */; };
+		0B0B4138281446890053541A /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4137281446890053541A /* AboutView.swift */; };
+		0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413C281453E30053541A /* AboutCompetitionsView.swift */; };
+		0B0B414028145CE80053541A /* AboutHealthDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413F28145CE80053541A /* AboutHealthDataView.swift */; };
 		0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */; };
 		0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */; };
 		0B1CBEB127C1A4AD0008C72A /* RefreshableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB027C1A4AD0008C72A /* RefreshableScrollView.swift */; };
@@ -114,6 +118,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchWelcomeView.swift; sourceTree = "<group>"; };
+		0B0B4137281446890053541A /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		0B0B413C281453E30053541A /* AboutCompetitionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutCompetitionsView.swift; sourceTree = "<group>"; };
+		0B0B413F28145CE80053541A /* AboutHealthDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutHealthDataView.swift; sourceTree = "<group>"; };
 		0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdateDelegate.swift; sourceTree = "<group>"; };
 		0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableBase.swift; sourceTree = "<group>"; };
 		0B1CBEB027C1A4AD0008C72A /* RefreshableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshableScrollView.swift; sourceTree = "<group>"; };
@@ -235,6 +243,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0B0B413E28145CD60053541A /* About */ = {
+			isa = PBXGroup;
+			children = (
+				0B0B4137281446890053541A /* AboutView.swift */,
+				0B0B413C281453E30053541A /* AboutCompetitionsView.swift */,
+				0B0B413F28145CE80053541A /* AboutHealthDataView.swift */,
+			);
+			path = About;
+			sourceTree = "<group>";
+		};
 		0B1CBEAF27C1A42D0008C72A /* Custom Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -491,6 +509,7 @@
 		0B9BADC2256AE43300EB1B60 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0B0B413E28145CD60053541A /* About */,
 				0B1CBEAF27C1A42D0008C72A /* Custom Views */,
 				0BBD78B825A282C600E08EB2 /* Competitions */,
 				0BBD78B325A280C300E08EB2 /* Home */,
@@ -521,6 +540,7 @@
 			children = (
 				0B35977A25715567006D956A /* LoggedInContentView.swift */,
 				0B6752D925715ED80032835D /* PermissionPromptView.swift */,
+				0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -690,6 +710,7 @@
 				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
 				0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */,
 				0B47A22F279CADBC00C2970E /* MockHttpConnector.swift in Sources */,
+				0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */,
 				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
 				0B1CBECC27C3F51C0008C72A /* CompetitionAdminDetails.swift in Sources */,
 				0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */,
@@ -720,6 +741,7 @@
 				0B8445E1275C464500F78480 /* LoginState.swift in Sources */,
 				0B47A239279CB57800C2970E /* MockCompetitionManager.swift in Sources */,
 				0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */,
+				0B0B414028145CE80053541A /* AboutHealthDataView.swift in Sources */,
 				0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */,
 				0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */,
 				0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */,
@@ -732,6 +754,7 @@
 				0B1CBEB627C1A5480008C72A /* ActivityIndicator.swift in Sources */,
 				0B47A222279C90EC00C2970E /* User.swift in Sources */,
 				0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */,
+				0B0B4138281446890053541A /* AboutView.swift in Sources */,
 				0B1CBED027C3F7C50008C72A /* JoinCompetitionViewModel.swift in Sources */,
 				0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */,
 				0B35972C257046FC006D956A /* AppDelegate.swift in Sources */,
@@ -748,6 +771,7 @@
 				0B99FC20256A273D00673133 /* KeychainUtilities.swift in Sources */,
 				0B99FBCE256A016900673133 /* FitWithFriendsApp.swift in Sources */,
 				0B359724256C7357006D956A /* AppStateViewModel.swift in Sources */,
+				0B0B413428143D4A0053541A /* FirstLaunchWelcomeView.swift in Sources */,
 				0B47A233279CB24200C2970E /* MockObjectGraph.swift in Sources */,
 				0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */,
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,

@@ -89,6 +89,8 @@ struct LoggedInContentView: View {
                     } else {
                         Text("Error showing competition details")
                     }
+                case .about:
+                    AboutView(emailUtility: objectGraph.emailUtility)
                 default:
                     Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                 }

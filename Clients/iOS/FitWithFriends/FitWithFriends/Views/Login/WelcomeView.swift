@@ -50,6 +50,9 @@ struct WelcomeView: View {
 
             Spacer()
         }
+        .sheet(isPresented: $viewModel.shouldShowFirstLaunchView) {
+            FirstLaunchWelcomeView(welcomeViewModel: viewModel)
+        }
     }
 }
 
