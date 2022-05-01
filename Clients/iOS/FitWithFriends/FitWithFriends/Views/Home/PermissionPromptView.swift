@@ -24,6 +24,7 @@ struct PermissionPromptView: View {
                     VStack {
                         Text("Please grant access to all requested permissions on the next screen")
                             .font(.title2)
+                            .padding(.top)
                             .padding(.leading)
                             .padding(.trailing)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -63,7 +64,7 @@ struct PermissionPromptView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Setup health data access")
+            .navigationTitle("Health data access")
         }
     }
 }

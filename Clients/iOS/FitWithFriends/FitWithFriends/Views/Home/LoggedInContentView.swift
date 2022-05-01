@@ -40,6 +40,21 @@ struct LoggedInContentView: View {
                             .padding(.top)
                             .padding(.leading)
                             .padding(.trailing)
+                    } else if homepageViewModel.loadedActivitySummary {
+                        // We have completed the call to HealthKit but there is no data returned
+                        // We probably don't have health data access, so show the user some troubleshooting message
+                        VStack {
+                            Text("We're having trouble reading your activity information. Please check permissions in iOS Settings > Privacy > Health > Fit w/ Friends.")
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .multilineTextAlignment(.leading)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .background(Color.secondarySystemBackground)
+                        .cornerRadius(10)
+                        .padding(.top)
+                        .padding(.leading)
+                        .padding(.trailing)
                     }
 
                     if let competitions = homepageViewModel.currentCompetitions {
@@ -131,5 +146,6 @@ struct LoggedInContentView: View {
 struct LoggedInContentView_Previews: PreviewProvider {
     static var previews: some View {
         LoggedInContentView(objectGraph: MockObjectGraph())
+            .previewInterfaceOrientation(.portrait)
     }
 }

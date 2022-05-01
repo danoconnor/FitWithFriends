@@ -19,8 +19,12 @@ class HealthKitManager {
     private let hkHealthStore = HKHealthStore()
     private let activitySummaryQueue = DispatchQueue(label: "ActivitySummaryQueue")
 
+    // User defaults keys
     private static let healthPromptKey = "HasPromptedForHealthPermissions"
     private static let lastUpdateKey = "LastHealthDataUpdate"
+    private static let lastKnownCalorieGoalKey = "LastKnownCalorieGoal"
+    private static let lastKnownExerciseGoalKey = "LastKnownExerciseGoal"
+    private static let lastKnownStandGoalKey = "LastKnownStandGoal"
 
     private static let backgroundTaskTimeout: TimeInterval = 60 // 60 seconds
 
@@ -37,6 +41,18 @@ class HealthKitManager {
         // Apple does not provide a way to check the current health permissions,
         // so the best we can do is check if we've shown the prompt before
         return userDefaults.bool(forKey: HealthKitManager.healthPromptKey) != true
+    }
+
+    var lastKnownCalorieGoal: Double {
+        userDefaults.double(forKey: HealthKitManager.lastKnownCalorieGoalKey)
+    }
+
+    var lastKnownExerciseGoal: Double {
+        userDefaults.double(forKey: HealthKitManager.lastKnownExerciseGoalKey)
+    }
+
+    var lastKnownStandGoal: Double {
+        userDefaults.double(forKey: HealthKitManager.lastKnownStandGoalKey)
     }
 
     init(activityDataService: ActivityDataService,
@@ -115,9 +131,19 @@ class HealthKitManager {
             if let error = error {
                 Logger.traceError(message: "Failed to get activity summary", error: error)
                 completion(nil)
+                return
             }
 
             let summary = summaries?.first { $0.dateComponents(for: calendar) == today }
+
+            // Update our last known goals if we were able to successfully get the summary
+            // These are used when there is no data for the current day so we can show the empty rings on the homepage
+            if let summary = summary {
+                self.userDefaults.set(summary.activeEnergyBurnedGoal.doubleValue(for: .kilocalorie()), forKey: HealthKitManager.lastKnownCalorieGoalKey)
+                self.userDefaults.set(summary.appleExerciseTimeGoal.doubleValue(for: .minute()), forKey: HealthKitManager.lastKnownExerciseGoalKey)
+                self.userDefaults.set(summary.appleStandHoursGoal.doubleValue(for: .count()), forKey: HealthKitManager.lastKnownStandGoalKey)
+            }
+
             completion(summary)
         }
 

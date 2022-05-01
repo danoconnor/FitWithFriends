@@ -30,17 +30,22 @@ class ActivitySummary: IdentifiableBase, Codable {
     }
 
     /// Creates an empty activity summary for the given date
-    init(date: Date) {
+    init(date: Date, calorieGoal: Double, exerciseGoal: Double, standGoal: Double) {
         self.date = date
 
         activeCaloriesBurned = 0
-        activeCaloriesGoal = 0
+        activeCaloriesGoal = calorieGoal
         exerciseTime = 0
-        exerciseTimeGoal = 0
+        exerciseTimeGoal = exerciseGoal
         standTime = 0
-        standTimeGoal = 0
+        standTimeGoal = standGoal
 
-        activitySummary = nil
+        activitySummary = HKActivitySummary(activeEnergyBurned: 0,
+                                            activeEnergyBurnedGoal: calorieGoal,
+                                            exerciseTime: 0,
+                                            exerciseTimeGoal: exerciseGoal,
+                                            standTime: 0,
+                                            standTimeGoal: standGoal)
     }
 
     init?(activitySummary: HKActivitySummary) {
@@ -65,9 +70,9 @@ extension ActivitySummary {
     /// This is an estimate of the points that this activity summary will provide
     /// The real source of truth comes from the service in the CompetitionOverview entity
     var competitionPoints: Double {
-        let caloriePoints = activeCaloriesBurned / activeCaloriesGoal * 100
-        let exercisePoints = exerciseTime / exerciseTimeGoal * 100
-        let standPoints = standTime / standTimeGoal * 100
+        let caloriePoints = activeCaloriesGoal > 0 ? activeCaloriesBurned / activeCaloriesGoal * 100 : 0
+        let exercisePoints = exerciseTimeGoal > 0 ? exerciseTime / exerciseTimeGoal * 100 : 0
+        let standPoints = standTimeGoal > 0 ? standTime / standTimeGoal * 100 : 0
         let totalPoints = caloriePoints + exercisePoints + standPoints
 
         // Apple's competition scoring has a maximum of 600 pts/day

@@ -21,55 +21,49 @@ struct CreateCompetitionView: View {
     }
 
     var body: some View {
-        VStack {
-            Spacer()
+        NavigationView {
+            VStack {
+                if viewModel.state.isFailed {
+                    Section {
+                        HStack {
+                            Image(systemName: "exclamationmark.circle")
 
-            Text("Create a new competition")
-                .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
-                .padding()
+                            Text(viewModel.state.errorMessage)
+                                .font(.subheadline)
 
-            TextField("Competition name", text: $competitionName)
-                .padding()
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-            DatePicker("Start date",
-                       selection: $startDate,
-                       displayedComponents: .date)
-                .padding()
-
-            DatePicker("End date",
-                       selection: $endDate,
-                       displayedComponents: .date)
-                .padding()
-
-            Spacer()
-            Spacer()
-
-            if viewModel.state.isFailed {
-                HStack {
-                    Image(systemName: "exclamationmark.circle")
-                        .padding(.leading)
-
-                    Text(viewModel.state.errorMessage)
-                        .font(.subheadline)
-                        .padding(.trailing)
-
-                    Spacer()
+                            Spacer()
+                        }
+                        .padding()
+                    }
+                    .background(Color.red)
                 }
-                .background(Color.red)
-            }
 
-            Button("Create") {
-                viewModel.createCompetition(competitionName: competitionName,
-                                            startDate: startDate,
-                                            endDate: endDate)
-            }
-            .font(.title2)
-            .padding()
-            .disabled(viewModel.state == .inProgress || competitionName.count == 0)
-        }
-        .onDisappear {
+                TextField("Competition name", text: $competitionName)
+                    .padding()
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
 
+                DatePicker("Start date",
+                           selection: $startDate,
+                           displayedComponents: .date)
+                    .padding()
+
+                DatePicker("End date",
+                           selection: $endDate,
+                           displayedComponents: .date)
+                    .padding()
+
+                Spacer()
+
+                Button("Create") {
+                    viewModel.createCompetition(competitionName: competitionName,
+                                                startDate: startDate,
+                                                endDate: endDate)
+                }
+                .font(.title2)
+                .padding()
+                .disabled(viewModel.state == .inProgress || competitionName.count == 0)
+            }
+            .navigationTitle("Create competition")
         }
     }
 }

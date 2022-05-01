@@ -63,15 +63,13 @@ struct TodaySummaryView: View {
 
 struct TodaySummaryView_Previews: PreviewProvider {
     private static var activitySummary: ActivitySummary {
-        let activitySummary = HKActivitySummary()
-        activitySummary.activeEnergyBurned = HKQuantity(unit: .kilocalorie(), doubleValue: 351.027)
-        activitySummary.appleExerciseTime = HKQuantity(unit: .minute(), doubleValue: 12.3)
-        activitySummary.appleStandHours = HKQuantity(unit: .count(), doubleValue: 4)
-        activitySummary.appleStandHoursGoal = HKQuantity(unit: .count(), doubleValue: 12)
-        activitySummary.appleExerciseTimeGoal = HKQuantity(unit: .minute(), doubleValue: 30)
-        activitySummary.activeEnergyBurnedGoal = HKQuantity(unit: .kilocalorie(), doubleValue: 700)
-
-        return ActivitySummary(activitySummary: activitySummary)!
+        let hkActivitySummary = HKActivitySummary(activeEnergyBurned: 51.027,
+                                                  activeEnergyBurnedGoal: 700,
+                                                  exerciseTime: 12.3,
+                                                  exerciseTimeGoal: 30,
+                                                  standTime: 4,
+                                                  standTimeGoal: 12)
+        return ActivitySummary(activitySummary: hkActivitySummary)!
     }
 
     static var previews: some View {
