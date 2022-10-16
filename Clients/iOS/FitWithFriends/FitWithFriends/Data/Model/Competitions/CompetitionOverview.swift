@@ -76,7 +76,7 @@ class CompetitionOverview: IdentifiableBase, Codable, Comparable {
 
         // If the competitions have ended, put the one that ended most recently first
         if (lhs.hasCompetitionEnded) {
-            return lhs.competitionEnd < rhs.competitionEnd
+            return lhs.competitionEnd > rhs.competitionEnd
         }
 
         // Both competitions are active, then put the one that will finish the soonest first

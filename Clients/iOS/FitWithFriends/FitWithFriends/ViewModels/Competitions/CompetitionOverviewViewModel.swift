@@ -37,6 +37,7 @@ class CompetitionOverviewViewModel: ObservableObject {
     private let showAllDetails: Bool
 
     let competitionName: String
+    let isCompetitionActive: Bool
     let userPositionDescription: String
     let competitionDatesDescription: String
     let availableActions: [CompetitionAction]
@@ -59,6 +60,7 @@ class CompetitionOverviewViewModel: ObservableObject {
         self.showAllDetails = showAllDetails
 
         competitionName = competitionOverview.competitionName
+        isCompetitionActive = competitionOverview.isCompetitionActive
 
         if competitionOverview.isUserAdmin {
             // If the user is the competition admin,

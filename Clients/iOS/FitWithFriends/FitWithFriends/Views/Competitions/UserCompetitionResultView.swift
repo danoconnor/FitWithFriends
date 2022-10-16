@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UserCompetitionResultView: View {
     let result: UserPosition
+    let isCompetitionActive: Bool
 
     private var positionBackgroundColor: Color {
         guard result.shouldShowPosition else {
@@ -43,8 +44,16 @@ struct UserCompetitionResultView: View {
             Spacer()
 
             if let totalPoints = result.userCompetitionPoints.totalPoints {
-                Text("\(Int(totalPoints)) (\(Int(result.userCompetitionPoints.pointsToday ?? 0)))")
-                    .padding(.leading)
+                if isCompetitionActive {
+                    Text("\(Int(totalPoints)) (\(Int(result.userCompetitionPoints.pointsToday ?? 0)))")
+                        .padding(.leading)
+                } else {
+                    // Don't include the points scored today if the competition is not active
+                    Text("\(Int(totalPoints))")
+                        .padding(.leading)
+                }
+
+
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -53,6 +62,6 @@ struct UserCompetitionResultView: View {
 
 struct UserCompetitionResultView_Previews: PreviewProvider {
     static var previews: some View {
-        UserCompetitionResultView(result: UserPosition(userCompetitionPoints: UserCompetitionPoints(), position: 1))
+        UserCompetitionResultView(result: UserPosition(userCompetitionPoints: UserCompetitionPoints(), position: 1), isCompetitionActive: true)
     }
 }
