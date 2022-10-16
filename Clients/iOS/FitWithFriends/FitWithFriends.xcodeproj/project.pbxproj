@@ -84,7 +84,6 @@
 		0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC16256A20A800673133 /* AuthenticationManager.swift */; };
 		0B99FC20256A273D00673133 /* KeychainUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC1F256A273D00673133 /* KeychainUtilities.swift */; };
 		0B99FC23256A275E00673133 /* KeychainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC22256A275E00673133 /* KeychainError.swift */; };
-		0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC26256A29A300673133 /* SecretConstants.swift */; };
 		0B99FC2B256A2C5300673133 /* ErrorResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC2A256A2C5300673133 /* ErrorResponse.swift */; };
 		0B99FC2E256A2CFB00673133 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC2D256A2CFB00673133 /* Token.swift */; };
 		0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B99FC33256A3BA600673133 /* TokenManager.swift */; };
@@ -112,6 +111,7 @@
 		0BD8B5BD27D42C79009BA5F2 /* CompetitionDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5BC27D42C79009BA5F2 /* CompetitionDetailViewModel.swift */; };
 		0BD8B5BF27D42C92009BA5F2 /* CompetitionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5BE27D42C92009BA5F2 /* CompetitionDetailView.swift */; };
 		0BD8B5C427D52011009BA5F2 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5C327D52011009BA5F2 /* ShareSheet.swift */; };
+		0BEA554228FCBFE4005B2BE9 /* SecretConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA554128FCBFE4005B2BE9 /* SecretConstants.swift */; };
 		0BF759C525B67CD00098AE13 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0BF759C425B67CD00098AE13 /* Colors.xcassets */; };
 		0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */; };
 		0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */; };
@@ -197,7 +197,6 @@
 		0B99FC16256A20A800673133 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		0B99FC1F256A273D00673133 /* KeychainUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainUtilities.swift; sourceTree = "<group>"; };
 		0B99FC22256A275E00673133 /* KeychainError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainError.swift; sourceTree = "<group>"; };
-		0B99FC26256A29A300673133 /* SecretConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretConstants.swift; sourceTree = "<group>"; };
 		0B99FC2A256A2C5300673133 /* ErrorResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResponse.swift; sourceTree = "<group>"; };
 		0B99FC2D256A2CFB00673133 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		0B99FC33256A3BA600673133 /* TokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManager.swift; sourceTree = "<group>"; };
@@ -225,6 +224,7 @@
 		0BD8B5BC27D42C79009BA5F2 /* CompetitionDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDetailViewModel.swift; sourceTree = "<group>"; };
 		0BD8B5BE27D42C92009BA5F2 /* CompetitionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionDetailView.swift; sourceTree = "<group>"; };
 		0BD8B5C327D52011009BA5F2 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		0BEA554128FCBFE4005B2BE9 /* SecretConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretConstants.swift; sourceTree = "<group>"; };
 		0BF759C425B67CD00098AE13 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageSheetViewModel.swift; sourceTree = "<group>"; };
@@ -400,7 +400,7 @@
 		0B99FBE1256A028700673133 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				0B99FC26256A29A300673133 /* SecretConstants.swift */,
+				0BEA554128FCBFE4005B2BE9 /* SecretConstants.swift */,
 				0B99FC36256A3DE100673133 /* Errors */,
 				0B99FC1E256A26D500673133 /* Keychain */,
 				0B99FC0B256A170000673133 /* Extensions */,
@@ -691,7 +691,6 @@
 				0B50BA4327F012C50066134D /* MockAppleAuthenticationManager.swift in Sources */,
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
-				0B99FC27256A29A300673133 /* SecretConstants.swift in Sources */,
 				0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */,
 				0B359721256C731A006D956A /* MainContentView.swift in Sources */,
 				0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */,
@@ -710,6 +709,7 @@
 				0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */,
 				0B47A22F279CADBC00C2970E /* MockHttpConnector.swift in Sources */,
 				0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */,
+				0BEA554228FCBFE4005B2BE9 /* SecretConstants.swift in Sources */,
 				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
 				0B1CBECC27C3F51C0008C72A /* CompetitionAdminDetails.swift in Sources */,
 				0B8445D4275C239300F78480 /* JSONDecoder+Extension.swift in Sources */,
