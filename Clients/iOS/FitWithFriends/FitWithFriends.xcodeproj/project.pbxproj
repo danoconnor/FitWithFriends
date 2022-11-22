@@ -14,10 +14,6 @@
 		0B0B4142281499BF0053541A /* NavigationBarColorModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */; };
 		0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */; };
 		0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */; };
-		0B1CBEB127C1A4AD0008C72A /* RefreshableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB027C1A4AD0008C72A /* RefreshableScrollView.swift */; };
-		0B1CBEB427C1A5020008C72A /* FramePreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB327C1A5020008C72A /* FramePreferenceKey.swift */; };
-		0B1CBEB627C1A5480008C72A /* ActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB527C1A5480008C72A /* ActivityIndicator.swift */; };
-		0B1CBEB827C1A5660008C72A /* RefreshableScrollViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB727C1A5660008C72A /* RefreshableScrollViewModel.swift */; };
 		0B1CBEBA27C1C0CC0008C72A /* MockUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */; };
 		0B1CBEBF27C3090B0008C72A /* AppProtocolHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEBE27C3090B0008C72A /* AppProtocolHandler.swift */; };
 		0B1CBEC327C309B20008C72A /* JoinCompetitionProtocolData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEC227C309B20008C72A /* JoinCompetitionProtocolData.swift */; };
@@ -59,6 +55,7 @@
 		0B50BA4127EFEB410066134D /* AppleAuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */; };
 		0B50BA4327F012C50066134D /* MockAppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4227F012C50066134D /* MockAppleAuthenticationManager.swift */; };
 		0B592C2A25715CAC004F68AB /* PermissionPromptViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */; };
+		0B5B3871292C77C200EF3602 /* Refresher in Frameworks */ = {isa = PBXBuildFile; productRef = 0B5B3870292C77C200EF3602 /* Refresher */; };
 		0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E66E25EB356100189702 /* CreateCompetitionView.swift */; };
 		0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */; };
 		0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6752D925715ED80032835D /* PermissionPromptView.swift */; };
@@ -125,10 +122,6 @@
 		0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarColorModifier.swift; sourceTree = "<group>"; };
 		0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdateDelegate.swift; sourceTree = "<group>"; };
 		0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableBase.swift; sourceTree = "<group>"; };
-		0B1CBEB027C1A4AD0008C72A /* RefreshableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshableScrollView.swift; sourceTree = "<group>"; };
-		0B1CBEB327C1A5020008C72A /* FramePreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramePreferenceKey.swift; sourceTree = "<group>"; };
-		0B1CBEB527C1A5480008C72A /* ActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicator.swift; sourceTree = "<group>"; };
-		0B1CBEB727C1A5660008C72A /* RefreshableScrollViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshableScrollViewModel.swift; sourceTree = "<group>"; };
 		0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUtilities.swift; sourceTree = "<group>"; };
 		0B1CBEBE27C3090B0008C72A /* AppProtocolHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProtocolHandler.swift; sourceTree = "<group>"; };
 		0B1CBEC227C309B20008C72A /* JoinCompetitionProtocolData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionProtocolData.swift; sourceTree = "<group>"; };
@@ -237,6 +230,7 @@
 			files = (
 				0B47A220279C893100C2970E /* CocoaLumberjackSwift in Frameworks */,
 				0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */,
+				0B5B3871292C77C200EF3602 /* Refresher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,23 +250,11 @@
 		0B1CBEAF27C1A42D0008C72A /* Custom Views */ = {
 			isa = PBXGroup;
 			children = (
-				0B1CBEB227C1A4EF0008C72A /* RefreshableScrollView */,
 				0BD8B5C327D52011009BA5F2 /* ShareSheet.swift */,
 				0B8D65E127DEDBD500934E18 /* SignInWithAppleButton.swift */,
 				0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */,
 			);
 			path = "Custom Views";
-			sourceTree = "<group>";
-		};
-		0B1CBEB227C1A4EF0008C72A /* RefreshableScrollView */ = {
-			isa = PBXGroup;
-			children = (
-				0B1CBEB027C1A4AD0008C72A /* RefreshableScrollView.swift */,
-				0B1CBEB327C1A5020008C72A /* FramePreferenceKey.swift */,
-				0B1CBEB527C1A5480008C72A /* ActivityIndicator.swift */,
-				0B1CBEB727C1A5660008C72A /* RefreshableScrollViewModel.swift */,
-			);
-			path = RefreshableScrollView;
 			sourceTree = "<group>";
 		};
 		0B1CBEBD27C308FA0008C72A /* AppProtocol */ = {
@@ -625,6 +607,7 @@
 			name = FitWithFriends;
 			packageProductDependencies = (
 				0B47A21F279C893100C2970E /* CocoaLumberjackSwift */,
+				0B5B3870292C77C200EF3602 /* Refresher */,
 			);
 			productName = FitWithFriends;
 			productReference = 0B99FBCA256A016900673133 /* Fit with Friends.app */;
@@ -655,6 +638,7 @@
 			mainGroup = 0B99FBC1256A016900673133;
 			packageReferences = (
 				0B47A21E279C893100C2970E /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
+				0B5B386F292C77C200EF3602 /* XCRemoteSwiftPackageReference "SwiftUI-Refresher" */,
 			);
 			productRefGroup = 0B99FBCB256A016900673133 /* Products */;
 			projectDirPath = "";
@@ -704,7 +688,6 @@
 				0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */,
 				0B47A22D279CACB600C2970E /* MockKeychainUtilities.swift in Sources */,
 				0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */,
-				0B1CBEB127C1A4AD0008C72A /* RefreshableScrollView.swift in Sources */,
 				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
 				0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */,
 				0B47A22F279CADBC00C2970E /* MockHttpConnector.swift in Sources */,
@@ -728,10 +711,8 @@
 				0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */,
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
 				0B8D65E427DEE1A000934E18 /* WelcomeViewModel.swift in Sources */,
-				0B1CBEB827C1A5660008C72A /* RefreshableScrollViewModel.swift in Sources */,
 				0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */,
 				0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */,
-				0B1CBEB427C1A5020008C72A /* FramePreferenceKey.swift in Sources */,
 				0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */,
 				0B47A231279CB12600C2970E /* MockUserService.swift in Sources */,
 				0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */,
@@ -750,7 +731,6 @@
 				0B1CBECA27C3F3B80008C72A /* CompetitionDescription.swift in Sources */,
 				0B99FC06256A0BA800673133 /* LogFormatter.swift in Sources */,
 				0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */,
-				0B1CBEB627C1A5480008C72A /* ActivityIndicator.swift in Sources */,
 				0B47A222279C90EC00C2970E /* User.swift in Sources */,
 				0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */,
 				0B0B4138281446890053541A /* AboutView.swift in Sources */,
@@ -986,6 +966,14 @@
 				minimumVersion = 3.0.0;
 			};
 		};
+		0B5B386F292C77C200EF3602 /* XCRemoteSwiftPackageReference "SwiftUI-Refresher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gh123man/SwiftUI-Refresher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -993,6 +981,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0B47A21E279C893100C2970E /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
 			productName = CocoaLumberjackSwift;
+		};
+		0B5B3870292C77C200EF3602 /* Refresher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0B5B386F292C77C200EF3602 /* XCRemoteSwiftPackageReference "SwiftUI-Refresher" */;
+			productName = Refresher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

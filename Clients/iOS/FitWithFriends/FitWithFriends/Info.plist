@@ -21,7 +21,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>1.0.2</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -36,13 +36,13 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1.0.0</string>
+	<string>1.0.2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>We use your health data to calculate activity points for your competitions. If you don't grant access then we won't be able to count your workout activity from this device.</string>
+	<string>We use your health data to calculate activity points for your competitions. If you don&apos;t grant access then we won&apos;t be able to count your workout activity from this device.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>We use your health data to calculate activity points for your competitions. If you don't grant access then we won't be able to count your workout activity from this device.</string>
+	<string>We use your health data to calculate activity points for your competitions. If you don&apos;t grant access then we won&apos;t be able to count your workout activity from this device.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

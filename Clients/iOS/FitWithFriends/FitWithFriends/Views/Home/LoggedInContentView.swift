@@ -6,6 +6,7 @@
 //
 
 import HealthKitUI
+import Refresher
 import SwiftUI
 
 struct LoggedInContentView: View {
@@ -30,7 +31,7 @@ struct LoggedInContentView: View {
 
     var body: some View {
         NavigationView {
-            RefreshableScrollView {
+            ScrollView {
                 VStack {
                     if let activitySummary = homepageViewModel.todayActivitySummary {
                         TodaySummaryView(activitySummary: activitySummary,
@@ -115,7 +116,8 @@ struct LoggedInContentView: View {
                         Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                     }
                 })
-            } onRefresh: {
+            }
+            .refreshable {
                 await homepageViewModel.refreshData()
             }
             .navigationTitle("Fit with Friends")
