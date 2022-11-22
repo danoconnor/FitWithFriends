@@ -37,6 +37,16 @@ router.post('/', function (req, res) {
         return;
     }
 
+    // Validate competition length - must be between one and 30 days
+    const maxCompetitionLengthInDays = 30;
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const maxCompetitionLengthInMs = maxCompetitionLengthInDays * msPerDay;
+    const competitionLengthInMs = endDate.getTime() - startDate.getTime();
+    if (competitionLengthInMs < msPerDay || competitionLengthInMs > maxCompetitionLengthInMs) {
+        errorHelpers.handleError(null, 400, 'End date was not valid', res);
+        return;
+    }
+
     // Check that the timezone is valid so we don't blow up later
     if (!allIANATimezones.includes(timezone)) {
         errorHelpers.handleError(null, 400, 'Timezone "' + timezone + '" is not in list of valid timezones', res);
