@@ -14,6 +14,8 @@ struct CreateCompetitionView: View {
     @State var endDate = Date().addingTimeInterval(TimeInterval.xtDays(8))
     @State var competitionName = ""
 
+    private let maxCompetitionLengthInDays: Double = 30;
+
     init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
         viewModel = CreateCompetitionViewModel(authenticationManager: objectGraph.authenticationManager,
                                                competitionManager: objectGraph.competitionManager,
@@ -49,6 +51,7 @@ struct CreateCompetitionView: View {
 
                 DatePicker("End date",
                            selection: $endDate,
+                           in: ClosedRange(uncheckedBounds: (startDate + .xtDays(1), startDate + .xtDays(maxCompetitionLengthInDays))),
                            displayedComponents: .date)
                     .padding()
 
