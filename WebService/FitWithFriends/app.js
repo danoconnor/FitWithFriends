@@ -56,16 +56,15 @@ app.use(function (req, res, next) {
 
 // error handlers
 
-// TODO: removed for testing
-// app.use(function (err, req, res, next) {
-//     res.status(err.status || 500);
-//     var errorToSend = globalConfig.sendErrorDetails ? err : {};
+ app.use(function (err, req, res, next) {
+     res.status(err.status || 500);
+     var errorToSend = globalConfig.sendErrorDetails ? err : {};
 
-//     res.render('error', {
-//         message: err.message,
-//         error: errorToSend
-//     });
-// });
+     res.render('error', {
+         message: err.message,
+         error: errorToSend
+     });
+ });
 
 app.set('port', process.env.PORT || 3000);
 
