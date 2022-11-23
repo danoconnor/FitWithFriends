@@ -399,20 +399,13 @@ function adminRemoveUser(req, res, targetUserId, competitionId) {
             database.query('DELETE FROM users_competitions WHERE user_id = $1 AND competition_id = $2', [sqlHexTargetUserId, competitionId])
                 .then(function (result) {
                     // Once the user is deleted, we need to change the competition access token so the removed user can't automatically re-join
-                    database.query('DELETE FROM users_competitions WHERE user_id = $1 AND competition_id = $2', [sqlHexTargetUserId, competitionId])
+                    const newAccessToken = cryptoHelpers.getRandomToken();
+                    database.query('UPDATE competitions SET access_token = $1 WHERE competition_id = $2', [newAccessToken, competitionId])
                         .then(function (result) {
-                            // Once the user is deleted, we need to change the competition access token so the removed user can't automatically re-join
-                            const newAccessToken = cryptoHelpers.getRandomToken();
-                            database.query('UPDATE competitions SET access_token = $1 WHERE competition_id = $2', [newAccessToken, competitionId])
-                                .then(function (result) {
-                                    res.sendStatus(200);
-                                })
-                                .catch(function (error) {
-                                    errorHelpers.handleError(error, 500, 'Failed to update competition token after removing user', res);
-                                });
+                            res.sendStatus(200);
                         })
                         .catch(function (error) {
-                            errorHelpers.handleError(error, 500, 'Error deleting user from competition as admin', res);
+                            errorHelpers.handleError(error, 500, 'Failed to update competition token after removing user', res);
                         });
                 })
                 .catch(function (error) {
