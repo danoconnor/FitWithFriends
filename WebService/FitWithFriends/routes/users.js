@@ -60,8 +60,9 @@ router.post('/userFromAppleID', function (req, res) {
 
             // Prefix the value with \x so the database will treat it as a hex value
             const sqlHexUserId = '\\x' + hexUserId;
+            const currentDate = new Date();
 
-            database.query('INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro) VALUES ($1, $2, $3, $4, $5)', [sqlHexUserId, firstName, lastName, 1, false])
+            database.query('INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, createdDate) VALUES ($1, $2, $3, $4, $5, $6)', [sqlHexUserId, firstName, lastName, 1, false, currentDate])
                 .then(result => {
                     res.sendStatus(200);
                 })
