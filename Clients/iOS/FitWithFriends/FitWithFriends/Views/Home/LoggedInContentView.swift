@@ -14,8 +14,6 @@ struct LoggedInContentView: View {
 
     private let objectGraph: IObjectGraph
 
-    private var lastShownSheet: HomepageSheetViewModel.HomepageSheet?
-
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
     @ObservedObject private var homepageViewModel: HomepageViewModel
 
@@ -140,6 +138,14 @@ struct LoggedInContentView: View {
                             .padding()
                     }
                 }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            // If the user navigates away from the app, then
+            // returns later while it is still in memory, we
+            // want to refresh the data automatically
+            Task.detached {
+                await self.homepageViewModel.refreshData()
             }
         }
     }
