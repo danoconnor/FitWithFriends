@@ -53,18 +53,9 @@ router.post('/', function (req, res) {
         return;
     }
 
-    // TODO: remove when multiple competitions are supported
-    // Check that the user has not already joined a competition yet
-    database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE user_id = $1', sqlHexUserId)
-        .then(function (result) {
-
-            // TODO: re-add a check for how many existing competitions the user is a part of
-            // should check that there is only 1 active competition at a time
-            //if (!result.length || result[0].count > 0) {
-            //    res.sendStatus(400);
-            //    return;
-            //}
-
+    // Check that the user is allowed to join a new competition
+    validateCompetitionCountLimit(sqlHexUserId)
+        .then(function () {
             // Generate an access code for this competition so users can be added
             const accessToken = cryptoHelpers.getRandomToken();
 
@@ -89,7 +80,7 @@ router.post('/', function (req, res) {
                 });
         })
         .catch(function (error) {
-            errorHelpers.handleError(error, 500, 'Error counting existing competitions', res);
+            errorHelpers.handleError(error, 400, 'User is not eligible to join a new competition', res, true);
         });
 });
 
@@ -108,7 +99,7 @@ router.post('/join', function (req, res) {
     const sqlHexUserId = '\\x' + userId;
 
     // Find matching competition and validate access token
-    database.query('SELECT competition_id FROM competitions WHERE access_token = $1 AND competition_id = $2', [accessToken, competitionId])
+    database.query('SELECT competition_id, ianaTimezone FROM competitions WHERE access_token = $1 AND competition_id = $2', [accessToken, competitionId])
         .then(function (result) {
             if (!result.length) {
                 errorHelpers.handleError(null, 404, 'Error finding competition', res);
@@ -117,31 +108,21 @@ router.post('/join', function (req, res) {
 
             const competitionId = result[0].competition_id;
 
-            // TODO: remove when multiple competitions are supported
-            // Check that the user has not already joined a competition yet
-            database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE user_id = $1', sqlHexUserId)
-                .then(function (result) {
-
-                    // TODO: re-add a check for how many existing competitions the user is a part of
-                    // should check that there is only 1 active competition at a time
-                    //if (!result.length || result[0].count > 0) {
-                    //    res.sendStatus(400);
-                    //    return;
-                    //}
-
-                    // Add the user to the competition
-                    database.query('INSERT INTO users_competitions VALUES ($1, $2) \
-                            ON CONFLICT (user_id, competition_id) DO NOTHING', [sqlHexUserId, competitionId])
-                        .then(function (result) {
-                            res.sendStatus(200);
-                        })
-                        .catch(function (error) {
-                            errorHelpers.handleError(error, 500, 'Error adding user to competition', res);
-                        });
-                })
-                .catch(function (error) {
-                    errorHelpers.handleError(error, 500, 'Error counting competitions', res);
-                });
+            // Check if the user has already hit their max number of active competitions
+            validateCompetitionCountLimit(sqlHexUserId).then(function () {
+                // User is allowed to join a competition - add the user to the competition
+                database.query('INSERT INTO users_competitions VALUES ($1, $2) \
+                        ON CONFLICT (user_id, competition_id) DO NOTHING', [sqlHexUserId, competitionId])
+                    .then(function (result) {
+                        res.sendStatus(200);
+                    })
+                    .catch(function (error) {
+                        errorHelpers.handleError(error, 500, 'Error adding user to competition', res);
+                    });
+            })
+            .catch(function (error) {
+                errorHelpers.handleError(error, 400, 'User is not able to join competition', res, true);
+            });
         })
         .catch(function (error) {
             errorHelpers.handleError(error, 500, 'Error finding competition', res);
@@ -431,6 +412,32 @@ function selfRemoveUser(req, res, targetUserId, competitionId) {
         .catch(function (error) {
             errorHelpers.handleError(error, 500, 'Error with user removing self from competition', res);
         });
+}
+
+// Checks that the user is under the max number of allowed active competitions
+// Returns a Promise that will continue if the user user is allowed to join a new competition
+// If the user cannot join a competition, then an error will be thrown
+// Expects a hex-formated user ID as a parameter
+function validateCompetitionCountLimit(sqlHexUserId) {
+    // TODO: handle timezones for active competition count
+    const currentDate = new Date();
+
+    // Check if the user has already hit their max number of active competitions
+    return Promise.all(
+            database.query('SELECT max_active_competitions FROM users WHERE user_id = $1', [sqlHexUserId]),
+            database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE user_id = $1 AND end_date <= $2', [sqlHexUserId, currentDate])
+        ).then(function (results) {
+            const maxCompetitionResult = results[0];
+            const competitionCountResult = results[0];
+
+            if (!maxCompetitionResult.length || !competitionCountResult) {
+                throw new Error('Failed to query competition limit info');
+            }
+
+            if (competitionCountResult.count >= maxCompetitionResult.max_active_competitions) {
+                throw new Error('Too many active or upcoming competitions');
+            }
+        })
 }
 
 // A list of all valid IANA timezone names
