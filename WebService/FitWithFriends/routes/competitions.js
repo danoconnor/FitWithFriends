@@ -423,7 +423,8 @@ function validateCompetitionCountLimit(sqlHexUserId) {
     const currentDate = new Date();
 
     // Check if the user has already hit their max number of active competitions
-    return Promise.all(
+    return new Promise((resolve, reject) => {
+        Promise.all(
             database.query('SELECT max_active_competitions FROM users WHERE user_id = $1', [sqlHexUserId]),
             database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE user_id = $1 AND end_date <= $2', [sqlHexUserId, currentDate])
         ).then(function (results) {
@@ -431,13 +432,20 @@ function validateCompetitionCountLimit(sqlHexUserId) {
             const competitionCountResult = results[0];
 
             if (!maxCompetitionResult.length || !competitionCountResult) {
-                throw new Error('Failed to query competition limit info');
+                reject(new Error('Failed to query competition limit info'));
+                return;
             }
 
             if (competitionCountResult.count >= maxCompetitionResult.max_active_competitions) {
-                throw new Error('Too many active or upcoming competitions');
+                reject(new Error('Too many active or upcoming competitions'));
+                return;
             }
-        })
+
+            resolve();
+        }).catch(function (error) {
+            reject(error);
+        });
+    });
 }
 
 // A list of all valid IANA timezone names
