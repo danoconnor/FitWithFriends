@@ -429,14 +429,17 @@ function validateCompetitionCountLimit(sqlHexUserId) {
             database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE user_id = $1 AND end_date <= $2', [sqlHexUserId, currentDate])
         ).then(function (results) {
             const maxCompetitionResult = results[0];
-            const competitionCountResult = results[0];
+            const competitionCountResult = results[1];
 
             if (!maxCompetitionResult.length || !competitionCountResult) {
                 reject(new Error('Failed to query competition limit info'));
                 return;
             }
 
-            if (competitionCountResult.count >= maxCompetitionResult.max_active_competitions) {
+            const maxAllowedCompetitions = maxCompetitionResult[0].max_active_competitions;
+            const currentCompetitionCount = competitionCountResult[0].count;
+
+            if (currentCompetitionCount >= maxAllowedCompetitions) {
                 reject(new Error('Too many active or upcoming competitions'));
                 return;
             }
