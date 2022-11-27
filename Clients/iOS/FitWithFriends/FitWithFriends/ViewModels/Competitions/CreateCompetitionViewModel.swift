@@ -38,7 +38,20 @@ class CreateCompetitionViewModel: ObservableObject {
 
             await MainActor.run {
                 if let error = error {
-                    self.state = .failed(errorMessage: error.localizedDescription)
+                    var errorMessage = error.localizedDescription
+
+                    // Check to see if we have a more specific error code
+                    if let errorWithDetails = error as? ErrorWithDetails,
+                       let details = errorWithDetails.errorDetails {
+                        switch details.fwfErrorCode {
+                        case .tooManyActiveCompetitions:
+                            errorMessage = "Too many active competitions"
+                        default:
+                            break
+                        }
+                    }
+
+                    self.state = .failed(errorMessage: errorMessage)
                 } else {
                     self.state = .success
                     self.homepageSheetViewModel.updateState(sheet: .createCompetition, state: false)

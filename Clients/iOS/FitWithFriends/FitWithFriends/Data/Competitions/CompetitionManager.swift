@@ -48,11 +48,11 @@ public class CompetitionManager: ObservableObject {
             Logger.traceError(message: "Failed to create competition", error: error)
         } else {
             Logger.traceInfo(message: "Successfully created competition")
-        }
 
-        // Fire-and-forget a task to refresh the competition data
-        Task.detached {
-            await self.refreshCompetitionOverviews()
+            // Fire-and-forget a task to refresh the competition data
+            Task.detached {
+                await self.refreshCompetitionOverviews()
+            }
         }
 
         return error

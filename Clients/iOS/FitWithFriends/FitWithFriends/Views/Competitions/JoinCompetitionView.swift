@@ -25,67 +25,79 @@ struct JoinCompetitionView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Join this competition?")
-                .font(.largeTitle)
-                .padding()
-
-            if viewModel.isLoading {
-                Spacer()
-
-                HStack {
+        NavigationView {
+            VStack(alignment: .leading) {
+                if viewModel.isLoading {
                     Spacer()
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .padding()
+
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .padding()
+                        Spacer()
+                    }
+
                     Spacer()
-                }
+                } else {
+                    if viewModel.state.isFailed {
+                        Section {
+                            HStack {
+                                Image(systemName: "exclamationmark.circle")
 
-                Spacer()
-            } else {
-                VStack(alignment: .leading) {
-                    Text(viewModel.competitionName)
-                        .font(.title3)
-                    Text(viewModel.adminName)
-                        .font(.title3)
-                        .padding(.bottom)
-                    
-                    Text(viewModel.competitionDateRange)
-                        .font(.title3)
-                    Text(viewModel.competitionMembers)
-                        .font(.title3)
-                }
-                .padding()
+                                Text(viewModel.state.errorMessage)
+                                    .font(.subheadline)
 
-                Spacer()
+                                Spacer()
+                            }
+                            .padding()
+                        }
+                        .background(Color.red)
+                    }
 
-                VStack(alignment: .center) {
-                    Button("Join") {
-                        joinLoading = true
-                        Task.detached {
-                            // TODO: error handling
-                            _ = await self.viewModel.joinCompetition()
+                    VStack(alignment: .leading) {
+                        Text(viewModel.competitionName)
+                            .font(.title3)
+                        Text(viewModel.adminName)
+                            .font(.title3)
+                            .padding(.bottom)
 
-                            await MainActor.run {
-                                self.joinLoading = false
+                        Text(viewModel.competitionDateRange)
+                            .font(.title3)
+                        Text(viewModel.competitionMembers)
+                            .font(.title3)
+                    }
+                    .padding()
+
+                    Spacer()
+
+                    VStack(alignment: .center) {
+                        Button("Join") {
+                            joinLoading = true
+                            Task.detached {
+                                await self.viewModel.joinCompetition()
+
+                                await MainActor.run {
+                                    self.joinLoading = false
+                                }
                             }
                         }
-                    }
-                    .font(.title2)
-                    .padding(.bottom)
-                    .disabled(joinLoading)
+                        .font(.title2)
+                        .padding(.bottom)
+                        .disabled(joinLoading)
 
-                    Button("No thanks") {
-                        objectGraph.appProtocolHandler.clearProtocolData()
-                        homepageSheetViewModel.updateState(sheet: .joinCompetition, state: false)
+                        Button("No thanks") {
+                            objectGraph.appProtocolHandler.clearProtocolData()
+                            homepageSheetViewModel.updateState(sheet: .joinCompetition, state: false)
+                        }
+                        .padding(.bottom)
                     }
-                    .padding(.bottom)
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
-            }
 
+            }
+            .navigationTitle("Join this competition?")
         }
-        .padding()
     }
 }
 
