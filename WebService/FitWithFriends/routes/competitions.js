@@ -424,10 +424,15 @@ function validateCompetitionCountLimit(sqlHexUserId) {
 
     // Check if the user has already hit their max number of active competitions
     return new Promise((resolve, reject) => {
-        Promise.all(
+        Promise.all([
             database.query('SELECT max_active_competitions FROM users WHERE user_id = $1', [sqlHexUserId]),
-            database.query('SELECT COUNT(competition_id) FROM users_competitions WHERE user_id = $1 AND end_date <= $2', [sqlHexUserId, currentDate])
-        ).then(function (results) {
+            database.query('SELECT COUNT(competitionData.competition_id) FROM \
+                                (SELECT competition_id FROM users_competitions WHERE user_id = $1) as usersCompetitions \
+	                            INNER JOIN \
+                                    (SELECT competition_id, end_date FROM competitions) as competitionData \
+	                            ON usersCompetitions.competition_id = competitionData.competition_id \
+	                        WHERE end_date > $2', [sqlHexUserId, currentDate])
+        ]).then(function (results) {
             const maxCompetitionResult = results[0];
             const competitionCountResult = results[1];
 

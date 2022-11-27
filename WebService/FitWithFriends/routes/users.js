@@ -62,7 +62,7 @@ router.post('/userFromAppleID', function (req, res) {
             const sqlHexUserId = '\\x' + hexUserId;
             const currentDate = new Date();
 
-            database.query('INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, createdDate) VALUES ($1, $2, $3, $4, $5, $6)', [sqlHexUserId, firstName, lastName, 1, false, currentDate])
+            database.query('INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date) VALUES ($1, $2, $3, $4, $5, $6)', [sqlHexUserId, firstName, lastName, 1, false, currentDate])
                 .then(result => {
                     res.sendStatus(200);
                 })
