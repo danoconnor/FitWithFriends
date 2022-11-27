@@ -41,12 +41,19 @@ class HttpConnector {
                 return .failure(HttpError.generic)
             }
 
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            decoder.dateDecodingStrategy = .formatted(DateFormatter.isoFormatter)
+
             guard (200 ... 299).contains(httpResponse.statusCode) else {
                 var error = HttpError.generic
+
+                let details = try? decoder.decode(FWFErrorDetails.self, from: data)
+
                 if (400 ... 499).contains(httpResponse.statusCode) {
-                    error = HttpError.clientError(code: httpResponse.statusCode)
+                    error = HttpError.clientError(code: httpResponse.statusCode, details: details)
                 } else if (500 ... 599).contains(httpResponse.statusCode) {
-                    error = HttpError.serverError(code: httpResponse.statusCode)
+                    error = HttpError.serverError(code: httpResponse.statusCode, details: details)
                 }
 
                 var message: String?
@@ -64,10 +71,6 @@ class HttpConnector {
             }
 
             do {
-                let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
-                decoder.dateDecodingStrategy = .formatted(DateFormatter.isoFormatter)
-
                 let parsedData = try decoder.decode(T.self, from: data)
                 return .success(parsedData)
             } catch {

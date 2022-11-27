@@ -101,6 +101,9 @@
 		0BBD78A1259A537100E08EB2 /* CompetitionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */; };
 		0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */; };
 		0BBD78B025A0335100E08EB2 /* DateFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78AF25A0335100E08EB2 /* DateFormatter+Extensions.swift */; };
+		0BC4C645293407BE004F1ADC /* FWFErrorDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC4C644293407BE004F1ADC /* FWFErrorDetails.swift */; };
+		0BC4C64729340F3D004F1ADC /* ErrorWithDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC4C64629340F3D004F1ADC /* ErrorWithDetails.swift */; };
+		0BC4C6492934103B004F1ADC /* FWFErrorCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC4C6482934103B004F1ADC /* FWFErrorCode.swift */; };
 		0BCB29DC256B3B23008FE93C /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCB29DB256B3B23008FE93C /* ViewState.swift */; };
 		0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */; };
 		0BD8B5B927D419E5009BA5F2 /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */; };
@@ -210,6 +213,9 @@
 		0BBD78A0259A537100E08EB2 /* CompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManager.swift; sourceTree = "<group>"; };
 		0BBD78A4259A552900E08EB2 /* Result+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Extensions.swift"; sourceTree = "<group>"; };
 		0BBD78AF25A0335100E08EB2 /* DateFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extensions.swift"; sourceTree = "<group>"; };
+		0BC4C644293407BE004F1ADC /* FWFErrorDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FWFErrorDetails.swift; sourceTree = "<group>"; };
+		0BC4C64629340F3D004F1ADC /* ErrorWithDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorWithDetails.swift; sourceTree = "<group>"; };
+		0BC4C6482934103B004F1ADC /* FWFErrorCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FWFErrorCode.swift; sourceTree = "<group>"; };
 		0BCB29DB256B3B23008FE93C /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
 		0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
@@ -474,6 +480,7 @@
 				0B99FC2D256A2CFB00673133 /* Token.swift */,
 				0B67532D2574686D0032835D /* Workout.swift */,
 				0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */,
+				0BC4C644293407BE004F1ADC /* FWFErrorDetails.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -485,6 +492,8 @@
 				0B99FC22256A275E00673133 /* KeychainError.swift */,
 				0B99FC37256A3DFC00673133 /* TokenError.swift */,
 				0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */,
+				0BC4C64629340F3D004F1ADC /* ErrorWithDetails.swift */,
+				0BC4C6482934103B004F1ADC /* FWFErrorCode.swift */,
 			);
 			path = Errors;
 			sourceTree = "<group>";
@@ -676,6 +685,7 @@
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
 				0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */,
+				0BC4C6492934103B004F1ADC /* FWFErrorCode.swift in Sources */,
 				0B359721256C731A006D956A /* MainContentView.swift in Sources */,
 				0B99FC38256A3DFC00673133 /* TokenError.swift in Sources */,
 				0B47A23B279CB5B200C2970E /* MockCompetitionService.swift in Sources */,
@@ -722,9 +732,11 @@
 				0B47A239279CB57800C2970E /* MockCompetitionManager.swift in Sources */,
 				0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */,
 				0B0B414028145CE80053541A /* AboutHealthDataView.swift in Sources */,
+				0BC4C64729340F3D004F1ADC /* ErrorWithDetails.swift in Sources */,
 				0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */,
 				0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */,
 				0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */,
+				0BC4C645293407BE004F1ADC /* FWFErrorDetails.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,
 				0B9058C927B0844800AE1712 /* Error+Extensions.swift in Sources */,
 				0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */,

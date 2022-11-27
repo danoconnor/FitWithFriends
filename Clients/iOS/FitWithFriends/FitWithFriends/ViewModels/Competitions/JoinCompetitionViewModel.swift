@@ -11,6 +11,8 @@ import Foundation
 class JoinCompetitionViewModel: ObservableObject {
     @Published var isLoading = true
 
+    @Published var state: ViewOperationState = .notStarted
+
     var adminName: String
     var competitionName: String
     var competitionDateRange: String
@@ -68,25 +70,48 @@ class JoinCompetitionViewModel: ObservableObject {
         }
     }
 
-    func joinCompetition() async -> Error? {
+    func joinCompetition() async  {
         guard let joinCompetitionProtocolData = appProtocolHandler.protocolData as? JoinCompetitionProtocolData else {
             Logger.traceError(message: "Could not get join competition data from protocol handler", error: nil)
-            return HttpError.generic
+            await MainActor.run {
+                self.state = .failed(errorMessage: "Unexpected error")
+            }
+
+            return
         }
 
         let error =  await competitionManager.joinCompetition(competitionId: joinCompetitionProtocolData.competitionId,
                                                               competitionToken: joinCompetitionProtocolData.competitionToken)
 
+        let newState: ViewOperationState
         if let error = error {
             Logger.traceError(message: "Failed to join competition \(joinCompetitionProtocolData.competitionId.description)", error: error)
+
+            var errorMessage = error.localizedDescription
+
+            // Check for a more specific error message
+            if let errorWithDetails = error as? ErrorWithDetails,
+               let details = errorWithDetails.errorDetails {
+                switch (details.fwfErrorCode) {
+                case .tooManyActiveCompetitions:
+                    errorMessage = "Too many active competitions"
+                default:
+                    break
+                }
+            }
+
+            newState = .failed(errorMessage: errorMessage)
         } else {
             // No error - refresh the competitions list and dismiss the modal
             Logger.traceInfo(message: "Successfully joined competition \(joinCompetitionProtocolData.competitionId.description)")
+            newState = .success
 
             await competitionManager.refreshCompetitionOverviews()
             homepageSheetViewModel.updateState(sheet: .joinCompetition, state: false)
         }
 
-        return error
+        await MainActor.run {
+            self.state = newState
+        }
     }
 }
