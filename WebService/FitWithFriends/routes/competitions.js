@@ -6,6 +6,7 @@ const database = require('../utilities/database');
 const errorHelpers = require('../utilities/errorHelpers');
 const cryptoHelpers = require('../utilities/cryptoHelpers');
 const { v4: uuid } = require('uuid');
+const FWFErrorCodes = require('../utilities/FWFErrorCodes');
 
 // Returns the competitionIds that the currently authenticated user is a member of
 router.get('/', function (req, res) {
@@ -80,7 +81,7 @@ router.post('/', function (req, res) {
                 });
         })
         .catch(function (error) {
-            errorHelpers.handleError(error, 400, 'User is not eligible to join a new competition', res, true);
+            errorHelpers.handleError(error, 400, 'User is not eligible to join a new competition', res, true, FWFErrorCodes.TooManyActiveCompetitions);
         });
 });
 
@@ -99,7 +100,7 @@ router.post('/join', function (req, res) {
     const sqlHexUserId = '\\x' + userId;
 
     // Find matching competition and validate access token
-    database.query('SELECT competition_id, ianaTimezone FROM competitions WHERE access_token = $1 AND competition_id = $2', [accessToken, competitionId])
+    database.query('SELECT competition_id, iana_timezone FROM competitions WHERE access_token = $1 AND competition_id = $2', [accessToken, competitionId])
         .then(function (result) {
             if (!result.length) {
                 errorHelpers.handleError(null, 404, 'Error finding competition', res);
@@ -121,7 +122,7 @@ router.post('/join', function (req, res) {
                     });
             })
             .catch(function (error) {
-                errorHelpers.handleError(error, 400, 'User is not able to join competition', res, true);
+                errorHelpers.handleError(error, 400, 'User is not able to join competition', res, true, FWFErrorCodes.TooManyActiveCompetitions);
             });
         })
         .catch(function (error) {

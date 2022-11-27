@@ -60,6 +60,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="utilities\errorHelpers.js" />
+    <Content Include="utilities\FWFErrorCodes.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\index.pug" />
     <Content Include="views\joinCompetition.pug">
       <SubType>Code</SubType>
