@@ -78,8 +78,8 @@ class CompetitionOverviewViewModel: ObservableObject {
         dateFormatter.dateStyle = .short
         dateFormatter.timeStyle = .none
 
-        let startString = dateFormatter.string(from: competitionOverview.competitionStart)
-        let endString = dateFormatter.string(from: competitionOverview.competitionEnd)
+        let startString = dateFormatter.string(from: competitionOverview.startDate)
+        let endString = dateFormatter.string(from: competitionOverview.endDate)
         competitionDatesDescription = "\(startString) - \(endString)"
 
         // Find the user's current position in the results
@@ -112,8 +112,12 @@ class CompetitionOverviewViewModel: ObservableObject {
         }
 
         if competitionOverview.hasCompetitionStarted && userPosition > 0 {
-            let userPositionPrefix = Date() > competitionOverview.competitionEnd ? "You finished in" : "You're in"
-            userPositionDescription = "\(userPositionPrefix) \(userPosition)\(userPositionString)"
+            if competitionOverview.isCompetitionProcessingResults {
+                userPositionDescription = "Processing final results..."
+            } else {
+                let userPositionPrefix = Date() > competitionOverview.endDate ? "You finished in" : "You're in"
+                userPositionDescription = "\(userPositionPrefix) \(userPosition)\(userPositionString)"
+            }
         } else {
             userPositionDescription = "Competition hasn't started"
         }

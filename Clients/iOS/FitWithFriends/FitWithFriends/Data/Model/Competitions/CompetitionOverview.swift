@@ -8,27 +8,6 @@
 import Foundation
 
 class CompetitionOverview: IdentifiableBase, Codable, Comparable {
-    let competitionId: UUID
-    let competitionName: String
-    let competitionStart: Date
-    let competitionEnd: Date
-    let currentResults: [UserCompetitionPoints]
-
-    /// If the current user is the admin of the competition
-    let isUserAdmin: Bool
-
-    var hasCompetitionStarted: Bool {
-        return Date() > competitionStart
-    }
-
-    var hasCompetitionEnded: Bool {
-        return Date() > competitionEnd
-    }
-
-    var isCompetitionActive: Bool {
-        return hasCompetitionStarted && !hasCompetitionEnded
-    }
-
     enum CodingKeys: String, CodingKey {
         case competitionId
         case competitionName
@@ -36,16 +15,48 @@ class CompetitionOverview: IdentifiableBase, Codable, Comparable {
         case competitionEnd
         case currentResults
         case isUserAdmin
+        case isCompetitionProcessingResults
+    }
+
+    let competitionId: UUID
+    let competitionName: String
+    let currentResults: [UserCompetitionPoints]
+    let competitionStart: Date
+    let competitionEnd: Date
+    let isCompetitionProcessingResults: Bool
+
+    var startDate: Date {
+        competitionStart.convertFromUTCToCurrentTimezone() ?? competitionStart
+    }
+
+    var endDate: Date {
+        competitionEnd.convertFromUTCToCurrentTimezone() ?? competitionEnd
+    }
+
+    /// If the current user is the admin of the competition
+    let isUserAdmin: Bool
+
+    var hasCompetitionStarted: Bool {
+        return Date() > startDate
+    }
+
+    var hasCompetitionEnded: Bool {
+        return Date() > endDate
+    }
+
+    var isCompetitionActive: Bool {
+        return hasCompetitionStarted && !hasCompetitionEnded
     }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
-    init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false) {
+    init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false, isCompetitionProcessingResults: Bool = false) {
         competitionId = id
         competitionName = name
         competitionStart = start
         competitionEnd = end
         self.currentResults = currentResults
         self.isUserAdmin = isUserAdmin
+        self.isCompetitionProcessingResults = isCompetitionProcessingResults
     }
 
     // MARK: Comparable
@@ -71,22 +82,22 @@ class CompetitionOverview: IdentifiableBase, Codable, Comparable {
 
         // If the competitions haven't started yet, then put the one that will start the soonest first
         if (!lhs.hasCompetitionStarted) {
-            return lhs.competitionStart > rhs.competitionStart
+            return lhs.startDate > rhs.startDate
         }
 
         // If the competitions have ended, put the one that ended most recently first
         if (lhs.hasCompetitionEnded) {
-            return lhs.competitionEnd > rhs.competitionEnd
+            return lhs.endDate > rhs.endDate
         }
 
         // Both competitions are active, then put the one that will finish the soonest first
-        if (lhs.competitionEnd != rhs.competitionEnd) {
-            return lhs.competitionEnd > rhs.competitionEnd
+        if (lhs.endDate != rhs.endDate) {
+            return lhs.endDate > rhs.endDate
         }
 
         // If both competitions are active and end on the same date, then put the longest running competition first
-        if (lhs.competitionStart != rhs.competitionStart) {
-            return lhs.competitionStart < rhs.competitionStart
+        if (lhs.startDate != rhs.startDate) {
+            return lhs.startDate < rhs.startDate
         }
 
         // If both competitions are active and start and end at the same time, just order by the UUID
@@ -95,6 +106,14 @@ class CompetitionOverview: IdentifiableBase, Codable, Comparable {
 }
 
 class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
+    enum CodingKeys: String, CodingKey {
+        case userId
+        case firstName
+        case lastName
+        case totalPoints = "activityPoints"
+        case pointsToday = "dailyPoints"
+    }
+
     let userId: String
     let firstName: String
     let lastName: String
@@ -103,14 +122,6 @@ class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
 
     var displayName: String {
         firstName + " " + lastName
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case userId
-        case firstName
-        case lastName
-        case totalPoints = "activityPoints"
-        case pointsToday = "dailyPoints"
     }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON

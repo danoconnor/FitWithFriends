@@ -9,7 +9,10 @@ import Foundation
 
 class CompetitionService: ServiceBase {
     func getCompetitionOverview(competitionId: UUID) async -> Result<CompetitionOverview, Error> {
-        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/overview",
+        // Need to query using the user's current timezone so we get accurate information on whether the competition is active or not
+        let ianaTimezone = TimeZone.current.identifier
+
+        return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/overview?timezone=\(ianaTimezone)",
                                                        method: .get)
     }
 
@@ -20,6 +23,8 @@ class CompetitionService: ServiceBase {
 
     func createCompetition(startDate: Date, endDate: Date, competitionName: String) async -> Error? {
         let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.timeZone = Calendar.current.timeZone
+        dateFormatter.formatOptions = .withFullDate
 
         let requestBody: [String: String] = [
             "startDate": dateFormatter.string(from: startDate),

@@ -58,6 +58,7 @@
 		0B5B3871292C77C200EF3602 /* Refresher in Frameworks */ = {isa = PBXBuildFile; productRef = 0B5B3870292C77C200EF3602 /* Refresher */; };
 		0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E66E25EB356100189702 /* CreateCompetitionView.swift */; };
 		0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */; };
+		0B674531297B5F3700F20018 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B674530297B5F3700F20018 /* Date+Extensions.swift */; };
 		0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6752D925715ED80032835D /* PermissionPromptView.swift */; };
 		0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B67532925745CF60032835D /* ActivitySummary.swift */; };
 		0B67532E2574686D0032835D /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B67532D2574686D0032835D /* Workout.swift */; };
@@ -168,6 +169,7 @@
 		0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptViewModel.swift; sourceTree = "<group>"; };
 		0B62E66E25EB356100189702 /* CreateCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionView.swift; sourceTree = "<group>"; };
 		0B62E67125EB399600189702 /* CreateCompetitionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionViewModel.swift; sourceTree = "<group>"; };
+		0B674530297B5F3700F20018 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		0B6752D925715ED80032835D /* PermissionPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionPromptView.swift; sourceTree = "<group>"; };
 		0B67532925745CF60032835D /* ActivitySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySummary.swift; sourceTree = "<group>"; };
 		0B67532D2574686D0032835D /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -435,6 +437,7 @@
 				0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */,
 				0B9058C827B0844800AE1712 /* Error+Extensions.swift */,
 				0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */,
+				0B674530297B5F3700F20018 /* Date+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -755,6 +758,7 @@
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
 				0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */,
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
+				0B674531297B5F3700F20018 /* Date+Extensions.swift in Sources */,
 				0BD8B5BD27D42C79009BA5F2 /* CompetitionDetailViewModel.swift in Sources */,
 				0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */,
 				0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */,
@@ -911,7 +915,7 @@
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -934,7 +938,7 @@
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

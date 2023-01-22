@@ -71,6 +71,11 @@ class HttpConnector {
             }
 
             do {
+                // TODO: testing, revert later
+                if let responseString = String(data: data, encoding: .utf8) {
+                    Logger.traceInfo(message: "Received HTTP response from \(url): \(responseString)")
+                }
+
                 let parsedData = try decoder.decode(T.self, from: data)
                 return .success(parsedData)
             } catch {

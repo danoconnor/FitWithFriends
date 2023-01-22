@@ -8,6 +8,12 @@ const cryptoHelpers = require('../utilities/cryptoHelpers');
 const { v4: uuid } = require('uuid');
 const FWFErrorCodes = require('../utilities/FWFErrorCodes');
 
+const msPerDay = 1000 * 60 * 60 * 24;
+
+// We won't announce results until 24hrs after the competition ends
+// This gives time for all clients to report final data and allows different timezones to complete their days
+const competitionResultProcessingTimeMs = msPerDay * 1;
+
 // Returns the competitionIds that the currently authenticated user is a member of
 router.get('/', function (req, res) {
     database.query('SELECT competition_id from users_competitions WHERE user_id = $1', ['\\x' + res.locals.oauth.token.user.id])
@@ -40,7 +46,6 @@ router.post('/', function (req, res) {
 
     // Validate competition length - must be between one and 30 days
     const maxCompetitionLengthInDays = 30;
-    const msPerDay = 1000 * 60 * 60 * 24;
     const maxCompetitionLengthInMs = maxCompetitionLengthInDays * msPerDay;
     const competitionLengthInMs = endDate.getTime() - startDate.getTime();
     if (competitionLengthInMs < msPerDay || competitionLengthInMs > maxCompetitionLengthInMs) {
@@ -54,6 +59,9 @@ router.post('/', function (req, res) {
         return;
     }
 
+    const startDateUTC = new Date(startDate.toUTCString());
+    const endDateUTC = new Date(endDate.toUTCString());
+
     // Check that the user is allowed to join a new competition
     validateCompetitionCountLimit(sqlHexUserId)
         .then(function () {
@@ -62,7 +70,7 @@ router.post('/', function (req, res) {
 
             const competitionId = uuid();
             database.query('INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                [startDate, endDate, displayName, sqlHexUserId, accessToken, timezone, competitionId])
+                [startDateUTC, endDateUTC, displayName, sqlHexUserId, accessToken, timezone, competitionId])
                 .then(function (result) {
                     // Add the admin user to the competition
                     database.query('INSERT INTO users_competitions VALUES ($1, $2)', [sqlHexUserId, competitionId])
@@ -152,7 +160,15 @@ router.post('/leave', function (req, res) {
 
 // Returns an overview of the given competition that contains a list of users and their current points for the competition
 // The user must be a member of this competition in order to receive the data
+//
+// Expects a query param with the user's current timezone (to decide whether to show the competition as active or not)
 router.get('/:competitionId/overview', function (req, res) {
+    const timezoneParam = req.query['timezone'];
+    if (!timezoneParam || !allIANATimezones.includes(timezoneParam)) {
+        errorHelpers.handleError(null, 400, 'Invalid timezone query param', res);
+        return;
+    }
+
     // 1. Get the competition data and the users
     Promise.all([
         database.query('SELECT user_id FROM users_competitions WHERE competition_id = $1', [req.params.competitionId]),
@@ -188,7 +204,7 @@ router.get('/:competitionId/overview', function (req, res) {
             var queryParams = [];
 
             // Make sure we use the date that matches the competition timezone
-            let currentDateStr = new Date().toLocaleDateString('en-US', { timeZone: competitionInfo.iana_timezone });
+            let currentDateStr = new Date().toLocaleDateString('en-US', { timeZone: timezoneParam });
             let currentDate = new Date(currentDateStr);
 
             // If the competition is currently active, then include each user's activity points so far today in the results
@@ -232,11 +248,18 @@ router.get('/:competitionId/overview', function (req, res) {
                         }
                     })
 
+                    // We don't announce results until 24hrs after the competition has ended
+                    // This allows clients to report final data and users in different timezones to finish their days
+                    const now = new Date();
+                    const timeSinceCompetitionEnd =  now - competitionInfo.end_date;
+                    const isCompetitionProcessingResults = timeSinceCompetitionEnd > 0 && timeSinceCompetitionEnd < competitionResultProcessingTimeMs;
+
                     res.json({
                         'competitionId': competitionInfo.competition_id,
                         'competitionName': competitionInfo.display_name,
                         'competitionStart': competitionInfo.start_date,
                         'competitionEnd': competitionInfo.end_date,
+                        'isCompetitionProcessingResults': isCompetitionProcessingResults,
                         'isUserAdmin': isUserAdmin,
                         'currentResults': parsedResults
                     });

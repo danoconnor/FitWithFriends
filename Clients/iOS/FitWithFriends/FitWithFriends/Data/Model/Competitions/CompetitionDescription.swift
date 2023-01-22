@@ -11,9 +11,17 @@ import Foundation
 class CompetitionDescription: Codable {
     let adminName: String
     let competitionName: String
+    let numMembers: UInt
     let competitionStart: Date
     let competitionEnd: Date
-    let numMembers: UInt
+
+    var startDate: Date {
+        competitionStart.convertFromUTCToCurrentTimezone() ?? competitionStart
+    }
+
+    var endDate: Date {
+        competitionEnd.convertFromUTCToCurrentTimezone() ?? competitionEnd
+    }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
     init(adminName: String = "Admin Name", competitionName: String = "Test Competition", start: Date = Date(), end: Date = Date(), numMembers: UInt = 0) {

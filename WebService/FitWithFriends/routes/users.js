@@ -4,6 +4,7 @@ const database = require('../utilities/database');
 const errorHelpers = require('../utilities/errorHelpers');
 const express = require('express');
 const oauthServer = require('../oauth/server');
+const { max } = require('pg/lib/defaults');
 const router = express.Router();
 
 router.get('/:userId', oauthServer.authenticate(), function (req, res) {
@@ -42,7 +43,17 @@ router.post('/userFromAppleID', function (req, res) {
         !lastName || !lastName.length ||
         !idToken || !idToken.length) {
         errorHelpers.handleError(null, 400, 'Missing required parameter', res);
-        return
+        return;
+    }
+
+    // Sanity checks to make sure none of the values are too large
+    const maxLength = 255;
+    if (userId.length > maxLength ||
+        firstName.length > maxLength ||
+        lastName.length > maxLength ||
+        idToken.length > maxLength) {
+        errorHelpers.handleError(null, 400, 'Parameter too long', res);
+        return;
     }
 
     // Validate authentication
