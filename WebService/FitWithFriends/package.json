@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@azure/identity": "^2.0.4",
+    "@azure/keyvault-certificates": "^4.7.0",
     "@azure/keyvault-keys": "^4.4.0",
     "@azure/keyvault-secrets": "^4.4.0",
+    "apn": "^2.2.0",
     "body-parser": "^1.15.0",
     "cookie-parser": "^1.4.0",
     "debug": "^2.2.0",
