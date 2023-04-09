@@ -66,6 +66,7 @@
     <Content Include="utilities\FWFErrorCodes.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="utilities\globalConfig.js" />
     <Content Include="utilities\pushNotificationPlatform.js">
       <SubType>Code</SubType>
     </Content>

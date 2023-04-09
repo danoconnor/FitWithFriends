@@ -17,7 +17,6 @@ const wellKnown = require('./routes/wellKnown');
 const globalConfig = require('./utilities/globalConfig')
 
 const oauthServer = require('./oauth/server');
-const config = require('./utilities/globalConfig');
 
 var app = express();
 
