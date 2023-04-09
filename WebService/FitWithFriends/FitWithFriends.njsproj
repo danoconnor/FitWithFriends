@@ -29,19 +29,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="admin\adminAuthMiddleware.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="admin\FWFClientTLSCA.pem" />
-    <Content Include="admin\routes\activityDataManagement.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="admin\routes\competitionManagement.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="admin\routes\tokenManagement.js">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="app.js" />
     <None Include="FitWithFriends - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\FitWithFriends - Web Deploy.pubxml" />
@@ -90,8 +77,6 @@
     <Content Include="views\error.pug" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="admin\" />
-    <Folder Include="admin\routes\" />
     <Folder Include="Properties\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="utilities\" />
