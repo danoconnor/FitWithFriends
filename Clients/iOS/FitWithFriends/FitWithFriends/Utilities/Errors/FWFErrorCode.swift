@@ -10,6 +10,6 @@ import Foundation
 enum FWFErrorCode: Int {
     case unknown = -1
 
-    // MARK - competition errors
+    // MARK: Competition errors
     case tooManyActiveCompetitions = 10001
 }
