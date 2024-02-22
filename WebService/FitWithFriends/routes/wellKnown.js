@@ -1,7 +1,6 @@
 'use strict';
-const express = require('express');
-const router = express.Router();
-
+var express = require('express');
+var router = express.Router();
 router.get('/apple-app-site-association', function (req, res) {
     res.json({
         "applinks": {
@@ -15,5 +14,4 @@ router.get('/apple-app-site-association', function (req, res) {
         }
     });
 });
-
 module.exports = router;

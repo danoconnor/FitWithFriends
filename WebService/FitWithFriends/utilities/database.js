@@ -1,6 +1,7 @@
-const pgp = require('pg-promise')()
-
-const cn = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var pgp = require('pg-promise')();
+var cn = {
     host: process.env.PGHOST,
     port: process.env.PGPORT,
     database: process.env.PGDATABASE,
@@ -8,5 +9,4 @@ const cn = {
     password: process.env.PGPASSWORD,
     ssl: process.env.PGUSESSL === "1"
 };
-
-module.exports = pgp(cn)
+exports.default = pgp(cn);

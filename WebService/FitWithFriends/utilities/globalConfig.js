@@ -1,5 +1,4 @@
-const config = {
+var config = {
     sendErrorDetails: true
-}
-
-module.exports = config
+};
+module.exports = config;
