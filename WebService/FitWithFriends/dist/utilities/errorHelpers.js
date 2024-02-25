@@ -1,21 +1,25 @@
-import { Response } from 'express';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handleError = void 0;
 // A single entry point to decide how to respond to the client in case of an error
 // It will always return the given status code to the client 
 // and will optionally return the errorMessage depending on global config and the alwaysSendDetails param
-export function handleError(error: Error | null, statusCode: number, errorMessage: string | null, res: Response<any>, alwaysSendDetails = false, customErrorCode: number | null = null) {
+function handleError(error, statusCode, errorMessage, res, alwaysSendDetails, customErrorCode) {
+    if (alwaysSendDetails === void 0) { alwaysSendDetails = false; }
+    if (customErrorCode === void 0) { customErrorCode = null; }
     res.status(statusCode);
-
     if (alwaysSendDetails || sendErrorDetails) {
         res.json({
             'error_details': error != null ? error.message : null,
             'context': errorMessage,
             'custom_error_code': customErrorCode
         });
-    } else {
+    }
+    else {
         res.send();
     }
-};
-
+}
+exports.handleError = handleError;
+;
 // A global config for whether to send error details to the client or not
-const sendErrorDetails = true;
+var sendErrorDetails = true;

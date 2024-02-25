@@ -31,7 +31,7 @@ router.post('/register', function (req, res) {
         .then(function () {
             res.sendStatus(200);
         })
-        .catch(function (error) {
+        .catch(error => {
             errorHelpers.handleError(error, 500, 'Unexpected error inserting push notification data into database', res);
         });
 });

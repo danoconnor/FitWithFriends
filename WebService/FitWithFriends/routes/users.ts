@@ -1,41 +1,21 @@
 'use strict';
 import { validateAppleIdToken } from '../utilities/appleIdAuthenticationHelpers';
-import database from '../utilities/database';
-import handleError from '../utilities/errorHelpers';
+import { DatabaseConnectionPool } from '../utilities/database';
+import { handleError } from '../utilities/errorHelpers';
 import express from 'express';
-import oauthServer from '../oauth/server';
-import { max } from 'pg/lib/defaults';
+import { ICreateUserParams, createUser } from '../sql/users.queries';
+import { convertUserIdToBuffer } from '../utilities/userHelpers';
+
 const router = express.Router();
-
-router.get('/:userId', oauthServer.authenticate(), function (req, res) {
-    if (res.locals.oauth.token.user.id !== req.params.userId) {
-        // Authenticated user does not match requested user
-        res.sendStatus(401)
-        return
-    }
-
-    database.query('SELECT display_name from users WHERE userid = $1', ['\\x' + req.params.userId])
-        .then(function (result) {
-            if (!result.length) {
-                res.sendStatus(404);
-                return;
-            }
-
-            res.json(result);
-        })
-        .catch(function (error) {
-            next(error);
-        });
-});
 
 // Creates a user from a Sign-in with Apple
 // The body should have the userId, firstName, lastName, idToken
 // that were provided by Sign-in with Apple
 router.post('/userFromAppleID', function (req, res) {
-    const userId = req.body['userId'];
-    const firstName = req.body['firstName'];
-    const lastName = req.body['lastName'];
-    const idToken = req.body['idToken'];
+    const userId: string | undefined = req.body['userId'];
+    const firstName: string | undefined = req.body['firstName'];
+    const lastName: string | undefined = req.body['lastName'];
+    const idToken: string | undefined = req.body['idToken'];
 
     // Validate input
     if (!userId || !userId.length ||
@@ -52,7 +32,7 @@ router.post('/userFromAppleID', function (req, res) {
         firstName.length > maxLength ||
         lastName.length > maxLength ||
         idToken.length > maxLength) {
-        errorHelpers.handleError(null, 400, 'Parameter too long', res);
+        handleError(null, 400, 'Parameter too long', res);
         return;
     }
 
@@ -68,12 +48,17 @@ router.post('/userFromAppleID', function (req, res) {
             // We want the database to handle it as hex to save on storage space, so we'll remove the '.' chars
             // which leaves only valid hex chars remaining
             const hexUserId = userId.replace(/\./g, '');
-
-            // Prefix the value with \x so the database will treat it as a hex value
-            const sqlHexUserId = '\\x' + hexUserId;
             const currentDate = new Date();
 
-            database.query('INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date) VALUES ($1, $2, $3, $4, $5, $6)', [sqlHexUserId, firstName, lastName, 1, false, currentDate])
+            const createUserParams: ICreateUserParams = {
+                userId: convertUserIdToBuffer(hexUserId),
+                firstName: firstName,
+                lastName: lastName,
+                maxActiveCompetitions: 1,
+                isPro: false,
+                createdDate: currentDate
+            };
+            createUser.run(createUserParams, DatabaseConnectionPool)
                 .then(_result => {
                     res.sendStatus(200);
                 })
@@ -82,7 +67,7 @@ router.post('/userFromAppleID', function (req, res) {
                 });
         })
         .catch(error => {
-            errorHelpers.handleError(error, 401, 'Token failed validation', res);
+            handleError(error, 401, 'Token failed validation', res);
         });
 });
 

@@ -1,24 +1,55 @@
 'use strict';
-var express = require('express');
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var express = require("express");
 var router = express.Router();
-var database = require('../utilities/database');
-var errorHelpers = require('../utilities/errorHelpers');
-var cryptoHelpers = require('../utilities/cryptoHelpers');
-var uuid = require('uuid').v4;
-var FWFErrorCodes = require('../utilities/FWFErrorCodes');
+var cryptoHelpers = __importStar(require("../utilities/cryptoHelpers"));
+var errorHelpers_1 = require("../utilities/errorHelpers");
+var database_1 = require("../utilities/database");
+var uuid_1 = require("uuid");
+var FWFErrorCodes_1 = __importDefault(require("../utilities/FWFErrorCodes"));
+var ActivitySummariesQueries = __importStar(require("../sql/activitySummaries.queries"));
+var CompetitionQueries = __importStar(require("../sql/competitions.queries"));
+var UserQueries = __importStar(require("../sql/users.queries"));
+var userHelpers_1 = require("../utilities/userHelpers");
 var msPerDay = 1000 * 60 * 60 * 24;
 // We won't announce results until 24hrs after the competition ends
 // This gives time for all clients to report final data and allows different timezones to complete their days
 var competitionResultProcessingTimeMs = msPerDay * 1;
 // Returns the competitionIds that the currently authenticated user is a member of
 router.get('/', function (req, res) {
-    database.query('SELECT competition_id from users_competitions WHERE user_id = $1', ['\\x' + res.locals.oauth.token.user.id])
+    CompetitionQueries.getUsersCompetitions.run({ userId: (0, userHelpers_1.convertUserIdToBuffer)(res.locals.oauth.token.user.id) }, database_1.DatabaseConnectionPool)
         .then(function (result) {
         var competitionIds = result.map(function (obj) { return obj.competition_id; });
         res.json(competitionIds);
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error getting users competitions', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error getting users competitions', res);
     });
 });
 // Create new competition. The currently authenticated user will become the admin for the competition.
@@ -28,11 +59,8 @@ router.post('/', function (req, res) {
     var endDate = new Date(req.body['endDate']);
     var displayName = req.body['displayName'];
     var timezone = req.body['ianaTimezone'];
-    // Prefix the value with \x so the database will treat it as a hex value
-    var userId = res.locals.oauth.token.user.id;
-    var sqlHexUserId = '\\x' + userId;
     if (!startDate || !endDate || !displayName || !timezone) {
-        errorHelpers.handleError(null, 400, 'Missing required parameter', res);
+        (0, errorHelpers_1.handleError)(null, 400, 'Missing required parameter', res);
         return;
     }
     // Validate competition length - must be between one and 30 days
@@ -40,42 +68,43 @@ router.post('/', function (req, res) {
     var maxCompetitionLengthInMs = maxCompetitionLengthInDays * msPerDay;
     var competitionLengthInMs = endDate.getTime() - startDate.getTime();
     if (competitionLengthInMs < msPerDay || competitionLengthInMs > maxCompetitionLengthInMs) {
-        errorHelpers.handleError(null, 400, 'End date was not valid', res);
+        (0, errorHelpers_1.handleError)(null, 400, 'End date was not valid', res, true);
         return;
     }
     // Check that the timezone is valid so we don't blow up later
     if (!allIANATimezones.includes(timezone)) {
-        errorHelpers.handleError(null, 400, 'Timezone "' + timezone + '" is not in list of valid timezones', res);
+        (0, errorHelpers_1.handleError)(null, 400, 'Timezone "' + timezone + '" is not in list of valid timezones', res, true);
         return;
     }
     var startDateUTC = new Date(startDate.toUTCString());
     var endDateUTC = new Date(endDate.toUTCString());
     // Check that the user is allowed to join a new competition
-    validateCompetitionCountLimit(sqlHexUserId)
+    var userId = res.locals.oauth.token.user.id;
+    validateCompetitionCountLimit(userId)
         .then(function () {
         // Generate an access code for this competition so users can be added
         var accessToken = cryptoHelpers.getRandomToken();
-        var competitionId = uuid();
-        database.query('INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) VALUES ($1, $2, $3, $4, $5, $6, $7)', [startDateUTC, endDateUTC, displayName, sqlHexUserId, accessToken, timezone, competitionId])
-            .then(function (result) {
+        var competitionId = (0, uuid_1.v4)();
+        CompetitionQueries.createCompetition.run({ startDate: startDateUTC, endDate: endDateUTC, displayName: displayName, adminUserId: (0, userHelpers_1.convertUserIdToBuffer)(userId), accessToken: accessToken, ianaTimezone: timezone, competitionId: competitionId }, database_1.DatabaseConnectionPool)
+            .then(function (_result) {
             // Add the admin user to the competition
-            database.query('INSERT INTO users_competitions VALUES ($1, $2)', [sqlHexUserId, competitionId])
-                .then(function (result) {
+            CompetitionQueries.addUserToCompetition.run({ userId: (0, userHelpers_1.convertUserIdToBuffer)(userId), competitionId: competitionId }, database_1.DatabaseConnectionPool)
+                .then(function (_result) {
                 res.json({
                     'competition_id': competitionId,
                     'accessCode': accessToken
                 });
             })
-                .catch(error => {
-                errorHelpers.handleError(error, 500, 'Error adding user to new competition', res);
+                .catch(function (error) {
+                (0, errorHelpers_1.handleError)(error, 500, 'Error adding user to new competition', res);
             });
         })
-            .catch(error => {
-            errorHelpers.handleError(error, 500, 'Error creating competition', res);
+            .catch(function (error) {
+            (0, errorHelpers_1.handleError)(error, 500, 'Error creating competition', res);
         });
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 400, 'User is not eligible to join a new competition', res, true, FWFErrorCodes.TooManyActiveCompetitions);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 400, 'User is not eligible to join a new competition', res, true, FWFErrorCodes_1.default.CompetitionErrorCodes.TooManyActiveCompetitions);
     });
 });
 // Join existing competition endpoint - adds the currently authenticated user to the competition that matches the given token
@@ -84,38 +113,35 @@ router.post('/join', function (req, res) {
     var accessToken = req.body['accessToken'];
     var competitionId = req.body['competitionId'];
     if (!accessToken || !competitionId) {
-        errorHelpers.handleError(null, 400, 'Missing required param', res);
+        (0, errorHelpers_1.handleError)(null, 400, 'Missing required param', res);
         return;
     }
-    // Prefix the value with \x so the database will treat it as a hex value
     var userId = res.locals.oauth.token.user.id;
-    var sqlHexUserId = '\\x' + userId;
     // Find matching competition and validate access token
-    database.query('SELECT competition_id, iana_timezone FROM competitions WHERE access_token = $1 AND competition_id = $2', [accessToken, competitionId])
+    CompetitionQueries.getCompetitionDescriptionDetails.run({ competitionAccessToken: accessToken, competitionId: competitionId }, database_1.DatabaseConnectionPool)
         .then(function (result) {
         if (!result.length) {
             errorHelpers.handleError(null, 404, 'Error finding competition', res);
             return;
         }
-        var competitionId = result[0].competition_id;
         // Check if the user has already hit their max number of active competitions
-        validateCompetitionCountLimit(sqlHexUserId).then(function () {
+        var userId = res.locals.oauth.token.user.id;
+        validateCompetitionCountLimit(userId).then(function () {
             // User is allowed to join a competition - add the user to the competition
-            database.query('INSERT INTO users_competitions VALUES ($1, $2) \
-                        ON CONFLICT (user_id, competition_id) DO NOTHING', [sqlHexUserId, competitionId])
-                .then(function (result) {
+            CompetitionQueries.addUserToCompetition.run({ userId: (0, userHelpers_1.convertUserIdToBuffer)(userId), competitionId: competitionId }, database_1.DatabaseConnectionPool)
+                .then(function (_result) {
                 res.sendStatus(200);
             })
-                .catch(error => {
-                errorHelpers.handleError(error, 500, 'Error adding user to competition', res);
+                .catch(function (error) {
+                (0, errorHelpers_1.handleError)(error, 500, 'Error adding user to competition', res);
             });
         })
-            .catch(error => {
-            errorHelpers.handleError(error, 400, 'User is not able to join competition', res, true, FWFErrorCodes.TooManyActiveCompetitions);
+            .catch(function (error) {
+            (0, errorHelpers_1.handleError)(error, 400, 'User is not able to join competition', res, true, FWFErrorCodes_1.default.CompetitionErrorCodes.TooManyActiveCompetitions);
         });
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error finding competition', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error finding competition', res);
     });
 });
 // Leave competition endpoint
@@ -130,11 +156,11 @@ router.post('/leave', function (req, res) {
         return;
     }
     if (targetUserId === res.locals.oauth.token.user.id) {
-        selfRemoveUser(req, res, targetUserId, competitionId);
+        selfRemoveUser(res, targetUserId, competitionId);
     }
     else {
         // This func will validate that the current user is the admin of the competition
-        adminRemoveUser(req, res, targetUserId, competitionId);
+        adminRemoveUser(res, targetUserId, competitionId);
     }
 });
 // Returns an overview of the given competition that contains a list of users and their current points for the competition
@@ -142,85 +168,65 @@ router.post('/leave', function (req, res) {
 //
 // Expects a query param with the user's current timezone (to decide whether to show the competition as active or not)
 router.get('/:competitionId/overview', function (req, res) {
-    var timezoneParam = req.query['timezone'];
+    var _a;
+    var timezoneParam = (_a = req.query['timezone']) === null || _a === void 0 ? void 0 : _a.toString();
+    var competitionId = req.params.competitionId;
     if (!timezoneParam || !allIANATimezones.includes(timezoneParam)) {
-        errorHelpers.handleError(null, 400, 'Invalid timezone query param', res);
+        (0, errorHelpers_1.handleError)(null, 400, 'Invalid timezone query param', res);
         return;
     }
     // 1. Get the competition data and the users
+    var userId = res.locals.oauth.token.user.id;
     Promise.all([
-        database.query('SELECT user_id FROM users_competitions WHERE competition_id = $1', [req.params.competitionId]),
-        database.query('SELECT competition_id, start_date, end_date, display_name, admin_user_id, iana_timezone FROM competitions WHERE competition_id = $1', [req.params.competitionId])
+        UserQueries.getUsersInCompetition.run({ competitionId: competitionId }, database_1.DatabaseConnectionPool),
+        CompetitionQueries.getCompetition.run({ competitionId: competitionId }, database_1.DatabaseConnectionPool)
     ])
-        .then(function (result) {
-        if (result.length < 2) {
-            errorHelpers.handleError(null, 500, 'Unexpected failure when getting competition info', res);
-            return;
-        }
-        var usersCompetitionsResult = result[0];
-        var competitionsResult = result[1];
+        .then(function (_a) {
+        var usersCompetitionsResult = _a[0], competitionsResult = _a[1];
         if (!usersCompetitionsResult.length || !competitionsResult.length) {
-            errorHelpers.handleError(null, 404, 'Could not find competition info', res);
+            (0, errorHelpers_1.handleError)(null, 404, 'Could not find competition info', res);
             return;
         }
         // 2. Check that the authenticated user is one of the members of this competition
-        if (!usersCompetitionsResult.filter(function (row) { return Buffer.from(row.user_id).toString('hex') === res.locals.oauth.token.user.id; }).length) {
-            errorHelpers.handleError(null, 401, 'User is not a member of the competition', res);
+        if (!usersCompetitionsResult.filter(function (row) { return row.userId === userId; }).length) {
+            (0, errorHelpers_1.handleError)(null, 401, 'User is not a member of the competition', res);
             return;
         }
         // 3. Calculate points for the activity data for all of the users in the competition in the competition date range
-        var userIdList = usersCompetitionsResult.map(function (row) { return '\'\\x' + Buffer.from(row.user_id).toString('hex') + '\''; }).join();
         var competitionInfo = competitionsResult[0];
-        var isUserAdmin = res.locals.oauth.token.user.id === Buffer.from(competitionInfo.admin_user_id).toString('hex');
-        var query = '';
-        var queryParams = [];
+        var isUserAdmin = userId === (0, userHelpers_1.convertBufferToUserId)(competitionInfo.admin_user_id);
         // Make sure we use the date that matches the competition timezone
         var currentDateStr = new Date().toLocaleDateString('en-US', { timeZone: timezoneParam });
         var currentDate = new Date(currentDateStr);
-        // If the competition is currently active, then include each user's activity points so far today in the results
-        if (currentDate >= competitionInfo.start_date && currentDate <= competitionInfo.end_date) {
-            queryParams = [competitionInfo.start_date, competitionInfo.end_date, currentDate];
-            query = 'SELECT userInfo.user_id, first_name, last_name, activity_points, daily_points FROM \
-                    (SELECT user_id, first_name, last_name FROM users WHERE user_id in (' + userIdList + ')) AS userInfo \
-                    LEFT OUTER JOIN \
-                        (SELECT user_id, SUM(daily_points) AS activity_points \
-                        FROM activity_summaries \
-                        WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
-                        GROUP BY user_id) AS activitySummaryData \
-                        LEFT OUTER JOIN \
-                            (SELECT user_id, daily_points \
-                            FROM activity_summaries \
-                            WHERE date = $3 and user_id in (' + userIdList + ')) AS today_points \
-                            ON activitySummaryData.user_id = today_points.user_id \
-                    ON activitySummaryData.user_id = userInfo.user_id';
-        }
-        else {
-            queryParams = [competitionInfo.start_date, competitionInfo.end_date];
-            query = 'SELECT userInfo.user_id, first_name, last_name, activity_points FROM \
-                    (SELECT user_id, first_name, last_name FROM users WHERE user_id in (' + userIdList + ')) AS userInfo \
-                    LEFT OUTER JOIN \
-                        (SELECT user_id, SUM(daily_points) AS activity_points \
-                        FROM activity_summaries \
-                        WHERE date >= $1 and date <= $2 and user_id in (' + userIdList + ') \
-                        GROUP BY user_id) AS activitySummaryData \
-                    ON activitySummaryData.user_id = userInfo.user_id';
-        }
-        database.query(query, queryParams)
-            .then(function (result) {
-            // Need to convert the binary user ID to a string to return to the client
-            var parsedResults = result.map(function (row) {
-                return {
-                    user_id: Buffer.from(row.user_id).toString('hex'),
-                    first_name: row.first_name,
-                    last_name: row.last_name,
-                    activity_points: row.activity_points,
-                    daily_points: row.daily_points
-                };
+        ;
+        var userPoints = {};
+        usersCompetitionsResult.forEach(function (row) {
+            userPoints[row.userId] = {
+                userId: row.userId,
+                firstName: row.first_name,
+                lastName: row.last_name,
+                activityPoints: 0,
+                pointsToday: 0
+            };
+        });
+        var userIdList = usersCompetitionsResult.map(function (row) { return (0, userHelpers_1.convertUserIdToBuffer)(row.userId); });
+        ActivitySummariesQueries.getActivitySummariesForUsers.run({ userIds: userIdList, startDate: competitionInfo.start_date, endDate: competitionInfo.end_date }, database_1.DatabaseConnectionPool)
+            .then(function (activitySummaries) {
+            // We allow users to score up to 600 total points per day (matching Apple's activity ring competition rules)
+            // This will eventually change when we allow users to define custom scoring rules, but for now we will stick with Apple's rules
+            var maxPointsPerDay = 600;
+            activitySummaries.forEach(function (row) {
+                var points = Math.round(row.calories_burned / row.calories_goal * 100) + Math.round(row.exercise_time / row.exercise_time_goal * 100) + Math.round(row.stand_time / row.stand_time_goal * 100);
+                var pointsScoredThisDay = Math.min(points, maxPointsPerDay);
+                userPoints[row.userId].activityPoints += pointsScoredThisDay;
+                if (row.date.getDay() === currentDate.getDay() && row.date.getMonth() === currentDate.getMonth() && row.date.getFullYear() === currentDate.getFullYear()) {
+                    userPoints[row.userId].pointsToday = pointsScoredThisDay;
+                }
             });
             // We don't announce results until 24hrs after the competition has ended
-            // This allows clients to report final data and users in different timezones to finish their days
+            // This allows clients to report fina_i data and users in different timezones to finish their days
             var now = new Date();
-            var timeSinceCompetitionEnd = now - competitionInfo.end_date;
+            var timeSinceCompetitionEnd = now.getTime() - competitionInfo.end_date.getTime();
             var isCompetitionProcessingResults = timeSinceCompetitionEnd > 0 && timeSinceCompetitionEnd < competitionResultProcessingTimeMs;
             res.json({
                 'competitionId': competitionInfo.competition_id,
@@ -229,15 +235,15 @@ router.get('/:competitionId/overview', function (req, res) {
                 'competitionEnd': competitionInfo.end_date,
                 'isCompetitionProcessingResults': isCompetitionProcessingResults,
                 'isUserAdmin': isUserAdmin,
-                'currentResults': parsedResults
+                'currentResults': userPoints
             });
         })
-            .catch(error => {
-            errorHelpers.handleError(error, 500, 'Error calculating results', res);
+            .catch(function (error) {
+            (0, errorHelpers_1.handleError)(error, 500, 'Error calculating results', res);
         });
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error getting competition info', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error getting competition info', res);
     });
 });
 // Returns a description of the competition containing the name, dates, and number of members of the competition
@@ -247,58 +253,55 @@ router.post('/description', function (req, res) {
     var competitionId = req.body['competitionId'];
     var competitionToken = req.body['competitionAccessToken'];
     if (!competitionId || !competitionToken) {
-        errorHelpers.handleError(null, 400, 'Missing required param', res);
+        (0, errorHelpers_1.handleError)(null, 400, 'Missing required param', res);
         return;
     }
     Promise.all([
-        database.query('SELECT COUNT(user_id) FROM users_competitions WHERE competition_id = $1', [competitionId]),
-        database.query('SELECT start_date, end_date, display_name, admin_user_id FROM competitions WHERE competition_id = $1 AND access_token = $2', [competitionId, competitionToken])
+        CompetitionQueries.getNumUsersInCompetition.run({ competitionId: competitionId }, database_1.DatabaseConnectionPool),
+        CompetitionQueries.getCompetitionDescriptionDetails.run({ competitionId: competitionId, competitionAccessToken: competitionToken }, database_1.DatabaseConnectionPool)
     ])
-        .then(function (result) {
-        if (result.length < 2) {
-            errorHelpers.handleError(null, 500, 'Unexpected failure when getting competition info', res);
-            return;
-        }
-        var usersCompetitionsResult = result[0];
-        var competitionsResult = result[1];
+        .then(function (_a) {
+        var usersCompetitionsResult = _a[0], competitionsResult = _a[1];
         if (!usersCompetitionsResult.length || !competitionsResult.length) {
-            errorHelpers.handleError(null, 404, 'Could not find competition info', res);
+            (0, errorHelpers_1.handleError)(null, 404, 'Could not find competition info', res);
             return;
         }
         var competitionInfo = competitionsResult[0];
         var numMembers = usersCompetitionsResult[0].count;
         // Find the display name of the competition admin so we can include it in the response
         // Don't need to use \x with admin_user_id because it comes from the previous query and is already in hex format
-        database.query('SELECT first_name, last_name FROM users WHERE user_id = $1', [competitionInfo.admin_user_id])
-            .then(function (result) {
-            if (!result.length) {
-                errorHelpers.handleError(null, 500, 'Unexpected failure when looking up admin user info', res);
+        UserQueries.getUserName.run({ userId: competitionInfo.admin_user_id }, database_1.DatabaseConnectionPool)
+            .then(function (adminNameResult) {
+            if (!adminNameResult.length) {
+                (0, errorHelpers_1.handleError)(null, 500, 'Unexpected failure when looking up admin user info', res);
                 return;
             }
-            var adminName = result[0].first_name + ' ' + result[0].last_name;
+            var adminName = adminNameResult[0].first_name + ' ' + adminNameResult[0].last_name;
             res.json({
                 'competitionName': competitionInfo.display_name,
                 'competitionStart': competitionInfo.start_date,
                 'competitionEnd': competitionInfo.end_date,
-                'numMembers': parseInt(numMembers),
+                'numMembers': numMembers,
                 'adminName': adminName
             });
         })
-            .catch(error => {
-            errorHelpers.handleError(error, 500, 'Error getting admin user details', res);
+            .catch(function (error) {
+            (0, errorHelpers_1.handleError)(error, 500, 'Error getting admin user details', res);
         });
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error getting description for competition', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error getting description for competition', res);
     });
 });
 // Returns the competition access token for the given competition ID
 // The authenticated user must be the admin of the competition to receive this data
 router.get('/:competitionId/adminDetail', function (req, res) {
-    database.query('SELECT competition_id, access_token FROM competitions WHERE competition_id = $1 AND admin_user_id = $2', [req.params.competitionId, '\\x' + res.locals.oauth.token.user.id])
+    var competitionId = req.params.competitionId;
+    var userId = res.locals.oauth.token.user.id;
+    CompetitionQueries.getCompetitionAdminDetails.run({ competitionId: competitionId, adminUserId: (0, userHelpers_1.convertUserIdToBuffer)(userId) }, database_1.DatabaseConnectionPool)
         .then(function (result) {
         if (!result.length) {
-            errorHelpers.handleError(error, 401, 'Competition not found or user is not admin', res);
+            (0, errorHelpers_1.handleError)(null, 401, 'Competition not found or user is not admin', res);
             return;
         }
         var competitionInfo = result[0];
@@ -307,8 +310,8 @@ router.get('/:competitionId/adminDetail', function (req, res) {
             'competitionId': competitionInfo.competition_id
         });
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error getting competition admin info', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error getting competition admin info', res);
     });
 });
 // Deletes the given competition
@@ -317,93 +320,91 @@ router.get('/:competitionId/adminDetail', function (req, res) {
 router.post('/delete', function (req, res) {
     var competitionId = req.body['competitionId'];
     if (!competitionId) {
-        errorHelpers.handleError(null, 400, 'Missing required parameter competitionId', res);
+        (0, errorHelpers_1.handleError)(null, 400, 'Missing required parameter competitionId', res);
+        return;
     }
     // Confirm that the authenticated user is the admin
-    database.query('SELECT competition_id, access_token FROM competitions WHERE competition_id = $1 AND admin_user_id = $2', [competitionId, '\\x' + res.locals.oauth.token.user.id])
+    var userId = res.locals.oauth.token.user.id;
+    CompetitionQueries.getCompetitionAdminDetails.run({ competitionId: competitionId, adminUserId: (0, userHelpers_1.convertUserIdToBuffer)(userId) }, database_1.DatabaseConnectionPool)
         .then(function (result) {
         if (!result.length) {
-            errorHelpers.handleError(error, 401, 'Competition not found or user is not admin', res);
+            (0, errorHelpers_1.handleError)(null, 401, 'Competition not found or user is not admin', res);
             return;
         }
-        database.query('DELETE FROM competitions WHERE competition_id = $1', [competitionId])
-            .then(function (result) {
+        CompetitionQueries.deleteCompetition.run({ competitionId: competitionId }, database_1.DatabaseConnectionPool)
+            .then(function (_result) {
             res.sendStatus(200);
         })
-            .catch(error => {
-            errorHelpers.handleError(error, 500, 'Error deleting competition', res);
+            .catch(function (error) {
+            (0, errorHelpers_1.handleError)(error, 500, 'Error deleting competition', res);
         });
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error getting competition admin info', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error getting competition admin info', res);
     });
 });
 module.exports = router;
 // Helper functions
 // Called when the admin of the competition is removing another user from the competition
-function adminRemoveUser(req, res, targetUserId, competitionId) {
-    var sqlHexTargetUserId = '\\x' + targetUserId;
+function adminRemoveUser(res, targetUserId, competitionId) {
     // Need to check that the current user is the admin of the competition
-    database.query('SELECT COUNT(competition_id) FROM competitions WHERE admin_user_id = $1 AND competition_id = $2', ['\\x' + res.locals.oauth.token.user.id, competitionId])
-        .then(function (result) {
-        if (!result.length || result[0].count != 1) {
-            errorHelpers.handleError(error, 401, 'User is trying to remove someone other than self and is not admin', res);
+    var authenticatedUserId = res.locals.oauth.token.user.id;
+    CompetitionQueries.getCompetitionAdminDetails.run({ competitionId: competitionId, adminUserId: (0, userHelpers_1.convertUserIdToBuffer)(authenticatedUserId) }, database_1.DatabaseConnectionPool)
+        .then(function (adminDetailsResult) {
+        if (!adminDetailsResult.length) {
+            (0, errorHelpers_1.handleError)(null, 401, 'User is trying to remove someone other than self and is not admin', res);
             return;
         }
-        database.query('DELETE FROM users_competitions WHERE user_id = $1 AND competition_id = $2', [sqlHexTargetUserId, competitionId])
-            .then(function (result) {
+        CompetitionQueries.deleteUserFromCompetition.run({ userId: (0, userHelpers_1.convertUserIdToBuffer)(targetUserId), competitionId: competitionId }, database_1.DatabaseConnectionPool)
+            .then(function (_deleteResult) {
             // Once the user is deleted, we need to change the competition access token so the removed user can't automatically re-join
             var newAccessToken = cryptoHelpers.getRandomToken();
-            database.query('UPDATE competitions SET access_token = $1 WHERE competition_id = $2', [newAccessToken, competitionId])
-                .then(function (result) {
+            CompetitionQueries.updateCompetitionAccessToken.run({ competitionId: competitionId, newAccessToken: newAccessToken }, database_1.DatabaseConnectionPool)
+                .then(function (_updateResult) {
                 res.sendStatus(200);
             })
-                .catch(error => {
-                errorHelpers.handleError(error, 500, 'Failed to update competition token after removing user', res);
+                .catch(function (error) {
+                (0, errorHelpers_1.handleError)(error, 500, 'Failed to update competition token after removing user', res);
             });
         })
-            .catch(error => {
-            errorHelpers.handleError(error, 500, 'Error deleting user from competition as admin', res);
+            .catch(function (error) {
+            (0, errorHelpers_1.handleError)(error, 500, 'Error deleting user from competition as admin', res);
         });
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error getting competition info', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error getting competition info', res);
     });
 }
 // Called when a user is trying to remove theirself from the competition
-function selfRemoveUser(req, res, targetUserId, competitionId) {
-    if (targetUserId !== res.locals.oauth.token.user.id) {
-        errorHelpers.handleError(error, 401, 'User is trying to remove someone other than self', res);
+function selfRemoveUser(res, targetUserId, competitionId) {
+    var authenticatedUserId = res.locals.oauth.token.user.id;
+    if (targetUserId !== authenticatedUserId) {
+        errorHelpers.handleError(null, 401, 'User is trying to remove someone other than self', res);
         return;
     }
-    database.query('DELETE FROM users_competitions WHERE user_id = $1 AND competition_id = $2', ['\\x' + res.locals.oauth.token.user.id, competitionId])
-        .then(function (result) {
+    CompetitionQueries.deleteUserFromCompetition.run({ userId: (0, userHelpers_1.convertUserIdToBuffer)(authenticatedUserId), competitionId: competitionId }, database_1.DatabaseConnectionPool)
+        .then(function (_result) {
         res.sendStatus(200);
     })
-        .catch(error => {
-        errorHelpers.handleError(error, 500, 'Error with user removing self from competition', res);
+        .catch(function (error) {
+        (0, errorHelpers_1.handleError)(error, 500, 'Error with user removing self from competition', res);
     });
 }
 // Checks that the user is under the max number of allowed active competitions
 // Returns a Promise that will continue if the user user is allowed to join a new competition
 // If the user cannot join a competition, then an error will be thrown
 // Expects a hex-formated user ID as a parameter
-function validateCompetitionCountLimit(sqlHexUserId) {
+function validateCompetitionCountLimit(userId) {
     // TODO: handle timezones for active competition count
     var currentDate = new Date();
+    var userIdBuffer = (0, userHelpers_1.convertUserIdToBuffer)(userId);
     // Check if the user has already hit their max number of active competitions
     return new Promise(function (resolve, reject) {
         Promise.all([
-            database.query('SELECT max_active_competitions FROM users WHERE user_id = $1', [sqlHexUserId]),
-            database.query('SELECT COUNT(competitionData.competition_id) FROM \
-                                (SELECT competition_id FROM users_competitions WHERE user_id = $1) as usersCompetitions \
-	                            INNER JOIN \
-                                    (SELECT competition_id, end_date FROM competitions) as competitionData \
-	                            ON usersCompetitions.competition_id = competitionData.competition_id \
-	                        WHERE end_date > $2', [sqlHexUserId, currentDate])
-        ]).then(function (results) {
-            var maxCompetitionResult = results[0];
-            var competitionCountResult = results[1];
+            UserQueries.getUserMaxCompetitions.run({ userId: userIdBuffer }, database_1.DatabaseConnectionPool),
+            CompetitionQueries.getNumberOfActiveCompetitionsForUser.run({ userId: userIdBuffer, currentDate: currentDate }, database_1.DatabaseConnectionPool)
+        ]).then(function (_a) {
+            var maxCompetitionResult = _a[0], competitionCountResult = _a[1];
             if (!maxCompetitionResult.length || !competitionCountResult) {
                 reject(new Error('Failed to query competition limit info'));
                 return;
@@ -415,7 +416,7 @@ function validateCompetitionCountLimit(sqlHexUserId) {
                 return;
             }
             resolve();
-        }).catch(error => {
+        }).catch(function (error) {
             reject(error);
         });
     });

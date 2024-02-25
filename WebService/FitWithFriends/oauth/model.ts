@@ -1,250 +1,215 @@
-const { DefaultAzureCredential } = require('@azure/identity');
-const { CryptographyClient } = require('@azure/keyvault-keys');
-const { SecretClient } = require('@azure/keyvault-secrets');
-const cryptoHelpers = require('../utilities/cryptoHelpers');
-const database = require('../utilities/database');
-const jwt = require('jsonwebtoken');
-const util = require('util');
+import { DefaultAzureCredential } from '@azure/identity';
+import { CryptographyClient, SignResult } from '@azure/keyvault-keys';
+import { SecretClient } from '@azure/keyvault-secrets';
+import cryptoHelpers = require('../utilities/cryptoHelpers');
+import jwt = require('jsonwebtoken');
+import util = require('util');
+import { RequestAuthenticationModel, RefreshTokenModel, ExtensionModel, Client, Falsey, Token, User, RefreshToken } from '@node-oauth/oauth2-server';
+import * as OauthQueries from '../sql/oauth.queries';
+import { DatabaseConnectionPool } from '../utilities/database';
+import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
 
-const tokenIssuer = 'com.danoconnor.fitwithfriends';
+class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenModel, ExtensionModel {
+    private accessTokenPublicKeyPem: string;
+    private tokenIssuer = 'com.danoconnor.fitwithfriends';
 
-var accessTokenPublicKeyPem;
-getPublicKeyFromAzureKeyvault();
+    // The default grant types that we support
+    // Note that the apple_id_token grant type is a custom type we have defined (AppleIdTokenGrant.ts)
+    // that allows us to issue refresh tokens if we are provided a valid Sign-In With Apple id token
+    private defaultGrants = ['apple_id_token', 'refresh_token'];
 
-/*
- *  Authroization codes
- */
+    constructor() {
+        this.accessTokenPublicKeyPem = '';
 
-module.exports.saveAuthorizationCode = function (token, client, user) {
-    // Prefix the value with \x so the database will treat it as a hex value
-    const sqlHexUserId = '\\x' + user.id;
-
-    database.query('INSERT INTO oauth_tokens(client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)', [
-        client.id,
-        token.refreshToken,
-        token.refreshTokenExpiresOn,
-        sqlHexUserId
-    ]).then(function (result) {
-        return result.length ? result[0] : false; // TODO return object with client: {id: clientId} and user: {id: userId} defined
-    });
-};
-
-/*
- * Get access token.
- */
-
-module.exports.getAccessToken = function (bearerToken) {
-    // Make sure we've gotten the expected public key from the key vault
-    if (!accessTokenPublicKeyPem) {
-        return null;
+        // This will run async and set the accessTokenPublicKeyPem variable when it completes
+        this.getPublicKeyFromAzureKeyvault();
     }
 
-    return new Promise((resolve, reject) => {
-        const verificationOptions = {
-            iss: tokenIssuer
+    // Finds the refresh token in the database that matches the token that the client provided
+    getRefreshToken(refreshToken: string): Promise<Falsey | RefreshToken> {
+        return OauthQueries.getRefreshToken.run({refreshToken: refreshToken}, DatabaseConnectionPool)
+            .then(result => {
+                if (!result.length) {
+                    return false;
+                }
+
+                const tokenResult = result[0];
+                const refreshToken: RefreshToken = {
+                    refreshToken: tokenResult.refresh_token,
+                    refreshTokenExpiresAt: tokenResult.refresh_token_expires_on,
+                    client: { id: tokenResult.client_id, grants: this.defaultGrants },
+                    user: { id: convertBufferToUserId(tokenResult.user_id) }
+                };
+
+                return refreshToken;
+            });
+    }
+
+    // Deletes the given refresh token from the database
+    revokeToken(token: RefreshToken): Promise<boolean> {
+        return OauthQueries.deleteRefreshToken.run({refreshToken: token.refreshToken}, DatabaseConnectionPool)
+            .then(_result => {
+                // Return true even if we didn't find the token in the database
+                return true;
+            });
+    }
+
+    // Creates a new refresh token. It will be saved to the database when the OAuth server calls saveRefreshToken
+    generateRefreshToken(client: Client, user: User, scope: string[]): Promise<string> {
+        // Just create a random token string here. It is associated with the user when we actually write it to the database
+        return Promise.resolve(cryptoHelpers.getRandomToken());
+    }
+
+    // Creates a new access token, valid for 1hr and signed by our Azure Keyvault private key
+    generateAccessToken(client: Client, user: User, scope: string[]): Promise<string> {
+        // We manually create the access token, instead of using the jsonwebtoken library,
+        // because we want to use Azure Keyvault to sign the token so that
+        // the private key never leaves the vault
+        const now = Math.floor(Date.now() / 1000);
+        const payload = {
+            iat: now,
+            nbf: now,
+            exp: now + (60 * 60), // Valid for 1hr
+            sub: user.id,
+            iss: this.tokenIssuer,
+            aud: scope,
+            client: client.id
         }
-        jwt.verify(bearerToken, accessTokenPublicKeyPem, verificationOptions, function (error, decoded) {
-            if (error) {
-                reject(error);
+        const payloadBase64 = this.base64url(JSON.stringify(payload));
+
+        const signingAlgorithm = 'RS256';
+        const header = {
+            alg: signingAlgorithm,
+            typ: 'JWT',
+            kid: process.env.ACCESS_TOKEN_SIGNING_KID_SHORT
+        }
+        const headerBase64 = this.base64url(JSON.stringify(header), 'binary');
+
+        const dataToSign = util.format('%s.%s', headerBase64, payloadBase64);
+        return this.signWithAzureKeyvault(dataToSign, signingAlgorithm)
+            .then(result => {
+                const signature = Buffer.from(result.result).toString('base64')
+                    .replace(/=/g, '')
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_');
+                return util.format('%s.%s.%s', headerBase64, payloadBase64, signature);
+            });
+    }
+
+    // Looks up the client app in the database
+    getClient(clientId: string, clientSecret: string): Promise<Client | Falsey> {
+        return OauthQueries.getClient.run({clientId: clientId, clientSecret: clientSecret}, DatabaseConnectionPool)
+            .then(result => {
+                if (!result.length) {
+                    return false;
+                }
+
+                const oAuthClient = result[0];
+                return {
+                    id: oAuthClient.client_id,
+                    grants: this.defaultGrants,
+                };
+            });
+    }
+
+    saveToken(token: Token, client: Client, user: User): Promise<Token | Falsey> {
+        // Our OAuth system reuses the same refresh token until it expires (or is otherwise revoked)
+        // Since we only store the refresh token in the database, we don't need to do anything if the
+        // refresh token hasn't changed
+        if (!token.refreshToken) {
+            const returnedAccessToken: Token = {
+                accessToken: token.accessToken,
+                accessTokenExpiresAt: token.accessTokenExpiresAt,
+                accessTokenExpiry: token.accessTokenExpiresAt,
+                client: { id: client.id, grants: this.defaultGrants }, 
+                user: user.id,
+                userId: user.id,
+                scope: token.scope
+            };
+            return Promise.resolve(returnedAccessToken);
+        }
+
+        return OauthQueries.saveRefreshToken.run({ clientId: token.client.id, refreshToken: token.refreshToken, refreshTokenExpiresOn: token.refreshTokenExpiresAt, userId: convertUserIdToBuffer(user.id) }, DatabaseConnectionPool)
+            .then(_result => {
+               const returnedRefreshToken: Token = {
+                    accessToken: token.accessToken,
+                    refreshToken: token.refreshToken,
+                    refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+                    client: { id: client.id, grants: this.defaultGrants }, 
+                    user: user.id,
+                    userId: user.id,
+                    scope: token.scope
+               };
+               return returnedRefreshToken;
+            });
+    }
+
+    getAccessToken(accessToken: string): Promise<Token | Falsey> {
+        // Make sure we've gotten the expected public key from the key vault
+        if (!this.accessTokenPublicKeyPem.length) {
+            throw new Error('Authentication system not initialized');
+        }
+
+        return new Promise((resolve, reject) => {
+            const verificationOptions: jwt.VerifyOptions = {
+                issuer: this.tokenIssuer
             }
 
-            resolve({
-                accessToken: bearerToken,
-                client: { id: decoded.client },
-                accessTokenExpiresAt: new Date(decoded.exp * 1000),
-                user: { id: decoded.sub },
-                scope: decoded.aud
+            jwt.verify(accessToken, this.accessTokenPublicKeyPem, verificationOptions, function (error, decoded) {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                // Expect the decoded payload to be a JwtPayload
+                const decodedPayload = decoded as jwt.JwtPayload;
+
+                resolve({
+                    accessToken: accessToken,
+                    client: { id: decodedPayload.client, grants: ['apple_id_token', 'refresh_token']},
+                    accessTokenExpiresAt: new Date(decodedPayload.exp * 1000),
+                    user: { id: decodedPayload.sub },
+                    scope: decodedPayload.aud as string[]
+                });
             });
         });
-    });
-};
-
-/**
- * Get client.
- */
-
-module.exports.getClient = function (clientId, clientSecret) {
-    return database.query('SELECT client_id, client_secret, redirect_uri FROM oauth_clients WHERE client_id = $1 AND client_secret = $2', [clientId, clientSecret])
-        .then(function (result) {
-            if (!result.length) { return false }
-            var oAuthClient = result[0];
-
-            if (!oAuthClient) {
-                return;
-            }
-
-            return {
-                id: oAuthClient.client_id,
-                grants: ['apple_id_token', 'refresh_token'], // the list of grant types that should be allowed. Note: apple_id_token is a unique grant type that we have defined
-            };
-        });
-};
-
-/**
- * Get refresh token.
- */
-
-module.exports.getRefreshToken = function (bearerToken) {
-    return database.query('SELECT client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE refresh_token = $1', [bearerToken])
-        .then(function (result) {
-            if (!result.length) {
-                return false;
-            }
-
-            const token = result[0];
-            return {
-                refreshToken: token.refresh_token,
-                refreshTokenExpiresAt: token.refresh_token_expires_on,
-                client: { id: token.client_id },
-                user: { id: Buffer.from(token.user_id).toString('hex') }
-            };
-        })
-};
-
-/**
- * Save token.
- */
-
-module.exports.saveToken = function (token, client, user) {
-    // Our OAuth system reuses the same refresh token until it expires (or is otherwise revoked)
-    // Since we only store the refresh token in the database, we don't need to do anything if the
-    // refresh token hasn't changed
-    if (!token.refreshToken) {
-        return {
-            accessToken: token.accessToken,
-            accessTokenExpiresAt: token.accessTokenExpiresAt,
-            accessTokenExpiry: token.accessTokenExpiresAt,
-            client: client.id,
-            user: user.id,
-            userId: user.id,
-            scope: token.scope
-        }
     }
 
-    // Prefix the value with \x so the database will treat it as a hex value
-    const sqlHexUserId = '\\x' + user.id;
-
-    return database.query('INSERT INTO oauth_tokens(client_id, refresh_token, refresh_token_expires_on, user_id) VALUES ($1, $2, $3, $4)', [
-        client.id,
-        token.refreshToken,
-        token.refreshTokenExpiresAt,
-        sqlHexUserId
-    ]).then(function (result) {
-        return {
-            accessToken: token.accessToken,
-            accessTokenExpiresAt: token.accessTokenExpiresAt,
-            refreshToken: token.refreshToken,
-            refreshTokenExpiresAt: token.refreshTokenExpiresAt,
-            scope: token.scope,
-            client: client.id,
-            user: user.id,
-            userId: user.id,
-            accessTokenExpiry: token.accessTokenExpiresAt,
-            refreshTokenExpiry: token.refreshTokenExpiresAt,
-        }
-    });
-};
-
-
-/**
- * Revoke token.
- */
-
-module.exports.revokeToken = function (token) {
-    return database.query('DELETE FROM oauth_tokens WHERE refresh_token = $1', [
-        token.refreshToken
-    ]).then(function (result) {
-        return true;
-    }).catch(function (error) {
-        return false;
-    });
-};
-
-/**
- * Generate access token.
- */
-
-module.exports.generateAccessToken = function (client, user, scope) {
-    // We manually create the access token, instead of using the jsonwebtoken library,
-    // because we want to use Azure Keyvault to sign the token so that
-    // the private key never leaves the vault
-    const now = Math.floor(Date.now() / 1000);
-    const payload = {
-        iat: now,
-        nbf: now,
-        exp: now + (60 * 60), // Valid for 1hr
-        sub: user.id,
-        iss: tokenIssuer,
-        aud: scope,
-        client: client.id
+    private getPublicKeyFromAzureKeyvault() {
+        const publicKeySecretName = process.env.ACCESS_TOKEN_SIGNING_PUBLIC_KEY_NAME;
+        const vaultUrl = process.env.AZURE_KEYVAULT_URL;
+    
+        const credential = new DefaultAzureCredential();
+        const client = new SecretClient(vaultUrl, credential);
+    
+        // Don't catch errors on purpose - if this fails then we want the app to crash
+        client.getSecret(publicKeySecretName)
+            .then(result => {
+                // The key vault stores the key with actual \n chars.
+                // If we don't replace those with actual newlines, then we get key decoding errors
+                this.accessTokenPublicKeyPem = result.value.replace(/\\n/g, '\n');
+            })
     }
-    const payloadBase64 = base64url(JSON.stringify(payload));
 
-    const signingAlgorithm = 'RS256';
-    const header = {
-        alg: signingAlgorithm,
-        typ: 'JWT',
-        kid: process.env.ACCESS_TOKEN_SIGNING_KID_SHORT
+    private base64url(string: string, encoding: BufferEncoding = 'utf-8'): string {
+        return Buffer
+            .from(string, encoding)
+            .toString('base64')
+            .replace(/=/g, '')
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_');
     }
-    const headerBase64 = base64url(JSON.stringify(header), 'binary');
 
-    const dataToSign = util.format('%s.%s', headerBase64, payloadBase64);
-    return signWithAzureKeyvault(dataToSign, signingAlgorithm)
-        .then(result => {
-            const signature = Buffer.from(result.result).toString('base64')
-                .replace(/=/g, '')
-                .replace(/\+/g, '-')
-                .replace(/\//g, '_');
-            return util.format('%s.%s.%s', headerBase64, payloadBase64, signature);
-        });
-};
-
-/**
- * Generate refresh token.
- */
-
-module.exports.generateRefreshToken = function (client, user, scope) {
-    // Just create a random token string here. It is associated with the user when we actually write it to the database
-    return cryptoHelpers.getRandomToken();
-};
-
-// Helper functions
-
-// Returns a promise that will return the signature
-function signWithAzureKeyvault(dataToSign, signingAlgorithm) {
-    const signingKeyId = process.env.ACCESS_TOKEN_SIGNING_KID;
-
-    // Need to set AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables
-    // for the credential to work
-    const credential = new DefaultAzureCredential();
-    const cryptographyClient = new CryptographyClient(signingKeyId, credential);
-
-    return cryptographyClient.signData(signingAlgorithm, Buffer.from(dataToSign));
+    private signWithAzureKeyvault(dataToSign, signingAlgorithm): Promise<SignResult> {
+        const signingKeyId = process.env.ACCESS_TOKEN_SIGNING_KID;
+    
+        // Need to set AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables
+        // for the credential to work
+        const credential = new DefaultAzureCredential();
+        const cryptographyClient = new CryptographyClient(signingKeyId, credential);
+    
+        return cryptographyClient.signData(signingAlgorithm, Buffer.from(dataToSign));
+    }
 }
 
-function getPublicKeyFromAzureKeyvault() {
-    const publicKeySecretName = process.env.ACCESS_TOKEN_SIGNING_PUBLIC_KEY_NAME;
-    const vaultUrl = process.env.AZURE_KEYVAULT_URL;
-
-    const credential = new DefaultAzureCredential();
-    const client = new SecretClient(vaultUrl, credential);
-
-    client.getSecret(publicKeySecretName)
-        .then(result => {
-            // The key vault stores the key with actual \n chars.
-            // If we don't replace those with actual newlines, then we get key decoding errors
-            accessTokenPublicKeyPem = result.value.replace(/\\n/g, '\n');
-        })
-        .catch(error => {
-            console.error(error.message);
-        });
-}
-
-function base64url(string, encoding) {
-    return Buffer
-        .from(string, encoding || 'utf8')
-        .toString('base64')
-        .replace(/=/g, '')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_');
-}
+export default AuthenticationModel;

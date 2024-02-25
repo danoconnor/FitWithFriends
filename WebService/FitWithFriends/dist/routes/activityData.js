@@ -47,7 +47,7 @@ router.post('/dailySummary', function (req, res) {
         .then(function (result) {
         res.sendStatus(200);
     })
-        .catch(error => {
+        .catch(function (error) {
         errorHelpers.handleError(error, 500, 'Unexpected error inserting data into database', res);
     });
 });

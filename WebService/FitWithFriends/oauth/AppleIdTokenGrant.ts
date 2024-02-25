@@ -1,93 +1,73 @@
-import AbstractGrantType from 'oauth2-server/lib/grant-types/abstract-grant-type';
+import { AbstractGrantType, ServerOptions, BaseModel, InvalidRequestError, Client, Falsey, Request, Token, User} from "@node-oauth/oauth2-server";
 import { validateAppleIdToken } from '../utilities/appleIdAuthenticationHelpers';
-import InvalidArgumentError from 'oauth2-server/lib/errors/invalid-argument-error';
-import InvalidRequestError from 'oauth2-server/lib/errors/invalid-request-error';
-import bluebird from 'bluebird';
-const promisify = require('promisify-any').use(bluebird);
-import util from 'util';
 
 // Constructor 
 
-function AppleIdTokenGrant(options) {
-    options = options || {};
+class AppleIdTokenGrant extends AbstractGrantType {
+    private model: BaseModel;
 
-    if (!options.model) {
-        throw new InvalidArgumentError('Missing parameter: `model`');
+    constructor(options: ServerOptions) {
+        super(options);
+        this.model = options.model;
     }
 
-    if (!options.model.saveToken) {
-        throw new InvalidArgumentError('Invalid argument: model does not implement `saveToken()`');
+    handle(request: Request, client: Client): Promise<Token | Falsey> {
+        if (!request.body.userId) {
+            throw new InvalidRequestError('Missing parameter: `userId`');
+        }
+    
+        if (!request.body.idToken) {
+            throw new InvalidRequestError('Missing parameter: `idToken`');
+        }
+    
+        const scope = this.getScope(request);
+    
+        const userId: string = request.body.userId;
+        const idToken: string = request.body.idToken;
+    
+        return validateAppleIdToken(userId, idToken)
+            .then(validationSuccess => {
+                if (!validationSuccess) {
+                    throw new InvalidRequestError('Token validation failed');
+                }
+    
+                // The userId will be something like 002261.d372c8cb204940c02479ef472f717857.2341
+                // We want the database to handle it as hex to save on storage space, so we'll remove the '.' chars
+                // which leaves only valid hex chars remaining
+                const hexUserId = userId.replace(/\./g, '');
+    
+                return this.saveToken({ id: hexUserId }, client, scope);
+            })
     }
 
-    AbstractGrantType.call(this, options);
+    saveToken(user: User, client: Client, requestedScope: string[]): Promise<Token | Falsey> {
+        var fns = [
+            this.validateScope(user, client, requestedScope),
+            this.generateAccessToken(client, user, requestedScope),
+            this.generateRefreshToken(client, user, requestedScope),
+            this.getAccessTokenExpiresAt(),
+            this.getRefreshTokenExpiresAt()
+        ];
+
+        return Promise.all(fns)
+            .then(([validatedScope, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt]) => {
+                if (validatedScope === false) {
+                    throw new InvalidRequestError('Invalid scope: Requested scope is invalid');
+                }
+
+                var token: Token = {
+                    client: client,
+                    user: user,
+                    accessToken: accessToken as string,
+                    accessTokenExpiresAt: accessTokenExpiresAt as Date,
+                    refreshToken: refreshToken as string,
+                    refreshTokenExpiresAt: refreshTokenExpiresAt as Date,
+                    scope: validatedScope as string[]
+                };
+
+                return this.model.saveToken(token, client, user);
+            });
+    }
 }
 
-util.inherits(AppleIdTokenGrant, AbstractGrantType);
-
-// This grant requires the request body to contain:
-//      userId: The user ID that was provided by Apple
-//      idToken: The ID token that was provided by Apple
-//      scope: The requested scope for the token (for now we expect it to be `default`)
-AppleIdTokenGrant.prototype.handle = function (request, client) {
-    if (!request) {
-        throw new InvalidArgumentError('Missing parameter: `request`');
-    }
-
-    if (!client) {
-        throw new InvalidArgumentError('Missing parameter: `client`');
-    }
-
-    if (!request.body.userId) {
-        throw new InvalidRequestError('Missing parameter: `userId`');
-    }
-
-    if (!request.body.idToken) {
-        throw new InvalidRequestError('Missing parameter: `idToken`');
-    }
-
-    const scope = this.getScope(request);
-
-    const userId = request.body.userId;
-    const idToken = request.body.idToken;
-
-    return validateAppleIdToken(userId, idToken)
-        .then(validationSuccess => {
-            if (!validationSuccess) {
-                throw new InvalidRequestError('Token validation failed');
-            }
-
-            // The userId will be something like 002261.d372c8cb204940c02479ef472f717857.2341
-            // We want the database to handle it as hex to save on storage space, so we'll remove the '.' chars
-            // which leaves only valid hex chars remaining
-            const hexUserId = userId.replace(/\./g, '');
-
-            return this.saveToken({ id: hexUserId }, client, scope);
-        })
-}
-
-// Based on the password grant implementation here: https://github.com/oauthjs/node-oauth2-server/blob/91d2cbe70a0eddc53d72def96864e2de0fd41703/lib/grant-types/password-grant-type.js
-AppleIdTokenGrant.prototype.saveToken = function (user, client, scope) {
-    var fns = [
-        this.validateScope(user, client, scope),
-        this.generateAccessToken(client, user, scope),
-        this.generateRefreshToken(client, user, scope),
-        this.getAccessTokenExpiresAt(),
-        this.getRefreshTokenExpiresAt()
-    ];
-
-    return Promise.all(fns)
-        .bind(this)
-        .spread(function (scope, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt) {
-            var token = {
-                accessToken: accessToken,
-                accessTokenExpiresAt: accessTokenExpiresAt,
-                refreshToken: refreshToken,
-                refreshTokenExpiresAt: refreshTokenExpiresAt,
-                scope: scope  
-            };
-
-            return promisify(this.model.saveToken, 3).call(this.model, token, client, user);
-        });
-};
-
-module.exports = AppleIdTokenGrant;
+export default AppleIdTokenGrant;

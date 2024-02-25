@@ -134,7 +134,7 @@ module.exports.revokeToken = function (token) {
         token.refreshToken
     ]).then(function (result) {
         return true;
-    }).catch(function (error) {
+    }).catch(error => {
         return false;
     });
 };
@@ -201,7 +201,7 @@ function getPublicKeyFromAzureKeyvault() {
         // If we don't replace those with actual newlines, then we get key decoding errors
         accessTokenPublicKeyPem = result.value.replace(/\\n/g, '\n');
     })
-        .catch(function (error) {
+        .catch(error => {
         console.error(error.message);
     });
 }
