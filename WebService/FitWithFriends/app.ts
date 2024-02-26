@@ -14,7 +14,7 @@ import competitions from './routes/competitions';
 import activityData from './routes/activityData';
 import pushNotifications from './routes/pushNotifications';
 import wellKnown from './routes/wellKnown';
-import globalConfig from './utilities/globalConfig';
+import { sendErrorDetails } from './utilities/errorHelpers';
 import HttpError from './utilities/httpError';
 
 import oauthServer from './oauth/server';
@@ -58,7 +58,7 @@ app.use(function (req, res, next) {
 // error handlers
  app.use(function (err, _req, res, next) {
     res.status(err.statusCode || 500);
-    const errorToSend = globalConfig.sendErrorDetails ? err : {};
+    const errorToSend = sendErrorDetails ? err : {};
     console.error(err.message);
 
     res.render('error', {

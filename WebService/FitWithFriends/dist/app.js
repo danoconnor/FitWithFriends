@@ -15,7 +15,7 @@ const competitions_1 = __importDefault(require("./routes/competitions"));
 const activityData_1 = __importDefault(require("./routes/activityData"));
 const pushNotifications_1 = __importDefault(require("./routes/pushNotifications"));
 const wellKnown_1 = __importDefault(require("./routes/wellKnown"));
-const globalConfig_1 = __importDefault(require("./utilities/globalConfig"));
+const errorHelpers_1 = require("./utilities/errorHelpers");
 const httpError_1 = __importDefault(require("./utilities/httpError"));
 const server_1 = __importDefault(require("./oauth/server"));
 var app = (0, express_1.default)();
@@ -51,7 +51,7 @@ app.use(function (req, res, next) {
 // error handlers
 app.use(function (err, _req, res, next) {
     res.status(err.statusCode || 500);
-    const errorToSend = globalConfig_1.default.sendErrorDetails ? err : {};
+    const errorToSend = errorHelpers_1.sendErrorDetails ? err : {};
     console.error(err.message);
     res.render('error', {
         message: err.message,

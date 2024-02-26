@@ -19,4 +19,4 @@ export function handleError(error: Error | null, statusCode: number, errorMessag
 };
 
 // A global config for whether to send error details to the client or not
-const sendErrorDetails = true;
+export const sendErrorDetails = true;
