@@ -27,18 +27,18 @@ const errorHelpers_1 = require("../utilities/errorHelpers");
 const ActivitySummaryQueries = __importStar(require("../sql/activitySummaries.queries"));
 const database_1 = require("../utilities/database");
 const express = __importStar(require("express"));
+const userHelpers_1 = require("../utilities/userHelpers");
 const router = express.Router();
 router.post('/dailySummary', function (req, res) {
     const dateStr = req.body['date'];
-    const caloriesBurned = req.body['activeCaloriesBurned'];
-    const caloriesGoal = req.body['activeCaloriesGoal'];
-    const exerciseTime = req.body['exerciseTime'];
-    const exerciseTimeGoal = req.body['exerciseTimeGoal'];
-    const standTime = req.body['standTime'];
-    const standTimeGoal = req.body['standTimeGoal'];
+    const caloriesBurned = Math.round(req.body['activeCaloriesBurned']);
+    const caloriesGoal = Math.round(req.body['activeCaloriesGoal']);
+    const exerciseTime = Math.round(req.body['exerciseTime']);
+    const exerciseTimeGoal = Math.round(req.body['exerciseTimeGoal']);
+    const standTime = Math.round(req.body['standTime']);
+    const standTimeGoal = Math.round(req.body['standTimeGoal']);
     const userId = res.locals.oauth.token.user.id;
-    // TODO: Other vars may be 0 - how to check that those are present?
-    if (!dateStr) {
+    if (!dateStr || Number.isNaN(caloriesBurned) || Number.isNaN(caloriesGoal) || Number.isNaN(exerciseTime) || Number.isNaN(exerciseTimeGoal) || Number.isNaN(standTime) || Number.isNaN(standTimeGoal)) {
         (0, errorHelpers_1.handleError)(null, 400, 'Missing required parameter date', res);
         return;
     }
@@ -47,7 +47,7 @@ router.post('/dailySummary', function (req, res) {
         (0, errorHelpers_1.handleError)(null, 400, 'Could not parse date', res);
         return;
     }
-    ActivitySummaryQueries.insertActivitySummary.run({ userId, date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal }, database_1.DatabaseConnectionPool)
+    ActivitySummaryQueries.insertActivitySummary.run({ userId: (0, userHelpers_1.convertUserIdToBuffer)(userId), date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal }, database_1.DatabaseConnectionPool)
         .then(_result => {
         res.sendStatus(200);
     })

@@ -3,21 +3,21 @@ import { handleError } from "../utilities/errorHelpers";
 import * as ActivitySummaryQueries from "../sql/activitySummaries.queries";
 import { DatabaseConnectionPool } from "../utilities/database";
 import * as express from "express";
+import { convertUserIdToBuffer } from "../utilities/userHelpers";
 const router = express.Router();
 
 router.post('/dailySummary', function (req, res) {
     const dateStr: string = req.body['date'];
-    const caloriesBurned: number = req.body['activeCaloriesBurned'];
-    const caloriesGoal: number = req.body['activeCaloriesGoal'];
-    const exerciseTime: number = req.body['exerciseTime'];
-    const exerciseTimeGoal: number = req.body['exerciseTimeGoal'];
-    const standTime: number = req.body['standTime'];
-    const standTimeGoal: number = req.body['standTimeGoal'];
+    const caloriesBurned: number = Math.round(req.body['activeCaloriesBurned']);
+    const caloriesGoal: number = Math.round(req.body['activeCaloriesGoal']);
+    const exerciseTime: number = Math.round(req.body['exerciseTime']);
+    const exerciseTimeGoal: number = Math.round(req.body['exerciseTimeGoal']);
+    const standTime: number = Math.round(req.body['standTime']);
+    const standTimeGoal: number = Math.round(req.body['standTimeGoal']);
 
-    const userId = res.locals.oauth.token.user.id;
+    const userId: string = res.locals.oauth.token.user.id;
 
-    // TODO: Other vars may be 0 - how to check that those are present?
-    if (!dateStr) {
+    if (!dateStr || Number.isNaN(caloriesBurned) || Number.isNaN(caloriesGoal) || Number.isNaN(exerciseTime) || Number.isNaN(exerciseTimeGoal) || Number.isNaN(standTime) || Number.isNaN(standTimeGoal)) {
         handleError(null, 400, 'Missing required parameter date', res);
         return;
     }
@@ -28,7 +28,7 @@ router.post('/dailySummary', function (req, res) {
         return;
     }
 
-    ActivitySummaryQueries.insertActivitySummary.run({ userId, date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal }, DatabaseConnectionPool)
+    ActivitySummaryQueries.insertActivitySummary.run({ userId: convertUserIdToBuffer(userId), date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal }, DatabaseConnectionPool)
         .then(_result => {
             res.sendStatus(200);
         })
