@@ -5,6 +5,7 @@ import { Response } from 'express';
 // and will optionally return the errorMessage depending on global config and the alwaysSendDetails param
 export function handleError(error: Error | null, statusCode: number, errorMessage: string | null, res: Response<any>, alwaysSendDetails = false, customErrorCode: number | null = null) {
     res.status(statusCode);
+    console.error(error != null ? error.message : errorMessage);
 
     if (alwaysSendDetails || sendErrorDetails) {
         res.json({

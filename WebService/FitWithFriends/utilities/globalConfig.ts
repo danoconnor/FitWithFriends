@@ -1,5 +1,3 @@
-const config = {
+export default {
     sendErrorDetails: true
-}
-
-module.exports = config
+};

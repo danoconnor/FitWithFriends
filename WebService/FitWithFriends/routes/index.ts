@@ -1,5 +1,5 @@
 'use strict';
-import handleError from '../utilities/errorHelpers';
+import { handleError } from '../utilities/errorHelpers';
 import express from 'express';
 const router = express.Router();
 

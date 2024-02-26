@@ -108,7 +108,7 @@ router.post('/join', function (req, res) {
     CompetitionQueries.getCompetitionDescriptionDetails.run({ competitionAccessToken: accessToken, competitionId }, DatabaseConnectionPool)
         .then((result) => {
             if (!result.length) {
-                errorHelpers.handleError(null, 404, 'Error finding competition', res);
+                handleError(null, 404, 'Error finding competition', res);
                 return;
             }
 
@@ -141,7 +141,7 @@ router.post('/leave', function (req, res) {
     const targetUserId: string = req.body['userId'];
     const competitionId: string = req.body['competitionId'];
     if (!targetUserId || !competitionId) {
-        errorHelpers.handleError(null, 404, 'Missing required param', res);
+        handleError(null, 404, 'Missing required param', res);
         return;
     }
 
@@ -217,7 +217,21 @@ router.get('/:competitionId/overview', function (req, res) {
                     // This will eventually change when we allow users to define custom scoring rules, but for now we will stick with Apple's rules
                     const maxPointsPerDay = 600;
                     activitySummaries.forEach(row => {
-                        const points = Math.round(row.calories_burned / row.calories_goal * 100) + Math.round(row.exercise_time / row.exercise_time_goal * 100) + Math.round(row.stand_time / row.stand_time_goal * 100);
+                        var points = 0;
+
+                        // Avoid divide-by-zero errors
+                        if (row.calories_goal > 0) {
+                            points += row.calories_burned / row.calories_goal * 100;
+                        }
+
+                        if (row.exercise_time_goal > 0) {
+                            points += row.exercise_time / row.exercise_time_goal * 100;
+                        }
+
+                        if (row.stand_time_goal > 0) {
+                            points += row.stand_time / row.stand_time_goal * 100;
+                        }
+                        
                         const pointsScoredThisDay = Math.min(points, maxPointsPerDay);
                         userPoints[row.userId].activityPoints += pointsScoredThisDay;
 
@@ -227,7 +241,7 @@ router.get('/:competitionId/overview', function (req, res) {
                     });
 
                     // We don't announce results until 24hrs after the competition has ended
-                    // This allows clients to report fina_i data and users in different timezones to finish their days
+                    // This allows clients to report final data and users in different timezones to finish their days
                     const now = new Date();
                     const timeSinceCompetitionEnd =  now.getTime() - competitionInfo.end_date.getTime();
                     const isCompetitionProcessingResults = timeSinceCompetitionEnd > 0 && timeSinceCompetitionEnd < competitionResultProcessingTimeMs;
@@ -340,7 +354,7 @@ router.post('/delete', function (req, res) {
     // Confirm that the authenticated user is the admin
     const userId = res.locals.oauth.token.user.id;
     CompetitionQueries.getCompetitionAdminDetails.run({ competitionId, adminUserId: convertUserIdToBuffer(userId) }, DatabaseConnectionPool)
-        .then(function (result) {
+        .then(result => {
             if (!result.length) {
                 handleError(null, 401, 'Competition not found or user is not admin', res);
                 return;
@@ -359,12 +373,12 @@ router.post('/delete', function (req, res) {
         });
 });
 
-module.exports = router;
+export default router;
 
 // Helper functions
 
 // Called when the admin of the competition is removing another user from the competition
-function adminRemoveUser(res, targetUserId: string, competitionId: string) {
+function adminRemoveUser(res: express.Response<any>, targetUserId: string, competitionId: string) {
     // Need to check that the current user is the admin of the competition
     const authenticatedUserId = res.locals.oauth.token.user.id;
     CompetitionQueries.getCompetitionAdminDetails.run({ competitionId, adminUserId: convertUserIdToBuffer(authenticatedUserId) }, DatabaseConnectionPool)
@@ -396,10 +410,10 @@ function adminRemoveUser(res, targetUserId: string, competitionId: string) {
 }
 
 // Called when a user is trying to remove theirself from the competition
-function selfRemoveUser(res, targetUserId: string, competitionId: string) {
+function selfRemoveUser(res: express.Response<any>, targetUserId: string, competitionId: string) {
     const authenticatedUserId = res.locals.oauth.token.user.id;
     if (targetUserId !== authenticatedUserId) {
-        errorHelpers.handleError(null, 401, 'User is trying to remove someone other than self', res);
+        handleError(null, 401, 'User is trying to remove someone other than self', res);
         return;
     }
 

@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "TZ='UTC' node app",
+    "preinstall": "tsc",
+    "start": "TZ='UTC' node dist/app",
     "postinstall": "typings install --save"
   },
   "description": "FitWithFriends",

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DatabaseConnectionPool = void 0;
-var pg_1 = require("pg");
+const pg_1 = require("pg");
 exports.DatabaseConnectionPool = new pg_1.Pool({
     host: process.env.PGHOST,
     port: parseInt(process.env.PGPORT),

@@ -66,6 +66,10 @@ class AppleIdTokenGrant extends AbstractGrantType {
                 };
 
                 return this.model.saveToken(token, client, user);
+            })
+            .catch((err) => {
+                console.error('Error saving token:', err);
+                return false;
             });
     }
 }

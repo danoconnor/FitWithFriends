@@ -21,6 +21,12 @@ function getApplePublicKey(header: JwtHeader, callback: SigningKeyCallback) {
 // Checks that the given id token is valid and issued by Apple
 // Returns a Promise that will return a bool indicating if the token is valid
 function validateAppleIdToken(userId: string, idToken: string) {
+    // If we are testing locally, skip the token validation
+    if (process.env.FWF_AUTH_USE_LOCAL_KEYPAIR === '1') {
+        console.log('Local testing override: Apple ID token validation skipped')
+        return Promise.resolve(true);
+    }
+
     return new Promise<boolean>((resolve, reject) => {
         // We need to verify four things about the ID token (from: https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user)
         // Verify the JWS E256 signature using the server�s public key

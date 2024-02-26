@@ -1,5 +1,5 @@
 'use strict';
-const express = require('express');
+import * as express from 'express';
 const router = express.Router();
 
 router.get('/apple-app-site-association', function (req, res) {
@@ -16,4 +16,4 @@ router.get('/apple-app-site-association', function (req, res) {
     });
 });
 
-module.exports = router;
+export default router;

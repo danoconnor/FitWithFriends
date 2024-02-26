@@ -176,6 +176,18 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
     }
 
     private getPublicKeyFromAzureKeyvault() {
+        // Used for testing - we can use a local keypair instead of the Azure Keyvault
+        if (process.env.FWF_AUTH_USE_LOCAL_KEYPAIR === "1") {
+            const fs = require('fs');
+            const path = process.env.FWF_AUTH_PUBLIC_KEY_PATH;
+            if (!path) {
+                throw new Error('FWF_AUTH_PUBLIC_KEY_PATH environment variable not set');
+            }
+
+            this.accessTokenPublicKeyPem = fs.readFileSync(path, 'utf-8');
+            return;
+        }
+
         const publicKeySecretName = process.env.ACCESS_TOKEN_SIGNING_PUBLIC_KEY_NAME;
         const vaultUrl = process.env.AZURE_KEYVAULT_URL;
     
@@ -201,6 +213,22 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
     }
 
     private signWithAzureKeyvault(dataToSign, signingAlgorithm): Promise<SignResult> {
+        // Used in testing - sign tokens with a local keypair
+        if (process.env.FWF_AUTH_USE_LOCAL_KEYPAIR === "1") {
+            const fs = require('fs');
+            const path = process.env.FWF_AUTH_PRIVATE_KEY_PATH;
+            if (!path) {
+                throw new Error('FWF_AUTH_PRIVATE_KEY_PATH environment variable not set');
+            }
+
+            const privateKeyPem = fs.readFileSync(path, 'utf-8');
+            const result: SignResult = {
+                result: cryptoHelpers.signData(dataToSign, privateKeyPem, 'RSA-SHA256'),
+                algorithm: signingAlgorithm
+            };
+            return Promise.resolve(result);
+        }
+
         const signingKeyId = process.env.ACCESS_TOKEN_SIGNING_KID;
     
         // Need to set AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables

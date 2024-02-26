@@ -18,3 +18,9 @@ export function getRandomToken(): string {
         .update(bytes)
         .digest('hex');
 }
+
+export function signData(data: string, privateKey: string, signingAlgorithm: string): Buffer {
+    const sign = crypto.createSign(signingAlgorithm);
+    sign.update(data);
+    return sign.sign(privateKey);
+}
