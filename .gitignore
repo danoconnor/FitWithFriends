@@ -7,6 +7,9 @@
 Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift
 Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace/xcuserdata
 
+# Compiled typescript output
+WebService/FitWithFriends/dist
+
 # User-specific files
 *.rsuser
 *.suo
