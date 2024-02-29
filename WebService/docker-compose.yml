@@ -16,6 +16,11 @@ services:
       - FWF_AUTH_USE_LOCAL_KEYPAIR=1
       - FWF_AUTH_PRIVATE_KEY_PATH=TestCerts/fwftest-key.pem
       - FWF_AUTH_PUBLIC_KEY_PATH=TestCerts/fwftest.pem
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     depends_on:
       - postgres
 
@@ -34,4 +39,5 @@ services:
       timeout: 10s
       retries: 10
     volumes:
-      - ./DatabaseSchema.sql:/docker-entrypoint-initdb.d/DatabaseSchema.sql
+      - ./CreateDatabaseTables.sql:/docker-entrypoint-initdb.d/1_CreateDatabaseTables.sql
+      - ./SetupTestData.sql:/docker-entrypoint-initdb.d/2_SetupTestData.sql
