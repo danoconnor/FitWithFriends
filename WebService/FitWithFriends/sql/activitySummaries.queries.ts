@@ -1,5 +1,5 @@
 /** Types generated for queries found in "sql/activitySummaries.sql" */
-import { PreparedQuery } from '@pgtyped/runtime';
+import { DatabaseConnectionPool } from '../utilities/database';
 
 export type DateOrString = Date | string;
 
@@ -39,8 +39,12 @@ const getActivitySummariesForUsersIR: any = {"usedParamSet":{"userIds":true,"end
  * WHERE user_id in :userIds! AND date <= :endDate! AND date >= :startDate!
  * ```
  */
-export const getActivitySummariesForUsers = new PreparedQuery<IGetActivitySummariesForUsersParams,IGetActivitySummariesForUsersResult>(getActivitySummariesForUsersIR);
-
+export function getActivitySummariesForUsers(params: IGetActivitySummariesForUsersParams): Promise<IGetActivitySummariesForUsersResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const getActivitySummariesForUsers = new pgtyped.PreparedQuery<IGetActivitySummariesForUsersParams,IGetActivitySummariesForUsersResult>(getActivitySummariesForUsersIR);
+    return getActivitySummariesForUsers.run(params, DatabaseConnectionPool);
+  });
+}
 
 /** 'InsertActivitySummary' parameters type */
 export interface IInsertActivitySummaryParams {
@@ -73,6 +77,11 @@ const insertActivitySummaryIR: any = {"usedParamSet":{"userId":true,"date":true,
  * ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal
  * ```
  */
-export const insertActivitySummary = new PreparedQuery<IInsertActivitySummaryParams,IInsertActivitySummaryResult>(insertActivitySummaryIR);
+export function insertActivitySummary(params: IInsertActivitySummaryParams): Promise<IInsertActivitySummaryResult | IInsertActivitySummaryResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const insertActivitySummary = new pgtyped.PreparedQuery<IInsertActivitySummaryParams,IInsertActivitySummaryResult>(insertActivitySummaryIR);
+    return insertActivitySummary.run(params, DatabaseConnectionPool);
+  });
+}
 
 

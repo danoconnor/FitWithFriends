@@ -1,5 +1,5 @@
 /** Types generated for queries found in "sql/pushNotifications.sql" */
-import { PreparedQuery } from '@pgtyped/runtime';
+import { DatabaseConnectionPool } from '../utilities/database';
 
 /** 'RegisterPushToken' parameters type */
 export interface IRegisterPushTokenParams {
@@ -27,6 +27,11 @@ const registerPushTokenIR: any = {"usedParamSet":{"userId":true,"pushToken":true
  * ON CONFLICT (user_id, push_token, platform) DO NOTHING
  * ```
  */
-export const registerPushToken = new PreparedQuery<IRegisterPushTokenParams,IRegisterPushTokenResult>(registerPushTokenIR);
+export function registerPushToken(params: IRegisterPushTokenParams): Promise<IRegisterPushTokenResult | IRegisterPushTokenResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const registerPushToken = new pgtyped.PreparedQuery<IRegisterPushTokenParams,IRegisterPushTokenResult>(registerPushTokenIR);
+    return registerPushToken.run(params, DatabaseConnectionPool);
+  });
+}
 
 

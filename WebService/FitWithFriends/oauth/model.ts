@@ -6,7 +6,6 @@ import jwt = require('jsonwebtoken');
 import util = require('util');
 import { RequestAuthenticationModel, RefreshTokenModel, ExtensionModel, Client, Falsey, Token, User, RefreshToken } from '@node-oauth/oauth2-server';
 import * as OauthQueries from '../sql/oauth.queries';
-import { DatabaseConnectionPool } from '../utilities/database';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
 
 class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenModel, ExtensionModel {
@@ -27,7 +26,7 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
 
     // Finds the refresh token in the database that matches the token that the client provided
     getRefreshToken(refreshToken: string): Promise<Falsey | RefreshToken> {
-        return OauthQueries.getRefreshToken.run({refreshToken: refreshToken}, DatabaseConnectionPool)
+        return OauthQueries.getRefreshToken({refreshToken: refreshToken})
             .then(result => {
                 if (!result.length) {
                     return false;
@@ -47,7 +46,7 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
 
     // Deletes the given refresh token from the database
     revokeToken(token: RefreshToken): Promise<boolean> {
-        return OauthQueries.deleteRefreshToken.run({refreshToken: token.refreshToken}, DatabaseConnectionPool)
+        return OauthQueries.deleteRefreshToken({refreshToken: token.refreshToken})
             .then(_result => {
                 // Return true even if we didn't find the token in the database
                 return true;
@@ -98,7 +97,7 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
 
     // Looks up the client app in the database
     getClient(clientId: string, clientSecret: string): Promise<Client | Falsey> {
-        return OauthQueries.getClient.run({clientId: clientId, clientSecret: clientSecret}, DatabaseConnectionPool)
+        return OauthQueries.getClient({clientId: clientId, clientSecret: clientSecret})
             .then(result => {
                 if (!result.length) {
                     return false;
@@ -109,6 +108,10 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
                     id: oAuthClient.client_id,
                     grants: this.defaultGrants,
                 };
+            })
+            .catch(error => {
+                console.error('Error getting client: ', error);
+                throw error;
             });
     }
 
@@ -129,7 +132,7 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
             return Promise.resolve(returnedAccessToken);
         }
 
-        return OauthQueries.saveRefreshToken.run({ clientId: token.client.id, refreshToken: token.refreshToken, refreshTokenExpiresOn: token.refreshTokenExpiresAt, userId: convertUserIdToBuffer(user.id) }, DatabaseConnectionPool)
+        return OauthQueries.saveRefreshToken({ clientId: token.client.id, refreshToken: token.refreshToken, refreshTokenExpiresOn: token.refreshTokenExpiresAt, userId: convertUserIdToBuffer(user.id) })
             .then(_result => {
                const returnedRefreshToken: Token = {
                     accessToken: token.accessToken,

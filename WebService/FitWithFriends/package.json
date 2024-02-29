@@ -1,11 +1,10 @@
 {
   "name": "fit-with-friends",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "preinstall": "tsc",
-    "start": "TZ='UTC' node dist/app",
-    "postinstall": "typings install --save"
+    "build": "tsc",
+    "start": "node dist/app"
   },
   "description": "FitWithFriends",
   "author": {
@@ -30,13 +29,13 @@
     "pg": "^8.11.3",
     "pug": "^3.0.2",
     "serve-favicon": "^2.5.0",
+    "typescript": "^5.3.3",
     "uuid": "^9.0.1"
   },
   "engines": {
     "node": "~21.6.x"
   },
   "devDependencies": {
-    "@pgtyped/cli": "^2.3.0",
-    "typings": "^0.6.10"
+    "@pgtyped/cli": "^2.3.0"
   }
 }

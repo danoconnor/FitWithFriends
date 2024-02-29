@@ -20,7 +20,7 @@ const competitionResultProcessingTimeMs = msPerDay * 1;
 
 // Returns the competitionIds that the currently authenticated user is a member of
 router.get('/', function (req, res) {
-    CompetitionQueries.getUsersCompetitions.run({ userId: convertUserIdToBuffer(res.locals.oauth.token.user.id) }, DatabaseConnectionPool)
+    CompetitionQueries.getUsersCompetitions({ userId: convertUserIdToBuffer(res.locals.oauth.token.user.id) })
         .then(result => {
             const competitionIds = result.map(obj => obj.competition_id);
             res.json(competitionIds);
@@ -69,10 +69,10 @@ router.post('/', function (req, res) {
             const accessToken = cryptoHelpers.getRandomToken();
 
             const competitionId = uuid();
-            CompetitionQueries.createCompetition.run({ startDate: startDateUTC, endDate: endDateUTC, displayName, adminUserId: convertUserIdToBuffer(userId), accessToken, ianaTimezone: timezone, competitionId }, DatabaseConnectionPool)
+            CompetitionQueries.createCompetition({ startDate: startDateUTC, endDate: endDateUTC, displayName, adminUserId: convertUserIdToBuffer(userId), accessToken, ianaTimezone: timezone, competitionId })
                 .then((_result) => {
                     // Add the admin user to the competition
-                    CompetitionQueries.addUserToCompetition.run({ userId: convertUserIdToBuffer(userId), competitionId }, DatabaseConnectionPool)
+                    CompetitionQueries.addUserToCompetition({ userId: convertUserIdToBuffer(userId), competitionId })
                         .then(function (_result) {
                             res.json({
                                 'competition_id': competitionId,
@@ -105,7 +105,7 @@ router.post('/join', function (req, res) {
     const userId: string = res.locals.oauth.token.user.id;
 
     // Find matching competition and validate access token
-    CompetitionQueries.getCompetitionDescriptionDetails.run({ competitionAccessToken: accessToken, competitionId }, DatabaseConnectionPool)
+    CompetitionQueries.getCompetitionDescriptionDetails({ competitionAccessToken: accessToken, competitionId })
         .then((result) => {
             if (!result.length) {
                 handleError(null, 404, 'Error finding competition', res);
@@ -116,7 +116,7 @@ router.post('/join', function (req, res) {
             const userId: string = res.locals.oauth.token.user.id;
             validateCompetitionCountLimit(userId).then(function () {
                 // User is allowed to join a competition - add the user to the competition
-                CompetitionQueries.addUserToCompetition.run({ userId: convertUserIdToBuffer(userId), competitionId }, DatabaseConnectionPool)
+                CompetitionQueries.addUserToCompetition({ userId: convertUserIdToBuffer(userId), competitionId })
                     .then((_result) => {
                         res.sendStatus(200);
                     })
@@ -168,8 +168,8 @@ router.get('/:competitionId/overview', function (req, res) {
     // 1. Get the competition data and the users
     const userId = res.locals.oauth.token.user.id;
     Promise.all([
-        UserQueries.getUsersInCompetition.run({ competitionId }, DatabaseConnectionPool),
-        CompetitionQueries.getCompetition.run({ competitionId }, DatabaseConnectionPool)
+        UserQueries.getUsersInCompetition({ competitionId }),
+        CompetitionQueries.getCompetition({ competitionId })
     ])
         .then(([usersCompetitionsResult, competitionsResult]) =>{
             if (!usersCompetitionsResult.length || !competitionsResult.length) {
@@ -211,7 +211,7 @@ router.get('/:competitionId/overview', function (req, res) {
             });
 
             const userIdList = usersCompetitionsResult.map(row => convertUserIdToBuffer(row.userId));
-            ActivitySummariesQueries.getActivitySummariesForUsers.run({ userIds: userIdList, startDate: competitionInfo.start_date, endDate: competitionInfo.end_date }, DatabaseConnectionPool)
+            ActivitySummariesQueries.getActivitySummariesForUsers({ userIds: userIdList, startDate: competitionInfo.start_date, endDate: competitionInfo.end_date })
                 .then(activitySummaries => {
                     // We allow users to score up to 600 total points per day (matching Apple's activity ring competition rules)
                     // This will eventually change when we allow users to define custom scoring rules, but for now we will stick with Apple's rules
@@ -278,8 +278,8 @@ router.post('/description', function (req, res) {
     }
 
     Promise.all([
-        CompetitionQueries.getNumUsersInCompetition.run({ competitionId }, DatabaseConnectionPool),
-        CompetitionQueries.getCompetitionDescriptionDetails.run({ competitionId, competitionAccessToken: competitionToken }, DatabaseConnectionPool)
+        CompetitionQueries.getNumUsersInCompetition({ competitionId }),
+        CompetitionQueries.getCompetitionDescriptionDetails({ competitionId, competitionAccessToken: competitionToken })
     ])
         .then(([usersCompetitionsResult, competitionsResult]) => {
             if (!usersCompetitionsResult.length || !competitionsResult.length) {
@@ -292,7 +292,7 @@ router.post('/description', function (req, res) {
 
             // Find the display name of the competition admin so we can include it in the response
             // Don't need to use \x with admin_user_id because it comes from the previous query and is already in hex format
-            UserQueries.getUserName.run({ userId: competitionInfo.admin_user_id }, DatabaseConnectionPool)
+            UserQueries.getUserName({ userId: competitionInfo.admin_user_id })
                 .then(adminNameResult => {
                     if (!adminNameResult.length) {
                         handleError(null, 500, 'Unexpected failure when looking up admin user info', res);
@@ -323,7 +323,7 @@ router.post('/description', function (req, res) {
 router.get('/:competitionId/adminDetail', function (req, res) {
     const competitionId: string = req.params.competitionId;
     const userId: string = res.locals.oauth.token.user.id;
-    CompetitionQueries.getCompetitionAdminDetails.run({ competitionId, adminUserId: convertUserIdToBuffer(userId) }, DatabaseConnectionPool)
+    CompetitionQueries.getCompetitionAdminDetails({ competitionId, adminUserId: convertUserIdToBuffer(userId) })
         .then(result => {
             if (!result.length) {
                 handleError(null, 401, 'Competition not found or user is not admin', res);
@@ -353,14 +353,14 @@ router.post('/delete', function (req, res) {
 
     // Confirm that the authenticated user is the admin
     const userId = res.locals.oauth.token.user.id;
-    CompetitionQueries.getCompetitionAdminDetails.run({ competitionId, adminUserId: convertUserIdToBuffer(userId) }, DatabaseConnectionPool)
+    CompetitionQueries.getCompetitionAdminDetails({ competitionId, adminUserId: convertUserIdToBuffer(userId) })
         .then(result => {
             if (!result.length) {
                 handleError(null, 401, 'Competition not found or user is not admin', res);
                 return;
             }
 
-            CompetitionQueries.deleteCompetition.run({ competitionId }, DatabaseConnectionPool)
+            CompetitionQueries.deleteCompetition({ competitionId })
                 .then(_result => {
                     res.sendStatus(200);
                 })
@@ -381,18 +381,18 @@ export default router;
 function adminRemoveUser(res: express.Response<any>, targetUserId: string, competitionId: string) {
     // Need to check that the current user is the admin of the competition
     const authenticatedUserId = res.locals.oauth.token.user.id;
-    CompetitionQueries.getCompetitionAdminDetails.run({ competitionId, adminUserId: convertUserIdToBuffer(authenticatedUserId) }, DatabaseConnectionPool)
+    CompetitionQueries.getCompetitionAdminDetails({ competitionId, adminUserId: convertUserIdToBuffer(authenticatedUserId) })
         .then(adminDetailsResult => {
             if (!adminDetailsResult.length) {
                 handleError(null, 401, 'User is trying to remove someone other than self and is not admin', res);
                 return;
             }
 
-            CompetitionQueries.deleteUserFromCompetition.run({ userId: convertUserIdToBuffer(targetUserId), competitionId }, DatabaseConnectionPool)
+            CompetitionQueries.deleteUserFromCompetition({ userId: convertUserIdToBuffer(targetUserId), competitionId })
                 .then(_deleteResult => {
                     // Once the user is deleted, we need to change the competition access token so the removed user can't automatically re-join
                     const newAccessToken = cryptoHelpers.getRandomToken();
-                    CompetitionQueries.updateCompetitionAccessToken.run({ competitionId, newAccessToken }, DatabaseConnectionPool)
+                    CompetitionQueries.updateCompetitionAccessToken({ competitionId, newAccessToken })
                         .then(_updateResult => {
                             res.sendStatus(200);
                         })
@@ -417,7 +417,7 @@ function selfRemoveUser(res: express.Response<any>, targetUserId: string, compet
         return;
     }
 
-    CompetitionQueries.deleteUserFromCompetition.run({ userId: convertUserIdToBuffer(authenticatedUserId), competitionId }, DatabaseConnectionPool)
+    CompetitionQueries.deleteUserFromCompetition({ userId: convertUserIdToBuffer(authenticatedUserId), competitionId })
         .then(_result => {
             res.sendStatus(200);
         })
@@ -438,8 +438,8 @@ function validateCompetitionCountLimit(userId: string) {
     // Check if the user has already hit their max number of active competitions
     return new Promise<void>((resolve, reject) => {
         Promise.all([
-            UserQueries.getUserMaxCompetitions.run({ userId: userIdBuffer }, DatabaseConnectionPool),
-            CompetitionQueries.getNumberOfActiveCompetitionsForUser.run({ userId: userIdBuffer, currentDate }, DatabaseConnectionPool)
+            UserQueries.getUserMaxCompetitions({ userId: userIdBuffer }),
+            CompetitionQueries.getNumberOfActiveCompetitionsForUser({ userId: userIdBuffer, currentDate })
         ]).then(([maxCompetitionResult, competitionCountResult]) => {
             if (!maxCompetitionResult.length || !competitionCountResult) {
                 reject(new Error('Failed to query competition limit info'));

@@ -28,7 +28,7 @@ router.post('/dailySummary', function (req, res) {
         return;
     }
 
-    ActivitySummaryQueries.insertActivitySummary.run({ userId: convertUserIdToBuffer(userId), date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal }, DatabaseConnectionPool)
+    ActivitySummaryQueries.insertActivitySummary({ userId: convertUserIdToBuffer(userId), date, caloriesBurned, caloriesGoal, exerciseTime, exerciseTimeGoal, standTime, standTimeGoal })
         .then(_result => {
             res.sendStatus(200);
         })

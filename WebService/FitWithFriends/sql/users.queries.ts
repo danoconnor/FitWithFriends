@@ -1,5 +1,5 @@
 /** Types generated for queries found in "sql/users.sql" */
-import { PreparedQuery } from '@pgtyped/runtime';
+import { DatabaseConnectionPool } from '../utilities/database';
 
 export type DateOrString = Date | string;
 
@@ -30,7 +30,12 @@ const createUserIR: any = {"usedParamSet":{"userId":true,"firstName":true,"lastN
  * INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date) VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!)
  * ```
  */
-export const createUser = new PreparedQuery<ICreateUserParams,ICreateUserResult>(createUserIR);
+export function createUser(params: ICreateUserParams): Promise<ICreateUserResult | ICreateUserResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const createUser = new pgtyped.PreparedQuery<ICreateUserParams,ICreateUserResult>(createUserIR);
+    return createUser.run(params, DatabaseConnectionPool);
+  });
+}
 
 
 /** 'GetUserName' parameters type */
@@ -58,7 +63,12 @@ const getUserNameIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"us
  * SELECT first_name, last_name FROM users WHERE user_id = :userId!
  * ```
  */
-export const getUserName = new PreparedQuery<IGetUserNameParams,IGetUserNameResult>(getUserNameIR);
+export function getUserName(params: IGetUserNameParams): Promise<IGetUserNameResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const getUserName = new pgtyped.PreparedQuery<IGetUserNameParams,IGetUserNameResult>(getUserNameIR);
+    return getUserName.run(params, DatabaseConnectionPool);
+  });
+}
 
 
 /** 'GetUserMaxCompetitions' parameters type */
@@ -85,7 +95,12 @@ const getUserMaxCompetitionsIR: any = {"usedParamSet":{"userId":true},"params":[
  * SELECT max_active_competitions FROM users WHERE user_id = :userId!
  * ```
  */
-export const getUserMaxCompetitions = new PreparedQuery<IGetUserMaxCompetitionsParams,IGetUserMaxCompetitionsResult>(getUserMaxCompetitionsIR);
+export function getUserMaxCompetitions(params: IGetUserMaxCompetitionsParams): Promise<IGetUserMaxCompetitionsResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const getUserMaxCompetitions = new pgtyped.PreparedQuery<IGetUserMaxCompetitionsParams,IGetUserMaxCompetitionsResult>(getUserMaxCompetitionsIR);
+    return getUserMaxCompetitions.run(params, DatabaseConnectionPool);
+  });
+}
 
 
 /** 'GetUsersInCompetition' parameters type */
@@ -117,6 +132,11 @@ const getUsersInCompetitionIR: any = {"usedParamSet":{"competitionId":true},"par
  *     ON usersCompetitions.user_id = userData.user_id
  * ```
  */
-export const getUsersInCompetition = new PreparedQuery<IGetUsersInCompetitionParams,IGetUsersInCompetitionResult>(getUsersInCompetitionIR);
+export function getUsersInCompetition(params: IGetUsersInCompetitionParams): Promise<IGetUsersInCompetitionResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const getUsersInCompetition = new pgtyped.PreparedQuery<IGetUsersInCompetitionParams,IGetUsersInCompetitionResult>(getUsersInCompetitionIR);
+    return getUsersInCompetition.run(params, DatabaseConnectionPool);
+  });
+}
 
 

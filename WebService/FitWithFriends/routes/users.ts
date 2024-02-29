@@ -1,6 +1,5 @@
 'use strict';
 import { validateAppleIdToken } from '../utilities/appleIdAuthenticationHelpers';
-import { DatabaseConnectionPool } from '../utilities/database';
 import { handleError } from '../utilities/errorHelpers';
 import express from 'express';
 import { ICreateUserParams, createUser } from '../sql/users.queries';
@@ -58,7 +57,7 @@ router.post('/userFromAppleID', function (req, res) {
                 isPro: false,
                 createdDate: currentDate
             };
-            createUser.run(createUserParams, DatabaseConnectionPool)
+            createUser(createUserParams)
                 .then(_result => {
                     res.sendStatus(200);
                 })

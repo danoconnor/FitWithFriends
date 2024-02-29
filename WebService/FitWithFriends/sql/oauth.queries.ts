@@ -1,5 +1,5 @@
 /** Types generated for queries found in "sql/oauth.sql" */
-import { PreparedQuery } from '@pgtyped/runtime';
+import { DatabaseConnectionPool } from '../utilities/database';
 
 export type DateOrString = Date | string;
 
@@ -30,7 +30,12 @@ const getClientIR: any = {"usedParamSet":{"clientId":true,"clientSecret":true},"
  * SELECT client_id, client_secret, redirect_uri FROM oauth_clients WHERE client_id = :clientId! AND client_secret = :clientSecret!
  * ```
  */
-export const getClient = new PreparedQuery<IGetClientParams,IGetClientResult>(getClientIR);
+export function getClient(params: IGetClientParams): Promise<IGetClientResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const getClient = new pgtyped.PreparedQuery<IGetClientParams,IGetClientResult>(getClientIR);
+    return getClient.run(params, DatabaseConnectionPool);
+  });
+}
 
 
 /** 'GetRefreshToken' parameters type */
@@ -60,7 +65,12 @@ const getRefreshTokenIR: any = {"usedParamSet":{"refreshToken":true},"params":[{
  * SELECT client_id, refresh_token, refresh_token_expires_on, user_id FROM oauth_tokens WHERE refresh_token = :refreshToken!
  * ```
  */
-export const getRefreshToken = new PreparedQuery<IGetRefreshTokenParams,IGetRefreshTokenResult>(getRefreshTokenIR);
+export function getRefreshToken(params: IGetRefreshTokenParams): Promise<IGetRefreshTokenResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const getRefreshToken = new pgtyped.PreparedQuery<IGetRefreshTokenParams,IGetRefreshTokenResult>(getRefreshTokenIR);
+    return getRefreshToken.run(params, DatabaseConnectionPool);
+  });
+}
 
 
 /** 'SaveRefreshToken' parameters type */
@@ -88,7 +98,12 @@ const saveRefreshTokenIR: any = {"usedParamSet":{"clientId":true,"refreshToken":
  * INSERT INTO oauth_tokens(client_id, refresh_token, refresh_token_expires_on, user_id) VALUES (:clientId!, :refreshToken!, :refreshTokenExpiresOn!, :userId!)
  * ```
  */
-export const saveRefreshToken = new PreparedQuery<ISaveRefreshTokenParams,ISaveRefreshTokenResult>(saveRefreshTokenIR);
+export function saveRefreshToken(params: ISaveRefreshTokenParams): Promise<ISaveRefreshTokenResult | ISaveRefreshTokenResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const saveRefreshToken = new pgtyped.PreparedQuery<ISaveRefreshTokenParams,ISaveRefreshTokenResult>(saveRefreshTokenIR);
+    return saveRefreshToken.run(params, DatabaseConnectionPool);
+  });
+}
 
 
 /** 'DeleteRefreshToken' parameters type */
@@ -113,6 +128,11 @@ const deleteRefreshTokenIR: any = {"usedParamSet":{"refreshToken":true},"params"
  * DELETE FROM oauth_tokens WHERE refresh_token = :refreshToken!
  * ```
  */
-export const deleteRefreshToken = new PreparedQuery<IDeleteRefreshTokenParams,IDeleteRefreshTokenResult>(deleteRefreshTokenIR);
+export function deleteRefreshToken(params: IDeleteRefreshTokenParams): Promise<IDeleteRefreshTokenResult | IDeleteRefreshTokenResult[]> {
+  return import('@pgtyped/runtime').then((pgtyped) => {
+    const deleteRefreshToken = new pgtyped.PreparedQuery<IDeleteRefreshTokenParams,IDeleteRefreshTokenResult>(deleteRefreshTokenIR);
+    return deleteRefreshToken.run(params, DatabaseConnectionPool);
+  });
+}
 
 

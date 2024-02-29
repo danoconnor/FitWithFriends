@@ -25,7 +25,7 @@ router.post('/register', function (req, res) {
     }
 
     const userId = res.locals.oauth.token.user.id;
-    PushNotificationQueries.registerPushToken.run({ userId: convertUserIdToBuffer(userId), pushToken, platform }, DatabaseConnectionPool)
+    PushNotificationQueries.registerPushToken({ userId: convertUserIdToBuffer(userId), pushToken, platform })
         .then(_result => {
             res.sendStatus(200);
         })
