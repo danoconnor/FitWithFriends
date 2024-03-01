@@ -6,6 +6,7 @@ services:
       context: ./FitWithFriends
     ports:
       - '3000:3000'
+      - '9229:9229'
     environment:
       - PGHOST=postgres
       - PGPORT=5432

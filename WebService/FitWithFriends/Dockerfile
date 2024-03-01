@@ -19,5 +19,5 @@ RUN npm run build
 # Expose a port for the app to listen on
 EXPOSE 3000
 
-# Start the app
-CMD [ "node", "dist/app" ]
+# Start the app with debug flags
+CMD [ "node", "--inspect=0.0.0.0:9229", "dist/app" ]
