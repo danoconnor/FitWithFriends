@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "node dist/app"
+    "start": "node dist/app",
+    "test": "jest"
   },
   "description": "FitWithFriends",
   "author": {
@@ -36,6 +37,11 @@
     "node": "~21.6.x"
   },
   "devDependencies": {
-    "@pgtyped/cli": "^2.3.0"
+    "@pgtyped/cli": "^2.3.0",
+    "@types/jest": "^29.5.12",
+    "axios": "^1.6.7",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2"
   }
 }

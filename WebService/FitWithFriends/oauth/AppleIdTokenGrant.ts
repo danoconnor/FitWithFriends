@@ -13,10 +13,12 @@ class AppleIdTokenGrant extends AbstractGrantType {
 
     handle(request: Request, client: Client): Promise<Token | Falsey> {
         if (!request.body.userId) {
+            console.error('Missing parameter: `userId`');
             throw new InvalidRequestError('Missing parameter: `userId`');
         }
     
         if (!request.body.idToken) {
+            console.error('Missing parameter: `idToken`');
             throw new InvalidRequestError('Missing parameter: `idToken`');
         }
     
@@ -28,6 +30,7 @@ class AppleIdTokenGrant extends AbstractGrantType {
         return validateAppleIdToken(userId, idToken)
             .then(validationSuccess => {
                 if (!validationSuccess) {
+                    console.error('Token validation failed');
                     throw new InvalidRequestError('Token validation failed');
                 }
     
@@ -52,6 +55,7 @@ class AppleIdTokenGrant extends AbstractGrantType {
         return Promise.all(fns)
             .then(([validatedScope, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt]) => {
                 if (validatedScope === false) {
+                    console.error('Invalid scope: Requested scope is invalid');
                     throw new InvalidRequestError('Invalid scope: Requested scope is invalid');
                 }
 

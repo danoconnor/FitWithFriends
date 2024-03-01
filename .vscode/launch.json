@@ -20,7 +20,7 @@
             "port": 9229,
             "address": "localhost",
             "localRoot": "${workspaceFolder}/WebService/FitWithFriends",
-            "remoteRoot": "/webservice-node-app",
+            "remoteRoot": "/app",
         }
     ]
 }
