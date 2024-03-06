@@ -27,8 +27,8 @@ const getUsersCompetitionsIR: any = {"usedParamSet":{"userId":true},"params":[{"
  * SELECT competition_id from users_competitions WHERE user_id = :userId!
  * ```
  */
-export function getUsersCompetitions(params: IGetUsersCompetitionsParams): Promise<IGetUsersCompetitionsResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function getUsersCompetitions(params: IGetUsersCompetitionsParams): Promise<Array<IGetUsersCompetitionsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const getUsersCompetitions = new pgtyped.PreparedQuery<IGetUsersCompetitionsParams,IGetUsersCompetitionsResult>(getUsersCompetitionsIR);
     return getUsersCompetitions.run(params, DatabaseConnectionPool);
   });
@@ -63,8 +63,8 @@ const createCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":tru
  * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!)
  * ```
  */
-export function createCompetition(params: ICreateCompetitionParams): Promise<ICreateCompetitionResult | ICreateCompetitionResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function createCompetition(params: ICreateCompetitionParams): Promise<Array<ICreateCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const createCompetition = new pgtyped.PreparedQuery<ICreateCompetitionParams,ICreateCompetitionResult>(createCompetitionIR);
     return createCompetition.run(params, DatabaseConnectionPool);
   });
@@ -96,8 +96,8 @@ const addUserToCompetitionIR: any = {"usedParamSet":{"userId":true,"competitionI
  * ON CONFLICT (user_id, competition_id) DO NOTHING
  * ```
  */
-export function addUserToCompetition(params: IAddUserToCompetitionParams): Promise<IAddUserToCompetitionResult | IAddUserToCompetitionResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function addUserToCompetition(params: IAddUserToCompetitionParams): Promise<Array<IAddUserToCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const addUserToCompetition = new pgtyped.PreparedQuery<IAddUserToCompetitionParams,IAddUserToCompetitionResult>(addUserToCompetitionIR);
     return addUserToCompetition.run(params, DatabaseConnectionPool);
   });
@@ -134,8 +134,8 @@ const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{
  * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId!
  * ```
  */
-export function getCompetition(params: IGetCompetitionParams): Promise<IGetCompetitionResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function getCompetition(params: IGetCompetitionParams): Promise<Array<IGetCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const getCompetition = new pgtyped.PreparedQuery<IGetCompetitionParams,IGetCompetitionResult>(getCompetitionIR);
     return getCompetition.run(params, DatabaseConnectionPool);
   });
@@ -173,8 +173,8 @@ const getCompetitionAdminDetailsIR: any = {"usedParamSet":{"competitionId":true,
  * SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!
  * ```
  */
-export function getCompetitionAdminDetails(params: IGetCompetitionAdminDetailsParams): Promise<IGetCompetitionAdminDetailsResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function getCompetitionAdminDetails(params: IGetCompetitionAdminDetailsParams): Promise<Array<IGetCompetitionAdminDetailsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const getCompetitionAdminDetails = new pgtyped.PreparedQuery<IGetCompetitionAdminDetailsParams,IGetCompetitionAdminDetailsResult>(getCompetitionAdminDetailsIR);
     return getCompetitionAdminDetails.run(params, DatabaseConnectionPool);
   });
@@ -205,8 +205,8 @@ const getNumUsersInCompetitionIR: any = {"usedParamSet":{"competitionId":true},"
  * SELECT count(user_id)::INTEGER FROM users_competitions WHERE competition_id = :competitionId!
  * ```
  */
-export function getNumUsersInCompetition(params: IGetNumUsersInCompetitionParams): Promise<IGetNumUsersInCompetitionResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function getNumUsersInCompetition(params: IGetNumUsersInCompetitionParams): Promise<Array<IGetNumUsersInCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const getNumUsersInCompetition = new pgtyped.PreparedQuery<IGetNumUsersInCompetitionParams,IGetNumUsersInCompetitionResult>(getNumUsersInCompetitionIR);
     return getNumUsersInCompetition.run(params, DatabaseConnectionPool);
   });
@@ -242,8 +242,8 @@ const getCompetitionDescriptionDetailsIR: any = {"usedParamSet":{"competitionId"
  * SELECT start_date, end_date, display_name, admin_user_id FROM competitions WHERE competition_id = :competitionId! AND access_token = :competitionAccessToken!
  * ```
  */
-export function getCompetitionDescriptionDetails(params: IGetCompetitionDescriptionDetailsParams): Promise<IGetCompetitionDescriptionDetailsResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function getCompetitionDescriptionDetails(params: IGetCompetitionDescriptionDetailsParams): Promise<Array<IGetCompetitionDescriptionDetailsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const getCompetitionDescriptionDetails = new pgtyped.PreparedQuery<IGetCompetitionDescriptionDetailsParams,IGetCompetitionDescriptionDetailsResult>(getCompetitionDescriptionDetailsIR);
     return getCompetitionDescriptionDetails.run(params, DatabaseConnectionPool);
   });
@@ -273,8 +273,8 @@ const deleteUserFromCompetitionIR: any = {"usedParamSet":{"userId":true,"competi
  * DELETE FROM users_competitions WHERE user_id = :userId! AND competition_id = :competitionId!
  * ```
  */
-export function deleteUserFromCompetition(params: IDeleteUserFromCompetitionParams): Promise<IDeleteUserFromCompetitionResult | IDeleteUserFromCompetitionResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function deleteUserFromCompetition(params: IDeleteUserFromCompetitionParams): Promise<Array<IDeleteUserFromCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const deleteUserFromCompetition = new pgtyped.PreparedQuery<IDeleteUserFromCompetitionParams,IDeleteUserFromCompetitionResult>(deleteUserFromCompetitionIR);
     return deleteUserFromCompetition.run(params, DatabaseConnectionPool);
   });
@@ -304,8 +304,8 @@ const updateCompetitionAccessTokenIR: any = {"usedParamSet":{"newAccessToken":tr
  * UPDATE competitions SET access_token = :newAccessToken! WHERE competition_id = :competitionId!
  * ```
  */
-export function updateCompetitionAccessToken(params: IUpdateCompetitionAccessTokenParams): Promise<IUpdateCompetitionAccessTokenResult | IUpdateCompetitionAccessTokenResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function updateCompetitionAccessToken(params: IUpdateCompetitionAccessTokenParams): Promise<Array<IUpdateCompetitionAccessTokenResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const updateCompetitionAccessToken = new pgtyped.PreparedQuery<IUpdateCompetitionAccessTokenParams,IUpdateCompetitionAccessTokenResult>(updateCompetitionAccessTokenIR);
     return updateCompetitionAccessToken.run(params, DatabaseConnectionPool);
   });
@@ -342,8 +342,8 @@ const getNumberOfActiveCompetitionsForUserIR: any = {"usedParamSet":{"userId":tr
  * WHERE end_date > :currentDate!
  * ```
  */
-export function getNumberOfActiveCompetitionsForUser(params: IGetNumberOfActiveCompetitionsForUserParams): Promise<IGetNumberOfActiveCompetitionsForUserResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function getNumberOfActiveCompetitionsForUser(params: IGetNumberOfActiveCompetitionsForUserParams): Promise<Array<IGetNumberOfActiveCompetitionsForUserResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const getNumberOfActiveCompetitionsForUser = new pgtyped.PreparedQuery<IGetNumberOfActiveCompetitionsForUserParams,IGetNumberOfActiveCompetitionsForUserResult>(getNumberOfActiveCompetitionsForUserIR);
     return getNumberOfActiveCompetitionsForUser.run(params, DatabaseConnectionPool);
   });
@@ -372,8 +372,8 @@ const deleteCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params"
  * DELETE FROM competitions WHERE competition_id = :competitionId!
  * ```
  */
-export function deleteCompetition(params: IDeleteCompetitionParams): Promise<IDeleteCompetitionResult | IDeleteCompetitionResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function deleteCompetition(params: IDeleteCompetitionParams): Promise<Array<IDeleteCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const deleteCompetition = new pgtyped.PreparedQuery<IDeleteCompetitionParams,IDeleteCompetitionResult>(deleteCompetitionIR);
     return deleteCompetition.run(params, DatabaseConnectionPool);
   });

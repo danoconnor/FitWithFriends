@@ -27,8 +27,8 @@ const registerPushTokenIR: any = {"usedParamSet":{"userId":true,"pushToken":true
  * ON CONFLICT (user_id, push_token, platform) DO NOTHING
  * ```
  */
-export function registerPushToken(params: IRegisterPushTokenParams): Promise<IRegisterPushTokenResult | IRegisterPushTokenResult[]> {
-  return import('@pgtyped/runtime').then((pgtyped) => {
+export function registerPushToken(params: IRegisterPushTokenParams): Promise<Array<IRegisterPushTokenResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
     const registerPushToken = new pgtyped.PreparedQuery<IRegisterPushTokenParams,IRegisterPushTokenResult>(registerPushTokenIR);
     return registerPushToken.run(params, DatabaseConnectionPool);
   });

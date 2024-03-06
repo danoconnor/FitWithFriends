@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "description": "FitWithFriends",
   "author": {

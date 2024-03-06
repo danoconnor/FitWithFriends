@@ -2,6 +2,7 @@
     "compilerOptions": {
         "skipLibCheck": true,
         "outDir": "./dist",
+        "esModuleInterop": true,
 
         /* Recommended settings from https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping  */
         "target": "ES2022",
