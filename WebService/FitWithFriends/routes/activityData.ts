@@ -18,12 +18,12 @@ router.post('/dailySummary', function (req, res) {
     const userId: string = res.locals.oauth.token.user.id;
 
     if (!dateStr || Number.isNaN(caloriesBurned) || Number.isNaN(caloriesGoal) || Number.isNaN(exerciseTime) || Number.isNaN(exerciseTimeGoal) || Number.isNaN(standTime) || Number.isNaN(standTimeGoal)) {
-        handleError(null, 400, 'Missing required parameter date', res);
+        handleError(null, 400, 'Missing required parameter', res);
         return;
     }
 
     const date = new Date(dateStr);
-    if (!date) {
+    if (isNaN(date.getTime())) {
         handleError(null, 400, 'Could not parse date', res);
         return;
     }

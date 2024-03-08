@@ -15,8 +15,6 @@ services:
       - PGDATABASE=${POSTGRES_DB}
       - PGUSESSL=0
       - FWF_AUTH_USE_LOCAL_KEYPAIR=1
-      - FWF_AUTH_PRIVATE_KEY_PATH=TestCerts/fwftest-key.pem
-      - FWF_AUTH_PUBLIC_KEY_PATH=TestCerts/fwftest.pem
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 10s

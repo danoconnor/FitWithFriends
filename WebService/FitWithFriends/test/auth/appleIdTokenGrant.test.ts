@@ -1,6 +1,7 @@
 import axios from 'axios';
-import * as TestSQL from './sql/testQueries.queries';
-import { convertUserIdToBuffer } from '../utilities/userHelpers';
+import * as TestSQL from '../sql/testQueries.queries';
+import * as RequestUtilities from '../testUtilities/testRequestUtilities';
+import { convertUserIdToBuffer } from '../../utilities/userHelpers';
 
 // The userId that will be created in the database during the test setup
 const testUserId = '123456';
@@ -18,6 +19,7 @@ beforeEach(async () => {
     } catch (error) {
         // Handle the error here
         console.log('Test setup failed: ' + error);
+        throw error;
     }
 });
 
@@ -67,17 +69,6 @@ test('Missing idToken', async () => {
 });
 
 async function makeOauthRequest(requestBody: any): Promise<axios.AxiosResponse<any, any>> {
-    try {
-        const response = await axios.post('http://localhost:3000/oauth/token', requestBody, 
-        {
-            headers: {
-                'Authorization': 'Basic NkE3NzNDMzItNUVCMy00MUM5LTgwMzYtQjk5MUI1MUYxNEY3OjExMjc5RUQ0LTI2ODctNDA4RC05QUU3LTIyQUIzQ0E0MTIxOQ==',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
-        return response;
-    } catch (error) {
-        return error.response;
-    }
+    return await RequestUtilities.makePostRequest('oauth/token', requestBody, undefined, 'application/x-www-form-urlencoded');
 }
 
