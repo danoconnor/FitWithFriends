@@ -42,5 +42,5 @@ afterEach(async () => {
 });
 
 test('Create competition happy path', async () => {
-
+    
 });

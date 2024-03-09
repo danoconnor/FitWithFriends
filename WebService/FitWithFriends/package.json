@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app",
-    "test": "tsc && jest -i --forceExit"
+    "test": "jest --forceExit"
   },
   "description": "FitWithFriends",
   "author": {

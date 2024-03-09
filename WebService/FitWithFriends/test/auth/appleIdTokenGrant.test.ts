@@ -8,11 +8,10 @@ import { convertUserIdToBuffer } from '../../utilities/userHelpers';
 */
 
 // The userId that will be created in the database during the test setup
-const testUserId = '123456';
+const testUserId = Math.random().toString().slice(2, 8);
 
 beforeEach(async () => {
     try {
-        await TestSQL.clearAllData();
         await TestSQL.createUser({
             userId: convertUserIdToBuffer(testUserId),
             firstName: 'Test',
@@ -21,10 +20,13 @@ beforeEach(async () => {
             createdDate: new Date()
         });
     } catch (error) {
-        // Handle the error here
         console.log('Test setup failed: ' + error);
         throw error;
     }
+});
+
+afterEach(async () => {
+    await TestSQL.clearDataForUser({ userId: convertUserIdToBuffer(testUserId) });
 });
 
 test('Happy path', async () => {
