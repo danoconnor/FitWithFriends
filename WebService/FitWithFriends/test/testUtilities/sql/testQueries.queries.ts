@@ -1,5 +1,5 @@
-/** Types generated for queries found in "test/sql/testQueries.sql" */
-import { DatabaseConnectionPool } from '../../utilities/database';
+/** Types generated for queries found in "test/testUtilities/sql/testQueries.sql" */
+import { DatabaseConnectionPool } from '../../../utilities/database';
 
 export type DateOrString = Date | string;
 
@@ -28,6 +28,68 @@ export function clearAllData(params: IClearAllDataParams): Promise<Array<IClearA
   return import('@pgtyped/runtime').then(pgtyped => {
     const clearAllData = new pgtyped.PreparedQuery<IClearAllDataParams,IClearAllDataResult>(clearAllDataIR);
     return clearAllData.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'ClearDataForUser' parameters type */
+export interface IClearDataForUserParams {
+  userId: Buffer;
+}
+
+/** 'ClearDataForUser' return type */
+export type IClearDataForUserResult = void;
+
+/** 'ClearDataForUser' query type */
+export interface IClearDataForUserQuery {
+  params: IClearDataForUserParams;
+  result: IClearDataForUserResult;
+}
+
+const clearDataForUserIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":188,"b":195}]}],"statement":"                                                                                                                                                         \nDELETE FROM users WHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ *                                                                                                                                                          
+ * DELETE FROM users WHERE user_id = :userId!
+ * ```
+ */
+export function clearDataForUser(params: IClearDataForUserParams): Promise<Array<IClearDataForUserResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const clearDataForUser = new pgtyped.PreparedQuery<IClearDataForUserParams,IClearDataForUserResult>(clearDataForUserIR);
+    return clearDataForUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'ClearDataForCompetition' parameters type */
+export interface IClearDataForCompetitionParams {
+  competitionId: string;
+}
+
+/** 'ClearDataForCompetition' return type */
+export type IClearDataForCompetitionResult = void;
+
+/** 'ClearDataForCompetition' query type */
+export interface IClearDataForCompetitionQuery {
+  params: IClearDataForCompetitionParams;
+  result: IClearDataForCompetitionResult;
+}
+
+const clearDataForCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":176,"b":190}]}],"statement":"                                                                                                                               \nDELETE FROM competitions WHERE competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ *                                                                                                                                
+ * DELETE FROM competitions WHERE competition_id = :competitionId!
+ * ```
+ */
+export function clearDataForCompetition(params: IClearDataForCompetitionParams): Promise<Array<IClearDataForCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const clearDataForCompetition = new pgtyped.PreparedQuery<IClearDataForCompetitionParams,IClearDataForCompetitionResult>(clearDataForCompetitionIR);
+    return clearDataForCompetition.run(params, DatabaseConnectionPool);
   });
 }
 
@@ -172,6 +234,75 @@ export function getActivitySummariesForUser(params: IGetActivitySummariesForUser
   return import('@pgtyped/runtime').then(pgtyped => {
     const getActivitySummariesForUser = new pgtyped.PreparedQuery<IGetActivitySummariesForUserParams,IGetActivitySummariesForUserResult>(getActivitySummariesForUserIR);
     return getActivitySummariesForUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'CreateCompetition' parameters type */
+export interface ICreateCompetitionParams {
+  accessToken: string;
+  adminUserId: Buffer;
+  competitionId: string;
+  displayName: string;
+  endDate: DateOrString;
+  ianaTimezone: string;
+  startDate: DateOrString;
+}
+
+/** 'CreateCompetition' return type */
+export type ICreateCompetitionResult = void;
+
+/** 'CreateCompetition' query type */
+export interface ICreateCompetitionQuery {
+  params: ICreateCompetitionParams;
+  result: ICreateCompetitionResult;
+}
+
+const createCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":131,"b":141}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":144,"b":152}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":155,"b":167}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":170,"b":182}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":185,"b":197}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":200,"b":213}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":216,"b":230}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) \nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) 
+ * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!)
+ * ```
+ */
+export function createCompetition(params: ICreateCompetitionParams): Promise<Array<ICreateCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const createCompetition = new pgtyped.PreparedQuery<ICreateCompetitionParams,ICreateCompetitionResult>(createCompetitionIR);
+    return createCompetition.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'AddUserToCompetition' parameters type */
+export interface IAddUserToCompetitionParams {
+  competitionId: string;
+  userId: Buffer;
+}
+
+/** 'AddUserToCompetition' return type */
+export type IAddUserToCompetitionResult = void;
+
+/** 'AddUserToCompetition' query type */
+export interface IAddUserToCompetitionQuery {
+  params: IAddUserToCompetitionParams;
+  result: IAddUserToCompetitionResult;
+}
+
+const addUserToCompetitionIR: any = {"usedParamSet":{"userId":true,"competitionId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":65,"b":72}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":75,"b":89}]}],"statement":"INSERT INTO users_competitions (user_id, competition_id)\nVALUES (:userId!, :competitionId!)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO users_competitions (user_id, competition_id)
+ * VALUES (:userId!, :competitionId!)
+ * ```
+ */
+export function addUserToCompetition(params: IAddUserToCompetitionParams): Promise<Array<IAddUserToCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const addUserToCompetition = new pgtyped.PreparedQuery<IAddUserToCompetitionParams,IAddUserToCompetitionResult>(addUserToCompetitionIR);
+    return addUserToCompetition.run(params, DatabaseConnectionPool);
   });
 }
 

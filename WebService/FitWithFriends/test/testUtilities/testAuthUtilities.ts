@@ -1,6 +1,7 @@
 import * as RequestUtilities from './testRequestUtilities';
-import * as TestSQL from '../sql/testQueries.queries';
+import * as TestSQL from './sql/testQueries.queries';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
+import { randomBytes } from 'crypto';
 
 /** The clientId that is setup by default in the SetupTestData.sql file */
 export const defaultClientId = "6a773c32-5eb3-41c9-8036-b991b51f14f7";
@@ -8,7 +9,8 @@ export const defaultClientId = "6a773c32-5eb3-41c9-8036-b991b51f14f7";
 /**  Expects that the user has already been created */
 export async function getAccessTokenForUser(userId: string): Promise<string> {
     // Add a new refresh token in the database, then use it to get an access token
-    const refreshToken = 'test_refresh_token';
+    const refreshToken = randomBytes(4).toString('hex');
+
     const now = new Date();
     await TestSQL.createRefreshToken({
         userId: convertUserIdToBuffer(userId),

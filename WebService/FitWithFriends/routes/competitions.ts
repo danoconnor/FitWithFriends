@@ -102,8 +102,6 @@ router.post('/join', function (req, res) {
         return;
     }
 
-    const userId: string = res.locals.oauth.token.user.id;
-
     // Find matching competition and validate access token
     CompetitionQueries.getCompetitionDescriptionDetails({ competitionAccessToken: accessToken, competitionId })
         .then((result) => {

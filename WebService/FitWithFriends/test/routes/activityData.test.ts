@@ -1,15 +1,17 @@
-import * as TestSQL from './sql/testQueries.queries';
-import * as RequestUtilities from './testUtilities/testRequestUtilities';
-import * as AuthUtilities from './testUtilities/testAuthUtilities';
-import { convertUserIdToBuffer } from './../utilities/userHelpers';
-import { couldStartTrivia } from 'typescript';
+import * as TestSQL from '../testUtilities/sql/testQueries.queries';
+import * as RequestUtilities from '../testUtilities/testRequestUtilities';
+import * as AuthUtilities from '../testUtilities/testAuthUtilities';
+import { convertUserIdToBuffer } from '../../utilities/userHelpers';
+
+/*
+    Tests the /activityData routes
+*/
 
 // The userId that will be created in the database during the test setup
-const testUserId = '123456';
+const testUserId = Math.random().toString().slice(2, 8);
 
 beforeEach(async () => {
     try {
-        await TestSQL.clearAllData();
         await TestSQL.createUser({
             userId: convertUserIdToBuffer(testUserId),
             firstName: 'Test',
@@ -24,9 +26,12 @@ beforeEach(async () => {
     }
 });
 
+afterEach(async () => {
+    await TestSQL.clearDataForUser({ userId: convertUserIdToBuffer(testUserId) });
+});
+
 test('Add activityData happy path', async () => {
-    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const expectedData = {
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
@@ -34,10 +39,19 @@ test('Add activityData happy path', async () => {
         exerciseTimeGoal: 30,
         standTime: 10,
         standTimeGoal: 12
-    },
-    token);
+    };
 
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', expectedData, token);
     expect(response.status).toBe(200);
+    
+    // Validate that the data was inserted into the database
+    const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
+    expect(activityDatas.length).toBe(1);
+
+    const activityData = activityDatas[0];
+    expect(activityData).not.toBeUndefined();
+    compareActivityDataResultToExpected(activityData, expectedData);
 });
 
 test('Add activityData update data for existing date', async () => {
@@ -75,19 +89,14 @@ test('Add activityData update data for existing date', async () => {
     expect(activityDatas.length).toBe(1);
     
     const activityData = activityDatas[0];
-    expect(activityData.calories_burned).toBe(newUpdateData.activeCaloriesBurned);
-    expect(activityData.calories_goal).toBe(newUpdateData.activeCaloriesGoal);
-    expect(activityData.exercise_time).toBe(newUpdateData.exerciseTime);
-    expect(activityData.exercise_time_goal).toBe(newUpdateData.exerciseTimeGoal);
-    expect(activityData.stand_time).toBe(newUpdateData.standTime);
-    expect(activityData.stand_time_goal).toBe(newUpdateData.standTimeGoal);
+    compareActivityDataResultToExpected(activityData, newUpdateData);
 });
 
 test('Add activityData for multiple days', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
 
     // Insert the data for the first day
-    const firstDayData = {
+    const firstDayExpectedData = {
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
@@ -96,11 +105,11 @@ test('Add activityData for multiple days', async () => {
         standTime: 10,
         standTimeGoal: 12
     };
-    var response = await RequestUtilities.makePostRequest('activityData/dailySummary', firstDayData, token);
+    var response = await RequestUtilities.makePostRequest('activityData/dailySummary', firstDayExpectedData, token);
     expect(response.status).toBe(200);
 
     // Insert the data for the second day
-    const secondDayData = {
+    const secondDayExpectedData = {
         date: '2021-01-02',
         activeCaloriesBurned: 200,
         activeCaloriesGoal: 600,
@@ -109,32 +118,20 @@ test('Add activityData for multiple days', async () => {
         standTime: 20,
         standTimeGoal: 24
     };
-    response = await RequestUtilities.makePostRequest('activityData/dailySummary', secondDayData, token);
+    response = await RequestUtilities.makePostRequest('activityData/dailySummary', secondDayExpectedData, token);
     expect(response.status).toBe(200);
 
     // Validate that the data was inserted into the database
     const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
     expect(activityDatas.length).toBe(2);
 
-    console.log(activityDatas[0].date.getDate());
-    console.log(new Date(firstDayData.date).getDate());
-    const firstDayActivityData = activityDatas.find(x => x.date.getUTCDate() === new Date(firstDayData.date).getUTCDate());
-    expect(firstDayActivityData).not.toBeUndefined();
-    expect(firstDayActivityData.calories_burned).toBe(firstDayData.activeCaloriesBurned);
-    expect(firstDayActivityData.calories_goal).toBe(firstDayData.activeCaloriesGoal);
-    expect(firstDayActivityData.exercise_time).toBe(firstDayData.exerciseTime);
-    expect(firstDayActivityData.exercise_time_goal).toBe(firstDayData.exerciseTimeGoal);
-    expect(firstDayActivityData.stand_time).toBe(firstDayData.standTime);
-    expect(firstDayActivityData.stand_time_goal).toBe(firstDayData.standTimeGoal);
+    const firstDayActivityDataResult = activityDatas.find(x => x.date.getUTCDate() === new Date(firstDayExpectedData.date).getUTCDate());
+    expect(firstDayActivityDataResult).not.toBeUndefined();
+    compareActivityDataResultToExpected(firstDayActivityDataResult, firstDayExpectedData);
     
-    const secondDayActivityData = activityDatas.find(x => x.date.getUTCDate() === new Date(secondDayData.date).getUTCDate());
-    expect(secondDayActivityData).not.toBeUndefined();
-    expect(secondDayActivityData.calories_burned).toBe(secondDayData.activeCaloriesBurned);
-    expect(secondDayActivityData.calories_goal).toBe(secondDayData.activeCaloriesGoal);
-    expect(secondDayActivityData.exercise_time).toBe(secondDayData.exerciseTime);
-    expect(secondDayActivityData.exercise_time_goal).toBe(secondDayData.exerciseTimeGoal);
-    expect(secondDayActivityData.stand_time).toBe(secondDayData.standTime);
-    expect(secondDayActivityData.stand_time_goal).toBe(secondDayData.standTimeGoal);
+    const secondDayActivityDataResult = activityDatas.find(x => x.date.getUTCDate() === new Date(secondDayExpectedData.date).getUTCDate());
+    expect(secondDayActivityDataResult).not.toBeUndefined();
+    compareActivityDataResultToExpected(secondDayActivityDataResult, secondDayExpectedData);
 });
 
 test('Add activityData missing token', async () => {
@@ -280,3 +277,14 @@ test('Add activityData invalid date', async () => {
     expect(response.status).toBe(400);
     expect(response.data.context).toContain('Could not parse date');
 });
+
+// Helpers
+
+function compareActivityDataResultToExpected(result: TestSQL.IGetActivitySummariesForUserResult, expected: any) {
+    expect(result.calories_burned).toBe(expected.activeCaloriesBurned);
+    expect(result.calories_goal).toBe(expected.activeCaloriesGoal);
+    expect(result.exercise_time).toBe(expected.exerciseTime);
+    expect(result.exercise_time_goal).toBe(expected.exerciseTimeGoal);
+    expect(result.stand_time).toBe(expected.standTime);
+    expect(result.stand_time_goal).toBe(expected.standTimeGoal);
+}

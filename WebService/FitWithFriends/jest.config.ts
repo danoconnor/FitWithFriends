@@ -9,7 +9,7 @@ const config: Config.InitialOptions = {
     testPathIgnorePatterns: [
         '/node_modules/',
         '/dist/',
-    ],
+    ]
 };
 
 export default config;

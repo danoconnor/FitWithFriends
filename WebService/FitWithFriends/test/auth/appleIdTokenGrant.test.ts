@@ -1,7 +1,11 @@
 import axios from 'axios';
-import * as TestSQL from '../sql/testQueries.queries';
+import * as TestSQL from '../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../testUtilities/testRequestUtilities';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
+
+/*
+    Tests the Apple idToken grant
+*/
 
 // The userId that will be created in the database during the test setup
 const testUserId = '123456';

@@ -1,22 +1,20 @@
-import { convertUserIdToBuffer } from "../utilities/userHelpers";
-import * as TestSQL from "./sql/testQueries.queries";
-import * as RequestUtilities from "./testUtilities/testRequestUtilities";
+import { convertUserIdToBuffer } from "../../utilities/userHelpers";
+import * as TestSQL from "../testUtilities/sql/testQueries.queries";
+import * as RequestUtilities from "../testUtilities/testRequestUtilities";
 
-beforeEach(async () => {
-    try {
-        await TestSQL.clearAllData();
-    } catch (error) {
-        // Handle the error here
-        console.log('Test setup failed: ' + error);
-        throw error;
-    }
+/*
+    Tests the /users routes
+*/
+
+// The ID we get from Apple has '.' chars in it, which are removed when we store it in the database
+const appleUserId = '002261.d372c8cb204940c02479ef472f717857.2341';
+const expectedUserId = appleUserId.replaceAll('.', '');
+
+afterEach(async () => {
+    await TestSQL.clearDataForUser({ userId: convertUserIdToBuffer(expectedUserId) });
 });
 
 test('userFromAppleID happy path', async () => {
-    // The ID we get from Apple has '.' chars in it, which are removed when we store it in the database
-    const appleUserId = '002261.d372c8cb204940c02479ef472f717857.2341';
-    const expectedUserId = appleUserId.replaceAll('.', '');
-
     const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
         userId: appleUserId,
         firstName: 'Test',
@@ -44,7 +42,7 @@ test('userFromAppleID missing userId', async () => {
 
 test('userFromAppleID missing firstName', async () => {
     const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
-        userId: '002261.d372c8cb204940c02479ef472f717857.2341',
+        userId: appleUserId,
         lastName: 'User',
         idToken: 'some_token'
     });
@@ -55,7 +53,7 @@ test('userFromAppleID missing firstName', async () => {
 
 test('userFromAppleID missing lastName', async () => {
     const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
-        userId: '002261.d372c8cb204940c02479ef472f717857.2341',
+        userId: appleUserId,
         firstName: 'Test',
         idToken: 'some_token'
     });
@@ -66,7 +64,7 @@ test('userFromAppleID missing lastName', async () => {
 
 test('userFromAppleID missing idToken', async () => {
     const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
-        userId: '002261.d372c8cb204940c02479ef472f717857.2341',
+        userId: appleUserId,
         firstName: 'Test',
         lastName: 'User'
     });
@@ -89,7 +87,7 @@ test('userFromAppleID userId too long', async () => {
 
 test('userFromAppleID firstName too long', async () => {
     const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
-        userId: '002261.d372c8cb204940c02479ef472f717857.2341',
+        userId: appleUserId,
         firstName: 'a'.repeat(256),
         lastName: 'User',
         idToken: 'some_token'
@@ -101,7 +99,7 @@ test('userFromAppleID firstName too long', async () => {
 
 test('userFromAppleID lastName too long', async () => {
     const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
-        userId: '002261.d372c8cb204940c02479ef472f717857.2341',
+        userId: appleUserId,
         firstName: 'Test',
         lastName: 'a'.repeat(256),
         idToken: 'some_token'
@@ -113,7 +111,7 @@ test('userFromAppleID lastName too long', async () => {
 
 test('userFromAppleID idToken too long', async () => {
     const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
-        userId: '002261.d372c8cb204940c02479ef472f717857.2341',
+        userId: appleUserId,
         firstName: 'Test',
         lastName: 'User',
         idToken: 'a'.repeat(256)

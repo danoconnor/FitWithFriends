@@ -1,15 +1,17 @@
-import axios from 'axios';
-import * as TestSQL from '../sql/testQueries.queries';
+import * as TestSQL from '../testUtilities/sql/testQueries.queries';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
 import * as RequestUtilities from '../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../testUtilities/testAuthUtilities';
 
+/*
+    Tests the refresh token grant
+*/
+
 // The userId that will be created in the database during the test setup
-const testUserId = '123456';
+const testUserId = Math.random().toString().slice(2, 8);
 
 beforeEach(async () => {
     try {
-        await TestSQL.clearAllData();
         await TestSQL.createUser({
             userId: convertUserIdToBuffer(testUserId),
             firstName: 'Test',
@@ -18,13 +20,18 @@ beforeEach(async () => {
             createdDate: new Date()
         });
     } catch (error) {
-        // Handle the error here
         console.log('Test setup failed: ' + error);
         throw error;
     }
 });
 
+afterEach(async () => {
+    await TestSQL.clearDataForUser({ userId: convertUserIdToBuffer(testUserId) });
+});
+
+
 test('Happy path', async () => {
+    // Create a refresh token in the database
     const refreshToken = 'SomeRefreshToken';
     let currentDate = new Date();
     await TestSQL.createRefreshToken({
@@ -34,6 +41,7 @@ test('Happy path', async () => {
         clientId: AuthUtilities.defaultClientId
     });
 
+    // Request a new access token using the refresh token
     const response = await RequestUtilities.makePostRequest('oauth/token', {
         grant_type: 'refresh_token',
         refresh_token: refreshToken
@@ -63,6 +71,7 @@ test('Nonexistent refreshToken', async () => {
 });
 
 test('Expired refreshToken', async () => {
+    // Create a refresh token in the database that has expired already
     const refreshToken = 'SomeRefreshToken';
     let currentDate = new Date();
     await TestSQL.createRefreshToken({
@@ -72,6 +81,7 @@ test('Expired refreshToken', async () => {
         clientId: AuthUtilities.defaultClientId
     });
 
+    // Attempt to request a new access token using the expired refresh token
     const response = await RequestUtilities.makePostRequest('oauth/token', {
         grant_type: 'refresh_token',
         refresh_token: refreshToken

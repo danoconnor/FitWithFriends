@@ -4,7 +4,7 @@ import { SecretClient } from '@azure/keyvault-secrets';
 import cryptoHelpers = require('../utilities/cryptoHelpers');
 import jwt = require('jsonwebtoken');
 import util = require('util');
-import { RequestAuthenticationModel, RefreshTokenModel, ExtensionModel, Client, Falsey, Token, User, RefreshToken } from '@node-oauth/oauth2-server';
+import { RequestAuthenticationModel, RefreshTokenModel, ExtensionModel, Client, Falsey, Token, User, RefreshToken, UnauthorizedRequestError } from '@node-oauth/oauth2-server';
 import * as OauthQueries from '../sql/oauth.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
 
@@ -160,7 +160,7 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
 
             jwt.verify(accessToken, this.accessTokenPublicKeyPem, verificationOptions, function (error, decoded) {
                 if (error) {
-                    reject(error);
+                    reject(new UnauthorizedRequestError(error.message));
                     return;
                 }
 

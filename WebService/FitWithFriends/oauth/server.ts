@@ -1,6 +1,6 @@
 import ExpressOAuthServer from '@node-oauth/express-oauth-server';
 import AppleIdTokenGrant from './AppleIdTokenGrant'
-import AuthenticationModel from './model';
+import AuthenticationModel from './oauthModel';
 
 // Note: our custom apple_id_token grant type replaces the password grant
 // because our app currently only supports Sign-In With Apple authentication
