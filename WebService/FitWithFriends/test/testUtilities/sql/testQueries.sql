@@ -29,3 +29,9 @@ VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ia
 /* @name AddUserToCompetition */
 INSERT INTO users_competitions (user_id, competition_id)
 VALUES (:userId!, :competitionId!);
+
+/* @name GetCompetition */
+SELECT * FROM competitions WHERE competition_id = :competitionId!;
+
+/* @name GetUsersInCompetition */
+SELECT * FROM users_competitions WHERE competition_id = :competitionId!;

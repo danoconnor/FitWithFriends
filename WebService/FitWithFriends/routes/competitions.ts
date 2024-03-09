@@ -4,7 +4,6 @@ import express = require('express');
 const router = express.Router();
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
 import { handleError } from '../utilities/errorHelpers';
-import { DatabaseConnectionPool } from '../utilities/database';
 import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../utilities/FWFErrorCodes';
 import * as ActivitySummariesQueries from '../sql/activitySummaries.queries';
@@ -40,6 +39,16 @@ router.post('/', function (req, res) {
 
     if (!startDate || !endDate || !displayName || !timezone) {
         handleError(null, 400, 'Missing required parameter', res);
+        return;
+    }
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        handleError(null, 400, 'Invalid date format', res);
+        return;
+    }
+
+    if (endDate < new Date()) {
+        handleError(null, 400, 'End date must be in the future', res);
         return;
     }
 

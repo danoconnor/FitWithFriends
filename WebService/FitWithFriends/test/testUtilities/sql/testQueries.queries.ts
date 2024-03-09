@@ -307,3 +307,74 @@ export function addUserToCompetition(params: IAddUserToCompetitionParams): Promi
 }
 
 
+/** 'GetCompetition' parameters type */
+export interface IGetCompetitionParams {
+  competitionId: string;
+}
+
+/** 'GetCompetition' return type */
+export interface IGetCompetitionResult {
+  access_token: string;
+  admin_user_id: Buffer;
+  competition_id: string;
+  display_name: string;
+  end_date: Date;
+  iana_timezone: string;
+  start_date: Date;
+}
+
+/** 'GetCompetition' query type */
+export interface IGetCompetitionQuery {
+  params: IGetCompetitionParams;
+  result: IGetCompetitionResult;
+}
+
+const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":50,"b":64}]}],"statement":"SELECT * FROM competitions WHERE competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT * FROM competitions WHERE competition_id = :competitionId!
+ * ```
+ */
+export function getCompetition(params: IGetCompetitionParams): Promise<Array<IGetCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getCompetition = new pgtyped.PreparedQuery<IGetCompetitionParams,IGetCompetitionResult>(getCompetitionIR);
+    return getCompetition.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetUsersInCompetition' parameters type */
+export interface IGetUsersInCompetitionParams {
+  competitionId: string;
+}
+
+/** 'GetUsersInCompetition' return type */
+export interface IGetUsersInCompetitionResult {
+  competition_id: string;
+  user_id: Buffer;
+}
+
+/** 'GetUsersInCompetition' query type */
+export interface IGetUsersInCompetitionQuery {
+  params: IGetUsersInCompetitionParams;
+  result: IGetUsersInCompetitionResult;
+}
+
+const getUsersInCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":56,"b":70}]}],"statement":"SELECT * FROM users_competitions WHERE competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT * FROM users_competitions WHERE competition_id = :competitionId!
+ * ```
+ */
+export function getUsersInCompetition(params: IGetUsersInCompetitionParams): Promise<Array<IGetUsersInCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getUsersInCompetition = new pgtyped.PreparedQuery<IGetUsersInCompetitionParams,IGetUsersInCompetitionResult>(getUsersInCompetitionIR);
+    return getUsersInCompetition.run(params, DatabaseConnectionPool);
+  });
+}
+
+
