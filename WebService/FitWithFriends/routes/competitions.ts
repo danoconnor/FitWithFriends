@@ -298,7 +298,6 @@ router.post('/description', function (req, res) {
             const numMembers = usersCompetitionsResult[0].count;
 
             // Find the display name of the competition admin so we can include it in the response
-            // Don't need to use \x with admin_user_id because it comes from the previous query and is already in hex format
             UserQueries.getUserName({ userId: competitionInfo.admin_user_id })
                 .then(adminNameResult => {
                     if (!adminNameResult.length) {

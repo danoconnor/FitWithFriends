@@ -244,6 +244,9 @@ test('Create competition too many active competitions', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(oneCompUserId);
     const response1 = await RequestUtilities.makePostRequest('competitions', competitionInfo1, accessToken);
     expect(response1.status).toBe(200);
+    expect(response1.data).toHaveProperty('competition_id');
+    const createdCompetitionId: string = response1.data.competition_id;
+    competitionsToCleanup.push(createdCompetitionId);
 
     // Create a second competition. This one should fail because the user is at the limit
     const competitionInfo2 = {
@@ -254,7 +257,6 @@ test('Create competition too many active competitions', async () => {
     };
 
     const response2 = await RequestUtilities.makePostRequest('competitions', competitionInfo2, accessToken);
-    console.log(response2);
     expect(response2.status).toBe(400);
     expect(response2.data.context).toContain('User is not eligible to join a new competition');
     expect(response2.data.custom_error_code).toEqual(FWFErrorCodes.CompetitionErrorCodes.TooManyActiveCompetitions);

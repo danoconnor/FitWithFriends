@@ -193,8 +193,6 @@ test('Get users competitions: only authenticated users competitions returned', a
     expect(response2.data).toContain(competitionInfoBothUsers.competitionId);
 });
 
-
-
 // Helpers
 
 async function createCompetitionWithUser(competitionInfo: TestSQL.ICreateCompetitionParams, userId: string) {
