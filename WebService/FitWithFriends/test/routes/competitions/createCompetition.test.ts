@@ -5,7 +5,7 @@ import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities
 import FWFErrorCodes from '../../../utilities/FWFErrorCodes';
 
 /*
-    Tests the /competitions route for getting the user's competitions
+    Tests the /competitions route for creating a new competition
 */
 
 // The userId that will be created in the database during the test setup

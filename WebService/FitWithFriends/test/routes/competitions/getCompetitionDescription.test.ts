@@ -5,7 +5,7 @@ import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities
 import { v4 as uuid } from 'uuid';
 
 /*
-    Tests the /competitions route for getting the user's competitions
+    Tests the /competitions/description route for getting the details of a competition
 */
 
 // The userId that will be created in the database during the test setup
