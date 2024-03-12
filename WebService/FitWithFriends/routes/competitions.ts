@@ -153,16 +153,63 @@ router.post('/leave', function (req, res) {
     const targetUserId: string = req.body['userId'];
     const competitionId: string = req.body['competitionId'];
     if (!targetUserId || !competitionId) {
-        handleError(null, 404, 'Missing required param', res);
+        handleError(null, 400, 'Missing required param', res);
         return;
     }
 
-    if (targetUserId === res.locals.oauth.token.user.id) {
-        selfRemoveUser(res, targetUserId, competitionId);
-    } else {
-        // This func will validate that the current user is the admin of the competition
-        adminRemoveUser(res, targetUserId, competitionId);
-    }
+    // Get the admin user ID for the competition
+    CompetitionQueries.getCompetition({ competitionId })
+        .then(competitionResult => {
+            if (!competitionResult.length) {
+                handleError(null, 404, 'Could not find competition info', res);
+                return;
+            }
+
+            const adminUserId = convertBufferToUserId(competitionResult[0].admin_user_id);
+            if (targetUserId === adminUserId) {
+                // If the admin user leaves the competition then nobody has the power
+                // to add new users or delete the competition
+                // So we do not allow the admin to leave the competition (they must delete the competition instead)
+                handleError(null, 400, 'Admin user cannot leave competition', res);
+                return;
+            }
+
+            const authenticatedUserId = res.locals.oauth.token.user.id;
+            const isUserAdmin = authenticatedUserId === adminUserId;
+            const isUserSelf = authenticatedUserId === targetUserId;
+            
+            // Admins can remove anyone, but normal users can only remove themselves
+            const canRemoveTargetUser = isUserAdmin || isUserSelf;
+            if (!canRemoveTargetUser) {
+                handleError(null, 401, 'User is not authorized to remove target user', res);
+                return;
+            }
+
+            CompetitionQueries.deleteUserFromCompetition({ userId: convertUserIdToBuffer(targetUserId), competitionId })
+                .then(_result => {
+                    if (isUserSelf) {
+                        res.sendStatus(200);
+                        return;
+                    }
+
+                    // If the admin removed another user, then we need to change the competition access token
+                    // so the removed user cannot rejoin the competition
+                    const newAccessToken = cryptoHelpers.getRandomToken();
+                    CompetitionQueries.updateCompetitionAccessToken({ competitionId, newAccessToken })
+                        .then(_updateResult => {
+                            res.sendStatus(200);
+                        })
+                        .catch(error => {
+                            handleError(error, 500, 'Failed to update competition token after removing user', res);
+                        });
+                })
+                .catch(error => {
+                    handleError(error, 500, 'Error removing user from competition', res);
+                });
+        })
+        .catch(error => {
+            handleError(error, 500, 'Error getting competition info', res);
+        });
 });
 
 // Returns an overview of the given competition that contains a list of users and their current points for the competition
@@ -388,60 +435,11 @@ export default router;
 
 // Helper functions
 
-// Called when the admin of the competition is removing another user from the competition
-function adminRemoveUser(res: express.Response<any>, targetUserId: string, competitionId: string) {
-    // Need to check that the current user is the admin of the competition
-    const authenticatedUserId = res.locals.oauth.token.user.id;
-    CompetitionQueries.getCompetitionAdminDetails({ competitionId, adminUserId: convertUserIdToBuffer(authenticatedUserId) })
-        .then(adminDetailsResult => {
-            if (!adminDetailsResult.length) {
-                handleError(null, 401, 'User is trying to remove someone other than self and is not admin', res);
-                return;
-            }
-
-            CompetitionQueries.deleteUserFromCompetition({ userId: convertUserIdToBuffer(targetUserId), competitionId })
-                .then(_deleteResult => {
-                    // Once the user is deleted, we need to change the competition access token so the removed user can't automatically re-join
-                    const newAccessToken = cryptoHelpers.getRandomToken();
-                    CompetitionQueries.updateCompetitionAccessToken({ competitionId, newAccessToken })
-                        .then(_updateResult => {
-                            res.sendStatus(200);
-                        })
-                        .catch(error => {
-                            handleError(error, 500, 'Failed to update competition token after removing user', res);
-                        });
-                })
-                .catch(error => {
-                    handleError(error, 500, 'Error deleting user from competition as admin', res);
-                });
-        })
-        .catch(error => {
-            handleError(error, 500, 'Error getting competition info', res);
-        });
-}
-
-// Called when a user is trying to remove theirself from the competition
-function selfRemoveUser(res: express.Response<any>, targetUserId: string, competitionId: string) {
-    const authenticatedUserId = res.locals.oauth.token.user.id;
-    if (targetUserId !== authenticatedUserId) {
-        handleError(null, 401, 'User is trying to remove someone other than self', res);
-        return;
-    }
-
-    CompetitionQueries.deleteUserFromCompetition({ userId: convertUserIdToBuffer(authenticatedUserId), competitionId })
-        .then(_result => {
-            res.sendStatus(200);
-        })
-        .catch(error => {
-            handleError(error, 500, 'Error with user removing self from competition', res);
-        });
-}
-
 // Checks that the user is under the max number of allowed active competitions
 // Returns a Promise that will continue if the user user is allowed to join a new competition
 // If the user cannot join a competition, then an error will be thrown
 // Expects a hex-formated user ID as a parameter
-function validateCompetitionCountLimit(userId: string) {
+function validateCompetitionCountLimit(userId: string): Promise<void> {
     // TODO: handle timezones for active competition count
     const currentDate = new Date();
     const userIdBuffer = convertUserIdToBuffer(userId);
