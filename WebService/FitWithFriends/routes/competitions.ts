@@ -384,7 +384,7 @@ router.get('/:competitionId/adminDetail', function (req, res) {
     CompetitionQueries.getCompetitionAdminDetails({ competitionId, adminUserId: convertUserIdToBuffer(userId) })
         .then(result => {
             if (!result.length) {
-                handleError(null, 401, 'Competition not found or user is not admin', res);
+                handleError(null, 404, 'Competition not found or user is not admin', res);
                 return;
             }
 
