@@ -42,6 +42,11 @@ router.post('/', function (req, res) {
         return;
     }
 
+    if (displayName.length > 255) {
+        handleError(null, 400, 'Display name is too long', res);
+        return;
+    }
+
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
         handleError(null, 400, 'Invalid date format', res);
         return;
@@ -168,7 +173,7 @@ router.get('/:competitionId/overview', function (req, res) {
     const timezoneParam = req.query['timezone']?.toString();
     const competitionId: string = req.params.competitionId;
     if (!timezoneParam || !allIANATimezones.includes(timezoneParam)) {
-        handleError(null, 400, 'Invalid timezone query param', res);
+        handleError(null, 400, 'Invalid timezone query param: ' + timezoneParam, res);
         return;
     }
 

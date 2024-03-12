@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "node dist/app",
-    "test": "jest --forceExit"
+    "start": "TZ='America/New_York' node dist/app",
+    "test": "TZ='America/New_York' jest --forceExit"
   },
   "description": "FitWithFriends",
   "author": {

@@ -261,3 +261,19 @@ test('Create competition too many active competitions', async () => {
     expect(response2.data.context).toContain('User is not eligible to join a new competition');
     expect(response2.data.custom_error_code).toEqual(FWFErrorCodes.CompetitionErrorCodes.TooManyActiveCompetitions);
 });
+
+test('Create competition: display name is too long', async () => {
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7), // 7 days from now
+        displayName: 'a'.repeat(300), // The limit is 255 characters
+        ianaTimezone: 'America/New_York'
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+
+    expect(response.status).toBe(400);
+    expect(response.data.context).toContain('Display name is too long');
+});
