@@ -40,3 +40,6 @@ SELECT * FROM competitions WHERE competition_id = :competitionId!;
 
 /* @name GetUsersInCompetition */
 SELECT * FROM users_competitions WHERE competition_id = :competitionId!;
+
+/* @name GetPushTokenForUser */
+SELECT * FROM push_tokens WHERE user_id = :userId!;

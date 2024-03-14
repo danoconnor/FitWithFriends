@@ -417,3 +417,38 @@ export function getUsersInCompetition(params: IGetUsersInCompetitionParams): Pro
 }
 
 
+/** 'GetPushTokenForUser' parameters type */
+export interface IGetPushTokenForUserParams {
+  userId: Buffer;
+}
+
+/** 'GetPushTokenForUser' return type */
+export interface IGetPushTokenForUserResult {
+  app_install_id: string;
+  platform: number;
+  push_token: string;
+  user_id: Buffer;
+}
+
+/** 'GetPushTokenForUser' query type */
+export interface IGetPushTokenForUserQuery {
+  params: IGetPushTokenForUserParams;
+  result: IGetPushTokenForUserResult;
+}
+
+const getPushTokenForUserIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":42,"b":49}]}],"statement":"SELECT * FROM push_tokens WHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT * FROM push_tokens WHERE user_id = :userId!
+ * ```
+ */
+export function getPushTokenForUser(params: IGetPushTokenForUserParams): Promise<Array<IGetPushTokenForUserResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getPushTokenForUser = new pgtyped.PreparedQuery<IGetPushTokenForUserParams,IGetPushTokenForUserResult>(getPushTokenForUserIR);
+    return getPushTokenForUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+

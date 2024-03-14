@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.2 (Homebrew)
+-- Dumped from database version 16.2 (Debian 16.2-1.pgdg120+2)
 -- Dumped by pg_dump version 16.0
 
--- Started on 2024-02-28 21:38:11 EST
+-- Started on 2024-03-13 21:13:16 EDT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -18,31 +18,12 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- TOC entry 5 (class 2615 OID 2200)
--- Name: public; Type: SCHEMA; Schema: -; Owner: pg_database_owner
---
-
--- CREATE SCHEMA public;
-
-
--- ALTER SCHEMA public OWNER TO pg_database_owner;
-
---
--- TOC entry 3664 (class 0 OID 0)
--- Dependencies: 5
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: pg_database_owner
---
-
--- COMMENT ON SCHEMA public IS 'standard public schema';
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- TOC entry 215 (class 1259 OID 16391)
+-- TOC entry 215 (class 1259 OID 16385)
 -- Name: activity_summaries; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -61,7 +42,7 @@ CREATE TABLE public.activity_summaries (
 ALTER TABLE public.activity_summaries OWNER TO postgres;
 
 --
--- TOC entry 216 (class 1259 OID 16396)
+-- TOC entry 216 (class 1259 OID 16390)
 -- Name: competitions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -79,7 +60,7 @@ CREATE TABLE public.competitions (
 ALTER TABLE public.competitions OWNER TO postgres;
 
 --
--- TOC entry 217 (class 1259 OID 16401)
+-- TOC entry 217 (class 1259 OID 16395)
 -- Name: oauth_clients; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -93,7 +74,7 @@ CREATE TABLE public.oauth_clients (
 ALTER TABLE public.oauth_clients OWNER TO postgres;
 
 --
--- TOC entry 218 (class 1259 OID 16406)
+-- TOC entry 218 (class 1259 OID 16400)
 -- Name: oauth_tokens; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -108,21 +89,22 @@ CREATE TABLE public.oauth_tokens (
 ALTER TABLE public.oauth_tokens OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 24616)
+-- TOC entry 219 (class 1259 OID 16405)
 -- Name: push_tokens; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.push_tokens (
     user_id bytea NOT NULL,
     push_token text NOT NULL,
-    platform smallint NOT NULL
+    platform smallint NOT NULL,
+    app_install_id uuid NOT NULL
 );
 
 
 ALTER TABLE public.push_tokens OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 16411)
+-- TOC entry 220 (class 1259 OID 16410)
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -139,7 +121,7 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 16418)
+-- TOC entry 221 (class 1259 OID 16417)
 -- Name: users_competitions; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -152,7 +134,16 @@ CREATE TABLE public.users_competitions (
 ALTER TABLE public.users_competitions OWNER TO postgres;
 
 --
--- TOC entry 3496 (class 2606 OID 16424)
+-- TOC entry 3240 (class 2606 OID 16481)
+-- Name: push_tokens Primary Key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.push_tokens
+    ADD CONSTRAINT "Primary Key" PRIMARY KEY (user_id, platform, app_install_id);
+
+
+--
+-- TOC entry 3234 (class 2606 OID 16423)
 -- Name: oauth_clients oauth_clients_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -161,7 +152,7 @@ ALTER TABLE ONLY public.oauth_clients
 
 
 --
--- TOC entry 3494 (class 2606 OID 16426)
+-- TOC entry 3232 (class 2606 OID 16425)
 -- Name: competitions primary_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -170,7 +161,7 @@ ALTER TABLE ONLY public.competitions
 
 
 --
--- TOC entry 3491 (class 2606 OID 16428)
+-- TOC entry 3229 (class 2606 OID 16427)
 -- Name: activity_summaries primary_key2; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -179,16 +170,7 @@ ALTER TABLE ONLY public.activity_summaries
 
 
 --
--- TOC entry 3508 (class 2606 OID 24622)
--- Name: push_tokens push_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.push_tokens
-    ADD CONSTRAINT push_tokens_pkey PRIMARY KEY (user_id, push_token, platform);
-
-
---
--- TOC entry 3500 (class 2606 OID 16430)
+-- TOC entry 3238 (class 2606 OID 16431)
 -- Name: oauth_tokens token_primary_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -197,7 +179,7 @@ ALTER TABLE ONLY public.oauth_tokens
 
 
 --
--- TOC entry 3506 (class 2606 OID 16432)
+-- TOC entry 3246 (class 2606 OID 16433)
 -- Name: users_competitions users_competitions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -206,7 +188,7 @@ ALTER TABLE ONLY public.users_competitions
 
 
 --
--- TOC entry 3502 (class 2606 OID 16434)
+-- TOC entry 3242 (class 2606 OID 16435)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -215,7 +197,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3492 (class 1259 OID 16435)
+-- TOC entry 3230 (class 1259 OID 16436)
 -- Name: fki_admin_user_id_foreignkey; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -223,7 +205,7 @@ CREATE INDEX fki_admin_user_id_foreignkey ON public.competitions USING btree (ad
 
 
 --
--- TOC entry 3503 (class 1259 OID 16436)
+-- TOC entry 3243 (class 1259 OID 16437)
 -- Name: fki_competition_id_foreignkey; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -231,7 +213,7 @@ CREATE INDEX fki_competition_id_foreignkey ON public.users_competitions USING bt
 
 
 --
--- TOC entry 3497 (class 1259 OID 16437)
+-- TOC entry 3235 (class 1259 OID 16438)
 -- Name: fki_oauth_tokens_client_id_fkey; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -239,7 +221,7 @@ CREATE INDEX fki_oauth_tokens_client_id_fkey ON public.oauth_tokens USING btree 
 
 
 --
--- TOC entry 3498 (class 1259 OID 16438)
+-- TOC entry 3236 (class 1259 OID 16439)
 -- Name: fki_oauth_tokens_user_id_fkey; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -247,7 +229,7 @@ CREATE INDEX fki_oauth_tokens_user_id_fkey ON public.oauth_tokens USING btree (u
 
 
 --
--- TOC entry 3504 (class 1259 OID 16439)
+-- TOC entry 3244 (class 1259 OID 16440)
 -- Name: fki_user_id_foreignkey; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -255,7 +237,7 @@ CREATE INDEX fki_user_id_foreignkey ON public.users_competitions USING btree (us
 
 
 --
--- TOC entry 3510 (class 2606 OID 16440)
+-- TOC entry 3248 (class 2606 OID 16441)
 -- Name: competitions admin_user_id_foreignkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -264,7 +246,7 @@ ALTER TABLE ONLY public.competitions
 
 
 --
--- TOC entry 3513 (class 2606 OID 16445)
+-- TOC entry 3252 (class 2606 OID 16446)
 -- Name: users_competitions competition_id_foreignkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -273,7 +255,7 @@ ALTER TABLE ONLY public.users_competitions
 
 
 --
--- TOC entry 3511 (class 2606 OID 16450)
+-- TOC entry 3249 (class 2606 OID 16451)
 -- Name: oauth_tokens oauth_tokens_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -282,7 +264,7 @@ ALTER TABLE ONLY public.oauth_tokens
 
 
 --
--- TOC entry 3512 (class 2606 OID 16455)
+-- TOC entry 3250 (class 2606 OID 16456)
 -- Name: oauth_tokens oauth_tokens_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -291,16 +273,16 @@ ALTER TABLE ONLY public.oauth_tokens
 
 
 --
--- TOC entry 3515 (class 2606 OID 24623)
+-- TOC entry 3251 (class 2606 OID 16461)
 -- Name: push_tokens userIdFKey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.push_tokens
-    ADD CONSTRAINT "userIdFKey" FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+    ADD CONSTRAINT "userIdFKey" FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
 --
--- TOC entry 3514 (class 2606 OID 16460)
+-- TOC entry 3253 (class 2606 OID 16466)
 -- Name: users_competitions user_id_foreignkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -309,7 +291,7 @@ ALTER TABLE ONLY public.users_competitions
 
 
 --
--- TOC entry 3509 (class 2606 OID 16465)
+-- TOC entry 3247 (class 2606 OID 16471)
 -- Name: activity_summaries user_id_foreignkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -317,17 +299,7 @@ ALTER TABLE ONLY public.activity_summaries
     ADD CONSTRAINT user_id_foreignkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
---
--- TOC entry 3665 (class 0 OID 0)
--- Dependencies: 5
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
---
-
--- REVOKE USAGE ON SCHEMA public FROM PUBLIC;
--- GRANT ALL ON SCHEMA public TO PUBLIC;
-
-
--- Completed on 2024-02-28 21:38:11 EST
+-- Completed on 2024-03-13 21:13:16 EDT
 
 --
 -- PostgreSQL database dump complete

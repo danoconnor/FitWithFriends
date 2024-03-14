@@ -3,6 +3,7 @@ import { DatabaseConnectionPool } from '../utilities/database';
 
 /** 'RegisterPushToken' parameters type */
 export interface IRegisterPushTokenParams {
+  appInstallId: string;
   platform: number;
   pushToken: string;
   userId: Buffer;
@@ -17,14 +18,14 @@ export interface IRegisterPushTokenQuery {
   result: IRegisterPushTokenResult;
 }
 
-const registerPushTokenIR: any = {"usedParamSet":{"userId":true,"pushToken":true,"platform":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":64,"b":71}]},{"name":"pushToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":84}]},{"name":"platform","required":true,"transform":{"type":"scalar"},"locs":[{"a":87,"b":96}]}],"statement":"INSERT INTO push_tokens(user_id, push_token, platform) \nVALUES (:userId!, :pushToken!, :platform!)\nON CONFLICT (user_id, push_token, platform) DO NOTHING"};
+const registerPushTokenIR: any = {"usedParamSet":{"userId":true,"pushToken":true,"platform":true,"appInstallId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":80,"b":87}]},{"name":"pushToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":90,"b":100}]},{"name":"platform","required":true,"transform":{"type":"scalar"},"locs":[{"a":103,"b":112}]},{"name":"appInstallId","required":true,"transform":{"type":"scalar"},"locs":[{"a":115,"b":128}]}],"statement":"INSERT INTO push_tokens(user_id, push_token, platform, app_install_id) \nVALUES (:userId!, :pushToken!, :platform!, :appInstallId!)\nON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLUDED.push_token"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO push_tokens(user_id, push_token, platform) 
- * VALUES (:userId!, :pushToken!, :platform!)
- * ON CONFLICT (user_id, push_token, platform) DO NOTHING
+ * INSERT INTO push_tokens(user_id, push_token, platform, app_install_id) 
+ * VALUES (:userId!, :pushToken!, :platform!, :appInstallId!)
+ * ON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLUDED.push_token
  * ```
  */
 export function registerPushToken(params: IRegisterPushTokenParams): Promise<Array<IRegisterPushTokenResult>> {
