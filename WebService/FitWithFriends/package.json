@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "TZ='UTC' node dist/app",
+    "start": "node dist/app",
     "test": "TZ='America/New_York' jest --forceExit"
   },
   "description": "FitWithFriends",
