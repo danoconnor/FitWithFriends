@@ -74,7 +74,7 @@ jobs:
         docker-compose -f ${{ env.WEBSERVICE_ROOT_PATH }}/docker-compose-local-testing.yml down --volumes
 
     - name: Zip artifact for deployment
-      run: zip release.zip ${{ env.WEBSERVICE_DIST_PATH }}/ -r
+      run: zip release.zip ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/ -r
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v3
