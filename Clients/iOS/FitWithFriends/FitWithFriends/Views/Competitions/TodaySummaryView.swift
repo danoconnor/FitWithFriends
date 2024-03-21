@@ -27,22 +27,22 @@ struct TodaySummaryView: View {
                     ActivityValueView(name: "Move",
                                       unit: "Cal",
                                       color: Color(red: 0.914, green: 0.078, blue: 0.204),
-                                      currentValue: activitySummary.activeCaloriesBurned,
-                                      goal: activitySummary.activeCaloriesGoal)
+                                      currentValue: activitySummary.activeCaloriesBurned ?? 0,
+                                      goal: activitySummary.activeCaloriesGoal ?? 0)
                         .padding(.bottom, 5)
 
                     ActivityValueView(name: "Exercise",
                                       unit: "Min",
                                       color: Color(red: 0.259, green: 0.914, blue: 0),
-                                      currentValue: activitySummary.exerciseTime,
-                                      goal: activitySummary.exerciseTimeGoal)
+                                      currentValue: activitySummary.exerciseTime ?? 0,
+                                      goal: activitySummary.exerciseTimeGoal ?? 0)
                         .padding(.bottom, 5)
 
                     ActivityValueView(name: "Stand",
                                       unit: "h",
                                       color: Color(red: 0.254, green: 0.749, blue: 0.847),
-                                      currentValue: activitySummary.standTime,
-                                      goal: activitySummary.standTimeGoal)
+                                      currentValue: activitySummary.standTime ?? 0,
+                                      goal: activitySummary.standTimeGoal ?? 0)
                 }
                 .padding(.leading)
                 .padding(.trailing)

@@ -30,10 +30,12 @@ class Workout: Codable {
              .cycling,
              .elliptical,
              .hiking,
+             .paddleSports,
              .rowing,
              .running,
              .swimming,
-             .walking:
+             .walking,
+             .swimBikeRun:
             distance = round(workout.totalDistance?.doubleValue(for: .mile()) ?? 0)
         case .stairs,
              .stairClimbing:
