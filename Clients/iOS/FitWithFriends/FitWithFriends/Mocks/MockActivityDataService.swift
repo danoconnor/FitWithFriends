@@ -13,7 +13,7 @@ class MockActivityDataService: ActivityDataService {
         super.init(httpConnector: MockHttpConnector(), tokenManager: MockTokenManager())
     }
 
-    override func reportActivitySummaries(activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
+    override func reportActivitySummaries(_ activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
             completion(self?.return_error)
         }

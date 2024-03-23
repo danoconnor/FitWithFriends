@@ -82,7 +82,27 @@ class HealthKitManager {
             case .loggedIn:
                 // Report the activity summaries when the user logs in
                 self?.activitySummaryQueue.async {
-                    self?.reportActivitySummaries(completion: nil)
+                    Logger.traceInfo(message: "Starting report data due to login")
+                    let dispatchGroup = DispatchGroup()
+
+                    dispatchGroup.enter()
+                    self?.reportWorkouts() {
+                        Logger.traceVerbose(message: "Report workouts after login complete")
+                        dispatchGroup.leave()
+                    }
+
+                    dispatchGroup.enter()
+                    self?.reportActivitySummaries() {
+                        Logger.traceVerbose(message: "Report activity summaries after login complete")
+                        dispatchGroup.leave()
+                    }
+
+                    let waitResult = dispatchGroup.wait(timeout: .now() + HealthKitManager.backgroundTaskTimeout)
+                    if waitResult == .success {
+                        Logger.traceInfo(message: "Completed report data after login")
+                    } else {
+                        Logger.traceError(message: "Report data after login timed out")
+                    }
                 }
             default:
                 break
@@ -226,26 +246,45 @@ class HealthKitManager {
             return
         }
 
-        Logger.traceInfo(message: "Received observer query update")
+        Logger.traceInfo(message: "Received observer query update for samples \(samples?.map { String(describing: $0) }.joined(separator: ",") ?? "nil")")
         guard let samples = samples,
             samples.count > 0 else {
             Logger.traceWarning(message: "Received empty update from observer")
             return
         }
 
-        if samples.contains(HKSampleType.workoutType()) {
-            reportWorkouts()
-        }
+        activitySummaryQueue.async { [weak self] in
+            let dispatchGroup = DispatchGroup()
 
-        // Any quantity types that we observe will be included in our activity summary reports
-        if samples.intersection(HealthKitManager.quantityTypesToObserve.map { HKQuantityType($0) }).count > 0 {
-            activitySummaryQueue.async { [weak self] in
-                self?.reportActivitySummaries(completion: completion)
+            if samples.contains(HKSampleType.workoutType()) {
+                dispatchGroup.enter()
+                self?.reportWorkouts() {
+                    Logger.traceVerbose(message: "Workout upload complete")
+                    dispatchGroup.leave()
+                }
             }
+
+            // Any quantity types that we observe will be included in our activity summary reports
+            if samples.intersection(HealthKitManager.quantityTypesToObserve.map { HKQuantityType($0) }).count > 0 {
+                dispatchGroup.enter()
+                self?.reportActivitySummaries() {
+                    Logger.traceVerbose(message: "Activity summary upload complete")
+                    dispatchGroup.leave()
+                }
+            }
+
+            let waitResult = dispatchGroup.wait(timeout: .now() + HealthKitManager.backgroundTaskTimeout)
+            if waitResult == .timedOut {
+                Logger.traceError(message: "Report data timed out")
+                completion()
+                return
+            }
+
+            Logger.traceVerbose(message: "Report data complete")
         }
     }
 
-    private func reportWorkouts() {
+    private func reportWorkouts(completion: @escaping () -> Void) {
         // Query for the workouts that have been added since the last update
         let dateRange = getQueryDateRange(for: HealthKitManager.lastWorkoutUpdateKey)
         let workoutActivityPredicate = HKQuery.predicateForWorkoutActivities(start: dateRange.startCompenents.date,
@@ -258,9 +297,11 @@ class HealthKitManager {
                                          sortDescriptors: nil) { [weak self] _, workouts, error in
             guard let workouts = workouts else {
                 Logger.traceError(message: "Failed to get workouts from observer update", error: error)
+                completion()
                 return
             }
 
+            var fwfWorkouts = [Workout]()
             for workoutSample in workouts {
                 guard let hkWorkout = workoutSample as? HKWorkout else {
                     Logger.traceWarning(message: "Could not create workout object")
@@ -269,14 +310,29 @@ class HealthKitManager {
 
                 let workout = Workout(workout: hkWorkout)
                 Logger.traceInfo(message: "Received workout update: \(workout.xtDictionary?.description ?? "nil")")
+
+                fwfWorkouts.append(workout)
+            }
+
+            self?.activityDataService.reportWorkouts(fwfWorkouts) { [weak self] reportError in
+                guard reportError == nil else {
+                    Logger.traceError(message: "Failed to report workouts", error: error)
+                    completion()
+                    return
+                }
+
+                Logger.traceVerbose(message: "Successfully reported workouts")
+                self?.storeLastUpdateTime(for: HealthKitManager.lastWorkoutUpdateKey, updateTime: Date())
+                completion()
             }
         }
+        hkHealthStore.execute(workoutQuery)
     }
 
-    private func reportActivitySummaries(completion: HKObserverQueryCompletionHandler?) {
+    private func reportActivitySummaries(completion: () -> Void) {
         guard HKHealthStore.isHealthDataAvailable() else {
             Logger.traceWarning(message: "Health data is not available on this device, not querying activity summaries")
-            completion?()
+            completion()
             return
         }
 
@@ -298,7 +354,7 @@ class HealthKitManager {
 
                 let calendar = Calendar.current
                 for activityResult in activityResults {
-                    guard let activityDate = activityResult.dateComponents(for: Calendar.current).date else {
+                    guard let activityDate = activityResult.dateComponents(for: calendar).date else {
                         Logger.traceWarning(message: "Could not get date for activity!")
                         continue
                     }
@@ -353,7 +409,7 @@ class HealthKitManager {
                 updatedActivitySummaries.append(activitySummary)
             }
 
-            self.activityDataService.reportActivitySummaries(activitySummaries: updatedActivitySummaries) { error in
+            self.activityDataService.reportActivitySummaries(updatedActivitySummaries) { error in
                 guard error == nil else {
                     Logger.traceError(message: "Failed to report activity summaries", error: error)
                     return
