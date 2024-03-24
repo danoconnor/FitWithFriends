@@ -371,7 +371,10 @@ class HealthKitManager {
             dispatchGroup.enter()
             getAllDailySumsSinceLastUpdate(for: quantityType) { success, result in
                 resultQueue.sync {
-                    containsFailures = true
+                    if !success {
+                        containsFailures = true
+                    }
+
                     quantityResults[quantityType] = result
                 }
 
@@ -415,6 +418,8 @@ class HealthKitManager {
                     return
                 }
 
+                // If we aren't sure that we got all the data from HealthKit properly,
+                // then don't update the cached last update time so that we retry getting the data next time
                 guard !containsFailures else {
                     Logger.traceWarning(message: "Successfully reported activity summaries, but there were errors in the HealthKit queries. Not updating last update time")
                     return

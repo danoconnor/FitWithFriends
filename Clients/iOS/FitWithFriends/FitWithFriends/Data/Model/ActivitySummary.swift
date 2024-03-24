@@ -10,12 +10,12 @@ import HealthKit
 
 class ActivitySummary: IdentifiableBase, Codable {
     let date: Date
-    private(set) var activeCaloriesBurned: Double?
-    private(set) var activeCaloriesGoal: Double?
-    private(set) var exerciseTime: Double?
-    private(set) var exerciseTimeGoal: Double?
-    private(set) var standTime: Double?
-    private(set) var standTimeGoal: Double?
+    private(set) var activeCaloriesBurned: Double
+    private(set) var activeCaloriesGoal: Double
+    private(set) var exerciseTime: Double
+    private(set) var exerciseTimeGoal: Double
+    private(set) var standTime: Double
+    private(set) var standTimeGoal: Double
     private(set) var distanceWalkingRunning: Double?
     private(set) var stepCount: UInt?
     private(set) var flightsClimbed: UInt?
@@ -38,6 +38,13 @@ class ActivitySummary: IdentifiableBase, Codable {
     /// Creates an empty `ActivitySummary` for the given date
     init(date: Date) {
         self.date = date
+
+        self.activeCaloriesBurned = 0
+        self.activeCaloriesGoal = 0
+        self.exerciseTime = 0
+        self.exerciseTimeGoal = 0
+        self.standTime = 0
+        self.standTimeGoal = 0
     }
 
     /// Creates an `ActivitySummary` for the given date with zero progress towards any of the given goals
@@ -95,16 +102,6 @@ extension ActivitySummary {
     /// This is an estimate of the points that this activity summary will provide
     /// The real source of truth comes from the service in the CompetitionOverview entity
     var competitionPoints: Double {
-        guard let activeCaloriesGoal = activeCaloriesGoal,
-              let activeCaloriesBurned = activeCaloriesBurned,
-              let exerciseTimeGoal = exerciseTimeGoal,
-              let exerciseTime = exerciseTime,
-              let standTimeGoal = standTimeGoal,
-              let standTime = standTime else {
-            Logger.traceWarning(message: "Could not calulate competition points because of missing data on the ActivitySummary")
-            return 0
-        }
-
         let caloriePoints = activeCaloriesGoal > 0 ? activeCaloriesBurned / activeCaloriesGoal * 100 : 0
         let exercisePoints = exerciseTimeGoal > 0 ? exerciseTime / exerciseTimeGoal * 100 : 0
         let standPoints = standTimeGoal > 0 ? standTime / standTimeGoal * 100 : 0
