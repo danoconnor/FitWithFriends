@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B0879672BAFBE9C0073AB09 /* IHealthStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0879662BAFBE9C0073AB09 /* IHealthStoreWrapper.swift */; };
+		0B0879692BAFC1410073AB09 /* HealthStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0879682BAFC1410073AB09 /* HealthStoreWrapper.swift */; };
 		0B0B413428143D4A0053541A /* FirstLaunchWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */; };
 		0B0B4138281446890053541A /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4137281446890053541A /* AboutView.swift */; };
 		0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413C281453E30053541A /* AboutCompetitionsView.swift */; };
@@ -119,6 +121,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B0879662BAFBE9C0073AB09 /* IHealthStoreWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IHealthStoreWrapper.swift; sourceTree = "<group>"; };
+		0B0879682BAFC1410073AB09 /* HealthStoreWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthStoreWrapper.swift; sourceTree = "<group>"; };
 		0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchWelcomeView.swift; sourceTree = "<group>"; };
 		0B0B4137281446890053541A /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		0B0B413C281453E30053541A /* AboutCompetitionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutCompetitionsView.swift; sourceTree = "<group>"; };
@@ -301,6 +305,8 @@
 			children = (
 				0B3597772571502A006D956A /* HealthKitManager.swift */,
 				0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */,
+				0B0879662BAFBE9C0073AB09 /* IHealthStoreWrapper.swift */,
+				0B0879682BAFC1410073AB09 /* HealthStoreWrapper.swift */,
 			);
 			path = WorkoutData;
 			sourceTree = "<group>";
@@ -697,6 +703,7 @@
 				0BC192AF2B12E6C300C3F4FA /* SecretConstants.swift in Sources */,
 				0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */,
 				0B47A229279CAB6E00C2970E /* MockAuthenticationService.swift in Sources */,
+				0B0879672BAFBE9C0073AB09 /* IHealthStoreWrapper.swift in Sources */,
 				0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */,
 				0B3597782571502A006D956A /* HealthKitManager.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
@@ -761,6 +768,7 @@
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0B674531297B5F3700F20018 /* Date+Extensions.swift in Sources */,
 				0BD8B5BD27D42C79009BA5F2 /* CompetitionDetailViewModel.swift in Sources */,
+				0B0879692BAFC1410073AB09 /* HealthStoreWrapper.swift in Sources */,
 				0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */,
 				0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */,
 				0B99FBEB256A070F00673133 /* HttpMethod.swift in Sources */,

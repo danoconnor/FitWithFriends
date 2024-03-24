@@ -18,6 +18,7 @@ class MockHealthKitManager: HealthKitManager {
         super.init(activityDataService: MockActivityDataService(),
                    activityUpdateDelegate: MockCompetitionManager(),
                    authenticationManager: MockAuthenticationManager(),
+                   healthStoreWrapper: HealthStoreWrapper(), // TODO: add mock
                    userDefaults: UserDefaults.standard)
 
         // Default to returning some activity data

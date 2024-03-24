@@ -14,9 +14,9 @@ class HealthKitManager {
     private let activityDataService: ActivityDataService
     private let activityUpdateDelegate: ActivityUpdateDelegate
     private let authenticationManager: AuthenticationManager
+    private let healthStoreWrapper: IHealthStoreWrapper
     private let userDefaults: UserDefaults
 
-    private let hkHealthStore = HKHealthStore()
     private let activitySummaryQueue = DispatchQueue(label: "ActivitySummaryQueue")
 
     // User defaults keys
@@ -46,7 +46,7 @@ class HealthKitManager {
     private var loginStateCancellable: AnyCancellable?
 
     var shouldPromptUser: Bool {
-        guard HKHealthStore.isHealthDataAvailable() else {
+        guard healthStoreWrapper.isHealthDataAvailable else {
             Logger.traceWarning(message: "Health data is not available on this device. Should not prompt user for permissions")
             return false
         }
@@ -71,10 +71,12 @@ class HealthKitManager {
     init(activityDataService: ActivityDataService,
          activityUpdateDelegate: ActivityUpdateDelegate,
          authenticationManager: AuthenticationManager,
+         healthStoreWrapper: IHealthStoreWrapper,
          userDefaults: UserDefaults) {
         self.activityDataService = activityDataService
         self.activityUpdateDelegate = activityUpdateDelegate
         self.authenticationManager = authenticationManager
+        self.healthStoreWrapper = healthStoreWrapper
         self.userDefaults = userDefaults
 
         loginStateCancellable = authenticationManager.$loginState.sink { [weak self] state in
@@ -122,7 +124,7 @@ class HealthKitManager {
         ]
         dataTypes.append(contentsOf: HealthKitManager.quantityTypesToObserve.map { HKQuantityType($0) })
 
-        hkHealthStore.requestAuthorization(toShare: nil, read: Set(dataTypes)) { [weak self] success, error in
+        healthStoreWrapper.requestAuthorization(toShare: nil, read: Set(dataTypes)) { [weak self] success, error in
             if let error = error {
                 Logger.traceError(message: "Failed to request authorization for health data", error: error)
                 completion()
@@ -146,7 +148,7 @@ class HealthKitManager {
     }
 
     func getCurrentActivitySummary(completion: @escaping (HKActivitySummary?) -> Void) {
-        guard HKHealthStore.isHealthDataAvailable() else {
+        guard healthStoreWrapper.isHealthDataAvailable else {
             Logger.traceWarning(message: "Health data is not available on this device, can't query current activity summary")
             completion(nil)
             return
@@ -158,7 +160,7 @@ class HealthKitManager {
 
         let predicate = HKQuery.predicateForActivitySummary(with: today)
 
-        let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, error in
+        healthStoreWrapper.executeActivitySummaryQuery(predicate: predicate) { _, summaries, error in
             if let error = error {
                 Logger.traceError(message: "Failed to get activity summary", error: error)
                 completion(nil)
@@ -177,19 +179,16 @@ class HealthKitManager {
 
             completion(summary)
         }
-
-        hkHealthStore.execute(query)
     }
 
     /// Register for hourly background updates for calorie, exercise, stand, steps, distance, and flights climbed
     private func registerForBackgroundUpdates() {
-        guard HKHealthStore.isHealthDataAvailable() else {
+        guard healthStoreWrapper.isHealthDataAvailable else {
             Logger.traceWarning(message: "Health data is not available on this device, not registering for background updates")
             return
         }
-
         for quantityType in HealthKitManager.quantityTypesToObserve {
-            hkHealthStore.enableBackgroundDelivery(for: HKQuantityType(quantityType),
+            healthStoreWrapper.enableBackgroundDelivery(for: HKQuantityType(quantityType),
                                                    frequency: .hourly) { success, error in
                 if let error = error {
                     Logger.traceError(message: "Failed to enable background delivery for \(quantityType)", error: error)
@@ -200,7 +199,7 @@ class HealthKitManager {
         }
 
         // Register for background updates when a workout completes
-        hkHealthStore.enableBackgroundDelivery(for: .workoutType(), 
+        healthStoreWrapper.enableBackgroundDelivery(for: .workoutType(),
                                                frequency: .immediate) { success, error in
             if let error = error {
                 Logger.traceError(message: "Failed to enable background delivery for workout type", error: error)
@@ -213,7 +212,7 @@ class HealthKitManager {
     /// Sets up a query that will execute when the calorie, exercise, or stand data is updated
     /// It will only execute max once an hour and only if the device is unlocked
     private func registerObserverQueries() {
-        guard HKHealthStore.isHealthDataAvailable() else {
+        guard healthStoreWrapper.isHealthDataAvailable else {
             Logger.traceWarning(message: "Health data is not available on this device, not registering data queries")
             return
         }
@@ -225,9 +224,8 @@ class HealthKitManager {
             HKQueryDescriptor(sampleType: HKQuantityType($0), predicate: nil)
         })
 
-        let query = HKObserverQuery(queryDescriptors: queryDescriptors,
-                                    updateHandler: observerQueryUpdateHandler(query:samples:completion:error:))
-        hkHealthStore.execute(query)
+        let query = healthStoreWrapper.executeObserverQuery(queryDescriptors: queryDescriptors,
+                                                            updateHandler: observerQueryUpdateHandler(query:samples:completion:error:))
 
         // Hold a reference to the query so it continues to be updated while the app is in memory
         observerQuery = query
@@ -291,10 +289,10 @@ class HealthKitManager {
                                                                              end: dateRange.endComponents.date)
         let workoutPredicate = HKQuery.predicateForWorkouts(activityPredicate: workoutActivityPredicate)
 
-        let workoutQuery = HKSampleQuery(sampleType: HKObjectType.workoutType(),
-                                         predicate: workoutPredicate,
-                                         limit: HKObjectQueryNoLimit,
-                                         sortDescriptors: nil) { [weak self] _, workouts, error in
+        healthStoreWrapper.executeSampleQuery(sampleType: HKObjectType.workoutType(),
+                                              predicate: workoutPredicate,
+                                              limit: HKObjectQueryNoLimit,
+                                              sortDescriptors: nil) { [weak self] _, workouts, error in
             guard let workouts = workouts else {
                 Logger.traceError(message: "Failed to get workouts from observer update", error: error)
                 completion()
@@ -326,11 +324,10 @@ class HealthKitManager {
                 completion()
             }
         }
-        hkHealthStore.execute(workoutQuery)
     }
 
     private func reportActivitySummaries(completion: () -> Void) {
-        guard HKHealthStore.isHealthDataAvailable() else {
+        guard healthStoreWrapper.isHealthDataAvailable else {
             Logger.traceWarning(message: "Health data is not available on this device, not querying activity summaries")
             completion()
             return
@@ -442,7 +439,7 @@ class HealthKitManager {
 
         let dateRangeDescription = "\(dateRange.startCompenents.date?.description ?? "nil") to \(dateRange.endComponents.date?.description ?? "nil")"
         Logger.traceInfo(message: "Executing activity summary query for dates \(dateRangeDescription)")
-        let activitySummaryQuery = HKActivitySummaryQuery(predicate: predicate) { _, summaries, error in
+        healthStoreWrapper.executeActivitySummaryQuery(predicate: predicate) { _, summaries, error in
             guard let summaries = summaries else {
                 Logger.traceError(message: "Failed to get activity summaries from observer update", error: error)
                 completion(false, [])
@@ -451,8 +448,6 @@ class HealthKitManager {
 
             completion(true, summaries)
         }
-
-        hkHealthStore.execute(activitySummaryQuery)
     }
 
     
@@ -522,7 +517,7 @@ class HealthKitManager {
         let dateRangeDescription = "\(startOfDay.description) to \(endOfDay.description)"
         Logger.traceInfo(message: "Executing query for \(String(describing: quantityTypeId)) in date range \(dateRangeDescription)")
 
-        let query = HKStatisticsQuery(quantityType: HKQuantityType(quantityTypeId), quantitySamplePredicate: predicate, options: .cumulativeSum) { _, statistics, error in
+        healthStoreWrapper.executeStatisticsQuery(quantityType: HKQuantityType(quantityTypeId), quantitySamplePredicate: predicate, options: .cumulativeSum) { _, statistics, error in
             if let error = error {
                 Logger.traceError(message: "Failed to get data for \(String(describing: quantityTypeId)) on \(date)",
                                   error: error)
@@ -530,7 +525,6 @@ class HealthKitManager {
 
             completion(error, statistics)
         }
-        hkHealthStore.execute(query)
     }
 
     private func storeLastUpdateTime(for key: String, updateTime: Date) {

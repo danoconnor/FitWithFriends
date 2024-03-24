@@ -17,6 +17,7 @@ class ObjectGraph: IObjectGraph {
     let competitionService: CompetitionService
     let emailUtility: EmailUtility
     let healthKitManager: HealthKitManager
+    let healthStoreWrapper: IHealthStoreWrapper
     let httpConnector: HttpConnector
     let keychainUtilities: KeychainUtilities
     let shakeGestureHandler: ShakeGestureHandler
@@ -30,6 +31,7 @@ class ObjectGraph: IObjectGraph {
         keychainUtilities = KeychainUtilities()
         userDefaults = UserDefaults.standard
         emailUtility = EmailUtility()
+        healthStoreWrapper = HealthStoreWrapper()
 
         shakeGestureHandler = ShakeGestureHandler(emailUtility: emailUtility)
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
@@ -53,6 +55,7 @@ class ObjectGraph: IObjectGraph {
         healthKitManager = HealthKitManager(activityDataService: activityDataService,
                                             activityUpdateDelegate: competitionManager,
                                             authenticationManager: authenticationManager,
+                                            healthStoreWrapper: healthStoreWrapper,
                                             userDefaults: userDefaults)
     }
 }
