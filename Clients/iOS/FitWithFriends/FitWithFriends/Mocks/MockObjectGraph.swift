@@ -7,21 +7,21 @@
 
 import Foundation
 
-class MockObjectGraph: IObjectGraph {
-    var activityDataService: ActivityDataService
+public class MockObjectGraph: IObjectGraph {
+    var activityDataService: IActivityDataService
     var appProtocolHandler: AppProtocolHandler
     var authenticationManager: AuthenticationManager
-    var authenticationService: AuthenticationService
+    var authenticationService: IAuthenticationService
     var competitionManager: CompetitionManager
-    var competitionService: CompetitionService
+    var competitionService: ICompetitionService
     var emailUtility: EmailUtility
-    var healthKitManager: HealthKitManager
-    var httpConnector: HttpConnector
+    var healthKitManager: IHealthKitManager
+    var httpConnector: IHttpConnector
     var keychainUtilities: KeychainUtilities
     var shakeGestureHandler: ShakeGestureHandler
     var tokenManager: TokenManager
     var userDefaults: UserDefaults
-    var userService: UserService
+    var userService: IUserService
 
     init() {
         activityDataService = MockActivityDataService()

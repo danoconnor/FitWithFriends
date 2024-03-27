@@ -7,6 +7,6 @@
 
 import Foundation
 
-class IdentifiableBase: Identifiable {
-    let id = UUID()
+public class IdentifiableBase: Identifiable {
+    public let id = UUID()
 }

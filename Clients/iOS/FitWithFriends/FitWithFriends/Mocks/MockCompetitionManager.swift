@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MockCompetitionManager: CompetitionManager {
+public class MockCompetitionManager: CompetitionManager {
     var return_error: Error?
 
     var return_competitionOverviews: [UUID: CompetitionOverview] = [:]

@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-class AppStateViewModel: ObservableObject {
+public class AppStateViewModel: ObservableObject {
     @Published var isLoggedIn = false
 
     private let authenticationManager: AuthenticationManager

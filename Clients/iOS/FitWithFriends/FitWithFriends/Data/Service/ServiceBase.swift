@@ -7,20 +7,20 @@
 
 import Foundation
 
-class ServiceBase {
-    private let httpConnector: HttpConnector
+public class ServiceBase {
+    private let httpConnector: IHttpConnector
     private let tokenManager: TokenManager
 
     private static var activeRefreshTokenTask: Task<Result<Token, Error>, Error>?
 
-    init(httpConnector: HttpConnector,
+    init(httpConnector: IHttpConnector,
          tokenManager: TokenManager) {
         self.httpConnector = httpConnector
         self.tokenManager = tokenManager
     }
 
     /// Gets a new access token using the refresh token
-    func getToken(token: Token) async -> Result<Token, Error> {
+    public func getToken(token: Token) async -> Result<Token, Error> {
         guard let refreshToken = token.refreshToken else {
             return .failure(TokenError.notFound)
         }

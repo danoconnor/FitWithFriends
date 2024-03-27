@@ -7,8 +7,8 @@
 
 import Foundation
 
-class CompetitionService: ServiceBase {
-    func getCompetitionOverview(competitionId: UUID) async -> Result<CompetitionOverview, Error> {
+public class CompetitionService: ServiceBase, ICompetitionService {
+    public func getCompetitionOverview(competitionId: UUID) async -> Result<CompetitionOverview, Error> {
         // Need to query using the user's current timezone so we get accurate information on whether the competition is active or not
         let ianaTimezone = TimeZone.current.identifier
 
@@ -16,12 +16,12 @@ class CompetitionService: ServiceBase {
                                                        method: .get)
     }
 
-    func getUsersCompetitions(userId: String) async -> Result<[UUID], Error> {
+    public func getUsersCompetitions(userId: String) async -> Result<[UUID], Error> {
         return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions",
                                                        method: .get)
     }
 
-    func createCompetition(startDate: Date, endDate: Date, competitionName: String) async -> Error? {
+    public func createCompetition(startDate: Date, endDate: Date, competitionName: String) async -> Error? {
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.timeZone = Calendar.current.timeZone
         dateFormatter.formatOptions = .withFullDate
@@ -39,7 +39,7 @@ class CompetitionService: ServiceBase {
         return result.xtError
     }
 
-    func joinCompetition(competitionId: UUID, competitionToken: String) async -> Error? {
+    public func joinCompetition(competitionId: UUID, competitionToken: String) async -> Error? {
         let requestBody: [String: String] = [
             "accessToken": competitionToken,
             "competitionId": competitionId.uuidString
@@ -51,7 +51,7 @@ class CompetitionService: ServiceBase {
         return result.xtError
     }
 
-    func removeUserFromCompetition(userId: String, competitionId: UUID) async -> Error? {
+    public func removeUserFromCompetition(userId: String, competitionId: UUID) async -> Error? {
         let requestBody: [String: String] = [
             "competitionId": competitionId.uuidString,
             "userId": userId.description
@@ -63,7 +63,7 @@ class CompetitionService: ServiceBase {
         return result.xtError
     }
 
-    func getCompetitionDetails(competitionId: UUID, competitionToken: String) async -> Result<CompetitionDescription, Error> {
+    public func getCompetitionDescription(competitionId: UUID, competitionToken: String) async -> Result<CompetitionDescription, Error> {
         let requestBody: [String: String] = [
             "competitionId": competitionId.uuidString,
             "competitionAccessToken": competitionToken
@@ -75,13 +75,13 @@ class CompetitionService: ServiceBase {
     }
 
     /// The user must be the admin of the competition, otherwise the request will be rejected
-    func getCompetitionAdminDetails(competitionId: UUID) async -> Result<CompetitionAdminDetails, Error> {
+    public func getCompetitionAdminDetails(competitionId: UUID) async -> Result<CompetitionAdminDetails, Error> {
         return await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/adminDetail",
                                                        method: .get)
     }
 
     /// The user must be the admin of the competition, otherwise the request will be rejected
-    func deleteCompetition(competitionId: UUID) async -> Error? {
+    public func deleteCompetition(competitionId: UUID) async -> Error? {
         let requestBody: [String: String] = [
             "competitionId": competitionId.uuidString
         ]

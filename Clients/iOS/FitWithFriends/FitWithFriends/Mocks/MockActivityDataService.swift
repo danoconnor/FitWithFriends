@@ -7,13 +7,13 @@
 
 import Foundation
 
-class MockActivityDataService: ActivityDataService {
-    var return_error: Error?
-    init() {
+public class MockActivityDataService: ActivityDataService {
+    public var return_error: Error?
+    public init() {
         super.init(httpConnector: MockHttpConnector(), tokenManager: MockTokenManager())
     }
 
-    override func reportActivitySummaries(_ activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
+    override public func reportActivitySummaries(_ activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
             completion(self?.return_error)
         }

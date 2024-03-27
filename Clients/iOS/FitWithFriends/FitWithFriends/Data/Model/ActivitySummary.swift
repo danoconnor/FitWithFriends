@@ -8,19 +8,19 @@
 import Foundation
 import HealthKit
 
-class ActivitySummary: IdentifiableBase, Codable {
-    let date: Date
-    private(set) var activeCaloriesBurned: Double
-    private(set) var activeCaloriesGoal: Double
-    private(set) var exerciseTime: Double
-    private(set) var exerciseTimeGoal: Double
-    private(set) var standTime: Double
-    private(set) var standTimeGoal: Double
-    private(set) var distanceWalkingRunning: Double?
-    private(set) var stepCount: UInt?
-    private(set) var flightsClimbed: UInt?
+public class ActivitySummary: IdentifiableBase, Codable {
+    public let date: Date
+    public private(set) var activeCaloriesBurned: Double
+    public private(set) var activeCaloriesGoal: Double
+    public private(set) var exerciseTime: Double
+    public private(set) var exerciseTimeGoal: Double
+    public private(set) var standTime: Double
+    public private(set) var standTimeGoal: Double
+    public private(set) var distanceWalkingRunning: Double?
+    public private(set) var stepCount: UInt?
+    public private(set) var flightsClimbed: UInt?
 
-    private(set) var activitySummary: HKActivitySummary?
+    public private(set) var activitySummary: HKActivitySummary?
 
     enum CodingKeys: String, CodingKey {
         case date
@@ -36,7 +36,7 @@ class ActivitySummary: IdentifiableBase, Codable {
     }
 
     /// Creates an empty `ActivitySummary` for the given date
-    init(date: Date) {
+    public init(date: Date) {
         self.date = date
 
         self.activeCaloriesBurned = 0
@@ -48,7 +48,7 @@ class ActivitySummary: IdentifiableBase, Codable {
     }
 
     /// Creates an `ActivitySummary` for the given date with zero progress towards any of the given goals
-    init(date: Date, calorieGoal: Double, exerciseGoal: Double, standGoal: Double) {
+    public init(date: Date, calorieGoal: Double, exerciseGoal: Double, standGoal: Double) {
         self.date = date
 
         activeCaloriesBurned = 0
@@ -60,7 +60,7 @@ class ActivitySummary: IdentifiableBase, Codable {
     }
 
     /// Creates an `ActivitySummary` based on the summary returned by Apple HealthKit
-    init?(activitySummary: HKActivitySummary) {
+    public init?(activitySummary: HKActivitySummary) {
         guard let activityDate = activitySummary.dateComponents(for: Calendar.current).date else {
             Logger.traceError(message: "Tried to initialize ActivitySummary without valid date")
             return nil
@@ -77,7 +77,7 @@ class ActivitySummary: IdentifiableBase, Codable {
         self.activitySummary = activitySummary
     }
 
-    func updateStatistic(quantityType: HKQuantityTypeIdentifier, value: HKStatistics) {
+    public func updateStatistic(quantityType: HKQuantityTypeIdentifier, value: HKStatistics) {
         switch quantityType {
         case .activeEnergyBurned:
             activeCaloriesBurned = value.sumQuantity()?.doubleValue(for: .largeCalorie()) ?? 0
@@ -101,7 +101,7 @@ class ActivitySummary: IdentifiableBase, Codable {
 extension ActivitySummary {
     /// This is an estimate of the points that this activity summary will provide
     /// The real source of truth comes from the service in the CompetitionOverview entity
-    var competitionPoints: Double {
+    public var competitionPoints: Double {
         let caloriePoints = activeCaloriesGoal > 0 ? activeCaloriesBurned / activeCaloriesGoal * 100 : 0
         let exercisePoints = exerciseTimeGoal > 0 ? exerciseTime / exerciseTimeGoal * 100 : 0
         let standPoints = standTimeGoal > 0 ? standTime / standTimeGoal * 100 : 0

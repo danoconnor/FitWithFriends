@@ -8,22 +8,22 @@
 import Foundation
 
 class ObjectGraph: IObjectGraph {
-    let activityDataService: ActivityDataService
+    let activityDataService: IActivityDataService
     let appleAuthenticationManager: AppleAuthenticationManager
     let appProtocolHandler: AppProtocolHandler
     let authenticationManager: AuthenticationManager
-    let authenticationService: AuthenticationService
+    let authenticationService: IAuthenticationService
     let competitionManager: CompetitionManager
-    let competitionService: CompetitionService
+    let competitionService: ICompetitionService
     let emailUtility: EmailUtility
-    let healthKitManager: HealthKitManager
+    let healthKitManager: IHealthKitManager
     let healthStoreWrapper: IHealthStoreWrapper
-    let httpConnector: HttpConnector
+    let httpConnector: IHttpConnector
     let keychainUtilities: KeychainUtilities
     let shakeGestureHandler: ShakeGestureHandler
     let tokenManager: TokenManager
     let userDefaults: UserDefaults
-    let userService: UserService
+    let userService: IUserService
 
     init() {
         appProtocolHandler = AppProtocolHandler()

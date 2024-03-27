@@ -8,18 +8,18 @@
 import Foundation
 import HealthKit
 
-class Workout: Codable {
-    let startDate: Date
-    let duration: TimeInterval
-    let caloriesBurned: Double
-    let activityTypeRawValue: UInt
-    let distance: Double?
+public class Workout: Codable {
+    public let startDate: Date
+    public let duration: TimeInterval
+    public let caloriesBurned: Double
+    public let activityTypeRawValue: UInt
+    public let distance: Double?
 
-    var activityType: HKWorkoutActivityType {
+    public var activityType: HKWorkoutActivityType {
         return HKWorkoutActivityType(rawValue: activityTypeRawValue) ?? .other
     }
 
-    init(workout: HKWorkout) {
+    public init(workout: HKWorkout) {
         startDate = workout.startDate
         caloriesBurned = round(workout.totalEnergyBurned?.doubleValue(for: .largeCalorie()) ?? 0)
         duration = round(workout.duration)

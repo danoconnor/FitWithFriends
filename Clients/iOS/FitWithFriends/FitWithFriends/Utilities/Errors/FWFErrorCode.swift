@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FWFErrorCode: Int {
+public enum FWFErrorCode: Int {
     case unknown = -1
 
     // MARK: Competition errors

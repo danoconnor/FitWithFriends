@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MockTokenManager: TokenManager {
+public class MockTokenManager: TokenManager {
     init() {
         super.init(keychainUtilities: MockKeychainUtilities())
     }

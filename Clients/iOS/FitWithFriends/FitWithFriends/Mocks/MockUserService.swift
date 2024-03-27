@@ -7,15 +7,27 @@
 
 import Foundation
 
-class MockUserService: UserService {
-    init() {
-        super.init(httpConnector: MockHttpConnector(), tokenManager: MockTokenManager())
-    }
-
-    var return_error: Error?
-    override func createUser(firstName: String, lastName: String, userId: String, idToken: String, authorizationCode: String) async -> Error? {
+public class MockUserService: IUserService {
+    public var param_createUser_firstName: String?
+    public var param_createUser_lastName: String?
+    public var param_createUser_userId: String?
+    public var param_createUser_idToken: String?
+    public var param_createUser_authorizationCode: String?
+    public var return_creatUser_error: Error?
+    public func createUser(firstName: String,
+                    lastName: String,
+                    userId: String,
+                    idToken: String,
+                    authorizationCode: String) async -> Error? {
+        param_createUser_firstName = firstName
+        param_createUser_lastName = lastName
+        param_createUser_userId = userId
+        param_createUser_idToken = idToken
+        param_createUser_authorizationCode = authorizationCode
+        
+        // Simulate a network delay
         await MockUtilities.delayOneSecond()
 
-        return return_error
+        return return_creatUser_error
     }
 }

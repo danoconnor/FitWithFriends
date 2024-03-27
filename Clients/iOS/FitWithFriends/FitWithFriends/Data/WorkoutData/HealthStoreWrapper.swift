@@ -8,37 +8,37 @@
 import Foundation
 import HealthKit
 
-class HealthStoreWrapper: IHealthStoreWrapper {
+public class HealthStoreWrapper: IHealthStoreWrapper {
     private let hkHealthStore: HKHealthStore
 
-    init() {
+    public init() {
         hkHealthStore = HKHealthStore()
     }
 
-    var isHealthDataAvailable: Bool {
+    public var isHealthDataAvailable: Bool {
         return HKHealthStore.isHealthDataAvailable()
     }
 
-    func requestAuthorization(toShare typesToShare: Set<HKSampleType>?,
+    public func requestAuthorization(toShare typesToShare: Set<HKSampleType>?,
                               read typesToRead: Set<HKObjectType>?,
                               completion: @escaping (Bool, (any Error)?) -> Void) {
         hkHealthStore.requestAuthorization(toShare: typesToShare, read: typesToRead, completion: completion)
     }
 
-    func enableBackgroundDelivery(for type: HKObjectType, 
+    public func enableBackgroundDelivery(for type: HKObjectType,
                                   frequency: HKUpdateFrequency,
                                   withCompletion completion: @escaping (Bool, (any Error)?) -> Void) {
         hkHealthStore.enableBackgroundDelivery(for: type, frequency: frequency, withCompletion: completion)
     }
 
-    func executeObserverQuery(queryDescriptors: [HKQueryDescriptor], updateHandler: @escaping (HKObserverQuery, Set<HKSampleType>?, @escaping HKObserverQueryCompletionHandler, (any Error)?) -> Void) -> HKObserverQuery {
+    public func executeObserverQuery(queryDescriptors: [HKQueryDescriptor], updateHandler: @escaping (HKObserverQuery, Set<HKSampleType>?, @escaping HKObserverQueryCompletionHandler, (any Error)?) -> Void) -> HKObserverQuery {
         let query = HKObserverQuery(queryDescriptors: queryDescriptors, updateHandler: updateHandler)
         hkHealthStore.execute(query)
 
         return query
     }
 
-    func executeSampleQuery(sampleType: HKSampleType, 
+    public func executeSampleQuery(sampleType: HKSampleType,
                             predicate: NSPredicate?,
                             limit: Int,
                             sortDescriptors: [NSSortDescriptor]?,
@@ -51,13 +51,13 @@ class HealthStoreWrapper: IHealthStoreWrapper {
         hkHealthStore.execute(query)
     }
     
-    func executeActivitySummaryQuery(predicate: NSPredicate?, 
+    public func executeActivitySummaryQuery(predicate: NSPredicate?,
                                      resultsHandler handler: @escaping (HKActivitySummaryQuery, [HKActivitySummary]?, (any Error)?) -> Void) {
         let query = HKActivitySummaryQuery(predicate: predicate, resultsHandler: handler)
         hkHealthStore.execute(query)
     }
     
-    func executeStatisticsQuery(quantityType: HKQuantityType, 
+    public func executeStatisticsQuery(quantityType: HKQuantityType,
                                 quantitySamplePredicate: NSPredicate?,
                                 options: HKStatisticsOptions,
                                 completionHandler handler: @escaping (HKStatisticsQuery, HKStatistics?, (any Error)?) -> Void) {
@@ -67,6 +67,4 @@ class HealthStoreWrapper: IHealthStoreWrapper {
                                       completionHandler: handler)
         hkHealthStore.execute(query)
     }
-    
-
 }

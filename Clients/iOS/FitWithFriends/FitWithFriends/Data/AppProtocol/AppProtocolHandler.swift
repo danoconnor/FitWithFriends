@@ -8,20 +8,20 @@
 import Combine
 import Foundation
 
-enum AppProtocolAction: String {
+public enum AppProtocolAction: String {
     case joinCompetition = "joincompetition"
 }
 
-protocol AppProtocolData {
+public protocol AppProtocolData {
     static var action: AppProtocolAction { get }
 }
 
-class AppProtocolHandler: ObservableObject {
-    @Published private(set) var protocolData: AppProtocolData?
+public class AppProtocolHandler: ObservableObject {
+    @Published public private(set) var protocolData: AppProtocolData?
 
     /// Takes the appropriate actions to handle the given protocol
     /// Returns true if the protocol was handled, false otherwise
-    func handleProtocol(url: URL) -> Bool {
+    public func handleProtocol(url: URL) -> Bool {
         guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return false
         }
@@ -59,7 +59,7 @@ class AppProtocolHandler: ObservableObject {
         return handled
     }
 
-    func clearProtocolData() {
+    public func clearProtocolData() {
         Logger.traceInfo(message: "Clearing protocol data")
         protocolData = nil
     }

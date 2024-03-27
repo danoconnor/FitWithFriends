@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-class CreateCompetitionViewModel: ObservableObject {
+public class CreateCompetitionViewModel: ObservableObject {
     private let authenticationManager: AuthenticationManager
     private let competitionManager: CompetitionManager
     private let homepageSheetViewModel: HomepageSheetViewModel

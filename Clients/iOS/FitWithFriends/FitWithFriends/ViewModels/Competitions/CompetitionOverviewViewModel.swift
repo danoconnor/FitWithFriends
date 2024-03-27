@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-class CompetitionOverviewViewModel: ObservableObject {
+public class CompetitionOverviewViewModel: ObservableObject {
     enum CompetitionAction: CustomStringConvertible, Hashable, Comparable {
         case deleteCompetition
         case leave

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CompetitionAdminDetails: Codable {
+public class CompetitionAdminDetails: Codable {
     let competitionId: UUID
     let competitionAccessToken: String
 

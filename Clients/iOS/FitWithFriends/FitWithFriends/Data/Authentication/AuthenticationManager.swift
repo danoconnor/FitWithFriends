@@ -9,21 +9,21 @@ import Combine
 import Foundation
 import AuthenticationServices
 
-class AuthenticationManager: ObservableObject {
-    @Published var loginState = LoginState.notLoggedIn(nil) {
+public class AuthenticationManager: ObservableObject {
+    @Published public var loginState = LoginState.notLoggedIn(nil) {
         didSet {
             Logger.traceInfo(message: "Login state changed: \(loginState)")
         }
     }
 
     private let appleAuthenticationManager: AppleAuthenticationManager
-    private let authenticationService: AuthenticationService
+    private let authenticationService: IAuthenticationService
     private let tokenManager: TokenManager
 
-    var loggedInUserId: String?
+    public var loggedInUserId: String?
 
-    init(appleAuthenticationManager: AppleAuthenticationManager,
-         authenticationService: AuthenticationService,
+    public init(appleAuthenticationManager: AppleAuthenticationManager,
+         authenticationService: IAuthenticationService,
          tokenManager: TokenManager) {
         self.appleAuthenticationManager = appleAuthenticationManager
         self.authenticationService = authenticationService
@@ -32,14 +32,14 @@ class AuthenticationManager: ObservableObject {
         setInitialLoginState()
     }
 
-    func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
+    public func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
         loginState = .inProgress
 
         Logger.traceInfo(message: "Beginning Apple login")
         appleAuthenticationManager.beginAppleLogin(presentationDelegate: delegate)
     }
 
-    func logout() {
+    public func logout() {
         Logger.traceInfo(message: "Logging out")
 
         tokenManager.deleteAllTokens()
@@ -47,7 +47,7 @@ class AuthenticationManager: ObservableObject {
         loginState = .notLoggedIn(nil)
     }
 
-    func refreshToken(token: Token) async -> Error? {
+    public func refreshToken(token: Token) async -> Error? {
         let result: Result<Token, Error> = await authenticationService.getToken(token: token)
 
         switch result {
@@ -95,7 +95,7 @@ class AuthenticationManager: ObservableObject {
 }
 
 extension AuthenticationManager: AppleAuthenticationDelegate {
-    func authenticationCompleted(result: Result<Token, Error>) {
+    public func authenticationCompleted(result: Result<Token, Error>) {
         switch result {
         case let .success(token):
             tokenManager.storeToken(token)

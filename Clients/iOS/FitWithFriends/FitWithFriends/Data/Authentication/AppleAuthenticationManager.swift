@@ -8,16 +8,16 @@
 import AuthenticationServices
 import Foundation
 
-protocol AppleAuthenticationDelegate: AnyObject {
+public protocol AppleAuthenticationDelegate: AnyObject {
     func authenticationCompleted(result: Result<Token, Error>)
 }
 
-class AppleAuthenticationManager: NSObject {
-    weak var authenticationDelegate: AppleAuthenticationDelegate?
+public class AppleAuthenticationManager: NSObject {
+    public weak var authenticationDelegate: AppleAuthenticationDelegate?
 
-    private let authenticationService: AuthenticationService
+    private let authenticationService: IAuthenticationService
     private let keychainUtilities: KeychainUtilities
-    private let userService: UserService
+    private let userService: IUserService
 
     private let appleIdProvider: ASAuthorizationAppleIDProvider
 
@@ -25,9 +25,9 @@ class AppleAuthenticationManager: NSObject {
     private static let appleUserKeychainService = "com.danoconnor.FitWithFriends"
     private static let appleUserKeychainAccount = "appleUserId"
 
-    init(authenticationService: AuthenticationService,
+    public init(authenticationService: IAuthenticationService,
          keychainUtilities: KeychainUtilities,
-         userService: UserService) {
+         userService: IUserService) {
         self.authenticationService = authenticationService
         self.keychainUtilities = keychainUtilities
         self.userService = userService
@@ -35,7 +35,7 @@ class AppleAuthenticationManager: NSObject {
         appleIdProvider = ASAuthorizationAppleIDProvider()
     }
 
-    func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {
+    public func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {
         let request = appleIdProvider.createRequest()
         request.requestedScopes = [.fullName]
 
@@ -53,7 +53,7 @@ class AppleAuthenticationManager: NSObject {
         controller.performRequests()
     }
 
-    func isAppleAccountValid() -> Bool {
+    public func isAppleAccountValid() -> Bool {
         // Get the last known Apple User ID from the keychain
         let appleUserIdResult: Result<String, KeychainError>
         appleUserIdResult = keychainUtilities.getKeychainItem(accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
@@ -102,7 +102,7 @@ class AppleAuthenticationManager: NSObject {
 }
 
 extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+    public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         Logger.traceInfo(message: "Got Apple authorization controller response")
 
         Task.detached { [weak self] in
@@ -110,7 +110,7 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
         }
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         Logger.traceError(message: "Received error from Apple authorization controller", error: error)
         authenticationDelegate?.authenticationCompleted(result: .failure(error))
     }

@@ -8,7 +8,7 @@
 import CocoaLumberjackSwift
 import Foundation
 
-class Logger {
+public class Logger {
     static let logLevel = DDLogLevel.all
 
     static func setupLogging() {

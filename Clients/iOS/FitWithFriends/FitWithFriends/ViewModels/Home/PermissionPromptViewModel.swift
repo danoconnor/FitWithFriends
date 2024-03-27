@@ -8,8 +8,8 @@
 import Combine
 import Foundation
 
-class PermissionPromptViewModel: ObservableObject {
-    private let healthKitManager: HealthKitManager
+public class PermissionPromptViewModel: ObservableObject {
+    private let healthKitManager: IHealthKitManager
     private let homepageSheetViewModel: HomepageSheetViewModel
 
     @Published private(set) var shouldPromptForHealth: Bool {
@@ -18,7 +18,7 @@ class PermissionPromptViewModel: ObservableObject {
         }
     }
 
-    init(healthKitManager: HealthKitManager,
+    init(healthKitManager: IHealthKitManager,
          homepageSheetViewModel: HomepageSheetViewModel) {
         self.healthKitManager = healthKitManager
         self.homepageSheetViewModel = homepageSheetViewModel

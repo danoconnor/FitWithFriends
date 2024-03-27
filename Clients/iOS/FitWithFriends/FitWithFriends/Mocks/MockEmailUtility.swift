@@ -7,6 +7,6 @@
 
 import Foundation
 
-class MockEmailUtility: EmailUtility {
-    override func sendEmailWithTextAttachement(subject: String, body: String, to: String, attachmentText: String, attachementFileName: String) {}
+public class MockEmailUtility: EmailUtility {
+    override public func sendEmailWithTextAttachement(subject: String, body: String, to: String, attachmentText: String, attachementFileName: String) {}
 }

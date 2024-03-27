@@ -10,14 +10,14 @@ import Foundation
 
 public class CompetitionManager: ObservableObject {
     private let authenticationManager: AuthenticationManager
-    private let competitionService: CompetitionService
+    private let competitionService: ICompetitionService
 
     private var loginStateCancellable: AnyCancellable?
 
     @Published private(set) var competitionOverviews: [UUID: CompetitionOverview]
 
     init(authenticationManager: AuthenticationManager,
-         competitionService: CompetitionService) {
+         competitionService: ICompetitionService) {
         self.authenticationManager = authenticationManager
         self.competitionService = competitionService
 
@@ -120,7 +120,7 @@ public class CompetitionManager: ObservableObject {
     }
 
     func getCompetitionDescription(for competitionId: UUID, competitionToken: String) async -> Result<CompetitionDescription, Error> {
-        return await competitionService.getCompetitionDetails(competitionId: competitionId, competitionToken: competitionToken)
+        return await competitionService.getCompetitionDescription(competitionId: competitionId, competitionToken: competitionToken)
     }
 
     func getCompetitionAdminDetail(for competitionId: UUID) async -> Result<CompetitionAdminDetails, Error> {
@@ -133,7 +133,7 @@ public class CompetitionManager: ObservableObject {
 }
 
 extension CompetitionManager: ActivityUpdateDelegate {
-    func activityDataUpdated() {
+    public func activityDataUpdated() {
         // When we have new activity data in the service, re-fetch the competition data
         // so it is up-to-date
         Task.detached {

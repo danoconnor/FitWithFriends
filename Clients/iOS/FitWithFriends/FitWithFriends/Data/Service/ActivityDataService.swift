@@ -7,9 +7,9 @@
 
 import Foundation
 
-class ActivityDataService: ServiceBase {
+public class ActivityDataService: ServiceBase, IActivityDataService {
     /// Apple's HealthKit APIs still use the completion block architecture, so add this wrapper to make things work smoothly
-    func reportActivitySummaries(_ activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
+    public func reportActivitySummaries(_ activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
         guard activitySummaries.count > 0 else {
             Logger.traceInfo(message: "No activity summaries to report")
             completion(nil)
@@ -23,7 +23,7 @@ class ActivityDataService: ServiceBase {
         }
     }
 
-    func reportWorkouts(_ workouts: [Workout], completion: @escaping (Error?) -> Void) {
+    public func reportWorkouts(_ workouts: [Workout], completion: @escaping (Error?) -> Void) {
         guard workouts.count > 0 else {
             Logger.traceInfo(message: "No workouts to report")
             completion(nil)

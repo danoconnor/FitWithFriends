@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MockKeychainUtilities: KeychainUtilities {
+public class MockKeychainUtilities: KeychainUtilities {
     var return_error: KeychainError?
 
     var return_getKeychainItem: Codable?

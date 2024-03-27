@@ -8,15 +8,15 @@
 import AuthenticationServices
 import Foundation
 
-class MockAppleAuthenticationManager: AppleAuthenticationManager {
-    init() {
+public class MockAppleAuthenticationManager: AppleAuthenticationManager {
+    public init() {
         super.init(authenticationService: MockAuthenticationService(), keychainUtilities: MockKeychainUtilities(), userService: MockUserService())
     }
 
-    override func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {}
+    override public func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {}
 
-    var return_isAppleAccountValid = true
-    override func isAppleAccountValid() -> Bool {
+    public var return_isAppleAccountValid = true
+    override public func isAppleAccountValid() -> Bool {
         return_isAppleAccountValid
     }
 }

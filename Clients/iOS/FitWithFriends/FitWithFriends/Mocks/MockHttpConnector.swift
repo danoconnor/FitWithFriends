@@ -7,12 +7,12 @@
 
 import Foundation
 
-class MockHttpConnector: HttpConnector {
-    var return_data: Decodable?
-    var return_error: Error?
-    override func makeRequest<T>(url: String,
-                                 headers: [String : String]? = nil,
-                                 body: [String : String]? = nil,
+public class MockHttpConnector: IHttpConnector {
+    public var return_data: Decodable?
+    public var return_error: Error?
+    public func makeRequest<T>(url: String,
+                                 headers: [String : String]?,
+                                 body: [String : String]?,
                                  method: HttpMethod) async -> Result<T, Error> where T : Decodable {
         await MockUtilities.delayOneSecond()
 

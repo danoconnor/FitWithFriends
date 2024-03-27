@@ -7,9 +7,9 @@
 
 import Foundation
 
-class UserService: ServiceBase {
+public class UserService: ServiceBase, IUserService {
     /// Creates a new user with the given credentials/user info. Will return an error if the username already exists
-    func createUser(firstName: String,
+    public func createUser(firstName: String,
                     lastName: String,
                     userId: String,
                     idToken: String,

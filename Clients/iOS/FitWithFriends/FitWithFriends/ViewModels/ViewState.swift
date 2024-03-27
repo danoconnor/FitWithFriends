@@ -5,20 +5,20 @@
 //  Created by Dan O'Connor on 11/22/20.
 //
 
-enum ViewOperationState: Equatable {
+public enum ViewOperationState: Equatable {
     case notStarted
     case inProgress
     case failed(errorMessage: String)
     case success
 
-    var isFailed: Bool {
+    public var isFailed: Bool {
         switch self {
         case .failed: return true
         default: return false
         }
     }
 
-    var errorMessage: String {
+    public var errorMessage: String {
         switch self {
         case let .failed(errorMessage):
             return errorMessage

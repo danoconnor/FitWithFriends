@@ -7,8 +7,8 @@
 
 import Foundation
 
-class HttpConnector {
-    func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: String]? = nil, method: HttpMethod) async -> Result<T, Error> {
+public class HttpConnector: IHttpConnector {
+    public func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: String]? = nil, method: HttpMethod) async -> Result<T, Error> {
         guard let urlObj = URL(string: url) else {
             return .failure(HttpError.invalidUrl(url: url))
         }

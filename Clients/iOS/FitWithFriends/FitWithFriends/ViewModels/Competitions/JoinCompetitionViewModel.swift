@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-class JoinCompetitionViewModel: ObservableObject {
+public class JoinCompetitionViewModel: ObservableObject {
     @Published var isLoading = true
 
     @Published var state: ViewOperationState = .notStarted

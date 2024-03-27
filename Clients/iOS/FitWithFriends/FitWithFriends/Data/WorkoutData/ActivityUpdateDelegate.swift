@@ -8,6 +8,6 @@
 import Foundation
 
 /// A delegate that is invoked whenever new activity data has been reported to the service
-protocol ActivityUpdateDelegate {
+public protocol ActivityUpdateDelegate {
     func activityDataUpdated()
 }

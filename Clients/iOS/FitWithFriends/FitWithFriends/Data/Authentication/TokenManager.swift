@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TokenManager {
+public class TokenManager {
     private let keychainUtilities: KeychainUtilities
 
     private var _token: Token?
