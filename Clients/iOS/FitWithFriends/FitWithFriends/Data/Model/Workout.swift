@@ -14,35 +14,18 @@ public class Workout: Codable {
     public let caloriesBurned: Double
     public let activityTypeRawValue: UInt
     public let distance: Double?
+    public let unit: Unit
 
     public var activityType: HKWorkoutActivityType {
         return HKWorkoutActivityType(rawValue: activityTypeRawValue) ?? .other
     }
 
-    public init(workout: HKWorkout) {
+    public init(workout: WorkoutSampleDTO) {
         startDate = workout.startDate
-        caloriesBurned = round(workout.totalEnergyBurned?.doubleValue(for: .largeCalorie()) ?? 0)
-        duration = round(workout.duration)
-        activityTypeRawValue = workout.workoutActivityType.rawValue
-
-        switch workout.workoutActivityType {
-        case .crossCountrySkiing,
-             .cycling,
-             .elliptical,
-             .hiking,
-             .paddleSports,
-             .rowing,
-             .running,
-             .swimming,
-             .walking,
-             .swimBikeRun:
-            distance = round(workout.totalDistance?.doubleValue(for: .mile()) ?? 0)
-        case .stairs,
-             .stairClimbing:
-            // For stair workouts, we measure distance in terms of stairs climbed instead of distance
-            distance = round(workout.totalFlightsClimbed?.doubleValue(for: .count()) ?? 0)
-        default:
-            distance = nil
-        }
+        duration = workout.duration
+        caloriesBurned = workout.caloriesBurned
+        activityTypeRawValue = workout.activityType.rawValue
+        distance = workout.distance
+        unit = workout.unit
     }
 }

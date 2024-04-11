@@ -11,6 +11,17 @@ import HealthKit
 import UIKit
 
 public class HealthKitManager: IHealthKitManager {
+    public enum HealthKitError: LocalizedError, CustomStringConvertible {
+        case unknownQuantityType(type: HKQuantityTypeIdentifier)
+
+        public var description: String {
+            switch self {
+            case let .unknownQuantityType(type):
+                return "Unknown quantity type in statistics query. Type: \(type.rawValue)"
+            }
+        }
+    }
+
     private let activityDataService: IActivityDataService
     private let activityUpdateDelegate: ActivityUpdateDelegate
     private let authenticationManager: AuthenticationManager
@@ -20,12 +31,12 @@ public class HealthKitManager: IHealthKitManager {
     private let activitySummaryQueue = DispatchQueue(label: "ActivitySummaryQueue")
 
     // User defaults keys
-    private static let healthPromptKey = "HasPromptedForHealthPermissions"
-    private static let lastKnownCalorieGoalKey = "LastKnownCalorieGoal"
-    private static let lastKnownExerciseGoalKey = "LastKnownExerciseGoal"
-    private static let lastKnownStandGoalKey = "LastKnownStandGoal"
-    private static let lastActivityDataUpdateKey = "LastActivityDataUpdate"
-    private static let lastWorkoutUpdateKey = "LastWorkoutUpdate"
+    public static let healthPromptKey = "HasPromptedForHealthPermissions"
+    public static let lastKnownCalorieGoalKey = "LastKnownCalorieGoal"
+    public static let lastKnownExerciseGoalKey = "LastKnownExerciseGoal"
+    public static let lastKnownStandGoalKey = "LastKnownStandGoal"
+    public static let lastActivityDataUpdateKey = "LastActivityDataUpdate"
+    public static let lastWorkoutUpdateKey = "LastWorkoutUpdate"
 
     private static let backgroundTaskTimeout: TimeInterval = 60 // 60 seconds
 
@@ -115,6 +126,7 @@ public class HealthKitManager: IHealthKitManager {
     public func requestHealthKitPermission(completion: @escaping () -> Void) {
         guard shouldPromptUser else {
             Logger.traceInfo(message: "User has already been prompted for health permissions, not prompting again")
+            completion()
             return
         }
 
@@ -162,8 +174,8 @@ public class HealthKitManager: IHealthKitManager {
         }
 
         let dispatchGroup = DispatchGroup()
-        var resultHKActivitySummary: HKActivitySummary?
-        var resultQuantities: [HKQuantityTypeIdentifier: HKStatistics] = [:]
+        var resultActivitySummaryDTO: ActivitySummaryDTO?
+        var resultQuantities: [HKQuantityTypeIdentifier: StatisticDTO] = [:]
         let quantityQueue = DispatchQueue(label: "CurrentActivitySummary_QuantityQueue")
 
         // Get the HKActivitySummary for today
@@ -179,17 +191,17 @@ public class HealthKitManager: IHealthKitManager {
                 return
             }
 
-            let summary = summaries?.first { $0.dateComponents(for: calendar) == today }
+            let summary = summaries?.first { calendar.dateComponents([.day, .month, .year, .era], from: $0.date) == today }
 
             // Update our last known goals if we were able to successfully get the summary
             // These are used when there is no data for the current day so we can show the empty rings on the homepage
             if let summary = summary {
-                self.userDefaults.set(summary.activeEnergyBurnedGoal.doubleValue(for: .kilocalorie()), forKey: HealthKitManager.lastKnownCalorieGoalKey)
-                self.userDefaults.set(summary.appleExerciseTimeGoal.doubleValue(for: .minute()), forKey: HealthKitManager.lastKnownExerciseGoalKey)
-                self.userDefaults.set(summary.appleStandHoursGoal.doubleValue(for: .count()), forKey: HealthKitManager.lastKnownStandGoalKey)
+                self.userDefaults.set(summary.activeEnergyBurnedGoal, forKey: HealthKitManager.lastKnownCalorieGoalKey)
+                self.userDefaults.set(summary.appleExerciseTimeGoal, forKey: HealthKitManager.lastKnownExerciseGoalKey)
+                self.userDefaults.set(summary.appleStandHoursGoal, forKey: HealthKitManager.lastKnownStandGoalKey)
 
                 Logger.traceVerbose(message: "Successfully got activity summary for \(today)")
-                resultHKActivitySummary = summary
+                resultActivitySummaryDTO = summary
             } else {
                 Logger.traceWarning(message: "Could not find activity summary for \(today) in result")
             }
@@ -220,15 +232,11 @@ public class HealthKitManager: IHealthKitManager {
         dispatchGroup.notify(queue: .global()) {
             Logger.traceVerbose(message: "Completed data queries for activity summary for \(today)")
 
-            var activitySummary: ActivitySummary?
-            if let resultHKActivitySummary = resultHKActivitySummary {
-                activitySummary = ActivitySummary(activitySummary: resultHKActivitySummary)
-            } else {
-                activitySummary = ActivitySummary(date: now)
-            }
+            let resultActivitySummaryDTO = resultActivitySummaryDTO ?? ActivitySummaryDTO(date: now)
+            let activitySummary = ActivitySummary(activitySummary: resultActivitySummaryDTO)
 
             for quantity in resultQuantities {
-                activitySummary?.updateStatistic(quantityType: quantity.key, value: quantity.value)
+                activitySummary.updateStatistic(quantityType: quantity.key, value: quantity.value)
             }
 
             completion(activitySummary)
@@ -273,7 +281,7 @@ public class HealthKitManager: IHealthKitManager {
         }
 
         var queryDescriptors = [
-            HKQueryDescriptor(sampleType: HKObjectType.workoutType(), predicate: nil)
+            HKQueryDescriptor(sampleType: HKObjectType.workoutType(), predicate: nil),
         ]
         queryDescriptors.append(contentsOf: HealthKitManager.quantityTypesToObserve.map {
             HKQueryDescriptor(sampleType: HKQuantityType($0), predicate: nil)
@@ -334,6 +342,7 @@ public class HealthKitManager: IHealthKitManager {
             }
 
             Logger.traceVerbose(message: "Report data complete")
+            completion()
         }
     }
 
@@ -344,10 +353,9 @@ public class HealthKitManager: IHealthKitManager {
                                                                              end: dateRange.endComponents.date)
         let workoutPredicate = HKQuery.predicateForWorkouts(activityPredicate: workoutActivityPredicate)
 
-        healthStoreWrapper.executeSampleQuery(sampleType: HKObjectType.workoutType(),
-                                              predicate: workoutPredicate,
-                                              limit: HKObjectQueryNoLimit,
-                                              sortDescriptors: nil) { [weak self] _, workouts, error in
+        healthStoreWrapper.executeWorkoutSampleQuery(predicate: workoutPredicate,
+                                                     limit: HKObjectQueryNoLimit,
+                                                     sortDescriptors: nil) { [weak self] _, workouts, error in
             guard let workouts = workouts else {
                 Logger.traceError(message: "Failed to get workouts from observer update", error: error)
                 completion()
@@ -356,12 +364,7 @@ public class HealthKitManager: IHealthKitManager {
 
             var fwfWorkouts = [Workout]()
             for workoutSample in workouts {
-                guard let hkWorkout = workoutSample as? HKWorkout else {
-                    Logger.traceWarning(message: "Could not create workout object")
-                    continue
-                }
-
-                let workout = Workout(workout: hkWorkout)
+                let workout = Workout(workout: workoutSample)
                 Logger.traceInfo(message: "Received workout update: \(workout.xtDictionary?.description ?? "nil")")
 
                 fwfWorkouts.append(workout)
@@ -381,7 +384,7 @@ public class HealthKitManager: IHealthKitManager {
         }
     }
 
-    private func reportActivitySummaries(completion: () -> Void) {
+    private func reportActivitySummaries(completion: @escaping () -> Void) {
         guard healthStoreWrapper.isHealthDataAvailable else {
             Logger.traceWarning(message: "Health data is not available on this device, not querying activity summaries")
             completion()
@@ -396,7 +399,7 @@ public class HealthKitManager: IHealthKitManager {
         // but we may still have results from others that we will try to report to the backend
         var containsFailures = false
 
-        var activitySummaries: [Date: HKActivitySummary] = [:]
+        var activitySummaries: [Date: ActivitySummaryDTO] = [:]
         dispatchGroup.enter()
         getActivitySummariesSinceLastUpdate { activityQuerySuccess, activityResults in
             resultQueue.sync {
@@ -406,19 +409,14 @@ public class HealthKitManager: IHealthKitManager {
 
                 let calendar = Calendar.current
                 for activityResult in activityResults {
-                    guard let activityDate = activityResult.dateComponents(for: calendar).date else {
-                        Logger.traceWarning(message: "Could not get date for activity!")
-                        continue
-                    }
-
-                    activitySummaries[activityDate] = activityResult
+                    activitySummaries[activityResult.date] = activityResult
                 }
             }
 
             dispatchGroup.leave()
         }
 
-        var quantityResults: [HKQuantityTypeIdentifier: [Date: HKStatistics]] = [:]
+        var quantityResults: [HKQuantityTypeIdentifier: [Date: StatisticDTO]] = [:]
         for quantityType in HealthKitManager.quantityTypesToObserve {
             dispatchGroup.enter()
             getAllDailySumsSinceLastUpdate(for: quantityType) { success, result in
@@ -446,15 +444,10 @@ public class HealthKitManager: IHealthKitManager {
 
             var updatedActivitySummaries: [ActivitySummary] = []
             for date in distinctDates {
-                var activitySummary: ActivitySummary
-                if let hkSummary = activitySummaries[date],
-                   let fwfActivitySummary = ActivitySummary(activitySummary: hkSummary) {
-                    activitySummary = fwfActivitySummary
-                } else {
-                    // If we didn't get an ActivitySummary for this day, then create an empty one
-                    // We may have additional data for this date that isn't included in the HKActivitySummary
-                    activitySummary = ActivitySummary(date: date)
-                }
+                // If we didn't get an ActivitySummary for this day, then create an empty one
+                // We may have additional data for this date that isn't included in the HKActivitySummary
+                let summaryDTO = activitySummaries[date] ?? ActivitySummaryDTO(date: date)
+                var activitySummary = ActivitySummary(activitySummary: summaryDTO)
 
                 // If we have any additional data for this day (step count, stairs climbed, etc.),
                 // then add it to the ActivitySummary
@@ -469,6 +462,10 @@ public class HealthKitManager: IHealthKitManager {
             }
 
             self.activityDataService.reportActivitySummaries(updatedActivitySummaries) { error in
+                defer {
+                    completion()
+                }
+
                 guard error == nil else {
                     Logger.traceError(message: "Failed to report activity summaries", error: error)
                     return
@@ -490,7 +487,7 @@ public class HealthKitManager: IHealthKitManager {
 
     /// Returns all daily activity summaries since the last activity summary update
     /// - Parameter completion: Returns a tuple that indicates whether the query succeeded or not and any results
-    private func getActivitySummariesSinceLastUpdate(completion: @escaping (Bool, [HKActivitySummary]) -> Void) {
+    private func getActivitySummariesSinceLastUpdate(completion: @escaping (Bool, [ActivitySummaryDTO]) -> Void) {
         // Get the activity summaries to report to the service
         let dateRange = getQueryDateRange(for: HealthKitManager.lastActivityDataUpdateKey)
         let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: dateRange.startCompenents,
@@ -514,13 +511,13 @@ public class HealthKitManager: IHealthKitManager {
     /// - Parameters:
     ///   - quantityTypeId: The quantity to query in HealthKit
     ///   - completion: Returns a tuple of success and any results. Results may be returned even if the success bool is false, because only queries on some days might have failed
-    private func getAllDailySumsSinceLastUpdate(for quantityTypeId: HKQuantityTypeIdentifier, completion: @escaping (Bool, [Date: HKStatistics]) -> Void) {
+    private func getAllDailySumsSinceLastUpdate(for quantityTypeId: HKQuantityTypeIdentifier, completion: @escaping (Bool, [Date: StatisticDTO]) -> Void) {
         let calendar = Calendar.current
         var date = getLastUpdateTime(for: HealthKitManager.lastActivityDataUpdateKey)
 
         let dispatchGroup = DispatchGroup()
         let resultsQueue = DispatchQueue(label: "getAllDailySumsResultQueue_\(String(describing: quantityTypeId))")
-        var results: [Date: HKStatistics] = [:]
+        var results: [Date: StatisticDTO] = [:]
         var hasFailure = false
 
         // Loop through each day since the last update up to and including today
@@ -564,7 +561,7 @@ public class HealthKitManager: IHealthKitManager {
         }
     }
 
-    private func getQuantityForDay(quantityTypeId: HKQuantityTypeIdentifier, date: Date, completion: @escaping (Error?, HKStatistics?) -> Void) {
+    private func getQuantityForDay(quantityTypeId: HKQuantityTypeIdentifier, date: Date, completion: @escaping (Error?, StatisticDTO?) -> Void) {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: date)
         let endOfDay = startOfDay.addingTimeInterval(60 * 60 * 24 - 1) // Set end of day as 1 second before midnight
@@ -576,7 +573,25 @@ public class HealthKitManager: IHealthKitManager {
         let dateRangeDescription = "\(startOfDay.description) to \(endOfDay.description)"
         Logger.traceInfo(message: "Executing query for \(String(describing: quantityTypeId)) in date range \(dateRangeDescription)")
 
-        healthStoreWrapper.executeStatisticsQuery(quantityType: HKQuantityType(quantityTypeId), quantitySamplePredicate: predicate, options: .cumulativeSum) { _, statistics, error in
+        let hkUnitForType: HKUnit
+        switch quantityTypeId {
+        case .activeEnergyBurned:
+            hkUnitForType = .largeCalorie()
+        case .appleExerciseTime:
+            hkUnitForType = .minute()
+        case .distanceWalkingRunning:
+            hkUnitForType = .meter()
+        case .appleStandTime, .stepCount, .flightsClimbed:
+            hkUnitForType = .count()
+        default:
+            completion(HttpError.generic, nil)
+            return
+        }
+
+        healthStoreWrapper.executeStatisticsQuery(quantityType: HKQuantityType(quantityTypeId),
+                                                  resultUnit: hkUnitForType,
+                                                  quantitySamplePredicate: predicate,
+                                                  options: .cumulativeSum) { _, statistics, error in
             if let error = error {
                 Logger.traceError(message: "Failed to get data for \(String(describing: quantityTypeId)) on \(date)",
                                   error: error)

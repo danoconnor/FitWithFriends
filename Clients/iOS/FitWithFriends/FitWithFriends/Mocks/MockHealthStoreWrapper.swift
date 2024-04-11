@@ -28,14 +28,17 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
             completion(self.return_authorizationSuccess, self.return_authorizationError)
         }
     }
-    
-    public var param_type: HKObjectType?
-    public var param_frequency: HKUpdateFrequency?
+
+    public var requestedBackgroundTypes: [(type: HKObjectType, frequency: HKUpdateFrequency)] = []
+    public var param_backgroundDelivery_type: HKObjectType?
+    public var param_backgroundDelivery_frequency: HKUpdateFrequency?
     public var return_enableBackgroundDeliverySuccess: Bool = true
     public var return_enableBackgroundDeliveryError: Error?
     public func enableBackgroundDelivery(for type: HKObjectType, frequency: HKUpdateFrequency, withCompletion completion: @escaping (Bool, (any Error)?) -> Void) {
-        param_type = type
-        param_frequency = frequency
+        param_backgroundDelivery_type = type
+        param_backgroundDelivery_frequency = frequency
+
+        requestedBackgroundTypes.append((type: type, frequency: frequency))
 
         // Kick it to a background thread to better mock the real HealthStoreWrapper
         DispatchQueue.global().async {
@@ -50,25 +53,28 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
         param_queryDescriptors = queryDescriptors
         param_updateHandler = updateHandler
 
+        return_observerQuery = HKObserverQuery(queryDescriptors: queryDescriptors,
+                                               updateHandler: updateHandler)
         return return_observerQuery!
     }
     
-    public var param_sampleQuery_sampleType: HKSampleType?
+
     public var param_sampleQuery_predicate: NSPredicate?
     public var param_sampleQuery_limit: Int?
     public var param_sampleQuery_sortDescriptors: [NSSortDescriptor]?
-    public var param_sampleQuery_resultsHandler: ((HKSampleQuery, [HKSample]?, (any Error)?) -> Void)?
-    public var return_sampleQuery_samples: [HKSample]?
+    public var param_sampleQuery_resultsHandler: ((HKSampleQuery, [WorkoutSampleDTO]?, (any Error)?) -> Void)?
+    public var return_sampleQuery_samples: [WorkoutSampleDTO]?
     public var return_sampleQuery_error: Error?
-    public func executeSampleQuery(sampleType: HKSampleType, predicate: NSPredicate?, limit: Int, sortDescriptors: [NSSortDescriptor]?, resultsHandler: @escaping (HKSampleQuery, [HKSample]?, (any Error)?) -> Void) {
-        param_sampleQuery_sampleType = sampleType
+    public func executeWorkoutSampleQuery(predicate: NSPredicate?, limit: Int, sortDescriptors: [NSSortDescriptor]?, resultsHandler: @escaping (HKSampleQuery, [WorkoutSampleDTO]?, (any Error)?) -> Void) {
         param_sampleQuery_predicate = predicate
         param_sampleQuery_limit = limit
         param_sampleQuery_sortDescriptors = sortDescriptors
         param_sampleQuery_resultsHandler = resultsHandler
 
         // Create the query because we need to return it, but we aren't going to actually execute this query
-        let sampleQuery = HKSampleQuery(sampleType: sampleType, predicate: predicate, limit: limit, sortDescriptors: sortDescriptors, resultsHandler: resultsHandler)
+        let sampleQuery = HKSampleQuery(sampleType: .workoutType(), predicate: predicate, limit: limit, sortDescriptors: sortDescriptors) { _, _, _ in
+            // No need to call the handler here, we will call it manually because we aren't actually executing this query
+        }
 
         // Kick it to a background thread to better mock the real HealthStoreWrapper
         DispatchQueue.global().async {
@@ -77,15 +83,17 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     }
     
     public var param_activitySummaryQuery_predicate: NSPredicate?
-    public var param_activitySummaryQuery_handler: ((HKActivitySummaryQuery, [HKActivitySummary]?, (any Error)?) -> Void)?
-    public var return_activitySummaryQuery_activitySummaries: [HKActivitySummary]?
+    public var param_activitySummaryQuery_handler: ((HKActivitySummaryQuery, [ActivitySummaryDTO]?, (any Error)?) -> Void)?
+    public var return_activitySummaryQuery_activitySummaries: [ActivitySummaryDTO]?
     public var return_activitySummaryQuery_error: Error?
-    public func executeActivitySummaryQuery(predicate: NSPredicate?, resultsHandler handler: @escaping (HKActivitySummaryQuery, [HKActivitySummary]?, (any Error)?) -> Void) {
+    public func executeActivitySummaryQuery(predicate: NSPredicate?, resultsHandler handler: @escaping (HKActivitySummaryQuery, [ActivitySummaryDTO]?, (any Error)?) -> Void) {
         param_activitySummaryQuery_predicate = predicate
         param_activitySummaryQuery_handler = handler
 
         // Create the query because we need to return it, but we aren't going to actually execute this query
-        let activitySummaryQuery = HKActivitySummaryQuery(predicate: predicate, resultsHandler: handler)
+        let activitySummaryQuery = HKActivitySummaryQuery(predicate: predicate) { _, _, _ in
+            // No need to call the handler here, we will call it manually because we aren't actually executing this query
+        }
 
         // Kick it to a background thread to better mock the real HealthStoreWrapper
         DispatchQueue.global().async {
@@ -94,23 +102,28 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     }
     
     public var param_statisticsQuery_quantityType: HKQuantityType?
+    public var param_statisticsQuery_resultUnit: HKUnit?
     public var param_statisticsQuery_quantitySamplePredicate: NSPredicate?
     public var param_statisticsQuery_options: HKStatisticsOptions?
-    public var param_statisticsQuery_handler: ((HKStatisticsQuery, HKStatistics?, (any Error)?) -> Void)?
-    public var return_statisticsQuery_statistics: HKStatistics?
+    public var param_statisticsQuery_handler: ((HKStatisticsQuery, StatisticDTO?, (any Error)?) -> Void)?
+    public var return_statisticsQuery_statistics: [HKQuantityType: StatisticDTO] = [:]
     public var return_statisticsQuery_error: Error?
-    public func executeStatisticsQuery(quantityType: HKQuantityType, quantitySamplePredicate: NSPredicate?, options: HKStatisticsOptions, completionHandler handler: @escaping (HKStatisticsQuery, HKStatistics?, (any Error)?) -> Void) {
+    public func executeStatisticsQuery(quantityType: HKQuantityType, resultUnit: HKUnit, quantitySamplePredicate: NSPredicate?, options: HKStatisticsOptions, completionHandler handler: @escaping (HKStatisticsQuery, StatisticDTO?, (any Error)?) -> Void) {
         param_statisticsQuery_quantityType = quantityType
+        param_statisticsQuery_resultUnit = resultUnit
         param_statisticsQuery_quantitySamplePredicate = quantitySamplePredicate
         param_statisticsQuery_options = options
         param_statisticsQuery_handler = handler
 
         // Create the query because we need to return it, but we aren't going to actually execute this query
-        let statisticsQuery = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: quantitySamplePredicate, options: options, completionHandler: handler)
+        let statisticsQuery = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: quantitySamplePredicate, options: options) { _, _, _ in
+            // No need to call the handler here, we will call it manually because we aren't actually executing this query
+        }
 
         // Kick it to a background thread to better mock the real HealthStoreWrapper
         DispatchQueue.global().async {
-            handler(statisticsQuery, self.return_statisticsQuery_statistics, self.return_statisticsQuery_error)
+            let statisticsToReturn = self.return_statisticsQuery_statistics[quantityType]
+            handler(statisticsQuery, statisticsToReturn, self.return_statisticsQuery_error)
         }
     }
     

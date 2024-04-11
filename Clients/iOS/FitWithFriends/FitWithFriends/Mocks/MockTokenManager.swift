@@ -8,7 +8,7 @@
 import Foundation
 
 public class MockTokenManager: TokenManager {
-    init() {
+    public init() {
         super.init(keychainUtilities: MockKeychainUtilities())
     }
 

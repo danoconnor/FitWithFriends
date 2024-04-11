@@ -11,5 +11,6 @@ public enum FWFErrorCode: Int {
     case unknown = -1
 
     // MARK: Competition errors
+    
     case tooManyActiveCompetitions = 10001
 }

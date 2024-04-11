@@ -8,19 +8,23 @@
 import Foundation
 import HealthKit
 
-public class ActivitySummary: IdentifiableBase, Codable {
+public class ActivitySummary: IdentifiableBase, Encodable {
     public let date: Date
-    public private(set) var activeCaloriesBurned: Double
-    public private(set) var activeCaloriesGoal: Double
-    public private(set) var exerciseTime: Double
-    public private(set) var exerciseTimeGoal: Double
-    public private(set) var standTime: Double
-    public private(set) var standTimeGoal: Double
-    public private(set) var distanceWalkingRunning: Double?
+
+    public let activeCaloriesGoal: UInt
+    public let exerciseTimeGoal: UInt
+    public let standTimeGoal: UInt
+
+    public private(set) var activeCaloriesBurned: UInt
+    public private(set) var exerciseTime: UInt
+    public private(set) var standTime: UInt
+    public private(set) var distanceWalkingRunning: UInt?
     public private(set) var stepCount: UInt?
     public private(set) var flightsClimbed: UInt?
 
-    public private(set) var activitySummary: HKActivitySummary?
+    /// Expose the underlying HKActivitySummary since we need it to use Apple's built in UI
+    /// for displaying the health rings
+    public let hkActivitySummary: HKActivitySummary
 
     enum CodingKeys: String, CodingKey {
         case date
@@ -35,63 +39,34 @@ public class ActivitySummary: IdentifiableBase, Codable {
         case flightsClimbed
     }
 
-    /// Creates an empty `ActivitySummary` for the given date
-    public init(date: Date) {
-        self.date = date
-
-        self.activeCaloriesBurned = 0
-        self.activeCaloriesGoal = 0
-        self.exerciseTime = 0
-        self.exerciseTimeGoal = 0
-        self.standTime = 0
-        self.standTimeGoal = 0
-    }
-
-    /// Creates an `ActivitySummary` for the given date with zero progress towards any of the given goals
-    public init(date: Date, calorieGoal: Double, exerciseGoal: Double, standGoal: Double) {
-        self.date = date
-
-        activeCaloriesBurned = 0
-        activeCaloriesGoal = calorieGoal
-        exerciseTime = 0
-        exerciseTimeGoal = exerciseGoal
-        standTime = 0
-        standTimeGoal = standGoal
-    }
-
     /// Creates an `ActivitySummary` based on the summary returned by Apple HealthKit
-    public init?(activitySummary: HKActivitySummary) {
-        guard let activityDate = activitySummary.dateComponents(for: Calendar.current).date else {
-            Logger.traceError(message: "Tried to initialize ActivitySummary without valid date")
-            return nil
-        }
+    public init(activitySummary: ActivitySummaryDTO) {
+        date = activitySummary.date
+        activeCaloriesBurned = activitySummary.activeEnergyBurned
+        activeCaloriesGoal = activitySummary.activeEnergyBurnedGoal
+        exerciseTime = activitySummary.appleExerciseTime
+        exerciseTimeGoal = activitySummary.appleExerciseTimeGoal
+        standTime = activitySummary.appleStandHours
+        standTimeGoal = activitySummary.appleStandHoursGoal
 
-        date = activityDate
-        activeCaloriesBurned = round(activitySummary.activeEnergyBurned.doubleValue(for: .largeCalorie()))
-        activeCaloriesGoal = round(activitySummary.activeEnergyBurnedGoal.doubleValue(for: .largeCalorie()))
-        exerciseTime = round(activitySummary.appleExerciseTime.doubleValue(for: .minute()))
-        exerciseTimeGoal = round(activitySummary.appleExerciseTimeGoal.doubleValue(for: .minute()))
-        standTime = round(activitySummary.appleStandHours.doubleValue(for: .count()))
-        standTimeGoal = round(activitySummary.appleStandHoursGoal.doubleValue(for: .count()))
-
-        self.activitySummary = activitySummary
+        self.hkActivitySummary = activitySummary.hkActivitySummary
     }
 
-    public func updateStatistic(quantityType: HKQuantityTypeIdentifier, value: HKStatistics) {
+    public func updateStatistic(quantityType: HKQuantityTypeIdentifier, value: StatisticDTO) {
         switch quantityType {
         case .activeEnergyBurned:
-            activeCaloriesBurned = value.sumQuantity()?.doubleValue(for: .largeCalorie()) ?? 0
+            activeCaloriesBurned = value.sumValue
         case .appleExerciseTime:
-            exerciseTime = value.sumQuantity()?.doubleValue(for: .minute()) ?? 0
+            exerciseTime = value.sumValue
         case .appleStandTime:
             // Convert min to hours
-            standTime = (value.sumQuantity()?.doubleValue(for: .minute()) ?? 0) / 60
+            standTime = value.sumValue
         case .distanceWalkingRunning:
-            distanceWalkingRunning = value.sumQuantity()?.doubleValue(for: .meter())
+            distanceWalkingRunning = value.sumValue
         case .stepCount:
-            stepCount = UInt(round(value.sumQuantity()?.doubleValue(for: .count()) ?? 0))
+            stepCount = value.sumValue
         case .flightsClimbed:
-            flightsClimbed = UInt(round(value.sumQuantity()?.doubleValue(for: .count()) ?? 0))
+            flightsClimbed = value.sumValue
         default:
             Logger.traceError(message: "Unexpected quantity type: \(String(describing: quantityType))")
         }
@@ -102,9 +77,9 @@ extension ActivitySummary {
     /// This is an estimate of the points that this activity summary will provide
     /// The real source of truth comes from the service in the CompetitionOverview entity
     public var competitionPoints: Double {
-        let caloriePoints = activeCaloriesGoal > 0 ? activeCaloriesBurned / activeCaloriesGoal * 100 : 0
-        let exercisePoints = exerciseTimeGoal > 0 ? exerciseTime / exerciseTimeGoal * 100 : 0
-        let standPoints = standTimeGoal > 0 ? standTime / standTimeGoal * 100 : 0
+        let caloriePoints = activeCaloriesGoal > 0 ? Double(activeCaloriesBurned) / Double(activeCaloriesGoal) * 100 : 0
+        let exercisePoints = exerciseTimeGoal > 0 ? Double(exerciseTime) / Double(exerciseTimeGoal) * 100 : 0
+        let standPoints = standTimeGoal > 0 ? Double(standTime) / Double(standTimeGoal) * 100 : 0
         let totalPoints = caloriePoints + exercisePoints + standPoints
 
         // Apple's competition scoring has a maximum of 600 pts/day

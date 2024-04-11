@@ -29,23 +29,23 @@ public protocol IHealthStoreWrapper {
     func executeObserverQuery(queryDescriptors: [HKQueryDescriptor], 
                               updateHandler: @escaping (HKObserverQuery, Set<HKSampleType>?, @escaping HKObserverQueryCompletionHandler, (any Error)?) -> Void) -> HKObserverQuery
 
-    /// Creates and executes an HKSampleQuery with the given parameters
+    /// Creates and executes an HKSampleQuery for the .workoutType() with the given parameters
     /// See `HKSampleQuery` for details on the parameters
-    func executeSampleQuery(sampleType: HKSampleType, 
-                            predicate: NSPredicate?,
-                            limit: Int,
-                            sortDescriptors: [NSSortDescriptor]?,
-                            resultsHandler: @escaping (HKSampleQuery, [HKSample]?, (any Error)?) -> Void)
+    func executeWorkoutSampleQuery(predicate: NSPredicate?,
+                                   limit: Int,
+                                   sortDescriptors: [NSSortDescriptor]?,
+                                   resultsHandler: @escaping (HKSampleQuery, [WorkoutSampleDTO]?, (any Error)?) -> Void)
 
     /// Creates and executes an HKActivitySummaryQuery with the given parameters
     /// See `HKActivitySummaryQuery` for details on the parameters
     func executeActivitySummaryQuery(predicate: NSPredicate?, 
-                                     resultsHandler handler: @escaping (HKActivitySummaryQuery, [HKActivitySummary]?, (any Error)?) -> Void)
+                                     resultsHandler handler: @escaping (HKActivitySummaryQuery, [ActivitySummaryDTO]?, (any Error)?) -> Void)
 
     /// Creates and executes an HKStatisticsQuery with the given parameters
     /// See `HKStatisticsQuery` for details on the parameter
     func executeStatisticsQuery(quantityType: HKQuantityType, 
+                                resultUnit: HKUnit,
                                 quantitySamplePredicate: NSPredicate?,
                                 options: HKStatisticsOptions,
-                                completionHandler handler: @escaping (HKStatisticsQuery, HKStatistics?, (any Error)?) -> Void)
+                                completionHandler handler: @escaping (HKStatisticsQuery, StatisticDTO?, (any Error)?) -> Void)
 }

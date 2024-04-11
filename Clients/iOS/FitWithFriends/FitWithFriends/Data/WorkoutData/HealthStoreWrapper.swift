@@ -38,33 +38,55 @@ public class HealthStoreWrapper: IHealthStoreWrapper {
         return query
     }
 
-    public func executeSampleQuery(sampleType: HKSampleType,
-                            predicate: NSPredicate?,
-                            limit: Int,
-                            sortDescriptors: [NSSortDescriptor]?,
-                            resultsHandler: @escaping (HKSampleQuery, [HKSample]?, (any Error)?) -> Void) {
-        let query = HKSampleQuery(sampleType: sampleType, 
+    public func executeWorkoutSampleQuery(predicate: NSPredicate?,
+                                          limit: Int,
+                                          sortDescriptors: [NSSortDescriptor]?,
+                                          resultsHandler: @escaping (HKSampleQuery, [WorkoutSampleDTO]?, (any Error)?) -> Void) {
+        let query = HKSampleQuery(sampleType: .workoutType(),
                                   predicate: predicate,
                                   limit: limit,
-                                  sortDescriptors: sortDescriptors,
-                                  resultsHandler: resultsHandler)
+                                  sortDescriptors: sortDescriptors) { query, samples, error in
+            let dto = samples?.compactMap { sample in
+                if let workoutSample = sample as? HKWorkout {
+                    return WorkoutSampleDTO(workout: workoutSample)
+                } else {
+                    Logger.traceWarning(message: "Sample was not of type HKWorkout. Actual type: \(type(of: sample))")
+                    return nil
+                }
+            }
+
+            resultsHandler(query, dto, error)
+        }
         hkHealthStore.execute(query)
     }
     
     public func executeActivitySummaryQuery(predicate: NSPredicate?,
-                                     resultsHandler handler: @escaping (HKActivitySummaryQuery, [HKActivitySummary]?, (any Error)?) -> Void) {
-        let query = HKActivitySummaryQuery(predicate: predicate, resultsHandler: handler)
+                                     resultsHandler handler: @escaping (HKActivitySummaryQuery, [ActivitySummaryDTO]?, (any Error)?) -> Void) {
+        let query = HKActivitySummaryQuery(predicate: predicate) { query, summaries, error in
+            let dto = summaries?.compactMap { ActivitySummaryDTO(hkActivitySummary: $0) }
+            handler(query, dto, error)
+        }
         hkHealthStore.execute(query)
     }
     
     public func executeStatisticsQuery(quantityType: HKQuantityType,
-                                quantitySamplePredicate: NSPredicate?,
-                                options: HKStatisticsOptions,
-                                completionHandler handler: @escaping (HKStatisticsQuery, HKStatistics?, (any Error)?) -> Void) {
+                                       resultUnit: HKUnit,
+                                       quantitySamplePredicate: NSPredicate?,
+                                       options: HKStatisticsOptions,
+                                       completionHandler handler: @escaping (HKStatisticsQuery, StatisticDTO?, (any Error)?) -> Void) {
         let query = HKStatisticsQuery(quantityType: quantityType,
                                       quantitySamplePredicate: quantitySamplePredicate,
-                                      options: options,
-                                      completionHandler: handler)
+                                      options: options) { query, statistic, error in
+            let dto: StatisticDTO?
+            if let statistic = statistic {
+                dto = StatisticDTO(hkStatistic: statistic, unit: resultUnit)
+            } else {
+                // The error field should be populated in this case
+                dto = nil
+            }
+
+            handler(query, dto, error)
+        }
         hkHealthStore.execute(query)
     }
 }

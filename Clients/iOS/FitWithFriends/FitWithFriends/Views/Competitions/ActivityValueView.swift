@@ -11,15 +11,15 @@ struct ActivityValueView: View {
     let name: String
     let unit: String
     let color: Color
-    let currentValue: Double
-    let goal: Double
+    let currentValue: UInt
+    let goal: UInt
 
     var body: some View {
         VStack {
             Text(name)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text("\(Int(currentValue))/\(Int(goal)) \(unit.uppercased())")
+            Text("\(currentValue)/\(goal) \(unit.uppercased())")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .foregroundColor(color)
         }

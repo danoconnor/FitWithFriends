@@ -8,6 +8,8 @@
 import Foundation
 
 public class MockHttpConnector: IHttpConnector {
+    public init() {}
+
     public var return_data: Decodable?
     public var return_error: Error?
     public func makeRequest<T>(url: String,
