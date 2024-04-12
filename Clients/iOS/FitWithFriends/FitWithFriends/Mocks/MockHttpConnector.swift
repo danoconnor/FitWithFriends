@@ -15,13 +15,13 @@ public class MockHttpConnector: IHttpConnector {
     public func makeRequest<T>(url: String,
                                  headers: [String : String]?,
                                  body: [String : String]?,
-                                 method: HttpMethod) async -> Result<T, Error> where T : Decodable {
+                                 method: HttpMethod) async throws -> T where T : Decodable {
         await MockUtilities.delayOneSecond()
 
         if let data = return_data as? T {
-            return .success(data)
+            return data
         } else {
-            return .failure(return_error ?? HttpError.generic)
+            throw return_error ?? HttpError.generic
         }
     }
 }

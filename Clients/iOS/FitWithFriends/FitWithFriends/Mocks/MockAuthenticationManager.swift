@@ -37,9 +37,4 @@ public class MockAuthenticationManager: AuthenticationManager {
         self.loginState = .notLoggedIn(nil)
         self.loggedInUserId = nil
     }
-
-    override public func refreshToken(token: Token) async -> Error? {
-        await MockUtilities.delayOneSecond()
-        return return_error
-    }
 }

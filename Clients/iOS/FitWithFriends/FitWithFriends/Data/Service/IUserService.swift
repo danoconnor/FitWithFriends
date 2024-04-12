@@ -16,10 +16,9 @@ public protocol IUserService {
     ///   - userId: The userId provided by Apple
     ///   - idToken: The idToken provided by Apple
     ///   - authorizationCode: The authorization code provided by Apple
-    /// - Returns: Nil if the request succeeds, or a relevant error if it failed
     func createUser(firstName: String,
                     lastName: String,
                     userId: String,
                     idToken: String,
-                    authorizationCode: String) async -> Error?
+                    authorizationCode: String) async throws
 }

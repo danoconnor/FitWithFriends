@@ -7,8 +7,8 @@
 
 import Foundation
 
-public class KeychainUtilities {
-    func getKeychainItem<T: Codable>(accessGroup: String, service: String, account: String) -> Result<T, KeychainError> {
+public class KeychainUtilities: IKeychainUtilities {
+    public func getKeychainItem<T: Codable>(accessGroup: String, service: String, account: String) throws -> T {
         let queryDictionary: [CFString: Any?] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
@@ -30,26 +30,26 @@ public class KeychainUtilities {
             }
 
             Logger.traceError(message: "Failed to query keychain for item. AccessGroup = \(accessGroup), Service = \(service), Account = \(account)", error: error)
-            return .failure(error)
+            throw error
         }
 
         guard let returnedData = result as? Data else {
             Logger.traceError(message: "Got success code but no result was returned")
-            return .failure(.couldNotParseKeychainData)
+            throw KeychainError.couldNotParseKeychainData
         }
 
         do {
             // Objects are converted to JSON when writing to the keychain so we'll treat the retuned data as JSON here
             let decodedObject = try JSONDecoder.fwfDefaultDecoder.decode(T.self, from: returnedData)
-            return .success(decodedObject)
+            return decodedObject
         } catch {
             print(error.localizedDescription)
             Logger.traceError(message: "Failed to unarchive data returned from keychain", error: error)
-            return .failure(.encodingError(innerError: error))
+            throw KeychainError.encodingError(innerError: error)
         }
     }
 
-    func writeKeychainItem<T: Codable>(_ item: T, accessGroup: String, service: String, account: String, updateExistingItemIfNecessary: Bool) -> KeychainError? {
+    public func writeKeychainItem<T: Codable>(_ item: T, accessGroup: String, service: String, account: String, updateExistingItemIfNecessary: Bool) throws {
         // The dictionary that lets us find the target entry
         let queryDictionary: [CFString: Any?] = [
             kSecClass: kSecClassGenericPassword,
@@ -63,7 +63,7 @@ public class KeychainUtilities {
         do {
             jsonData = try JSONEncoder.fwfDefaultEncoder.encode(item)
         } catch {
-            return .encodingError(innerError: error)
+            throw KeychainError.encodingError(innerError: error)
         }
 
         // Dictionary to use to create a new keychain item
@@ -87,13 +87,11 @@ public class KeychainUtilities {
             }
 
             Logger.traceError(message: "Failed to add data to keychain. AccessGroup = \(accessGroup), Service = \(service), Account = \(account)", error: error)
-            return error
+            throw error
         }
-
-        return nil
     }
 
-    func deleteKeychainItem(accessGroup: String, service: String, account: String) -> KeychainError? {
+    public func deleteKeychainItem(accessGroup: String, service: String, account: String) throws {
         let queryDictionary: [CFString: Any?] = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
@@ -107,13 +105,11 @@ public class KeychainUtilities {
         if status != errSecSuccess, status != errSecItemNotFound {
             let error = KeychainError.generic(statusCode: status)
             Logger.traceError(message: "Failed to delete keychain item. AccessGroup = \(accessGroup), Service = \(service), Account = \(account)", error: error)
-            return error
+            throw error
         }
-
-        return nil
     }
 
-    func deleteAllItems(in accessGroup: String) -> KeychainError? {
+    public func deleteAllItems(in accessGroup: String) throws {
         let queryDictionary: [CFString: Any?] = [
             kSecAttrAccessGroup: getAccessGroupWithPrefix(accessGroup: accessGroup),
             kSecClass: kSecClassGenericPassword
@@ -125,10 +121,8 @@ public class KeychainUtilities {
         if status != errSecSuccess, status != errSecItemNotFound {
             let error = KeychainError.generic(statusCode: status)
             Logger.traceError(message: "Failed to delete all keychain items", error: error)
-            return error
+            throw error
         }
-
-        return nil
     }
 
     private func getAccessGroupWithPrefix(accessGroup: String) -> String {

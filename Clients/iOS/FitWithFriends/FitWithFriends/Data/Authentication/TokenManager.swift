@@ -7,8 +7,8 @@
 
 import Foundation
 
-public class TokenManager {
-    private let keychainUtilities: KeychainUtilities
+public class TokenManager: ITokenManager {
+    private let keychainUtilities: IKeychainUtilities
 
     private var _token: Token?
     private let tokenQueue = DispatchQueue(label: "TokenManagerQueue")
@@ -21,35 +21,43 @@ public class TokenManager {
     private let tokenKeychainService = "com.danoconnor.FitWithFriends"
     private let tokenKeychainAccount = "accessToken"
 
-    init(keychainUtilities: KeychainUtilities) {
+    public init(keychainUtilities: IKeychainUtilities) {
         self.keychainUtilities = keychainUtilities
     }
 
-    func getCachedToken() -> Result<Token, TokenError> {
+    public func getCachedToken() throws -> Token {
         // Use the in-memory token cache for performance
         if let token = cachedToken {
             Logger.traceInfo(message: "Found token in memory cache")
-            return token.isAccessTokenExpired ? .failure(.expired(token: token)) : .success(token)
+
+            if token.isAccessTokenExpired {
+                throw TokenError.expired(token: token)
+            }
+
+            return token
         }
 
-        // If we don't have a token in memory, check the keychain
-        Logger.traceInfo(message: "Searching for token in keychain")
-        let keychainResult: Result<Token, KeychainError> = keychainUtilities.getKeychainItem(accessGroup: tokenKeychainGroup,
-                                                                                             service: tokenKeychainService,
-                                                                                             account: tokenKeychainAccount)
+        do {
+            // If we don't have a token in memory, check the keychain
+            Logger.traceInfo(message: "Searching for token in keychain")
+            let keychainToken: Token = try keychainUtilities.getKeychainItem(accessGroup: tokenKeychainGroup,
+                                                                             service: tokenKeychainService,
+                                                                             account: tokenKeychainAccount)
 
-        switch keychainResult {
-        case let .success(token):
             Logger.traceInfo(message: "Found token data in keychain")
-            cachedToken = token
-            return token.isAccessTokenExpired ? .failure(.expired(token: token)) : .success(token)
-        case .failure:
-            Logger.traceInfo(message: "No token found in keychain")
-            return .failure(.notFound)
+
+            if keychainToken.isAccessTokenExpired {
+                throw TokenError.expired(token: keychainToken)
+            }
+
+            return keychainToken
+        } catch {
+            Logger.traceError(message: "Couldn't find token in keychain", error: error)
+            throw error
         }
     }
 
-    func storeToken(_ token: Token) {
+    public func storeToken(_ token: Token) {
         // When we use the refresh token to get a new access token,
         // the server won't return the refresh token in the response.
         // In that case, re-use the previously known refresh token
@@ -60,26 +68,27 @@ public class TokenManager {
 
         cachedToken = token
 
-        let keychainResult = keychainUtilities.writeKeychainItem(token,
-                                                                 accessGroup: tokenKeychainGroup,
-                                                                 service: tokenKeychainService,
-                                                                 account: tokenKeychainAccount,
-                                                                 updateExistingItemIfNecessary: true)
-
-        if let error = keychainResult {
+        do {
+            try keychainUtilities.writeKeychainItem(token,
+                                                    accessGroup: tokenKeychainGroup,
+                                                    service: tokenKeychainService,
+                                                    account: tokenKeychainAccount,
+                                                    updateExistingItemIfNecessary: true)
+        } catch {
             Logger.traceError(message: "Could not save token to keychain", error: error)
         }
     }
 
-    func deleteAllTokens() {
-        if let error = keychainUtilities.deleteKeychainItem(accessGroup: tokenKeychainGroup,
-                                                            service: tokenKeychainService,
-                                                            account: tokenKeychainAccount) {
-            Logger.traceError(message: "Failed to delete tokens from keychain", error: error)
-            return
-        }
+    public func deleteAllTokens() {
+        do {
+            try keychainUtilities.deleteKeychainItem(accessGroup: tokenKeychainGroup,
+                                                     service: tokenKeychainService,
+                                                     account: tokenKeychainAccount)
 
-        cachedToken = nil
-        Logger.traceInfo(message: "Successfully deleted cached tokens")
+            cachedToken = nil
+            Logger.traceInfo(message: "Successfully deleted cached tokens")
+        } catch {
+            Logger.traceError(message: "Failed to delete tokens from keychain", error: error)
+        }
     }
 }

@@ -18,7 +18,7 @@ public class MockUserService: IUserService {
                     lastName: String,
                     userId: String,
                     idToken: String,
-                    authorizationCode: String) async -> Error? {
+                    authorizationCode: String) async throws {
         param_createUser_firstName = firstName
         param_createUser_lastName = lastName
         param_createUser_userId = userId
@@ -28,6 +28,8 @@ public class MockUserService: IUserService {
         // Simulate a network delay
         await MockUtilities.delayOneSecond()
 
-        return return_creatUser_error
+        if let error = return_creatUser_error {
+            throw error
+        }
     }
 }

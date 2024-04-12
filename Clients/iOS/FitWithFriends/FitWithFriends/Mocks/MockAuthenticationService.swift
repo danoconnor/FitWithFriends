@@ -9,28 +9,36 @@ import Foundation
 
 public class MockAuthenticationService: IAuthenticationService {
     public var param_getToken_token: Token?
-    public var return_getToken: Result<Token, Error>?
-    public func getToken(token: Token) async -> Result<Token, Error> {
+    public var return_getToken: Token?
+    public func getToken(token: Token) async throws -> Token {
         param_getToken_token = token
         
         // Simulate a network delay
         await MockUtilities.delayOneSecond()
-        
-        return return_getToken ?? .failure(HttpError.generic)
+
+        if let retVal = return_getToken {
+            return retVal
+        } else {
+            throw HttpError.generic
+        }
     }
     
     public var param_getTokenFromAppleId_userId: String?
     public var param_getTokenFromAppleId_idToken: String?
     public var param_getTokenFromAppleId_authorizationCode: String?
-    public var return_getTokenFromAppleId: Result<Token, Error>?
-    public func getTokenFromAppleId(userId: String, idToken: String, authorizationCode: String) async -> Result<Token, Error> {
+    public var return_getTokenFromAppleId: Token?
+    public func getTokenFromAppleId(userId: String, idToken: String, authorizationCode: String) async throws -> Token {
         param_getTokenFromAppleId_userId = userId
         param_getTokenFromAppleId_idToken = idToken
         param_getTokenFromAppleId_authorizationCode = authorizationCode
 
         // Simulate a network delay
         await MockUtilities.delayOneSecond()
-        
-        return return_getTokenFromAppleId ?? .failure(HttpError.generic)
+
+        if let retVal = return_getTokenFromAppleId {
+            return retVal
+        } else {
+            throw HttpError.generic
+        }
     }
 }

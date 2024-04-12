@@ -17,9 +17,9 @@ public class MockObjectGraph: IObjectGraph {
     var emailUtility: EmailUtility
     var healthKitManager: IHealthKitManager
     var httpConnector: IHttpConnector
-    var keychainUtilities: KeychainUtilities
+    var keychainUtilities: IKeychainUtilities
     var shakeGestureHandler: ShakeGestureHandler
-    var tokenManager: TokenManager
+    var tokenManager: ITokenManager
     var userDefaults: UserDefaults
     var userService: IUserService
 

@@ -13,7 +13,7 @@ public class UserService: ServiceBase, IUserService {
                     lastName: String,
                     userId: String,
                     idToken: String,
-                    authorizationCode: String) async -> Error? {
+                    authorizationCode: String) async throws {
         let requestBody: [String: String] = [
             "firstName": firstName,
             "lastName": lastName,
@@ -23,9 +23,8 @@ public class UserService: ServiceBase, IUserService {
         ]
 
         let url = "\(SecretConstants.serviceBaseUrl)/users/userFromAppleID"
-        let result: Result<EmptyResponse, Error> =  await makeRequestWithClientAuthentication(url: url,
-                                                                                              method: .post,
-                                                                                              body: requestBody)
-        return result.xtError
+        let _: EmptyResponse = try await makeRequestWithClientAuthentication(url: url,
+                                                                             method: .post,
+                                                                             body: requestBody)
     }
 }

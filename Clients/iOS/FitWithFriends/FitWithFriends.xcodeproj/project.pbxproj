@@ -124,6 +124,7 @@
 		0BCF647E2BC75F57004E98C7 /* Unit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF647D2BC75F57004E98C7 /* Unit.swift */; };
 		0BCF64812BC76945004E98C7 /* ActivityDataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF647F2BC768EE004E98C7 /* ActivityDataServiceTests.swift */; };
 		0BCF64832BC76A16004E98C7 /* ITokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF64822BC76A16004E98C7 /* ITokenManager.swift */; };
+		0BCF64852BC76C1F004E98C7 /* IKeychainUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF64842BC76C1F004E98C7 /* IKeychainUtilities.swift */; };
 		0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */; };
 		0BD8B5B927D419E5009BA5F2 /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */; };
 		0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5BA27D41F2E009BA5F2 /* UserPosition.swift */; };
@@ -265,6 +266,7 @@
 		0BCF647D2BC75F57004E98C7 /* Unit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unit.swift; sourceTree = "<group>"; };
 		0BCF647F2BC768EE004E98C7 /* ActivityDataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDataServiceTests.swift; sourceTree = "<group>"; };
 		0BCF64822BC76A16004E98C7 /* ITokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITokenManager.swift; sourceTree = "<group>"; };
+		0BCF64842BC76C1F004E98C7 /* IKeychainUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKeychainUtilities.swift; sourceTree = "<group>"; };
 		0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
 		0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
 		0BD8B5BA27D41F2E009BA5F2 /* UserPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPosition.swift; sourceTree = "<group>"; };
@@ -545,6 +547,7 @@
 			isa = PBXGroup;
 			children = (
 				0B99FC1F256A273D00673133 /* KeychainUtilities.swift */,
+				0BCF64842BC76C1F004E98C7 /* IKeychainUtilities.swift */,
 			);
 			path = Keychain;
 			sourceTree = "<group>";
@@ -852,6 +855,7 @@
 				0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */,
 				0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */,
 				0B47A23D279CB69400C2970E /* MockEmailUtility.swift in Sources */,
+				0BCF64852BC76C1F004E98C7 /* IKeychainUtilities.swift in Sources */,
 				0B1CBEC527C30F390008C72A /* MockAppProtocolHandler.swift in Sources */,
 				0B47A23F279CB6D600C2970E /* MockHealthKitManager.swift in Sources */,
 				0B1CBEC327C309B20008C72A /* JoinCompetitionProtocolData.swift in Sources */,

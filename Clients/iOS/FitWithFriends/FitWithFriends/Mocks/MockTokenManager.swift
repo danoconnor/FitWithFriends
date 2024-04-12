@@ -7,22 +7,20 @@
 
 import Foundation
 
-public class MockTokenManager: TokenManager {
-    public init() {
-        super.init(keychainUtilities: MockKeychainUtilities())
-    }
+public class MockTokenManager: ITokenManager {
+    public init() {}
 
     var return_token: Token?
     var return_cachedTokenError: TokenError?
-    override func getCachedToken() -> Result<Token, TokenError> {
+    public func getCachedToken() throws -> Token {
         if let token = return_token {
-            return .success(token)
+            return token
         } else {
-            return .failure(return_cachedTokenError ?? TokenError.notFound)
+            throw return_cachedTokenError ?? TokenError.notFound
         }
     }
 
-    override func storeToken(_ token: Token) {}
+    public func storeToken(_ token: Token) {}
 
-    override func deleteAllTokens() {}
+    public func deleteAllTokens() {}
 }

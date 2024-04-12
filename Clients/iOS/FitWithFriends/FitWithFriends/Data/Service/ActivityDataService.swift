@@ -18,8 +18,12 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
 
         Task.detached { [weak self] in
             guard let self = self else { return }
-            let error = await self.reportActivitySummaries(activitySummaries)
-            completion(error)
+            do {
+                try await self.reportActivitySummaries(activitySummaries)
+                completion(nil)
+            } catch {
+                completion(error)
+            }
         }
     }
 
@@ -32,33 +36,27 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
 
         Task.detached { [weak self] in
             guard let self = self else { return }
-            let error = await self.reportWorkouts(workouts)
-            completion(error)
+            do {
+                try await self.reportWorkouts(workouts)
+                completion(nil)
+            } catch {
+                completion(error)
+            }
         }
     }
 
-    private func reportActivitySummaries(_ activitySummaries: [ActivitySummary]) async -> Error? {
-        do {
-            let requestBody = try getRequestBody(for: activitySummaries)
-            let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
-                                                                                               method: .post,
-                                                                                               body: requestBody)
-            return result.xtError
-        } catch {
-            return error
-        }
+    private func reportActivitySummaries(_ activitySummaries: [ActivitySummary]) async throws {
+        let requestBody = try getRequestBody(for: activitySummaries)
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
+                                                                           method: .post,
+                                                                           body: requestBody)
     }
 
-    private func reportWorkouts(_ workouts: [Workout]) async -> Error? {
-        do {
-            let requestBody = try getRequestBody(for: workouts)
-            let result: Result<EmptyResponse, Error> = await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/workouts",
-                                                                                               method: .post,
-                                                                                               body: requestBody)
-            return result.xtError
-        } catch {
-            return error
-        }
+    private func reportWorkouts(_ workouts: [Workout]) async throws {
+        let requestBody = try getRequestBody(for: workouts)
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/workouts",
+                                                                           method: .post,
+                                                                           body: requestBody)
     }
 
     private func getRequestBody<T>(for entities: [T]) throws -> [String: String] where T : Encodable {

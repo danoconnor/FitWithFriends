@@ -40,11 +40,10 @@ public class JoinCompetitionViewModel: ObservableObject {
                 return
             }
 
-            let result = await self.competitionManager.getCompetitionDescription(for: joinCompetitionProtocolData.competitionId,
-                                                                                 competitionToken: joinCompetitionProtocolData.competitionToken)
+            do {
+                let description = try await self.competitionManager.getCompetitionDescription(for: joinCompetitionProtocolData.competitionId,
+                                                                                              competitionToken: joinCompetitionProtocolData.competitionToken)
 
-            switch result {
-            case let .success(description):
                 self.adminName = "Created by " + description.adminName
                 self.competitionName = description.competitionName
 
@@ -61,7 +60,7 @@ public class JoinCompetitionViewModel: ObservableObject {
                 await MainActor.run { [weak self] in
                     self?.isLoading = false
                 }
-            case let .failure(error):
+            } catch {
                 Logger.traceError(message: "Could not get competition description for \(joinCompetitionProtocolData.competitionId)", error: error)
 
                 // Dismiss the join competition modal
@@ -80,11 +79,18 @@ public class JoinCompetitionViewModel: ObservableObject {
             return
         }
 
-        let error =  await competitionManager.joinCompetition(competitionId: joinCompetitionProtocolData.competitionId,
-                                                              competitionToken: joinCompetitionProtocolData.competitionToken)
-
         let newState: ViewOperationState
-        if let error = error {
+        do {
+            try await competitionManager.joinCompetition(competitionId: joinCompetitionProtocolData.competitionId,
+                                                         competitionToken: joinCompetitionProtocolData.competitionToken)
+
+            // Refresh the competitions list and dismiss the modal
+            Logger.traceInfo(message: "Successfully joined competition \(joinCompetitionProtocolData.competitionId.description)")
+            newState = .success
+
+            await competitionManager.refreshCompetitionOverviews()
+            homepageSheetViewModel.updateState(sheet: .joinCompetition, state: false)
+        } catch {
             Logger.traceError(message: "Failed to join competition \(joinCompetitionProtocolData.competitionId.description)", error: error)
 
             var errorMessage = error.localizedDescription
@@ -101,13 +107,6 @@ public class JoinCompetitionViewModel: ObservableObject {
             }
 
             newState = .failed(errorMessage: errorMessage)
-        } else {
-            // No error - refresh the competitions list and dismiss the modal
-            Logger.traceInfo(message: "Successfully joined competition \(joinCompetitionProtocolData.competitionId.description)")
-            newState = .success
-
-            await competitionManager.refreshCompetitionOverviews()
-            homepageSheetViewModel.updateState(sheet: .joinCompetition, state: false)
         }
 
         await MainActor.run {

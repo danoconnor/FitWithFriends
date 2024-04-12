@@ -17,9 +17,9 @@ protocol IObjectGraph {
     var emailUtility: EmailUtility { get }
     var healthKitManager: IHealthKitManager { get }
     var httpConnector: IHttpConnector { get }
-    var keychainUtilities: KeychainUtilities { get }
+    var keychainUtilities: IKeychainUtilities { get }
     var shakeGestureHandler: ShakeGestureHandler { get }
-    var tokenManager: TokenManager { get }
+    var tokenManager: ITokenManager { get }
     var userDefaults: UserDefaults { get }
     var userService: IUserService { get }
 }

@@ -11,10 +11,10 @@ import Fit_with_Friends
 import XCTest
 
 final class ActivityDataServiceTests: XCTestCase {
-    private var activityDataService: ActivityDataService?
+    private var activityDataService: ActivityDataService!
 
-    private var httpConnector: MockHttpConnector?
-    private var tokenManager: MockTokenManager?
+    private var httpConnector: MockHttpConnector!
+    private var tokenManager: MockTokenManager!
 
     override func setUp() {
         httpConnector = MockHttpConnector()

@@ -19,9 +19,9 @@ class ObjectGraph: IObjectGraph {
     let healthKitManager: IHealthKitManager
     let healthStoreWrapper: IHealthStoreWrapper
     let httpConnector: IHttpConnector
-    let keychainUtilities: KeychainUtilities
+    let keychainUtilities: IKeychainUtilities
     let shakeGestureHandler: ShakeGestureHandler
-    let tokenManager: TokenManager
+    let tokenManager: ITokenManager
     let userDefaults: UserDefaults
     let userService: IUserService
 
