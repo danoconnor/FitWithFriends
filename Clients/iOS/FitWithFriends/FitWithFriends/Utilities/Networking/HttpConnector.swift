@@ -8,7 +8,7 @@
 import Foundation
 
 public class HttpConnector: IHttpConnector {
-    public func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: String]? = nil, method: HttpMethod) async throws -> T {
+    public func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: Any]? = nil, method: HttpMethod) async throws -> T {
         guard let urlObj = URL(string: url) else {
             throw HttpError.invalidUrl(url: url)
         }
@@ -17,13 +17,7 @@ public class HttpConnector: IHttpConnector {
         request.httpMethod = method.rawValue
 
         if let body = body {
-            var kvPairs: [String] = []
-            body.forEach {
-                kvPairs.append("\($0.key)=\($0.value)")
-            }
-
-            let bodyString = kvPairs.joined(separator: "&")
-            request.httpBody = bodyString.data(using: .utf8)
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
         }
 
         if let headers = headers {

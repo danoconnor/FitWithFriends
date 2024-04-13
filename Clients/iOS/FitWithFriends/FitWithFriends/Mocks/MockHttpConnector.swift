@@ -10,12 +10,21 @@ import Foundation
 public class MockHttpConnector: IHttpConnector {
     public init() {}
 
+    public var param_url: String?
+    public var param_headers: [String: String]?
+    public var param_body: [String: Any]?
+    public var param_method: HttpMethod?
     public var return_data: Decodable?
     public var return_error: Error?
     public func makeRequest<T>(url: String,
-                                 headers: [String : String]?,
-                                 body: [String : String]?,
-                                 method: HttpMethod) async throws -> T where T : Decodable {
+                               headers: [String : String]?,
+                               body: [String : Any]?,
+                               method: HttpMethod) async throws -> T where T : Decodable {
+        param_url = url
+        param_headers = headers
+        param_body = body
+        param_method = method
+
         await MockUtilities.delayOneSecond()
 
         if let data = return_data as? T {

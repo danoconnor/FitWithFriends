@@ -80,8 +80,7 @@ public class ServiceBase {
     /// Makes a request using a user token.
     /// If there is no available token, an error will be returned and the caller should prompt the user for credentials and use those to fetch a new token
     /// If there is a token available, but it is expired, then an attempt will be made to automatically fetch a new access token using a stored refresh token
-    func makeRequestWithUserAuthentication<T: Decodable>(url: String, method: HttpMethod, body: [String: String]? = nil) async throws -> T {
-        
+    func makeRequestWithUserAuthentication<T: Decodable>(url: String, method: HttpMethod, body: [String: Any]? = nil) async throws -> T {
         let tokenResult: Token
         do {
             let cachedToken = try tokenManager.getCachedToken()
@@ -103,7 +102,7 @@ public class ServiceBase {
     private func refreshTokenAndRetryRequest<T: Decodable>(expiredToken: Token,
                                                            url: String,
                                                            method: HttpMethod,
-                                                           body: [String: String]? = nil) async throws ->T {
+                                                           body: [String: Any]? = nil) async throws ->T {
         do {
             let token = try await getToken(token: expiredToken)
 

@@ -26,4 +26,13 @@ public class Token: Codable {
 
         return refreshTokenExpiry < Date()
     }
+
+    /// Used by unit tests
+    init(accessToken: String, accessTokenExpiry: Date, refreshToken: String? = nil, refreshTokenExpiry: Date? = nil, userId: String) {
+        self.accessToken = accessToken
+        self.accessTokenExpiry = accessTokenExpiry
+        self.refreshToken = refreshToken
+        self.refreshTokenExpiry = refreshTokenExpiry
+        self.userId = userId
+    }
 }

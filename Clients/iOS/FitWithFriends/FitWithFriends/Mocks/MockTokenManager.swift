@@ -10,7 +10,11 @@ import Foundation
 public class MockTokenManager: ITokenManager {
     public init() {}
 
-    var return_token: Token?
+    var return_token: Token? = Token(accessToken: "ACCESS_TOKEN",
+                                     accessTokenExpiry: Date(timeIntervalSinceNow: 60 * 60),
+                                     refreshToken: "REFRESH_TOKEN", 
+                                     refreshTokenExpiry: Date(timeIntervalSinceNow: 60 * 60 * 24),
+                                     userId: "ABCDEF1234")
     var return_cachedTokenError: TokenError?
     public func getCachedToken() throws -> Token {
         if let token = return_token {

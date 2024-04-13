@@ -8,7 +8,10 @@
 import Foundation
 
 public protocol IHttpConnector {
-    func makeRequest<T: Decodable>(url: String, headers: [String: String]?, body: [String: String]?, method: HttpMethod) async throws -> T
+    func makeRequest<T: Decodable>(url: String, 
+                                   headers: [String: String]?,
+                                   body: [String: Any]?,
+                                   method: HttpMethod) async throws -> T
 }
 
 // Helper extension to provide default values

@@ -8,7 +8,7 @@
 import Foundation
 
 public class ActivityDataService: ServiceBase, IActivityDataService {
-    /// Apple's HealthKit APIs still use the completion block architecture, so add this wrapper to make things work smoothly
+    /// Apple's HealthKit APIs still use the completion block pattern, so add this wrapper to make things work smoothly
     public func reportActivitySummaries(_ activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
         guard activitySummaries.count > 0 else {
             Logger.traceInfo(message: "No activity summaries to report")
@@ -27,6 +27,7 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
         }
     }
 
+    /// Apple's HealthKit APIs still use the completion block pattern, so add this wrapper to make things work smoothly
     public func reportWorkouts(_ workouts: [Workout], completion: @escaping (Error?) -> Void) {
         guard workouts.count > 0 else {
             Logger.traceInfo(message: "No workouts to report")
@@ -59,8 +60,10 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
                                                                            body: requestBody)
     }
 
-    private func getRequestBody<T>(for entities: [T]) throws -> [String: String] where T : Encodable {
-        let encodedData = try JSONEncoder.fwfDefaultEncoder.encode(entities)
+    private func getRequestBody<T>(for entities: [T]) throws -> [String: Any] where T : Encodable {
+        let encodedData = try JSONEncoder.fwfDefaultEncoder.encode([
+            "values": entities
+        ])
         let jsonData = try JSONSerialization.jsonObject(with: encodedData, options: .allowFragments)
 
         guard let anyDict = jsonData as? [String: Any] else {
@@ -68,6 +71,6 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
             throw HttpError.generic
         }
 
-        return anyDict.mapValues { String(describing: $0) }
+        return anyDict
     }
 }
