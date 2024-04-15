@@ -22,7 +22,7 @@ public class UserService: ServiceBase, IUserService {
             "authorizationCode": authorizationCode
         ]
 
-        let url = "\(SecretConstants.serviceBaseUrl)/users/userFromAppleID"
+        let url = "\(serverEnvironmentManager.baseUrl)/users/userFromAppleID"
         let _: EmptyResponse = try await makeRequestWithClientAuthentication(url: url,
                                                                              method: .post,
                                                                              body: requestBody)

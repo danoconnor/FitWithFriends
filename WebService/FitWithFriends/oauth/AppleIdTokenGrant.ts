@@ -39,7 +39,7 @@ class AppleIdTokenGrant extends AbstractGrantType {
                     throw new InvalidRequestError('Token validation failed');
                 }
 
-                // The userId will be something like 002261.d372c8cb204940c02479ef472f717857.2341
+                // The userId will be something like 002261.abcdef123456789002479ef472f717857.2341
                 // We want the database to handle it as hex to save on storage space, so we'll remove the '.' chars
                 // which leaves only valid hex chars remaining
                 const hexUserId = userId.replace(/\./g, '');

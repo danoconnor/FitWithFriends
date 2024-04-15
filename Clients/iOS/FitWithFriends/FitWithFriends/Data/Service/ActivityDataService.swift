@@ -47,30 +47,14 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
     }
 
     private func reportActivitySummaries(_ activitySummaries: [ActivitySummary]) async throws {
-        let requestBody = try getRequestBody(for: activitySummaries)
-        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/dailySummary",
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/activityData/dailySummary",
                                                                            method: .post,
-                                                                           body: requestBody)
+                                                                           body: ValueArrayDTO(values: activitySummaries))
     }
 
     private func reportWorkouts(_ workouts: [Workout]) async throws {
-        let requestBody = try getRequestBody(for: workouts)
-        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/activityData/workouts",
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/activityData/workouts",
                                                                            method: .post,
-                                                                           body: requestBody)
-    }
-
-    private func getRequestBody<T>(for entities: [T]) throws -> [String: Any] where T : Encodable {
-        let encodedData = try JSONEncoder.fwfDefaultEncoder.encode([
-            "values": entities
-        ])
-        let jsonData = try JSONSerialization.jsonObject(with: encodedData, options: .allowFragments)
-
-        guard let anyDict = jsonData as? [String: Any] else {
-            Logger.traceError(message: "Failed to convert workout array to JSON")
-            throw HttpError.generic
-        }
-
-        return anyDict
+                                                                           body: ValueArrayDTO(values: workouts))
     }
 }

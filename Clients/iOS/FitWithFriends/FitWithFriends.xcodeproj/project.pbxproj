@@ -125,6 +125,10 @@
 		0BCF64812BC76945004E98C7 /* ActivityDataServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF647F2BC768EE004E98C7 /* ActivityDataServiceTests.swift */; };
 		0BCF64832BC76A16004E98C7 /* ITokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF64822BC76A16004E98C7 /* ITokenManager.swift */; };
 		0BCF64852BC76C1F004E98C7 /* IKeychainUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF64842BC76C1F004E98C7 /* IKeychainUtilities.swift */; };
+		0BCF64882BCA29C0004E98C7 /* ValueArrayDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF64872BCA29C0004E98C7 /* ValueArrayDTO.swift */; };
+		0BCF648B2BCC25CC004E98C7 /* ServerEnvironmentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF648A2BCC25CC004E98C7 /* ServerEnvironmentManager.swift */; };
+		0BCF64972BCC3F55004E98C7 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0BCF64962BCC3F55004E98C7 /* Settings.bundle */; };
+		0BCF649B2BCCB790004E98C7 /* ServerEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCF649A2BCCB790004E98C7 /* ServerEnvironment.swift */; };
 		0BD42FF525B6671700968D87 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */; };
 		0BD8B5B927D419E5009BA5F2 /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */; };
 		0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD8B5BA27D41F2E009BA5F2 /* UserPosition.swift */; };
@@ -267,6 +271,10 @@
 		0BCF647F2BC768EE004E98C7 /* ActivityDataServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDataServiceTests.swift; sourceTree = "<group>"; };
 		0BCF64822BC76A16004E98C7 /* ITokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITokenManager.swift; sourceTree = "<group>"; };
 		0BCF64842BC76C1F004E98C7 /* IKeychainUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKeychainUtilities.swift; sourceTree = "<group>"; };
+		0BCF64872BCA29C0004E98C7 /* ValueArrayDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueArrayDTO.swift; sourceTree = "<group>"; };
+		0BCF648A2BCC25CC004E98C7 /* ServerEnvironmentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerEnvironmentManager.swift; sourceTree = "<group>"; };
+		0BCF64962BCC3F55004E98C7 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		0BCF649A2BCCB790004E98C7 /* ServerEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerEnvironment.swift; sourceTree = "<group>"; };
 		0BD42FF425B6671700968D87 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
 		0BD8B5B827D419E5009BA5F2 /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
 		0BD8B5BA27D41F2E009BA5F2 /* UserPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPosition.swift; sourceTree = "<group>"; };
@@ -432,6 +440,7 @@
 		0B99FBCC256A016900673133 /* FitWithFriends */ = {
 			isa = PBXGroup;
 			children = (
+				0BCF64942BCC3F0B004E98C7 /* RootSettings */,
 				0B47A223279CA88800C2970E /* Mocks */,
 				0B35977D25715675006D956A /* Data */,
 				0BF759C325B67CB60098AE13 /* Resources */,
@@ -474,6 +483,7 @@
 		0B99FBE3256A048500673133 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				0BCF64892BCC25B2004E98C7 /* Environment */,
 				0B99FC12256A1BDE00673133 /* EmptyResponse.swift */,
 				0B99FC2A256A2C5300673133 /* ErrorResponse.swift */,
 				0B99FBE4256A04A200673133 /* HttpConnector.swift */,
@@ -529,6 +539,7 @@
 		0B99FC19256A250D00673133 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				0BCF64862BCA29A7004E98C7 /* DTOs */,
 				0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */,
 				0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */,
 				0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */,
@@ -674,6 +685,31 @@
 			path = DTOs;
 			sourceTree = "<group>";
 		};
+		0BCF64862BCA29A7004E98C7 /* DTOs */ = {
+			isa = PBXGroup;
+			children = (
+				0BCF64872BCA29C0004E98C7 /* ValueArrayDTO.swift */,
+			);
+			path = DTOs;
+			sourceTree = "<group>";
+		};
+		0BCF64892BCC25B2004E98C7 /* Environment */ = {
+			isa = PBXGroup;
+			children = (
+				0BCF648A2BCC25CC004E98C7 /* ServerEnvironmentManager.swift */,
+				0BCF649A2BCCB790004E98C7 /* ServerEnvironment.swift */,
+			);
+			path = Environment;
+			sourceTree = "<group>";
+		};
+		0BCF64942BCC3F0B004E98C7 /* RootSettings */ = {
+			isa = PBXGroup;
+			children = (
+				0BCF64962BCC3F55004E98C7 /* Settings.bundle */,
+			);
+			path = RootSettings;
+			sourceTree = "<group>";
+		};
 		0BF759C325B67CB60098AE13 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -718,6 +754,7 @@
 				0B99FBC6256A016900673133 /* Sources */,
 				0B99FBC7256A016900673133 /* Frameworks */,
 				0B99FBC8256A016900673133 /* Resources */,
+				0BCF64992BCCB4F4004E98C7 /* Remove Settings bundle from Release builds */,
 			);
 			buildRules = (
 			);
@@ -789,10 +826,33 @@
 				0BF759C525B67CD00098AE13 /* Colors.xcassets in Resources */,
 				0B99FBD5256A016900673133 /* Preview Assets.xcassets in Resources */,
 				0B99FBD2256A016900673133 /* Assets.xcassets in Resources */,
+				0BCF64972BCC3F55004E98C7 /* Settings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0BCF64992BCCB4F4004E98C7 /* Remove Settings bundle from Release builds */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Remove Settings bundle from Release builds";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Our Settings.bundle (which displays FwF settings in the iOS Settings app) only contains settings related to debug builds\n# so remove it from Release builds\nBUILD_APP_DIR=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app\"\n\nif [ $CONFIGURATION == \"Release\" ]; then\n    rm -rf \"$BUILD_APP_DIR/Settings.bundle\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0B0879792BB3A8E80073AB09 /* Sources */ = {
@@ -810,6 +870,7 @@
 			files = (
 				0B8D65E227DEDBD500934E18 /* SignInWithAppleButton.swift in Sources */,
 				0BCF64832BC76A16004E98C7 /* ITokenManager.swift in Sources */,
+				0BCF648B2BCC25CC004E98C7 /* ServerEnvironmentManager.swift in Sources */,
 				0BBD78B025A0335100E08EB2 /* DateFormatter+Extensions.swift in Sources */,
 				0BBD78A5259A552900E08EB2 /* Result+Extensions.swift in Sources */,
 				0B99FC2B256A2C5300673133 /* ErrorResponse.swift in Sources */,
@@ -863,6 +924,7 @@
 				0B99FC17256A20A800673133 /* AuthenticationManager.swift in Sources */,
 				0B8D65E427DEE1A000934E18 /* WelcomeViewModel.swift in Sources */,
 				0BBD789C259A4BB600E08EB2 /* CompetitionService.swift in Sources */,
+				0BCF649B2BCCB790004E98C7 /* ServerEnvironment.swift in Sources */,
 				0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */,
 				0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */,
 				0B47A231279CB12600C2970E /* MockUserService.swift in Sources */,
@@ -913,6 +975,7 @@
 				0B08796F2BB251450073AB09 /* IHttpConnector.swift in Sources */,
 				0B08796D2BB0FCD20073AB09 /* IHealthKitManager.swift in Sources */,
 				0B0B413428143D4A0053541A /* FirstLaunchWelcomeView.swift in Sources */,
+				0BCF64882BCA29C0004E98C7 /* ValueArrayDTO.swift in Sources */,
 				0B47A233279CB24200C2970E /* MockObjectGraph.swift in Sources */,
 				0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */,
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,

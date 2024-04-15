@@ -10,7 +10,7 @@ import Foundation
 public protocol IHttpConnector {
     func makeRequest<T: Decodable>(url: String, 
                                    headers: [String: String]?,
-                                   body: [String: Any]?,
+                                   body: Encodable?,
                                    method: HttpMethod) async throws -> T
 }
 

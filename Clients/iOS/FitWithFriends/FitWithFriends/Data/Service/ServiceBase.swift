@@ -13,9 +13,13 @@ public class ServiceBase {
 
     private static var activeRefreshTokenTask: Task<Token, Error>?
 
+    let serverEnvironmentManager: ServerEnvironmentManager
+
     public init(httpConnector: IHttpConnector,
+                serverEnvironmentManager: ServerEnvironmentManager,
                 tokenManager: ITokenManager) {
         self.httpConnector = httpConnector
+        self.serverEnvironmentManager = serverEnvironmentManager
         self.tokenManager = tokenManager
     }
 
@@ -46,7 +50,7 @@ public class ServiceBase {
                 RequestConstants.Body.refreshToken: refreshToken
             ]
 
-            let result: Token = try await self.makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
+            let result: Token = try await self.makeRequestWithClientAuthentication(url: "\(serverEnvironmentManager.baseUrl)/oauth/token",
                                                                                    method: .post,
                                                                                    body: requestBody)
 
@@ -67,7 +71,7 @@ public class ServiceBase {
     /// Makes a request to the service and authenticates by providing the client ID/secret.
     /// This request is not authenticated as a specific user
     func makeRequestWithClientAuthentication<T: Decodable>(url: String, method: HttpMethod, body: [String: String]? = nil) async throws -> T {
-        let authString = "\(SecretConstants.clientId):\(SecretConstants.clientSecret)"
+        let authString = "\(serverEnvironmentManager.clientId):\(serverEnvironmentManager.clientSecret)"
         let base64AuthString = authString.data(using: .utf8)!.base64EncodedString()
 
         let headers: [String: String] = [
@@ -80,8 +84,7 @@ public class ServiceBase {
     /// Makes a request using a user token.
     /// If there is no available token, an error will be returned and the caller should prompt the user for credentials and use those to fetch a new token
     /// If there is a token available, but it is expired, then an attempt will be made to automatically fetch a new access token using a stored refresh token
-    func makeRequestWithUserAuthentication<T: Decodable>(url: String, method: HttpMethod, body: [String: Any]? = nil) async throws -> T {
-        let tokenResult: Token
+    func makeRequestWithUserAuthentication<T: Decodable>(url: String, method: HttpMethod, body: Encodable? = nil) async throws -> T {
         do {
             let cachedToken = try tokenManager.getCachedToken()
 
@@ -102,7 +105,7 @@ public class ServiceBase {
     private func refreshTokenAndRetryRequest<T: Decodable>(expiredToken: Token,
                                                            url: String,
                                                            method: HttpMethod,
-                                                           body: [String: Any]? = nil) async throws ->T {
+                                                           body: Encodable? = nil) async throws ->T {
         do {
             let token = try await getToken(token: expiredToken)
 

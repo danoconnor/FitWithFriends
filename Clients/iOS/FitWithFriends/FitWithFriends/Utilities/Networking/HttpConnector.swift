@@ -8,7 +8,7 @@
 import Foundation
 
 public class HttpConnector: IHttpConnector {
-    public func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: [String: Any]? = nil, method: HttpMethod) async throws -> T {
+    public func makeRequest<T: Decodable>(url: String, headers: [String: String]? = nil, body: Encodable? = nil, method: HttpMethod) async throws -> T {
         guard let urlObj = URL(string: url) else {
             throw HttpError.invalidUrl(url: url)
         }
@@ -17,7 +17,22 @@ public class HttpConnector: IHttpConnector {
         request.httpMethod = method.rawValue
 
         if let body = body {
-            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            // Our OAuth server requires the request to be in form-urlencoded format
+            // so if the body is a [String: String], then send it as form-urlencoded
+            // Otherwise, send it as standard json
+            if let bodyDict = body as? [String: String] {
+                var kvPairs: [String] = []
+                bodyDict.forEach {
+                    kvPairs.append("\($0.key)=\($0.value)")
+                }
+
+                let bodyString = kvPairs.joined(separator: "&")
+                request.httpBody = bodyString.data(using: .utf8)
+                request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            } else {
+                request.httpBody = try JSONEncoder.fwfDefaultEncoder.encode(body)
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            }
         }
 
         if let headers = headers {

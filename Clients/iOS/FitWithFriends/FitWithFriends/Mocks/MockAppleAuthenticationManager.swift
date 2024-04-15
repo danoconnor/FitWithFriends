@@ -10,7 +10,7 @@ import Foundation
 
 public class MockAppleAuthenticationManager: AppleAuthenticationManager {
     public init() {
-        super.init(authenticationService: MockAuthenticationService(), keychainUtilities: MockKeychainUtilities(), userService: MockUserService())
+        super.init(authenticationService: MockAuthenticationService(), keychainUtilities: MockKeychainUtilities(), serverEnvironmentManager: ServerEnvironmentManager(userDefaults: UserDefaults.standard), userService: MockUserService())
     }
 
     override public func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {}

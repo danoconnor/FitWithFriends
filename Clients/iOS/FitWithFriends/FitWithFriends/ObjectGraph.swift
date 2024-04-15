@@ -20,6 +20,7 @@ class ObjectGraph: IObjectGraph {
     let healthStoreWrapper: IHealthStoreWrapper
     let httpConnector: IHttpConnector
     let keychainUtilities: IKeychainUtilities
+    let serverEnvironmentManager: ServerEnvironmentManager
     let shakeGestureHandler: ShakeGestureHandler
     let tokenManager: ITokenManager
     let userDefaults: UserDefaults
@@ -33,16 +34,18 @@ class ObjectGraph: IObjectGraph {
         emailUtility = EmailUtility()
         healthStoreWrapper = HealthStoreWrapper()
 
+        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults)
         shakeGestureHandler = ShakeGestureHandler(emailUtility: emailUtility)
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
 
-        activityDataService = ActivityDataService(httpConnector: httpConnector, tokenManager: tokenManager)
-        authenticationService = AuthenticationService(httpConnector: httpConnector, tokenManager: tokenManager)
-        competitionService = CompetitionService(httpConnector: httpConnector, tokenManager: tokenManager)
-        userService = UserService(httpConnector: httpConnector, tokenManager: tokenManager)
+        activityDataService = ActivityDataService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
+        authenticationService = AuthenticationService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
+        competitionService = CompetitionService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
+        userService = UserService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
 
         appleAuthenticationManager = AppleAuthenticationManager(authenticationService: authenticationService,
-                                                                keychainUtilities: keychainUtilities,
+                                                                keychainUtilities: keychainUtilities, 
+                                                                serverEnvironmentManager: serverEnvironmentManager,
                                                                 userService: userService)
         authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,
                                                       authenticationService: authenticationService,

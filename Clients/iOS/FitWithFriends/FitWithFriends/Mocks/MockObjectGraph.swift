@@ -18,6 +18,7 @@ public class MockObjectGraph: IObjectGraph {
     var healthKitManager: IHealthKitManager
     var httpConnector: IHttpConnector
     var keychainUtilities: IKeychainUtilities
+    var serverEnvironmentManager: ServerEnvironmentManager
     var shakeGestureHandler: ShakeGestureHandler
     var tokenManager: ITokenManager
     var userDefaults: UserDefaults
@@ -38,5 +39,7 @@ public class MockObjectGraph: IObjectGraph {
         tokenManager = MockTokenManager()
         userDefaults = UserDefaults.standard
         userService = MockUserService()
+
+        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults)
     }
 }

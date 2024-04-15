@@ -12,13 +12,13 @@ public class MockHttpConnector: IHttpConnector {
 
     public var param_url: String?
     public var param_headers: [String: String]?
-    public var param_body: [String: Any]?
+    public var param_body: Encodable?
     public var param_method: HttpMethod?
     public var return_data: Decodable?
     public var return_error: Error?
     public func makeRequest<T>(url: String,
                                headers: [String : String]?,
-                               body: [String : Any]?,
+                               body: Encodable?,
                                method: HttpMethod) async throws -> T where T : Decodable {
         param_url = url
         param_headers = headers

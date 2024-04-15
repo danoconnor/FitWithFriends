@@ -12,12 +12,12 @@ public class CompetitionService: ServiceBase, ICompetitionService {
         // Need to query using the user's current timezone so we get accurate information on whether the competition is active or not
         let ianaTimezone = TimeZone.current.identifier
 
-        return try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/overview?timezone=\(ianaTimezone)",
+        return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/\(competitionId.uuidString)/overview?timezone=\(ianaTimezone)",
                                                            method: .get)
     }
 
     public func getUsersCompetitions(userId: String) async throws -> [UUID] {
-        return try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions",
+        return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions",
                                                            method: .get)
     }
 
@@ -33,7 +33,7 @@ public class CompetitionService: ServiceBase, ICompetitionService {
             "ianaTimezone": TimeZone.current.identifier
         ]
 
-        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions",
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions",
                                                                            method: .post,
                                                                            body: requestBody)
     }
@@ -44,7 +44,7 @@ public class CompetitionService: ServiceBase, ICompetitionService {
             "competitionId": competitionId.uuidString
         ]
 
-        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/join",
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/join",
                                                                            method: .post,
                                                                            body: requestBody)
     }
@@ -55,7 +55,7 @@ public class CompetitionService: ServiceBase, ICompetitionService {
             "userId": userId.description
         ]
 
-        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/leave",
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/leave",
                                                                            method: .post,
                                                                            body: requestBody)
     }
@@ -66,14 +66,14 @@ public class CompetitionService: ServiceBase, ICompetitionService {
             "competitionAccessToken": competitionToken
         ]
 
-        return try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/description",
+        return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/description",
                                                            method: .post,
                                                            body: requestBody)
     }
 
     /// The user must be the admin of the competition, otherwise the request will be rejected
     public func getCompetitionAdminDetails(competitionId: UUID) async throws -> CompetitionAdminDetails {
-        return try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/\(competitionId.uuidString)/adminDetail",
+        return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/\(competitionId.uuidString)/adminDetail",
                                                            method: .get)
     }
 
@@ -83,7 +83,7 @@ public class CompetitionService: ServiceBase, ICompetitionService {
             "competitionId": competitionId.uuidString
         ]
 
-        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(SecretConstants.serviceBaseUrl)/competitions/delete",
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/delete",
                                                                            method: .post,
                                                                            body: requestBody)
     }

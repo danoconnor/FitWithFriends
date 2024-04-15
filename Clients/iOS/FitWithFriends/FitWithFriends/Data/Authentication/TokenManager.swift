@@ -63,7 +63,6 @@ public class TokenManager: ITokenManager {
         // In that case, re-use the previously known refresh token
         if token.refreshToken == nil {
             token.refreshToken = cachedToken?.refreshToken
-            token.refreshTokenExpiry = cachedToken?.refreshTokenExpiry
         }
 
         cachedToken = token

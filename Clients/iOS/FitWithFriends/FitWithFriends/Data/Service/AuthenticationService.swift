@@ -17,7 +17,7 @@ public class AuthenticationService: ServiceBase, IAuthenticationService {
             RequestConstants.Body.grantType: RequestConstants.Body.appleIdTokenGrant
         ]
 
-        return try await makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
+        return try await makeRequestWithClientAuthentication(url: "\(serverEnvironmentManager.baseUrl)/oauth/token",
                                                              method: .post,
                                                              body: requestBody)
     }

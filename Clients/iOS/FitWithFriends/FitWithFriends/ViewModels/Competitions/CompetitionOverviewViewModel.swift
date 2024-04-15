@@ -32,6 +32,7 @@ public class CompetitionOverviewViewModel: ObservableObject {
     private let authenticationManager: AuthenticationManager
     private let competitionManager: CompetitionManager
     private let competitionOverview: CompetitionOverview
+    private let serverEnvironmentManager: ServerEnvironmentManager
 
     /// When false, it will only show the top three users in the competition
     private let showAllDetails: Bool
@@ -53,10 +54,12 @@ public class CompetitionOverviewViewModel: ObservableObject {
     init(authenticationManager: AuthenticationManager,
          competitionManager: CompetitionManager,
          competitionOverview: CompetitionOverview,
+         serverEnrivonmentManager: ServerEnvironmentManager,
          showAllDetails: Bool) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager
         self.competitionOverview = competitionOverview
+        self.serverEnvironmentManager = serverEnrivonmentManager
         self.showAllDetails = showAllDetails
 
         competitionName = competitionOverview.competitionName
@@ -185,7 +188,9 @@ public class CompetitionOverviewViewModel: ObservableObject {
         do {
             let adminDetail = try await competitionManager.getCompetitionAdminDetail(for: competitionOverview.competitionId)
 
-            shareUrl = JoinCompetitionProtocolData.createWebsiteUrl(competitionId: adminDetail.competitionId, competitionToken: adminDetail.competitionAccessToken)
+            shareUrl = JoinCompetitionProtocolData.createWebsiteUrl(serverBaseUrl: serverEnvironmentManager.baseUrl,
+                                                                    competitionId: adminDetail.competitionId,
+                                                                    competitionToken: adminDetail.competitionAccessToken)
             await MainActor.run {
                 self.shouldShowSheet = true
             }

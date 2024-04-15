@@ -17,6 +17,7 @@ public class AppleAuthenticationManager: NSObject {
 
     private let authenticationService: IAuthenticationService
     private let keychainUtilities: IKeychainUtilities
+    private let serverEnvironmentManager: ServerEnvironmentManager
     private let userService: IUserService
 
     private let appleIdProvider: ASAuthorizationAppleIDProvider
@@ -26,10 +27,12 @@ public class AppleAuthenticationManager: NSObject {
     private static let appleUserKeychainAccount = "appleUserId"
 
     public init(authenticationService: IAuthenticationService,
-         keychainUtilities: IKeychainUtilities,
-         userService: IUserService) {
+                keychainUtilities: IKeychainUtilities,
+                serverEnvironmentManager: ServerEnvironmentManager,
+                userService: IUserService) {
         self.authenticationService = authenticationService
         self.keychainUtilities = keychainUtilities
+        self.serverEnvironmentManager = serverEnvironmentManager
         self.userService = userService
 
         appleIdProvider = ASAuthorizationAppleIDProvider()
@@ -136,13 +139,22 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
             return
         }
 
+        var userId = appleIdCredential.user
+
+        if serverEnvironmentManager.isLocalTesting {
+            // This value is hardcoded in our local database setup script (SetingTestData.sql)
+            // Local server builds skip Apple idToken validation so we can mock the userId here
+            Logger.traceWarning(message: "Overriding Apple userId to hardcoded value")
+            userId = "abcdef1234567890"
+        }
+
         // Apple will only provide the user's name when they first setup the account
         // Their docs say that the fullName property should be nil, but it appears to be
         // a not-nil object with nil/empty strings for all properties. So we need to check
         // the description to see if there's actually any data in there
         if let userName = appleIdCredential.fullName,
             userName.description.count > 0 {
-            await createNewUser(userId: appleIdCredential.user,
+            await createNewUser(userId: userId,
                                 userName: userName,
                                 idToken: idToken,
                                 authorizationCode: authorizationCode)
@@ -150,7 +162,7 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
 
         Logger.traceInfo(message: "Attempting to fetch token for user with ID \(appleIdCredential.user)")
         do {
-            let token = try await authenticationService.getTokenFromAppleId(userId: appleIdCredential.user,
+            let token = try await authenticationService.getTokenFromAppleId(userId: userId,
                                                                             idToken: idToken,
                                                                             authorizationCode: authorizationCode)
             authenticationDelegate?.authenticationCompleted(result: .success(token))
