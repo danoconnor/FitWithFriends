@@ -47,41 +47,49 @@ export function getActivitySummariesForUsers(params: IGetActivitySummariesForUse
 }
 
 
-/** 'InsertActivitySummary' parameters type */
-export interface IInsertActivitySummaryParams {
-  caloriesBurned: number;
-  caloriesGoal: number;
-  date: DateOrString;
-  exerciseTime: number;
-  exerciseTimeGoal: number;
-  standTime: number;
-  standTimeGoal: number;
-  userId: Buffer;
+/** 'InsertActivitySummaries' parameters type */
+export interface IInsertActivitySummariesParams {
+  summaries: readonly ({
+    user_id: Buffer,
+    date: DateOrString,
+    calories_burned: number,
+    calories_goal: number,
+    exercise_time: number,
+    exercise_time_goal: number,
+    stand_time: number,
+    stand_time_goal: number
+  })[];
 }
 
-/** 'InsertActivitySummary' return type */
-export type IInsertActivitySummaryResult = void;
+/** 'InsertActivitySummaries' return type */
+export type IInsertActivitySummariesResult = void;
 
-/** 'InsertActivitySummary' query type */
-export interface IInsertActivitySummaryQuery {
-  params: IInsertActivitySummaryParams;
-  result: IInsertActivitySummaryResult;
+/** 'InsertActivitySummaries' query type */
+export interface IInsertActivitySummariesQuery {
+  params: IInsertActivitySummariesParams;
+  result: IInsertActivitySummariesResult;
 }
 
-const insertActivitySummaryIR: any = {"usedParamSet":{"userId":true,"date":true,"caloriesBurned":true,"caloriesGoal":true,"exerciseTime":true,"exerciseTimeGoal":true,"standTime":true,"standTimeGoal":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":150,"b":157}]},{"name":"date","required":true,"transform":{"type":"scalar"},"locs":[{"a":160,"b":165}]},{"name":"caloriesBurned","required":true,"transform":{"type":"scalar"},"locs":[{"a":168,"b":183}]},{"name":"caloriesGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":186,"b":199}]},{"name":"exerciseTime","required":true,"transform":{"type":"scalar"},"locs":[{"a":202,"b":215}]},{"name":"exerciseTimeGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":218,"b":235}]},{"name":"standTime","required":true,"transform":{"type":"scalar"},"locs":[{"a":238,"b":248}]},{"name":"standTimeGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":251,"b":265}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)\nVALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!)\nON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal"};
+const insertActivitySummariesIR: any = {"usedParamSet":{"summaries":true},"params":[{"name":"summaries","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"user_id","required":true},{"name":"date","required":true},{"name":"calories_burned","required":true},{"name":"calories_goal","required":true},{"name":"exercise_time","required":true},{"name":"exercise_time_goal","required":true},{"name":"stand_time","required":true},{"name":"stand_time_goal","required":true}]},"locs":[{"a":149,"b":159}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)\nVALUES :summaries!\nON CONFLICT (user_id, date) DO UPDATE SET \n    calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned), \n    calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal), \n    exercise_time = GREATEST(activity_summaries.exercise_time, EXCLUDED.exercise_time),\n    exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal), \n    stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time), \n    stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal)"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)
- * VALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!)
- * ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal
+ * VALUES :summaries!
+ * ON CONFLICT (user_id, date) DO UPDATE SET 
+ *     calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned), 
+ *     calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal), 
+ *     exercise_time = GREATEST(activity_summaries.exercise_time, EXCLUDED.exercise_time),
+ *     exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal), 
+ *     stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time), 
+ *     stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal)
  * ```
  */
-export function insertActivitySummary(params: IInsertActivitySummaryParams): Promise<Array<IInsertActivitySummaryResult>> {
+export function insertActivitySummaries(params: IInsertActivitySummariesParams): Promise<Array<IInsertActivitySummariesResult>> {
   return import('@pgtyped/runtime').then(pgtyped => {
-    const insertActivitySummary = new pgtyped.PreparedQuery<IInsertActivitySummaryParams,IInsertActivitySummaryResult>(insertActivitySummaryIR);
-    return insertActivitySummary.run(params, DatabaseConnectionPool);
+    const insertActivitySummaries = new pgtyped.PreparedQuery<IInsertActivitySummariesParams,IInsertActivitySummariesResult>(insertActivitySummariesIR);
+    return insertActivitySummaries.run(params, DatabaseConnectionPool);
   });
 }
 

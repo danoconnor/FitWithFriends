@@ -16,8 +16,7 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
             return
         }
 
-        Task.detached { [weak self] in
-            guard let self = self else { return }
+        Task.detached {
             do {
                 try await self.reportActivitySummaries(activitySummaries)
                 completion(nil)
@@ -35,8 +34,7 @@ public class ActivityDataService: ServiceBase, IActivityDataService {
             return
         }
 
-        Task.detached { [weak self] in
-            guard let self = self else { return }
+        Task.detached {
             do {
                 try await self.reportWorkouts(workouts)
                 completion(nil)

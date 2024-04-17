@@ -42,7 +42,7 @@ test('Add activityData happy path', async () => {
     };
 
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', expectedData, token);
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [expectedData] }, token);
     expect(response.status).toBe(200);
     
     // Validate that the data was inserted into the database
@@ -58,7 +58,7 @@ test('Add activityData update data for existing date', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
 
     // Insert the initial data
-    var response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    var response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
@@ -66,7 +66,7 @@ test('Add activityData update data for existing date', async () => {
         exerciseTimeGoal: 30,
         standTime: 10,
         standTimeGoal: 12
-    },
+    }] },
     token);
     expect(response.status).toBe(200);
 
@@ -81,7 +81,7 @@ test('Add activityData update data for existing date', async () => {
         standTimeGoal: 24
     };
 
-    response = await RequestUtilities.makePostRequest('activityData/dailySummary', newUpdateData, token);
+    response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [newUpdateData] }, token);
     expect(response.status).toBe(200);
 
     // Validate that the data was updated in the database
@@ -95,7 +95,6 @@ test('Add activityData update data for existing date', async () => {
 test('Add activityData for multiple days', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
 
-    // Insert the data for the first day
     const firstDayExpectedData = {
         date: '2021-01-01',
         activeCaloriesBurned: 100,
@@ -105,10 +104,6 @@ test('Add activityData for multiple days', async () => {
         standTime: 10,
         standTimeGoal: 12
     };
-    var response = await RequestUtilities.makePostRequest('activityData/dailySummary', firstDayExpectedData, token);
-    expect(response.status).toBe(200);
-
-    // Insert the data for the second day
     const secondDayExpectedData = {
         date: '2021-01-02',
         activeCaloriesBurned: 200,
@@ -118,7 +113,8 @@ test('Add activityData for multiple days', async () => {
         standTime: 20,
         standTimeGoal: 24
     };
-    response = await RequestUtilities.makePostRequest('activityData/dailySummary', secondDayExpectedData, token);
+
+    var response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [firstDayExpectedData, secondDayExpectedData] }, token);
     expect(response.status).toBe(200);
 
     // Validate that the data was inserted into the database
@@ -151,14 +147,14 @@ test('Add activityData missing token', async () => {
 
 test('Add activityData missing date', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
         exerciseTime: 15,
         exerciseTimeGoal: 30,
         standTime: 10,
         standTimeGoal: 12
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
@@ -167,14 +163,14 @@ test('Add activityData missing date', async () => {
 
 test('Add activityData missing activeCaloriesBurned', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: '2021-01-01',
         activeCaloriesGoal: 500,
         exerciseTime: 15,
         exerciseTimeGoal: 30,
         standTime: 10,
         standTimeGoal: 12
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
@@ -183,14 +179,14 @@ test('Add activityData missing activeCaloriesBurned', async () => {
 
 test('Add activityData missing activeCaloriesGoal', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         exerciseTime: 15,
         exerciseTimeGoal: 30,
         standTime: 10,
         standTimeGoal: 12
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
@@ -199,14 +195,14 @@ test('Add activityData missing activeCaloriesGoal', async () => {
 
 test('Add activityData missing exerciseTime', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
         exerciseTimeGoal: 30,
         standTime: 10,
         standTimeGoal: 12
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
@@ -215,14 +211,14 @@ test('Add activityData missing exerciseTime', async () => {
 
 test('Add activityData missing exerciseTimeGoal', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
         exerciseTime: 15,
         standTime: 10,
         standTimeGoal: 12
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
@@ -231,14 +227,14 @@ test('Add activityData missing exerciseTimeGoal', async () => {
 
 test('Add activityData missing standTime', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
         exerciseTime: 15,
         exerciseTimeGoal: 30,
         standTimeGoal: 12
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
@@ -247,14 +243,14 @@ test('Add activityData missing standTime', async () => {
 
 test('Add activityData missing standTimeGoal', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: '2021-01-01',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
         exerciseTime: 15,
         exerciseTimeGoal: 30,
         standTime: 10
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
@@ -263,7 +259,7 @@ test('Add activityData missing standTimeGoal', async () => {
 
 test('Add activityData invalid date', async () => {
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', {
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [{
         date: 'invalid',
         activeCaloriesBurned: 100,
         activeCaloriesGoal: 500,
@@ -271,7 +267,7 @@ test('Add activityData invalid date', async () => {
         exerciseTimeGoal: 30,
         standTime: 10,
         standTimeGoal: 12
-    },
+    }] },
     token);
 
     expect(response.status).toBe(400);
