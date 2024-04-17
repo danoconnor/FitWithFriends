@@ -1,6 +1,6 @@
 'use strict';
 import { handleError } from "../utilities/errorHelpers";
-import * as ActivitySummaryQueries from "../sql/activitySummaries.queries";
+import * as ActivityDataQueries from "../sql/activityData.queries";
 import { DatabaseConnectionPool } from "../utilities/database";
 import * as express from "express";
 import { convertUserIdToBuffer } from "../utilities/userHelpers";
@@ -18,14 +18,14 @@ router.post('/dailySummary', function (req, res) {
     const userIdBuffer = convertUserIdToBuffer(userId);
 
     var summariesToInsert: { 
-        user_id: Buffer; 
+        userId: Buffer; 
         date: Date; 
-        calories_burned: number; 
-        calories_goal: number; 
-        exercise_time: number; 
-        exercise_time_goal: number;
-        stand_time: number; 
-        stand_time_goal: number; }[] = [];
+        caloriesBurned: number; 
+        caloriesGoal: number; 
+        exerciseTime: number; 
+        exerciseTimeGoal: number;
+        standTime: number; 
+        standTimeGoal: number; }[] = [];
 
     for (const summary of summaries) {
         const dateStr: string = summary['date'];
@@ -48,23 +48,80 @@ router.post('/dailySummary', function (req, res) {
         }
 
         summariesToInsert.push({
-            user_id: userIdBuffer,
+            userId: userIdBuffer,
             date,
-            calories_burned: caloriesBurned,
-            calories_goal: caloriesGoal,
-            exercise_time: exerciseTime,
-            exercise_time_goal: exerciseTimeGoal,
-            stand_time: standTime,
-            stand_time_goal: standTimeGoal
+            caloriesBurned,
+            caloriesGoal,
+            exerciseTime,
+            exerciseTimeGoal,
+            standTime,
+            standTimeGoal
         });
     }
 
-    ActivitySummaryQueries.insertActivitySummaries({ summaries: summariesToInsert })
+    ActivityDataQueries.insertActivitySummaries({ summaries: summariesToInsert })
         .then(_result => {
             res.sendStatus(200);
         })
         .catch(error => {
-            handleError(error, 500, 'Unexpected error inserting data into database', res);
+            handleError(error, 500, 'Unexpected error inserting activity summaries into database', res);
+        });
+});
+
+// Expect a POST request with a JSON body with a values key and an array of workouts as the value
+router.post('/workouts', function (req, res) {
+    const workouts = req.body['values'];
+    if (!workouts || !Array.isArray(workouts) || workouts.length === 0) {
+        handleError(null, 400, 'Missing required parameter', res);
+        return;
+    }
+
+    const userId: string = res.locals.oauth.token.user.id;
+    const userIdBuffer = convertUserIdToBuffer(userId);
+
+    var workoutsToInsert: {
+        userId: Buffer,
+        startDate: Date,
+        workoutType: number,
+        duration: number,
+        distance: number | null,
+        unit: number | null
+      }[] = [];
+
+    for (const workout of workouts) {
+        const startDateStr: string = workout['startDate'];
+        const workoutType: number = workout['workoutType'];
+        const duration: number = Math.round(workout['duration']);
+        const distance: number | null = workout['distance'] === undefined ? null : Math.round(workout['distance']);
+        const unit: number | null = workout['unit'] === undefined ? null : workout['unit'];
+
+        if (!startDateStr || Number.isNaN(workoutType) || Number.isNaN(duration)) {
+            handleError(null, 400, 'Missing required parameter', res);
+            return;
+        }
+
+        const startDate = new Date(startDateStr);
+        if (isNaN(startDate.getTime())) {
+            handleError(null, 400, 'Could not parse date', res);
+            return;
+        }
+
+        workoutsToInsert.push({
+            userId: userIdBuffer,
+            startDate,
+            workoutType,
+            duration,
+            distance,
+            unit
+        });
+    }
+
+    ActivityDataQueries.insertWorkouts({ workouts: workoutsToInsert })
+        .then(_result => {
+            res.sendStatus(200);
+        })
+        .catch(error => {
+            handleError(error, 500, 'Unexpected error inserting workouts into database', res);
         });
 });
 

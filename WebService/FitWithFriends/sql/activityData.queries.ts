@@ -1,4 +1,4 @@
-/** Types generated for queries found in "sql/activitySummaries.sql" */
+/** Types generated for queries found in "sql/activityData.sql" */
 import { DatabaseConnectionPool } from '../utilities/database';
 
 export type DateOrString = Date | string;
@@ -50,14 +50,14 @@ export function getActivitySummariesForUsers(params: IGetActivitySummariesForUse
 /** 'InsertActivitySummaries' parameters type */
 export interface IInsertActivitySummariesParams {
   summaries: readonly ({
-    user_id: Buffer,
+    userId: Buffer,
     date: DateOrString,
-    calories_burned: number,
-    calories_goal: number,
-    exercise_time: number,
-    exercise_time_goal: number,
-    stand_time: number,
-    stand_time_goal: number
+    caloriesBurned: number,
+    caloriesGoal: number,
+    exerciseTime: number,
+    exerciseTimeGoal: number,
+    standTime: number,
+    standTimeGoal: number
   })[];
 }
 
@@ -70,7 +70,7 @@ export interface IInsertActivitySummariesQuery {
   result: IInsertActivitySummariesResult;
 }
 
-const insertActivitySummariesIR: any = {"usedParamSet":{"summaries":true},"params":[{"name":"summaries","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"user_id","required":true},{"name":"date","required":true},{"name":"calories_burned","required":true},{"name":"calories_goal","required":true},{"name":"exercise_time","required":true},{"name":"exercise_time_goal","required":true},{"name":"stand_time","required":true},{"name":"stand_time_goal","required":true}]},"locs":[{"a":149,"b":159}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)\nVALUES :summaries!\nON CONFLICT (user_id, date) DO UPDATE SET \n    calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned), \n    calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal), \n    exercise_time = GREATEST(activity_summaries.exercise_time, EXCLUDED.exercise_time),\n    exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal), \n    stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time), \n    stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal)"};
+const insertActivitySummariesIR: any = {"usedParamSet":{"summaries":true},"params":[{"name":"summaries","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"date","required":true},{"name":"caloriesBurned","required":true},{"name":"caloriesGoal","required":true},{"name":"exerciseTime","required":true},{"name":"exerciseTimeGoal","required":true},{"name":"standTime","required":true},{"name":"standTimeGoal","required":true}]},"locs":[{"a":149,"b":159}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)\nVALUES :summaries!\nON CONFLICT (user_id, date) DO UPDATE SET \n    calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned), \n    calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal), \n    exercise_time = GREATEST(activity_summaries.exercise_time, EXCLUDED.exercise_time),\n    exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal), \n    stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time), \n    stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal)"};
 
 /**
  * Query generated from SQL:
@@ -90,6 +90,44 @@ export function insertActivitySummaries(params: IInsertActivitySummariesParams):
   return import('@pgtyped/runtime').then(pgtyped => {
     const insertActivitySummaries = new pgtyped.PreparedQuery<IInsertActivitySummariesParams,IInsertActivitySummariesResult>(insertActivitySummariesIR);
     return insertActivitySummaries.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'InsertWorkouts' parameters type */
+export interface IInsertWorkoutsParams {
+  workouts: readonly ({
+    userId: Buffer,
+    startDate: DateOrString,
+    workoutType: number,
+    duration: number,
+    distance: number | null | void,
+    unit: number | null | void
+  })[];
+}
+
+/** 'InsertWorkouts' return type */
+export type IInsertWorkoutsResult = void;
+
+/** 'InsertWorkouts' query type */
+export interface IInsertWorkoutsQuery {
+  params: IInsertWorkoutsParams;
+  result: IInsertWorkoutsResult;
+}
+
+const insertWorkoutsIR: any = {"usedParamSet":{"workouts":true},"params":[{"name":"workouts","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"startDate","required":true},{"name":"workoutType","required":true},{"name":"duration","required":true},{"name":"distance","required":false},{"name":"unit","required":false}]},"locs":[{"a":89,"b":98}]}],"statement":"INSERT INTO workouts(user_id, start_date, workout_type, duration, distance, unit)\nVALUES :workouts!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO workouts(user_id, start_date, workout_type, duration, distance, unit)
+ * VALUES :workouts!
+ * ```
+ */
+export function insertWorkouts(params: IInsertWorkoutsParams): Promise<Array<IInsertWorkoutsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const insertWorkouts = new pgtyped.PreparedQuery<IInsertWorkoutsParams,IInsertWorkoutsResult>(insertWorkoutsIR);
+    return insertWorkouts.run(params, DatabaseConnectionPool);
   });
 }
 

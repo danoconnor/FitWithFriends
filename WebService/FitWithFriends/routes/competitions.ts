@@ -6,7 +6,7 @@ import * as cryptoHelpers from '../utilities/cryptoHelpers';
 import { handleError } from '../utilities/errorHelpers';
 import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../utilities/FWFErrorCodes';
-import * as ActivitySummariesQueries from '../sql/activitySummaries.queries';
+import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
@@ -270,7 +270,7 @@ router.get('/:competitionId/overview', function (req, res) {
             });
 
             const userIdList = usersCompetitionsResult.map(row => convertUserIdToBuffer(row.userId));
-            ActivitySummariesQueries.getActivitySummariesForUsers({ userIds: userIdList, startDate: competitionInfo.start_date, endDate: competitionInfo.end_date })
+            ActivityDataQueries.getActivitySummariesForUsers({ userIds: userIdList, startDate: competitionInfo.start_date, endDate: competitionInfo.end_date })
                 .then(activitySummaries => {
                     // We allow users to score up to 600 total points per day (matching Apple's activity ring competition rules)
                     // This will eventually change when we allow users to define custom scoring rules, but for now we will stick with Apple's rules

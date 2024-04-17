@@ -9,7 +9,7 @@ WHERE user_id in :userIds! AND date <= :endDate! AND date >= :startDate!;
 
 /* 
     @name InsertActivitySummaries 
-    @param summaries -> ((user_id!, date!, calories_burned!, calories_goal!, exercise_time!, exercise_time_goal!, stand_time!, stand_time_goal!)...)
+    @param summaries -> ((userId!, date!, caloriesBurned!, caloriesGoal!, exerciseTime!, exerciseTimeGoal!, standTime!, standTimeGoal!)...)
 */
 INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)
 VALUES :summaries!
@@ -20,3 +20,10 @@ ON CONFLICT (user_id, date) DO UPDATE SET
     exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal), 
     stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time), 
     stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal);
+
+/* 
+    @name InsertWorkouts
+    @param workouts -> ((userId!, startDate!, workoutType!, duration!, distance, unit)...)
+*/
+INSERT INTO workouts(user_id, start_date, workout_type, duration, distance, unit)
+VALUES :workouts!;
