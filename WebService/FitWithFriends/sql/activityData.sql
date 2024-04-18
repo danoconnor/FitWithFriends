@@ -23,7 +23,7 @@ ON CONFLICT (user_id, date) DO UPDATE SET
 
 /* 
     @name InsertWorkouts
-    @param workouts -> ((userId!, startDate!, workoutType!, duration!, distance, unit)...)
+    @param workouts -> ((userId!, startDate!, caloriesBurned!, workoutType!, duration!, distance, unit)...)
 */
-INSERT INTO workouts(user_id, start_date, workout_type, duration, distance, unit)
+INSERT INTO workouts(user_id, start_date, calories_burned, workout_type, duration, distance, unit)
 VALUES :workouts!;

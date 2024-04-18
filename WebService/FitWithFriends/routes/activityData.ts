@@ -82,6 +82,7 @@ router.post('/workouts', function (req, res) {
     var workoutsToInsert: {
         userId: Buffer,
         startDate: Date,
+        caloriesBurned: number,
         workoutType: number,
         duration: number,
         distance: number | null,
@@ -90,12 +91,15 @@ router.post('/workouts', function (req, res) {
 
     for (const workout of workouts) {
         const startDateStr: string = workout['startDate'];
-        const workoutType: number = workout['workoutType'];
+        const caloriesBurned: number = Math.round(workout['caloriesBurned']);
+        // TODO: We should translate this to a platform agnostic value
+        const workoutType: number = workout['appleActivityTypeRawValue'];
+        // Duration is in seconds
         const duration: number = Math.round(workout['duration']);
         const distance: number | null = workout['distance'] === undefined ? null : Math.round(workout['distance']);
         const unit: number | null = workout['unit'] === undefined ? null : workout['unit'];
 
-        if (!startDateStr || Number.isNaN(workoutType) || Number.isNaN(duration)) {
+        if (!startDateStr || workoutType == undefined || Number.isNaN(workoutType) || Number.isNaN(duration) || Number.isNaN(caloriesBurned)) {
             handleError(null, 400, 'Missing required parameter', res);
             return;
         }
@@ -109,6 +113,7 @@ router.post('/workouts', function (req, res) {
         workoutsToInsert.push({
             userId: userIdBuffer,
             startDate,
+            caloriesBurned,
             workoutType,
             duration,
             distance,
