@@ -10,10 +10,10 @@ import HealthKit
 
 public class Workout: Codable {
     public let startDate: Date
-    public let duration: UInt
-    public let caloriesBurned: UInt
+    public let duration: TimeInterval
+    public let caloriesBurned: Double
     public let appleActivityTypeRawValue: UInt
-    public let distance: UInt?
+    public let distance: Double?
     public let unit: Unit
 
     public var activityType: HKWorkoutActivityType {
@@ -22,10 +22,10 @@ public class Workout: Codable {
 
     public init(workout: WorkoutSampleDTO) {
         startDate = workout.startDate
-        duration = UInt(round(workout.duration))
-        caloriesBurned = UInt(round(workout.caloriesBurned))
+        duration = workout.duration
+        caloriesBurned = workout.caloriesBurned
         appleActivityTypeRawValue = workout.activityType.rawValue
-        distance = workout.distance != nil ? UInt(round(workout.distance!)) : nil
+        distance = workout.distance
         unit = workout.unit
     }
 }
