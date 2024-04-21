@@ -407,7 +407,6 @@ public class HealthKitManager: IHealthKitManager {
                     containsFailures = true
                 }
 
-                let calendar = Calendar.current
                 for activityResult in activityResults {
                     activitySummaries[activityResult.date] = activityResult
                 }
@@ -447,7 +446,7 @@ public class HealthKitManager: IHealthKitManager {
                 // If we didn't get an ActivitySummary for this day, then create an empty one
                 // We may have additional data for this date that isn't included in the HKActivitySummary
                 let summaryDTO = activitySummaries[date] ?? ActivitySummaryDTO(date: date)
-                var activitySummary = ActivitySummary(activitySummary: summaryDTO)
+                let activitySummary = ActivitySummary(activitySummary: summaryDTO)
 
                 // If we have any additional data for this day (step count, stairs climbed, etc.),
                 // then add it to the ActivitySummary
