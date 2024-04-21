@@ -4,7 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # Secrets that shouldn't be synced to source control
-Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift
+# Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift
 Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace/xcuserdata
 WebService/.env
 

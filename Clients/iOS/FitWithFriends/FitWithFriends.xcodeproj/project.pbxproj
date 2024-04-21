@@ -748,6 +748,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0B99FBD9256A016900673133 /* Build configuration list for PBXNativeTarget "FitWithFriends" */;
 			buildPhases = (
+				0BCF64B22BD57D39004E98C7 /* ShellScript */,
 				0B99FBC6256A016900673133 /* Sources */,
 				0B99FBC7256A016900673133 /* Frameworks */,
 				0B99FBC8256A016900673133 /* Resources */,
@@ -848,6 +849,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Our Settings.bundle (which displays FwF settings in the iOS Settings app) only contains settings related to debug builds\n# so remove it from Release builds\nBUILD_APP_DIR=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app\"\n\nif [ $CONFIGURATION == \"Release\" ]; then\n    rm -rf \"$BUILD_APP_DIR/Settings.bundle\"\nfi\n";
+		};
+		0BCF64B22BD57D39004E98C7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho $DANOCON_TEST_VAR\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
