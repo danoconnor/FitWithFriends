@@ -42,6 +42,7 @@ permissions:
 
 jobs:
   build:
+    name: Web service build and test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -85,6 +86,7 @@ jobs:
         path: ./release.zip
 
   deploy:
+    name: Web service deploy to Azure
     permissions:
       contents: none
     runs-on: ubuntu-latest
