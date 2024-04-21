@@ -1,4 +1,4 @@
-name: iOS starter workflow
+name: iOS client build and test
 
 on:
   push:
@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
+
+env:
+  XCODE_PROJECT_DIR: ./Clients/iOS/FitWithFriends
 
 jobs:
   build:
@@ -16,6 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set Default Scheme
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
           default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
@@ -25,6 +29,7 @@ jobs:
         env:
           scheme: ${{ 'default' }}
           platform: ${{ 'iOS Simulator' }}
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
@@ -36,6 +41,7 @@ jobs:
         env:
           scheme: ${{ 'default' }}
           platform: ${{ 'iOS Simulator' }}
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
