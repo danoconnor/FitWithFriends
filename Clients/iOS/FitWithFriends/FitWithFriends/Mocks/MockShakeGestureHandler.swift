@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MockShakeGestureHandler: ShakeGestureHandler {
+public class MockShakeGestureHandler: ShakeGestureHandler {
     init() {
         super.init(emailUtility: MockEmailUtility())
     }

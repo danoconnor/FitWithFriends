@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AboutView: View {
     let emailUtility: EmailUtility
+    let serverEnvironmentManager: ServerEnvironmentManager
 
     var body: some View {
         NavigationView {
@@ -49,7 +50,7 @@ struct AboutView: View {
                         .padding(.bottom, 5)
 
                         Link("Download privacy policy",
-                             destination: URL(string: "\(SecretConstants.serviceBaseUrl)/FitWithFriendsPrivacyPolicy.docx")!)
+                             destination: URL(string: "\(serverEnvironmentManager.baseUrl)/FitWithFriendsPrivacyPolicy.docx")!)
                     }
                     .padding(.leading)
                     .padding(.trailing)
@@ -63,6 +64,7 @@ struct AboutView: View {
 
 struct AboutView_Previews: PreviewProvider {
     static var previews: some View {
-        AboutView(emailUtility: MockEmailUtility())
+        AboutView(emailUtility: MockEmailUtility(),
+                  serverEnvironmentManager: ServerEnvironmentManager(userDefaults: UserDefaults.standard))
     }
 }

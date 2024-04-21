@@ -7,14 +7,14 @@
 
 import Foundation
 
-class MockAppProtocolHandler: AppProtocolHandler {
-    var return_protocolData: AppProtocolData?
-    override var protocolData: AppProtocolData? {
+public class MockAppProtocolHandler: AppProtocolHandler {
+    public  var return_protocolData: AppProtocolData?
+    override public var protocolData: AppProtocolData? {
         return return_protocolData
     }
 
-    var return_handleProtocol = false
-    override func handleProtocol(url: URL) -> Bool {
+    public var return_handleProtocol = false
+    override public func handleProtocol(url: URL) -> Bool {
         return return_handleProtocol
     }
 }

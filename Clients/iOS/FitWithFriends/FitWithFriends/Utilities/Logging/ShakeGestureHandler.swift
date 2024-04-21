@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class ShakeGestureHandler {
+public class ShakeGestureHandler {
     private let emailUtility: EmailUtility
 
     init(emailUtility: EmailUtility) {

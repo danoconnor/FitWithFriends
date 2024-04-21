@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-class CompetitionOverviewViewModel: ObservableObject {
+public class CompetitionOverviewViewModel: ObservableObject {
     enum CompetitionAction: CustomStringConvertible, Hashable, Comparable {
         case deleteCompetition
         case leave
@@ -32,6 +32,7 @@ class CompetitionOverviewViewModel: ObservableObject {
     private let authenticationManager: AuthenticationManager
     private let competitionManager: CompetitionManager
     private let competitionOverview: CompetitionOverview
+    private let serverEnvironmentManager: ServerEnvironmentManager
 
     /// When false, it will only show the top three users in the competition
     private let showAllDetails: Bool
@@ -53,10 +54,12 @@ class CompetitionOverviewViewModel: ObservableObject {
     init(authenticationManager: AuthenticationManager,
          competitionManager: CompetitionManager,
          competitionOverview: CompetitionOverview,
+         serverEnrivonmentManager: ServerEnvironmentManager,
          showAllDetails: Bool) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager
         self.competitionOverview = competitionOverview
+        self.serverEnvironmentManager = serverEnrivonmentManager
         self.showAllDetails = showAllDetails
 
         competitionName = competitionOverview.competitionName
@@ -152,8 +155,9 @@ class CompetitionOverviewViewModel: ObservableObject {
     /// Once the user has confirmed the deletion via the alert, the view will call this func to actually
     /// perform the deletion
     func deleteCompetitionConfirmed() async {
-        let error = await competitionManager.deleteCompetition(competitionId: competitionOverview.competitionId)
-        if let error = error {
+        do {
+            try await competitionManager.deleteCompetition(competitionId: competitionOverview.competitionId)
+        } catch {
             Logger.traceError(message: "Failed to delete competition \(competitionOverview.competitionId)", error: error)
         }
 
@@ -161,8 +165,9 @@ class CompetitionOverviewViewModel: ObservableObject {
     }
 
     private func leaveCompetition() async {
-        let error = await competitionManager.leaveCompetition(competitionId: competitionOverview.competitionId)
-        if error != nil {
+        do {
+            try await competitionManager.leaveCompetition(competitionId: competitionOverview.competitionId)
+        } catch {
             Logger.traceError(message: "Failed to leave competition \(competitionOverview.competitionId)", error: error)
         }
 
@@ -170,8 +175,9 @@ class CompetitionOverviewViewModel: ObservableObject {
     }
 
     private func removeUser(userId: String) async {
-        let error = await competitionManager.removeUserFromCompetition(competitionId: competitionOverview.competitionId, targetUser: userId)
-        if error != nil {
+        do {
+            try await competitionManager.removeUserFromCompetition(competitionId: competitionOverview.competitionId, targetUser: userId)
+        } catch {
             Logger.traceError(message: "Failed to remove user \(userId) from competition \(competitionOverview.competitionId)", error: error)
         }
 
@@ -179,15 +185,17 @@ class CompetitionOverviewViewModel: ObservableObject {
     }
 
     private func shareCompetition() async {
-        let adminDetailResult = await competitionManager.getCompetitionAdminDetail(for: competitionOverview.competitionId)
-        guard let adminDetail = adminDetailResult.xtSuccess else {
-            Logger.traceError(message: "Failed to get admin details for \(competitionOverview.competitionId)", error: adminDetailResult.xtError)
-            return
-        }
+        do {
+            let adminDetail = try await competitionManager.getCompetitionAdminDetail(for: competitionOverview.competitionId)
 
-        shareUrl = JoinCompetitionProtocolData.createWebsiteUrl(competitionId: adminDetail.competitionId, competitionToken: adminDetail.competitionAccessToken)
-        await MainActor.run {
-            self.shouldShowSheet = true
+            shareUrl = JoinCompetitionProtocolData.createWebsiteUrl(serverBaseUrl: serverEnvironmentManager.baseUrl,
+                                                                    competitionId: adminDetail.competitionId,
+                                                                    competitionToken: adminDetail.competitionAccessToken)
+            await MainActor.run {
+                self.shouldShowSheet = true
+            }
+        } catch {
+            Logger.traceError(message: "Failed to get admin details for \(competitionOverview.competitionId)", error: error)
         }
     }
 }

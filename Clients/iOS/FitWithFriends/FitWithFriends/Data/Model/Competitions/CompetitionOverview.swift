@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CompetitionOverview: IdentifiableBase, Codable, Comparable {
+public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
     enum CodingKeys: String, CodingKey {
         case competitionId
         case competitionName
@@ -61,11 +61,11 @@ class CompetitionOverview: IdentifiableBase, Codable, Comparable {
 
     // MARK: Comparable
 
-    static func == (lhs: CompetitionOverview, rhs: CompetitionOverview) -> Bool {
+    public static func == (lhs: CompetitionOverview, rhs: CompetitionOverview) -> Bool {
         return lhs.competitionId == rhs.competitionId
     }
 
-    static func < (lhs: CompetitionOverview, rhs: CompetitionOverview) -> Bool {
+    public static func < (lhs: CompetitionOverview, rhs: CompetitionOverview) -> Bool {
         // Order active competitions before non-active competitions
         if lhs.isCompetitionActive != rhs.isCompetitionActive {
             return lhs.isCompetitionActive
@@ -105,7 +105,7 @@ class CompetitionOverview: IdentifiableBase, Codable, Comparable {
     }
 }
 
-class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
+public class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
     enum CodingKeys: String, CodingKey {
         case userId
         case firstName
@@ -125,7 +125,7 @@ class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
     }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
-    init(userId: String = "user_id", firstName: String = "Test", lastName: String = "User", total: Double = 0, today: Double = 0) {
+    public init(userId: String = "user_id", firstName: String = "Test", lastName: String = "User", total: Double = 0, today: Double = 0) {
         self.userId = userId
         self.firstName = firstName
         self.lastName = lastName
@@ -133,11 +133,11 @@ class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
         pointsToday = today
     }
 
-    static func == (lhs: UserCompetitionPoints, rhs: UserCompetitionPoints) -> Bool {
+    public static func == (lhs: UserCompetitionPoints, rhs: UserCompetitionPoints) -> Bool {
         return lhs.userId == rhs.userId
     }
 
-    static func < (lhs: UserCompetitionPoints, rhs: UserCompetitionPoints) -> Bool {
+    public static func < (lhs: UserCompetitionPoints, rhs: UserCompetitionPoints) -> Bool {
         let lhsPoints = lhs.totalPoints ?? 0
         let rhsPoints = rhs.totalPoints ?? 0
 

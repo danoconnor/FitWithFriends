@@ -50,11 +50,9 @@ struct TodaySummaryView: View {
 
                 Spacer()
 
-                if let summary = activitySummary.activitySummary {
-                    ActivityRingView(activitySummary: summary)
-                        .frame(width: 120, height: 120, alignment: .center)
-                        .padding()
-                }
+                ActivityRingView(activitySummary: activitySummary.hkActivitySummary)
+                    .frame(width: 120, height: 120, alignment: .center)
+                    .padding()
             }
         }
         .background(Color.secondarySystemBackground)
@@ -63,13 +61,14 @@ struct TodaySummaryView: View {
 
 struct TodaySummaryView_Previews: PreviewProvider {
     private static var activitySummary: ActivitySummary {
-        let hkActivitySummary = HKActivitySummary(activeEnergyBurned: 51.027,
-                                                  activeEnergyBurnedGoal: 700,
-                                                  exerciseTime: 12.3,
-                                                  exerciseTimeGoal: 30,
-                                                  standTime: 4,
-                                                  standTimeGoal: 12)
-        return ActivitySummary(activitySummary: hkActivitySummary)!
+        let summaryDTO = ActivitySummaryDTO(date: Date(),
+                                            activeEnergyBurned: 51,
+                                            activeEnergyBurnedGoal: 700,
+                                            appleExerciseTime: 12,
+                                            appleExerciseTimeGoal: 30,
+                                            appleStandHours: 4,
+                                            appleStandHoursGoal: 12)
+        return ActivitySummary(activitySummary: summaryDTO)
     }
 
     static var previews: some View {

@@ -8,16 +8,17 @@
 import AuthenticationServices
 import Foundation
 
-protocol AppleAuthenticationDelegate: AnyObject {
+public protocol AppleAuthenticationDelegate: AnyObject {
     func authenticationCompleted(result: Result<Token, Error>)
 }
 
-class AppleAuthenticationManager: NSObject {
-    weak var authenticationDelegate: AppleAuthenticationDelegate?
+public class AppleAuthenticationManager: NSObject {
+    public weak var authenticationDelegate: AppleAuthenticationDelegate?
 
-    private let authenticationService: AuthenticationService
-    private let keychainUtilities: KeychainUtilities
-    private let userService: UserService
+    private let authenticationService: IAuthenticationService
+    private let keychainUtilities: IKeychainUtilities
+    private let serverEnvironmentManager: ServerEnvironmentManager
+    private let userService: IUserService
 
     private let appleIdProvider: ASAuthorizationAppleIDProvider
 
@@ -25,25 +26,31 @@ class AppleAuthenticationManager: NSObject {
     private static let appleUserKeychainService = "com.danoconnor.FitWithFriends"
     private static let appleUserKeychainAccount = "appleUserId"
 
-    init(authenticationService: AuthenticationService,
-         keychainUtilities: KeychainUtilities,
-         userService: UserService) {
+    public init(authenticationService: IAuthenticationService,
+                keychainUtilities: IKeychainUtilities,
+                serverEnvironmentManager: ServerEnvironmentManager,
+                userService: IUserService) {
         self.authenticationService = authenticationService
         self.keychainUtilities = keychainUtilities
+        self.serverEnvironmentManager = serverEnvironmentManager
         self.userService = userService
 
         appleIdProvider = ASAuthorizationAppleIDProvider()
     }
 
-    func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {
+    public func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {
         let request = appleIdProvider.createRequest()
         request.requestedScopes = [.fullName]
 
-        let appleUserIdResult: Result<String, KeychainError> = keychainUtilities.getKeychainItem(accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
-                                                                                                 service: AppleAuthenticationManager.appleUserKeychainService,
-                                                                                                 account: AppleAuthenticationManager.appleUserKeychainAccount)
-        if let appleUserId = appleUserIdResult.xtSuccess {
+        do {
+            let appleUserId: String = try keychainUtilities.getKeychainItem(accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
+                                                                            service: AppleAuthenticationManager.appleUserKeychainService,
+                                                                            account: AppleAuthenticationManager.appleUserKeychainAccount)
+
             request.user = appleUserId
+        } catch {
+            // Not a blocking error, we can continue the login process without a prepopulated userId
+            Logger.traceWarning(message: "Could not get userId out of keychain. Error: \(error.localizedDescription)")
         }
 
         let controller = ASAuthorizationController(authorizationRequests: [request])
@@ -53,17 +60,17 @@ class AppleAuthenticationManager: NSObject {
         controller.performRequests()
     }
 
-    func isAppleAccountValid() -> Bool {
-        // Get the last known Apple User ID from the keychain
-        let appleUserIdResult: Result<String, KeychainError>
-        appleUserIdResult = keychainUtilities.getKeychainItem(accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
-                                                              service: AppleAuthenticationManager.appleUserKeychainService,
-                                                              account: AppleAuthenticationManager.appleUserKeychainAccount)
-
+    public func isAppleAccountValid() -> Bool {
         var accountIsValid = true
 
-        guard let userId = appleUserIdResult.xtSuccess else {
-            Logger.traceInfo(message: "Could not get Apple user ID from keychain. Error: \(appleUserIdResult.xtError?.localizedDescription ?? "nil")")
+        // Get the last known Apple User ID from the keychain
+        let userId: String
+        do {
+            userId = try keychainUtilities.getKeychainItem(accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
+                                                           service: AppleAuthenticationManager.appleUserKeychainService,
+                                                           account: AppleAuthenticationManager.appleUserKeychainAccount)
+        } catch {
+            Logger.traceInfo(message: "Could not get Apple user ID from keychain. Error: \(error.localizedDescription)")
 
             // Return true if we don't have an Apple account setup
             return accountIsValid
@@ -85,13 +92,14 @@ class AppleAuthenticationManager: NSObject {
 
             if !accountIsValid {
                 // Remove our cached Apple user ID if it is no longer valid
-                let deleteError = self?.keychainUtilities.deleteKeychainItem(accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
-                                                                             service: AppleAuthenticationManager.appleUserKeychainService,
-                                                                             account: AppleAuthenticationManager.appleUserKeychainAccount)
-                if let deleteError = deleteError {
-                    Logger.traceError(message: "Could not remove Apple user ID from keychain", error: deleteError)
-                } else {
+                do {
+                    try self?.keychainUtilities.deleteKeychainItem(accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
+                                                                   service: AppleAuthenticationManager.appleUserKeychainService,
+                                                                   account: AppleAuthenticationManager.appleUserKeychainAccount)
+
                     Logger.traceInfo(message: "Successfully removed Apple user ID from keychain because it is no longer valid")
+                } catch {
+                    Logger.traceError(message: "Could not remove Apple user ID from keychain", error: error)
                 }
             }
         }
@@ -102,7 +110,7 @@ class AppleAuthenticationManager: NSObject {
 }
 
 extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+    public func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         Logger.traceInfo(message: "Got Apple authorization controller response")
 
         Task.detached { [weak self] in
@@ -110,7 +118,7 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
         }
     }
 
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         Logger.traceError(message: "Received error from Apple authorization controller", error: error)
         authenticationDelegate?.authenticationCompleted(result: .failure(error))
     }
@@ -131,51 +139,67 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
             return
         }
 
+        var userId = appleIdCredential.user
+
+        if serverEnvironmentManager.isLocalTesting {
+            // This value is hardcoded in our local database setup script (SetingTestData.sql)
+            // Local server builds skip Apple idToken validation so we can mock the userId here
+            Logger.traceWarning(message: "Overriding Apple userId to hardcoded value")
+            userId = "abcdef1234567890"
+        }
+
         // Apple will only provide the user's name when they first setup the account
         // Their docs say that the fullName property should be nil, but it appears to be
         // a not-nil object with nil/empty strings for all properties. So we need to check
         // the description to see if there's actually any data in there
         if let userName = appleIdCredential.fullName,
             userName.description.count > 0 {
-            await createNewUser(userId: appleIdCredential.user,
+            await createNewUser(userId: userId,
                                 userName: userName,
                                 idToken: idToken,
                                 authorizationCode: authorizationCode)
         }
 
         Logger.traceInfo(message: "Attempting to fetch token for user with ID \(appleIdCredential.user)")
-        let tokenResult = await authenticationService.getTokenFromAppleId(userId: appleIdCredential.user,
-                                                                          idToken: idToken,
-                                                                          authorizationCode: authorizationCode)
-        authenticationDelegate?.authenticationCompleted(result: tokenResult)
+        do {
+            let token = try await authenticationService.getTokenFromAppleId(userId: userId,
+                                                                            idToken: idToken,
+                                                                            authorizationCode: authorizationCode)
+            authenticationDelegate?.authenticationCompleted(result: .success(token))
+        } catch {
+            authenticationDelegate?.authenticationCompleted(result: .failure(error))
+        }
     }
 
     private func createNewUser(userId: String, userName: PersonNameComponents, idToken: String, authorizationCode: String) async {
         Logger.traceInfo(message: "Apple provided user name - creating new user with ID \(userId)")
 
         // Try to use nickname as the first name for more familiarity, if available
-        let createUserResult = await userService.createUser(firstName: userName.nickname ?? userName.givenName ?? "",
-                                                            lastName: userName.familyName ?? "",
-                                                            userId: userId,
-                                                            idToken: idToken,
-                                                            authorizationCode: authorizationCode)
+        do {
+            try await userService.createUser(firstName: userName.nickname ?? userName.givenName ?? "",
+                                             lastName: userName.familyName ?? "",
+                                             userId: userId,
+                                             idToken: idToken,
+                                             authorizationCode: authorizationCode)
 
-        if let createUserError = createUserResult {
+            Logger.traceVerbose(message: "Successfully created user with id \(userId)")
+        } catch {
             // Don't throw if there is an error creating the user,
             // it's possible that the user already exists so we should continue
             // and attempt to get a token
-            Logger.traceError(message: "Failed to create user for ID \(userId)", error: createUserError)
+            Logger.traceError(message: "Failed to create user for ID \(userId)", error: error)
             return
         }
 
-        let saveUserError = keychainUtilities.writeKeychainItem(userId,
-                                                                accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
-                                                                service: AppleAuthenticationManager.appleUserKeychainService,
-                                                                account: AppleAuthenticationManager.appleUserKeychainAccount,
-                                                                updateExistingItemIfNecessary: false)
+        do {
+            try keychainUtilities.writeKeychainItem(userId,
+                                                    accessGroup: AppleAuthenticationManager.appleUserKeychainGroup,
+                                                    service: AppleAuthenticationManager.appleUserKeychainService,
+                                                    account: AppleAuthenticationManager.appleUserKeychainAccount,
+                                                    updateExistingItemIfNecessary: false)
 
-        if let saveUserError = saveUserError {
-            Logger.traceError(message: "Failed to save Apple user ID to keychain", error: saveUserError)
+        } catch {
+            Logger.traceError(message: "Failed to save Apple user ID to keychain", error: error)
             return
         }
     }

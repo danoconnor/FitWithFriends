@@ -452,3 +452,41 @@ export function getPushTokenForUser(params: IGetPushTokenForUserParams): Promise
 }
 
 
+/** 'GetWorkoutsForUser' parameters type */
+export interface IGetWorkoutsForUserParams {
+  userId: Buffer;
+}
+
+/** 'GetWorkoutsForUser' return type */
+export interface IGetWorkoutsForUserResult {
+  calories_burned: number;
+  distance: number | null;
+  duration: number;
+  start_date: Date;
+  unit: number | null;
+  user_id: Buffer;
+  workout_type: number;
+}
+
+/** 'GetWorkoutsForUser' query type */
+export interface IGetWorkoutsForUserQuery {
+  params: IGetWorkoutsForUserParams;
+  result: IGetWorkoutsForUserResult;
+}
+
+const getWorkoutsForUserIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":39,"b":46}]}],"statement":"SELECT * FROM workouts WHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT * FROM workouts WHERE user_id = :userId!
+ * ```
+ */
+export function getWorkoutsForUser(params: IGetWorkoutsForUserParams): Promise<Array<IGetWorkoutsForUserResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getWorkoutsForUser = new pgtyped.PreparedQuery<IGetWorkoutsForUserParams,IGetWorkoutsForUserResult>(getWorkoutsForUserIR);
+    return getWorkoutsForUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+

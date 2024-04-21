@@ -7,20 +7,20 @@
 
 import Foundation
 
-class FWFErrorDetails: Decodable {
+public class FWFErrorDetails: Decodable {
     /// Context provided by the service about the scenario that threw the error
-    let context: String
+    public let context: String
 
     /// The raw error message that was thrown
     /// May be nil
-    let errorDetails: String?
+    public let errorDetails: String?
 
     /// A custom error code that maps to our known errors
     /// May be nil
-    let customErrorCode: Int?
+    public let customErrorCode: Int?
 
     /// The custom error code, parsed into a more usable enum value
-    var fwfErrorCode: FWFErrorCode {
+    public var fwfErrorCode: FWFErrorCode {
         if let rawCode = customErrorCode,
            let code = FWFErrorCode(rawValue: rawCode) {
             return code

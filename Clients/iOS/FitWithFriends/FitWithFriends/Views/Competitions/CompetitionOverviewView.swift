@@ -23,7 +23,7 @@ struct CompetitionOverviewView: View {
         self.showAllDetails = showAllDetails
         viewModel = CompetitionOverviewViewModel(authenticationManager: objectGraph.authenticationManager,
                                                  competitionManager: objectGraph.competitionManager,
-                                                 competitionOverview: competitionOverview,
+                                                 competitionOverview: competitionOverview, serverEnrivonmentManager: objectGraph.serverEnvironmentManager,
                                                  showAllDetails: showAllDetails)
     }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MockCompetitionManager: CompetitionManager {
+public class MockCompetitionManager: CompetitionManager {
     var return_error: Error?
 
     var return_competitionOverviews: [UUID: CompetitionOverview] = [:]
@@ -32,8 +32,11 @@ class MockCompetitionManager: CompetitionManager {
         ]
     }
 
-    override func createCompetition(startDate: Date, endDate: Date, competitionName: String) async -> Error? {
+    override func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws {
         await MockUtilities.delayOneSecond()
-        return return_error
+
+        if let error = return_error {
+            throw error
+        }
     }
 }

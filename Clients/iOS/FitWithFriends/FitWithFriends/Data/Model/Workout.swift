@@ -8,39 +8,24 @@
 import Foundation
 import HealthKit
 
-class Workout: Codable {
-    let startDate: Date
-    let duration: TimeInterval
-    let caloriesBurned: Double
-    let activityTypeRawValue: UInt
-    let distance: Double?
+public class Workout: Codable {
+    public let startDate: Date
+    public let duration: TimeInterval
+    public let caloriesBurned: Double
+    public let appleActivityTypeRawValue: UInt
+    public let distance: Double?
+    public let unit: Unit
 
-    var activityType: HKWorkoutActivityType {
-        return HKWorkoutActivityType(rawValue: activityTypeRawValue) ?? .other
+    public var activityType: HKWorkoutActivityType {
+        return HKWorkoutActivityType(rawValue: appleActivityTypeRawValue) ?? .other
     }
 
-    init(workout: HKWorkout) {
+    public init(workout: WorkoutSampleDTO) {
         startDate = workout.startDate
-        caloriesBurned = round(workout.totalEnergyBurned?.doubleValue(for: .largeCalorie()) ?? 0)
-        duration = round(workout.duration)
-        activityTypeRawValue = workout.workoutActivityType.rawValue
-
-        switch workout.workoutActivityType {
-        case .crossCountrySkiing,
-             .cycling,
-             .elliptical,
-             .hiking,
-             .rowing,
-             .running,
-             .swimming,
-             .walking:
-            distance = round(workout.totalDistance?.doubleValue(for: .mile()) ?? 0)
-        case .stairs,
-             .stairClimbing:
-            // For stair workouts, we measure distance in terms of stairs climbed instead of distance
-            distance = round(workout.totalFlightsClimbed?.doubleValue(for: .count()) ?? 0)
-        default:
-            distance = nil
-        }
+        duration = workout.duration
+        caloriesBurned = workout.caloriesBurned
+        appleActivityTypeRawValue = workout.activityType.rawValue
+        distance = workout.distance
+        unit = workout.unit
     }
 }

@@ -7,27 +7,35 @@
 
 import Foundation
 
-class MockKeychainUtilities: KeychainUtilities {
+public class MockKeychainUtilities: IKeychainUtilities {
+    public init() {}
+
     var return_error: KeychainError?
 
     var return_getKeychainItem: Codable?
-    override func getKeychainItem<T: Codable>(accessGroup: String, service: String, account: String) -> Result<T, KeychainError> {
+    public func getKeychainItem<T: Codable>(accessGroup: String, service: String, account: String) throws -> T {
         if let item = return_getKeychainItem as? T {
-            return .success(item)
+            return item
         } else {
-            return .failure(return_error ?? KeychainError.couldNotParseKeychainData)
+            throw return_error ?? KeychainError.couldNotParseKeychainData
         }
     }
 
-    override func writeKeychainItem<T: Codable>(_ item: T, accessGroup: String, service: String, account: String, updateExistingItemIfNecessary: Bool) -> KeychainError? {
-        return return_error
+    public func writeKeychainItem<T: Codable>(_ item: T, accessGroup: String, service: String, account: String, updateExistingItemIfNecessary: Bool) throws {
+        if let error = return_error {
+            throw error
+        }
     }
 
-    override func deleteKeychainItem(accessGroup: String, service: String, account: String) -> KeychainError? {
-        return return_error
+    public func deleteKeychainItem(accessGroup: String, service: String, account: String) throws {
+        if let error = return_error {
+            throw error
+        }
     }
 
-    override func deleteAllItems(in accessGroup: String) -> KeychainError? {
-        return return_error
+    public func deleteAllItems(in accessGroup: String) throws {
+        if let error = return_error {
+            throw error
+        }
     }
 }

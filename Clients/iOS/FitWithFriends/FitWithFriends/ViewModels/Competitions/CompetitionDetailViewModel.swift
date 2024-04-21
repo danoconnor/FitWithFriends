@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CompetitionDetailViewModel {
+public class CompetitionDetailViewModel {
     private let competitionManager: CompetitionManager
     private let homepageSheetViewModel: HomepageSheetViewModel
 

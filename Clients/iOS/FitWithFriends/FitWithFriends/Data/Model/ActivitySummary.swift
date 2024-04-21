@@ -8,16 +8,23 @@
 import Foundation
 import HealthKit
 
-class ActivitySummary: IdentifiableBase, Codable {
-    let date: Date
-    let activeCaloriesBurned: Double
-    let activeCaloriesGoal: Double
-    let exerciseTime: Double
-    let exerciseTimeGoal: Double
-    let standTime: Double
-    let standTimeGoal: Double
+public class ActivitySummary: IdentifiableBase, Encodable {
+    public let date: Date
 
-    var activitySummary: HKActivitySummary?
+    public let activeCaloriesGoal: UInt
+    public let exerciseTimeGoal: UInt
+    public let standTimeGoal: UInt
+
+    public private(set) var activeCaloriesBurned: UInt
+    public private(set) var exerciseTime: UInt
+    public private(set) var standTime: UInt
+    public private(set) var distanceWalkingRunning: UInt?
+    public private(set) var stepCount: UInt?
+    public private(set) var flightsClimbed: UInt?
+
+    /// Expose the underlying HKActivitySummary since we need it to use Apple's built in UI
+    /// for displaying the health rings
+    public let hkActivitySummary: HKActivitySummary
 
     enum CodingKeys: String, CodingKey {
         case date
@@ -27,52 +34,52 @@ class ActivitySummary: IdentifiableBase, Codable {
         case exerciseTimeGoal
         case standTime
         case standTimeGoal
+        case distanceWalkingRunning
+        case stepCount
+        case flightsClimbed
     }
 
-    /// Creates an empty activity summary for the given date
-    init(date: Date, calorieGoal: Double, exerciseGoal: Double, standGoal: Double) {
-        self.date = date
+    /// Creates an `ActivitySummary` based on the summary returned by Apple HealthKit
+    public init(activitySummary: ActivitySummaryDTO) {
+        date = activitySummary.date
+        activeCaloriesBurned = activitySummary.activeEnergyBurned
+        activeCaloriesGoal = activitySummary.activeEnergyBurnedGoal
+        exerciseTime = activitySummary.appleExerciseTime
+        exerciseTimeGoal = activitySummary.appleExerciseTimeGoal
+        standTime = activitySummary.appleStandHours
+        standTimeGoal = activitySummary.appleStandHoursGoal
 
-        activeCaloriesBurned = 0
-        activeCaloriesGoal = calorieGoal
-        exerciseTime = 0
-        exerciseTimeGoal = exerciseGoal
-        standTime = 0
-        standTimeGoal = standGoal
-
-        activitySummary = HKActivitySummary(activeEnergyBurned: 0,
-                                            activeEnergyBurnedGoal: calorieGoal,
-                                            exerciseTime: 0,
-                                            exerciseTimeGoal: exerciseGoal,
-                                            standTime: 0,
-                                            standTimeGoal: standGoal)
+        self.hkActivitySummary = activitySummary.hkActivitySummary
     }
 
-    init?(activitySummary: HKActivitySummary) {
-        guard let activityDate = activitySummary.dateComponents(for: Calendar.current).date else {
-            Logger.traceError(message: "Tried to initialize ActivitySummary without valid date")
-            return nil
+    public func updateStatistic(quantityType: HKQuantityTypeIdentifier, value: StatisticDTO) {
+        switch quantityType {
+        case .activeEnergyBurned:
+            activeCaloriesBurned = value.sumValue
+        case .appleExerciseTime:
+            exerciseTime = value.sumValue
+        case .appleStandTime:
+            // Convert min to hours
+            standTime = value.sumValue
+        case .distanceWalkingRunning:
+            distanceWalkingRunning = value.sumValue
+        case .stepCount:
+            stepCount = value.sumValue
+        case .flightsClimbed:
+            flightsClimbed = value.sumValue
+        default:
+            Logger.traceError(message: "Unexpected quantity type: \(String(describing: quantityType))")
         }
-
-        date = activityDate
-        activeCaloriesBurned = round(activitySummary.activeEnergyBurned.doubleValue(for: .largeCalorie()))
-        activeCaloriesGoal = round(activitySummary.activeEnergyBurnedGoal.doubleValue(for: .largeCalorie()))
-        exerciseTime = round(activitySummary.appleExerciseTime.doubleValue(for: .minute()))
-        exerciseTimeGoal = round(activitySummary.appleExerciseTimeGoal.doubleValue(for: .minute()))
-        standTime = round(activitySummary.appleStandHours.doubleValue(for: .count()))
-        standTimeGoal = round(activitySummary.appleStandHoursGoal.doubleValue(for: .count()))
-
-        self.activitySummary = activitySummary
     }
 }
 
 extension ActivitySummary {
     /// This is an estimate of the points that this activity summary will provide
     /// The real source of truth comes from the service in the CompetitionOverview entity
-    var competitionPoints: Double {
-        let caloriePoints = activeCaloriesGoal > 0 ? activeCaloriesBurned / activeCaloriesGoal * 100 : 0
-        let exercisePoints = exerciseTimeGoal > 0 ? exerciseTime / exerciseTimeGoal * 100 : 0
-        let standPoints = standTimeGoal > 0 ? standTime / standTimeGoal * 100 : 0
+    public var competitionPoints: Double {
+        let caloriePoints = activeCaloriesGoal > 0 ? Double(activeCaloriesBurned) / Double(activeCaloriesGoal) * 100 : 0
+        let exercisePoints = exerciseTimeGoal > 0 ? Double(exerciseTime) / Double(exerciseTimeGoal) * 100 : 0
+        let standPoints = standTimeGoal > 0 ? Double(standTime) / Double(standTimeGoal) * 100 : 0
         let totalPoints = caloriePoints + exercisePoints + standPoints
 
         // Apple's competition scoring has a maximum of 600 pts/day

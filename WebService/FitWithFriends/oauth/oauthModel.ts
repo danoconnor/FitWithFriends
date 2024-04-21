@@ -123,11 +123,14 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
             const returnedAccessToken: Token = {
                 accessToken: token.accessToken,
                 accessTokenExpiresAt: token.accessTokenExpiresAt,
-                accessTokenExpiry: token.accessTokenExpiresAt,
                 client: { id: client.id, grants: this.defaultGrants }, 
                 user: user.id,
+                scope: token.scope,
+                // By default, the OAuth server will not return these properties
+                // We have enabled the allowExtendedTokenAttributes option to enable us to add properties
                 userId: user.id,
-                scope: token.scope
+                // Include the AT expiry date again here since the OAuth server doesn't return the built in accessTokenExpiresAt property
+                accessTokenExpiry: token.accessTokenExpiresAt,
             };
             return Promise.resolve(returnedAccessToken);
         }
@@ -136,12 +139,17 @@ class AuthenticationModel implements RequestAuthenticationModel, RefreshTokenMod
             .then(_result => {
                const returnedRefreshToken: Token = {
                     accessToken: token.accessToken,
+                    accessTokenExpiresAt: token.accessTokenExpiresAt,
                     refreshToken: token.refreshToken,
                     refreshTokenExpiresAt: token.refreshTokenExpiresAt,
                     client: { id: client.id, grants: this.defaultGrants }, 
                     user: user.id,
+                    scope: token.scope,
+                    // By default, the OAuth server will not return these properties
+                    // We have enabled the allowExtendedTokenAttributes option to enable us to add properties
                     userId: user.id,
-                    scope: token.scope
+                    // Include the AT expiry date again here since the OAuth server doesn't return the built in accessTokenExpiresAt property
+                    accessTokenExpiry: token.accessTokenExpiresAt,
                };
                return returnedRefreshToken;
             });

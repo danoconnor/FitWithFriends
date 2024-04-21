@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-class HomepageSheetViewModel: ObservableObject {
+public class HomepageSheetViewModel: ObservableObject {
     typealias HomepageSheetState = (shouldShow: Bool, contextData: Any?)
 
     // Order is important - sheets listed first will be given precedence over those listed later
@@ -37,7 +37,7 @@ class HomepageSheetViewModel: ObservableObject {
         .competitionDetails: (shouldShow: false, contextData: nil),
     ]
 
-    init(appProtocolHandler: AppProtocolHandler, healthKitManager: HealthKitManager) {
+    init(appProtocolHandler: AppProtocolHandler, healthKitManager: IHealthKitManager) {
         if healthKitManager.shouldPromptUser {
             updateState(sheet: .permissionPrompt, state: true)
         }

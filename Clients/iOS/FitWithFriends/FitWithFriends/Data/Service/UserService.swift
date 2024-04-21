@@ -7,13 +7,13 @@
 
 import Foundation
 
-class UserService: ServiceBase {
+public class UserService: ServiceBase, IUserService {
     /// Creates a new user with the given credentials/user info. Will return an error if the username already exists
-    func createUser(firstName: String,
+    public func createUser(firstName: String,
                     lastName: String,
                     userId: String,
                     idToken: String,
-                    authorizationCode: String) async -> Error? {
+                    authorizationCode: String) async throws {
         let requestBody: [String: String] = [
             "firstName": firstName,
             "lastName": lastName,
@@ -22,10 +22,9 @@ class UserService: ServiceBase {
             "authorizationCode": authorizationCode
         ]
 
-        let url = "\(SecretConstants.serviceBaseUrl)/users/userFromAppleID"
-        let result: Result<EmptyResponse, Error> =  await makeRequestWithClientAuthentication(url: url,
-                                                                                              method: .post,
-                                                                                              body: requestBody)
-        return result.xtError
+        let url = "\(serverEnvironmentManager.baseUrl)/users/userFromAppleID"
+        let _: EmptyResponse = try await makeRequestWithClientAuthentication(url: url,
+                                                                             method: .post,
+                                                                             body: requestBody)
     }
 }

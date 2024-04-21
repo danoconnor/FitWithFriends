@@ -7,9 +7,9 @@
 
 import Foundation
 
-class AuthenticationService: ServiceBase {
+public class AuthenticationService: ServiceBase, IAuthenticationService {
     /// Gets a token using the idToken provided by Sign-In with Apple
-    func getTokenFromAppleId(userId: String, idToken: String, authorizationCode: String) async -> Result<Token, Error> {
+    public func getTokenFromAppleId(userId: String, idToken: String, authorizationCode: String) async throws -> Token {
         let requestBody: [String: String] = [
             "userId": userId,
             "idToken": idToken,
@@ -17,8 +17,8 @@ class AuthenticationService: ServiceBase {
             RequestConstants.Body.grantType: RequestConstants.Body.appleIdTokenGrant
         ]
 
-        return await makeRequestWithClientAuthentication(url: "\(SecretConstants.serviceBaseUrl)/oauth/token",
-                                                         method: .post,
-                                                         body: requestBody)
+        return try await makeRequestWithClientAuthentication(url: "\(serverEnvironmentManager.baseUrl)/oauth/token",
+                                                             method: .post,
+                                                             body: requestBody)
     }
 }

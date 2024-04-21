@@ -8,7 +8,7 @@
 import Foundation
 
 /// This description contains details about the competition and is provided when a user clicks a join competition link, but has not yet joined the competition
-class CompetitionDescription: Codable {
+public class CompetitionDescription: Codable {
     let adminName: String
     let competitionName: String
     let numMembers: UInt

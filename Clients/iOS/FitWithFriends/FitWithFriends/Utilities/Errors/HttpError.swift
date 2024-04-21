@@ -7,17 +7,17 @@
 
 import Foundation
 
-enum HttpError: LocalizedError, CustomStringConvertible, ErrorWithDetails {
+public enum HttpError: LocalizedError, CustomStringConvertible, ErrorWithDetails {
     case invalidUrl(url: String)
     case serverError(code: Int, details: FWFErrorDetails?)
     case clientError(code: Int, details: FWFErrorDetails?)
     case generic
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         return description
     }
 
-    var errorDetails: FWFErrorDetails? {
+    public var errorDetails: FWFErrorDetails? {
         switch self {
         case let .clientError(_, details):
             return details
@@ -28,7 +28,7 @@ enum HttpError: LocalizedError, CustomStringConvertible, ErrorWithDetails {
         }
     }
 
-    var description: String {
+    public var description: String {
         switch self {
         case let .invalidUrl(url: url):
             return "Invalid url: \(url)"

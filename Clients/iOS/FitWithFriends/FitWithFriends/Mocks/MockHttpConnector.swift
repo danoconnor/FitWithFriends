@@ -7,19 +7,30 @@
 
 import Foundation
 
-class MockHttpConnector: HttpConnector {
-    var return_data: Decodable?
-    var return_error: Error?
-    override func makeRequest<T>(url: String,
-                                 headers: [String : String]? = nil,
-                                 body: [String : String]? = nil,
-                                 method: HttpMethod) async -> Result<T, Error> where T : Decodable {
+public class MockHttpConnector: IHttpConnector {
+    public init() {}
+
+    public var param_url: String?
+    public var param_headers: [String: String]?
+    public var param_body: Encodable?
+    public var param_method: HttpMethod?
+    public var return_data: Decodable?
+    public var return_error: Error?
+    public func makeRequest<T>(url: String,
+                               headers: [String : String]?,
+                               body: Encodable?,
+                               method: HttpMethod) async throws -> T where T : Decodable {
+        param_url = url
+        param_headers = headers
+        param_body = body
+        param_method = method
+
         await MockUtilities.delayOneSecond()
 
         if let data = return_data as? T {
-            return .success(data)
+            return data
         } else {
-            return .failure(return_error ?? HttpError.generic)
+            throw return_error ?? HttpError.generic
         }
     }
 }

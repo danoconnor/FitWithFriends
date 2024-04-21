@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-class CreateCompetitionViewModel: ObservableObject {
+public class CreateCompetitionViewModel: ObservableObject {
     private let authenticationManager: AuthenticationManager
     private let competitionManager: CompetitionManager
     private let homepageSheetViewModel: HomepageSheetViewModel
@@ -32,30 +32,28 @@ class CreateCompetitionViewModel: ObservableObject {
         Task.detached { [weak self] in
             guard let self = self else { return }
 
-            let error = await self.competitionManager.createCompetition(startDate: startDate,
-                                                                        endDate: endDate,
-                                                                        competitionName: competitionName)
+            let newState: ViewOperationState
+            do {
+                try await self.competitionManager.createCompetition(startDate: startDate,
+                                                                    endDate: endDate,
+                                                                    competitionName: competitionName)
+                newState = .success
+                self.homepageSheetViewModel.updateState(sheet: .createCompetition, state: false)
+            } catch {
+                var errorMessage = error.localizedDescription
+
+                // Check to see if we have a more specific error code
+                if let errorWithDetails = error as? ErrorWithDetails,
+                   let details = errorWithDetails.errorDetails,
+                   case .tooManyActiveCompetitions = details.fwfErrorCode {
+                        errorMessage = "Too many active competitions"
+                }
+
+                newState = .failed(errorMessage: errorMessage)
+            }
 
             await MainActor.run {
-                if let error = error {
-                    var errorMessage = error.localizedDescription
-
-                    // Check to see if we have a more specific error code
-                    if let errorWithDetails = error as? ErrorWithDetails,
-                       let details = errorWithDetails.errorDetails {
-                        switch details.fwfErrorCode {
-                        case .tooManyActiveCompetitions:
-                            errorMessage = "Too many active competitions"
-                        default:
-                            break
-                        }
-                    }
-
-                    self.state = .failed(errorMessage: errorMessage)
-                } else {
-                    self.state = .success
-                    self.homepageSheetViewModel.updateState(sheet: .createCompetition, state: false)
-                }
+                self.state = newState
             }
         }
     }

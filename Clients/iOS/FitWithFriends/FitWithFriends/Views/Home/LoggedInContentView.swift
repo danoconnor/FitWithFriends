@@ -109,7 +109,8 @@ struct LoggedInContentView: View {
                             Text("Error showing competition details")
                         }
                     case .about:
-                        AboutView(emailUtility: objectGraph.emailUtility)
+                        AboutView(emailUtility: objectGraph.emailUtility,
+                                  serverEnvironmentManager: objectGraph.serverEnvironmentManager)
                     default:
                         Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                     }

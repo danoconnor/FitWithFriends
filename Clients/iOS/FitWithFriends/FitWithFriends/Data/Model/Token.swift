@@ -7,23 +7,21 @@
 
 import Foundation
 
-class Token: Codable {
-    let accessToken: String
-    let accessTokenExpiry: Date
-    var refreshToken: String?
-    var refreshTokenExpiry: Date?
-    let userId: String
+public class Token: Codable {
+    public let accessToken: String
+    public let accessTokenExpiry: Date
+    public var refreshToken: String?
+    public let userId: String
 
-    var isAccessTokenExpired: Bool {
+    public var isAccessTokenExpired: Bool {
         return accessTokenExpiry < Date()
     }
 
-    var isRefreshTokenExpired: Bool {
-        guard let refreshTokenExpiry = refreshTokenExpiry else {
-            // If we don't have a refresh token, then we need to get one
-            return true
-        }
-
-        return refreshTokenExpiry < Date()
+    /// Used by unit tests
+    init(accessToken: String, accessTokenExpiry: Date, refreshToken: String? = nil, userId: String) {
+        self.accessToken = accessToken
+        self.accessTokenExpiry = accessTokenExpiry
+        self.refreshToken = refreshToken
+        self.userId = userId
     }
 }

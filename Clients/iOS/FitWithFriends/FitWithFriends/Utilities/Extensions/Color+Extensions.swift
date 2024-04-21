@@ -10,11 +10,6 @@ import SwiftUI
 import UIKit
 
 extension Color {
-    // MARK: Custom colors
-
-    static let gold = Color("Gold")
-    static let silver = Color("Silver")
-    static let bronze = Color("Bronze")
 
     // MARK: Import system colors from UIKit into SwiftUI.
     // From https://stackoverflow.com/questions/56466128/what-are-the-primary-and-secondary-colors-in-swiftui

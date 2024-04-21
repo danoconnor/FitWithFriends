@@ -8,10 +8,10 @@
 import Foundation
 import MessageUI
 
-class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
+public class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
     private var emailViewController: MFMailComposeViewController?
 
-    func sendLogEmail() {
+    public func sendLogEmail() {
         Logger.traceInfo(message: "Sending log email")
         Logger.flushLog()
 
@@ -23,7 +23,7 @@ class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
                                      attachementFileName: "FitWithFriends_Logs.txt")
     }
 
-    func sendEmailWithTextAttachement(subject: String, body: String, to: String, attachmentText: String, attachementFileName: String){
+    public func sendEmailWithTextAttachement(subject: String, body: String, to: String, attachmentText: String, attachementFileName: String){
         guard MFMailComposeViewController.canSendMail() else {
             Logger.traceWarning(message: "Cannot send email")
             return
@@ -48,7 +48,7 @@ class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
         }
     }
 
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+    public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         emailViewController?.dismiss(animated: true) { [weak self] in
             self?.emailViewController = nil
         }

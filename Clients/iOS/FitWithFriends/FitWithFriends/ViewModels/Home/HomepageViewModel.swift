@@ -9,10 +9,10 @@ import Combine
 import Foundation
 import HealthKit
 
-class HomepageViewModel: ObservableObject {
+public class HomepageViewModel: ObservableObject {
     private let authenticationManager: AuthenticationManager
     private let competitionManager: CompetitionManager
-    private let healthKitManager: HealthKitManager
+    private let healthKitManager: IHealthKitManager
 
     @Published var loadedActivitySummary: Bool
     @Published var todayActivitySummary: ActivitySummary?
@@ -21,7 +21,9 @@ class HomepageViewModel: ObservableObject {
 
     private var competitionLoadListener: AnyCancellable?
 
-    init(authenticationManager: AuthenticationManager, competitionManager: CompetitionManager, healthKitManager: HealthKitManager) {
+    init(authenticationManager: AuthenticationManager,
+         competitionManager: CompetitionManager,
+         healthKitManager: IHealthKitManager) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager
         self.healthKitManager = healthKitManager
@@ -55,28 +57,8 @@ class HomepageViewModel: ObservableObject {
     private func refreshTodayActivitySummary() async {
         return await withCheckedContinuation { continuation in
             healthKitManager.getCurrentActivitySummary { summary in
-                let activitySummary: ActivitySummary?
-                if let summary = summary {
-                    activitySummary = ActivitySummary(activitySummary: summary)
-                } else {
-                    // Couldn't get activity summary for today - check if it is because there is no data for today or if we don't have access
-
-                    let lastKnownCalorieGoal = self.healthKitManager.lastKnownCalorieGoal
-                    let lastKnownExerciseGoal = self.healthKitManager.lastKnownExerciseGoal
-                    let lastKnownStandGoal = self.healthKitManager.lastKnownStandGoal
-
-                    if lastKnownCalorieGoal > 0, lastKnownExerciseGoal > 0, lastKnownStandGoal > 0 {
-                        // We have existing known goals so we probably have health data access
-                        // Create an activity summary with no data
-                        activitySummary = ActivitySummary(date: Date(), calorieGoal: lastKnownCalorieGoal, exerciseGoal: lastKnownExerciseGoal, standGoal: lastKnownStandGoal)
-                    } else {
-                        // We don't have existing goals, so we probably don't have health data access
-                        activitySummary = nil
-                    }
-                }
-
                 DispatchQueue.main.async {
-                    self.todayActivitySummary = activitySummary
+                    self.todayActivitySummary = summary
                     self.loadedActivitySummary = true
                     continuation.resume()
                 }

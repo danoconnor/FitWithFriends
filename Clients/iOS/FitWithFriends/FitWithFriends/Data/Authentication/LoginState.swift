@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum LoginState {
+public enum LoginState {
     case notLoggedIn(Error?)
     case inProgress
     case loggedIn

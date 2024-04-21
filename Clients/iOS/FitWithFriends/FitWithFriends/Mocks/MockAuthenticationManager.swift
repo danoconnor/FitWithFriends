@@ -8,23 +8,23 @@
 import AuthenticationServices
 import Foundation
 
-class MockAuthenticationManager: AuthenticationManager {
-    init() {
+public class MockAuthenticationManager: AuthenticationManager {
+    public init() {
         super.init(appleAuthenticationManager: MockAppleAuthenticationManager(),
                    authenticationService: MockAuthenticationService(),
                    tokenManager: MockTokenManager())
     }
 
-    var return_loggedInUserId: String?
-    override var loggedInUserId: String? {
+    public var return_loggedInUserId: String?
+    override public var loggedInUserId: String? {
         get { return return_loggedInUserId }
         set {}
     }
 
-    var return_error: Error?
+    public var return_error: Error?
 
-    var userToLogin: UInt = 0
-    override func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
+    public var userToLogin: UInt = 0
+    override public func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
         loginState = .inProgress
 
         Task.detached {
@@ -33,13 +33,8 @@ class MockAuthenticationManager: AuthenticationManager {
         }
     }
 
-    override func logout() {
+    override public func logout() {
         self.loginState = .notLoggedIn(nil)
         self.loggedInUserId = nil
-    }
-
-    override func refreshToken(token: Token) async -> Error? {
-        await MockUtilities.delayOneSecond()
-        return return_error
     }
 }

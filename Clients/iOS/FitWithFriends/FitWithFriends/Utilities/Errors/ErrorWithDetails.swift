@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol ErrorWithDetails {
+public protocol ErrorWithDetails {
     var errorDetails: FWFErrorDetails? { get }
 }

@@ -8,7 +8,7 @@
 import CocoaLumberjackSwift
 import Foundation
 
-class Logger {
+public class Logger {
     static let logLevel = DDLogLevel.all
 
     static func setupLogging() {
@@ -75,7 +75,8 @@ class Logger {
     }
 
     static func trace(_ level: DDLogFlag, message: String, file: String = #file, functionName: String = #function, line: UInt = #line) {
-        let logMessage = DDLogMessage(message: message,
+        let logMessage = DDLogMessage(format: message,
+                                      formatted: message,
                                       level: logLevel,
                                       flag: level,
                                       context: 0,

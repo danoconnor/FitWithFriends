@@ -8,18 +8,19 @@
 import Foundation
 
 protocol IObjectGraph {
-    var activityDataService: ActivityDataService { get }
+    var activityDataService: IActivityDataService { get }
     var appProtocolHandler: AppProtocolHandler { get }
     var authenticationManager: AuthenticationManager { get }
-    var authenticationService: AuthenticationService { get }
+    var authenticationService: IAuthenticationService { get }
     var competitionManager: CompetitionManager { get }
-    var competitionService: CompetitionService { get }
+    var competitionService: ICompetitionService { get }
     var emailUtility: EmailUtility { get }
-    var healthKitManager: HealthKitManager { get }
-    var httpConnector: HttpConnector { get }
-    var keychainUtilities: KeychainUtilities { get }
+    var healthKitManager: IHealthKitManager { get }
+    var httpConnector: IHttpConnector { get }
+    var keychainUtilities: IKeychainUtilities { get }
+    var serverEnvironmentManager: ServerEnvironmentManager { get }
     var shakeGestureHandler: ShakeGestureHandler { get }
-    var tokenManager: TokenManager { get }
+    var tokenManager: ITokenManager { get }
     var userDefaults: UserDefaults { get }
-    var userService: UserService { get }
+    var userService: IUserService { get }
 }
