@@ -1,8 +1,6 @@
-name: iOS client build and test
+name: iOS client build and test (for PRs)
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
