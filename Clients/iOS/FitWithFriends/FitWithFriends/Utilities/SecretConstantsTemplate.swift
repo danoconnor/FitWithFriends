@@ -8,27 +8,27 @@
 import Foundation
 
 struct SecretConstants {
-    static let keychainPrefix = "U7MJ9CBUMD"
+    static let keychainPrefix = ""
 
-    static let supportEmail = "fitwithfriendsapp@gmail.com"
+    static let supportEmail = ""
 
-    static let baseAppProtocol = "fitwithfriends"
+    static let baseAppProtocol = ""
 
-    static let developerName = "Dan O'Connor"
+    static let developerName = ""
 
     // MARK: Local testing values
 
-    static let localServiceBaseUrl = "https://localhost:3000"
+    static let localServiceBaseUrl = ""
 
-    static let localClientSecret = "11279ed4-2687-408d-9ae7-22ab3ca41219"
+    static let localClientSecret = ""
 
-    static let localClientId = "6a773c32-5eb3-41c9-8036-b991b51f14f7"
+    static let localClientId = ""
 
     // MARK: Production values
 
-    static let prodServiceBaseUrl = "TODO"
+    static let prodServiceBaseUrl = ""
 
-    static let prodClientSecret = "TODO"
+    static let prodClientSecret = ""
 
-    static let prodClientId = "TODO"
+    static let prodClientId = ""
 }
