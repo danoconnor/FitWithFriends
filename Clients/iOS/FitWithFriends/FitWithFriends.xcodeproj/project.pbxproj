@@ -748,7 +748,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0B99FBD9256A016900673133 /* Build configuration list for PBXNativeTarget "FitWithFriends" */;
 			buildPhases = (
-				0BCF64B22BD57D39004E98C7 /* ShellScript */,
+				0BCF64B22BD57D39004E98C7 /* Setup SecretConstants.swift */,
 				0B99FBC6256A016900673133 /* Sources */,
 				0B99FBC7256A016900673133 /* Frameworks */,
 				0B99FBC8256A016900673133 /* Resources */,
@@ -850,7 +850,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Our Settings.bundle (which displays FwF settings in the iOS Settings app) only contains settings related to debug builds\n# so remove it from Release builds\nBUILD_APP_DIR=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app\"\n\nif [ $CONFIGURATION == \"Release\" ]; then\n    rm -rf \"$BUILD_APP_DIR/Settings.bundle\"\nfi\n";
 		};
-		0BCF64B22BD57D39004E98C7 /* ShellScript */ = {
+		0BCF64B22BD57D39004E98C7 /* Setup SecretConstants.swift */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -858,14 +858,18 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/FitWithFriends/Utilities/SecretConstantsTemplate.swift",
 			);
+			name = "Setup SecretConstants.swift";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/FitWithFriends/Utilities/SecretConstants.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho $DANOCON_TEST_VAR\n";
+			shellScript = "# Set the below environment variables to insert the secrets into SecretsConstants.swift \n# FWF_KEYCHAIN_PREFIX\n# FWF_SUPPORT_EMAIL\n# FWF_APP_PROTOCOL\n# FWF_DEVELOPER_NAME\n# FWF_LOCAL_SERVER_URL\n# FWF_LOCAL_CLIENT_SECRET\n# FWF_LOCAL_CLIENT_ID\n# FWF_PROD_SERVER_URL\n# FWF_PROD_CLIENT_SECRET\n# FWF_PROD_CLIENT_ID\n\n# Copy the template into the real file, then replace all the empty vars with our actual values\ncp $PROJECT_DIR/FitWithFriends/Utilities/SecretConstantsTemplate.swift $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let keychainPrefix = \"\"/static let keychainPrefix = \"'\"$FWF_KEYCHAIN_PREFIX\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let supportEmail = \"\"/static let supportEmail = \"'\"$FWF_SUPPORT_EMAIL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let baseAppProtocol = \"\"/static let baseAppProtocol = \"'\"$FWF_APP_PROTOCOL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let developerName = \"\"/static let developerName = \"'\"$FWF_DEVELOPER_NAME\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localServiceBaseUrl = \"\"/static let localServiceBaseUrl = \"'\"$FWF_LOCAL_SERVER_URL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localClientSecret = \"\"/static let localClientSecret = \"'\"$FWF_LOCAL_CLIENT_SECRET\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localClientId = \"\"/static let localClientId = \"'\"$FWF_LOCAL_CLIENT_ID\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodServiceBaseUrl = \"\"/static let prodServiceBaseUrl = \"'\"$FWF_PROD_SERVER_URL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodClientSecret = \"\"/static let prodClientSecret = \"'\"$FWF_PROD_CLIENT_SECRET\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodClientId = \"\"/static let prodClientId = \"'\"$FWF_PROD_CLIENT_ID\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1193,6 +1197,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FitWithFriends/Preview Content\"";
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1216,6 +1221,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"FitWithFriends/Preview Content\"";
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
