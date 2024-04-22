@@ -22,8 +22,6 @@ name: Web servce build/test/deploy to Azure (on push to main)
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
 
 env:
