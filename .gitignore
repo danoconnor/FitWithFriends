@@ -6,6 +6,7 @@
 # Secrets that shouldn't be synced to source control
 Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift
 Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace/xcuserdata
+Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace/xcshareddata
 WebService/.env
 
 # Compiled typescript output
