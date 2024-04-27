@@ -5,6 +5,8 @@ const router = express.Router();
 router.post('/performDailyTasks', function (req, res) {
     // TODO: find competitions that are ending and send push notifications and archive completed competitions
     // TODO: Cleanup expired tokens
+
+    res.sendStatus(200);
 });
 
 export default router;

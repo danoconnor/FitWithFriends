@@ -15,6 +15,7 @@ services:
       - PGDATABASE=${PGDATABASE}
       - PGUSESSL=0
       - FWF_AUTH_USE_LOCAL_KEYPAIR=1
+      - FWF_ADMIN_AUTH_SECRET=${ADMIN_AUTH_SECRET}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 60s
