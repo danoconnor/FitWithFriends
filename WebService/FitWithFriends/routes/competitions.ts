@@ -10,7 +10,7 @@ import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
-import { getCompetitionStandingsWithCurrentUser } from '../utilities/competitionStandingsHelper';
+import { getCompetitionStandings } from '../utilities/competitionStandingsHelper';
 
 const msPerDay = 1000 * 60 * 60 * 24;
 
@@ -247,7 +247,7 @@ router.get('/:competitionId/overview', function (req, res) {
             const competitionInfo = competitionsResult[0];
             const isUserAdmin = userId === convertBufferToUserId(competitionInfo.admin_user_id);
 
-            getCompetitionStandingsWithCurrentUser(competitionInfo, usersCompetitionsResult, timezoneParam)
+            getCompetitionStandings(competitionInfo, usersCompetitionsResult, timezoneParam)
                 .then(userPoints => {
                     // We don't announce results until 24hrs after the competition has ended
                     // This allows clients to report final data and users in different timezones to finish their days

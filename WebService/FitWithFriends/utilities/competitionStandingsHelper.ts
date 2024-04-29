@@ -11,7 +11,7 @@ export interface UserPoints {
     pointsToday: number;
 };
 
-export async function getCompetitionStandingsWithCurrentUser(
+export async function getCompetitionStandings(
     competitionInfo: CompetitionQueries.IGetCompetitionDescriptionDetailsResult, 
     users: Array<UserQueries.IGetUsersInCompetitionResult>,
     timeZone: string): Promise<{ [userId: string]: UserPoints }> {
