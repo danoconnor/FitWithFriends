@@ -5,11 +5,12 @@ const router = express.Router();
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
 import { handleError } from '../utilities/errorHelpers';
 import { v4 as uuid } from 'uuid';
-import FWFErrorCodes from '../utilities/FWFErrorCodes';
+import FWFErrorCodes from '../utilities/enums/FWFErrorCodes';
 import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
+import { getCompetitionStandingsWithCurrentUser } from '../utilities/competitionStandingsHelper';
 
 const msPerDay = 1000 * 60 * 60 * 24;
 
@@ -246,59 +247,8 @@ router.get('/:competitionId/overview', function (req, res) {
             const competitionInfo = competitionsResult[0];
             const isUserAdmin = userId === convertBufferToUserId(competitionInfo.admin_user_id);
 
-            // Make sure we use the date that matches the competition timezone
-            let currentDateStr = new Date().toLocaleDateString('en-US', { timeZone: timezoneParam });
-            let currentDate = new Date(currentDateStr);
-
-            interface UserPoints {
-                userId: string;
-                firstName: string;
-                lastName: string;
-                activityPoints: number;
-                pointsToday: number;
-            };
-
-            var userPoints: { [userId: string]: UserPoints } = {};
-            usersCompetitionsResult.forEach(row => {
-                userPoints[row.userId] = {
-                    userId: row.userId,
-                    firstName: row.first_name,
-                    lastName: row.last_name,
-                    activityPoints: 0,
-                    pointsToday: 0
-                };
-            });
-
-            const userIdList = usersCompetitionsResult.map(row => convertUserIdToBuffer(row.userId));
-            ActivityDataQueries.getActivitySummariesForUsers({ userIds: userIdList, startDate: competitionInfo.start_date, endDate: competitionInfo.end_date })
-                .then(activitySummaries => {
-                    // We allow users to score up to 600 total points per day (matching Apple's activity ring competition rules)
-                    // This will eventually change when we allow users to define custom scoring rules, but for now we will stick with Apple's rules
-                    const maxPointsPerDay = 600;
-                    activitySummaries.forEach(row => {
-                        var points = 0;
-
-                        // Avoid divide-by-zero errors
-                        if (row.calories_goal > 0) {
-                            points += row.calories_burned / row.calories_goal * 100;
-                        }
-
-                        if (row.exercise_time_goal > 0) {
-                            points += row.exercise_time / row.exercise_time_goal * 100;
-                        }
-
-                        if (row.stand_time_goal > 0) {
-                            points += row.stand_time / row.stand_time_goal * 100;
-                        }
-                        
-                        const pointsScoredThisDay = Math.min(points, maxPointsPerDay);
-                        userPoints[row.userId].activityPoints += pointsScoredThisDay;
-
-                        if (row.date.getDay() === currentDate.getDay() && row.date.getMonth() === currentDate.getMonth() && row.date.getFullYear() === currentDate.getFullYear()) {
-                            userPoints[row.userId].pointsToday = pointsScoredThisDay;
-                        }
-                    });
-
+            getCompetitionStandingsWithCurrentUser(competitionInfo, usersCompetitionsResult, timezoneParam)
+                .then(userPoints => {
                     // We don't announce results until 24hrs after the competition has ended
                     // This allows clients to report final data and users in different timezones to finish their days
                     const now = new Date();

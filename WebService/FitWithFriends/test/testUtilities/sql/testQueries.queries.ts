@@ -360,6 +360,7 @@ export interface IGetCompetitionResult {
   end_date: Date;
   iana_timezone: string;
   start_date: Date;
+  state: number;
 }
 
 /** 'GetCompetition' query type */

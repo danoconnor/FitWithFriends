@@ -117,6 +117,7 @@ export interface IGetCompetitionResult {
   end_date: Date;
   iana_timezone: string;
   start_date: Date;
+  state: number;
 }
 
 /** 'GetCompetition' query type */
@@ -125,13 +126,13 @@ export interface IGetCompetitionQuery {
   result: IGetCompetitionResult;
 }
 
-const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":216,"b":230}]}],"statement":"                                                                                      \nSELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId!"};
+const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":223,"b":237}]}],"statement":"                                                                                      \nSELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state FROM competitions WHERE competition_id = :competitionId!"};
 
 /**
  * Query generated from SQL:
  * ```
  *                                                                                       
- * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId!
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state FROM competitions WHERE competition_id = :competitionId!
  * ```
  */
 export function getCompetition(params: IGetCompetitionParams): Promise<Array<IGetCompetitionResult>> {

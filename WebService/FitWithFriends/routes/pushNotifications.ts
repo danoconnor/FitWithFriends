@@ -1,5 +1,5 @@
 'use strict';
-import PushNotificationPlatform from '../utilities/PushNotificationPlatform';
+import PushNotificationPlatform from '../utilities/enums/PushNotificationPlatform';
 import { handleError } from '../utilities/errorHelpers';
 import * as PushNotificationQueries from '../sql/pushNotifications.queries';
 import * as express from 'express';
