@@ -381,3 +381,44 @@ export function deleteCompetition(params: IDeleteCompetitionParams): Promise<Arr
 }
 
 
+/** 'GetCompetitionsInState' parameters type */
+export interface IGetCompetitionsInStateParams {
+  finishedBeforeDate: DateOrString;
+  state: number;
+}
+
+/** 'GetCompetitionsInState' return type */
+export interface IGetCompetitionsInStateResult {
+  admin_user_id: Buffer;
+  competition_id: string;
+  display_name: string;
+  end_date: Date;
+  iana_timezone: string;
+  start_date: Date;
+  state: number;
+}
+
+/** 'GetCompetitionsInState' query type */
+export interface IGetCompetitionsInStateQuery {
+  params: IGetCompetitionsInStateParams;
+  result: IGetCompetitionsInStateResult;
+}
+
+const getCompetitionsInStateIR: any = {"usedParamSet":{"state":true,"finishedBeforeDate":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":128,"b":134}]},{"name":"finishedBeforeDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":170}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state \nFROM competitions\nWHERE state = :state! AND end_date > :finishedBeforeDate!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state 
+ * FROM competitions
+ * WHERE state = :state! AND end_date > :finishedBeforeDate!
+ * ```
+ */
+export function getCompetitionsInState(params: IGetCompetitionsInStateParams): Promise<Array<IGetCompetitionsInStateResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getCompetitionsInState = new pgtyped.PreparedQuery<IGetCompetitionsInStateParams,IGetCompetitionsInStateResult>(getCompetitionsInStateIR);
+    return getCompetitionsInState.run(params, DatabaseConnectionPool);
+  });
+}
+
+

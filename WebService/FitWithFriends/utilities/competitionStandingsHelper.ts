@@ -11,9 +11,16 @@ export interface UserPoints {
     pointsToday: number;
 };
 
+/**
+ * Get the current standings for a competition
+ * @param competitionInfo The competition to get the standings for
+ * @param users The users in the competition. It is optional to include the first and last name of the user. If included, the names will be included in the result
+ * @param timeZone The timezone of the competition
+ * @returns A map of userId to UserPoints
+ */
 export async function getCompetitionStandings(
     competitionInfo: CompetitionQueries.IGetCompetitionDescriptionDetailsResult, 
-    users: Array<UserQueries.IGetUsersInCompetitionResult>,
+    users: Array<{ userId: string, first_name: string | undefined, last_name: string | null | undefined }>,
     timeZone: string): Promise<{ [userId: string]: UserPoints }> {
     // Make sure we use the date that matches the competition timezone
     let currentDateStr = new Date().toLocaleDateString('en-US', { timeZone });

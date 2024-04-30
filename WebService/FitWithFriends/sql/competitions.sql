@@ -39,3 +39,8 @@ WHERE end_date > :currentDate!;
 
 /* @name DeleteCompetition */
 DELETE FROM competitions WHERE competition_id = :competitionId!;
+
+/* @name GetCompetitionsInState */
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state 
+FROM competitions
+WHERE state = :state! AND end_date > :finishedBeforeDate!;
