@@ -36,3 +36,37 @@ export function registerPushToken(params: IRegisterPushTokenParams): Promise<Arr
 }
 
 
+/** 'GetPushTokensForUser' parameters type */
+export interface IGetPushTokensForUserParams {
+  platform: number;
+  userId: Buffer;
+}
+
+/** 'GetPushTokensForUser' return type */
+export interface IGetPushTokensForUserResult {
+  push_token: string;
+}
+
+/** 'GetPushTokensForUser' query type */
+export interface IGetPushTokensForUserQuery {
+  params: IGetPushTokensForUserParams;
+  result: IGetPushTokensForUserResult;
+}
+
+const getPushTokensForUserIR: any = {"usedParamSet":{"userId":true,"platform":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":52,"b":59}]},{"name":"platform","required":true,"transform":{"type":"scalar"},"locs":[{"a":76,"b":85}]}],"statement":"SELECT push_token FROM push_tokens \nWHERE user_id = :userId! AND platform = :platform!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT push_token FROM push_tokens 
+ * WHERE user_id = :userId! AND platform = :platform!
+ * ```
+ */
+export function getPushTokensForUser(params: IGetPushTokensForUserParams): Promise<Array<IGetPushTokensForUserResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getPushTokensForUser = new pgtyped.PreparedQuery<IGetPushTokensForUserParams,IGetPushTokensForUserResult>(getPushTokensForUserIR);
+    return getPushTokensForUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+

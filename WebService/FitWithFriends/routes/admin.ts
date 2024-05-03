@@ -6,13 +6,14 @@ import { handleError } from '../utilities/errorHelpers';
 
 const router = express.Router();
 
-router.post('/performDailyTasks', async function (req, res) {
+router.post('/performDailyTasks', function (req, res) {
     // TODO: Cleanup expired tokens
     const processCompetitionsTask = processesRecentlyEndedCompetitions();
     const archiveCompetitionsTask = archiveCompetitions();
     
-    await Promise.all([processCompetitionsTask, archiveCompetitionsTask])
+    Promise.all([processCompetitionsTask, archiveCompetitionsTask])
         .then(() => {
+            console.log('Daily tasks completed');
             res.sendStatus(200);
         })
         .catch(err => {
