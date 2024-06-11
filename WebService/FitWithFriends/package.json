@@ -12,7 +12,7 @@
     "name": ""
   },
   "dependencies": {
-    "@azure/identity": "^4.1.0",
+    "@azure/identity": "^4.2.1",
     "@azure/keyvault-certificates": "^4.8.0",
     "@azure/keyvault-keys": "^4.8.0",
     "@azure/keyvault-secrets": "^4.8.0",
@@ -27,7 +27,7 @@
     "jwks-rsa": "3.1.0",
     "morgan": "^1.10.0",
     "pg": "^8.11.5",
-    "pug": "^3.0.2",
+    "pug": "^3.0.3",
     "serve-favicon": "^2.5.0",
     "typescript": "^5.4.5",
     "uuid": "^9.0.1"
