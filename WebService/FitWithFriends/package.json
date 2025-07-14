@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app",
-    "test": "TZ='America/New_York' jest --forceExit"
+    "test": "TZ='America/New_York' NODE_OPTIONS='--experimental-vm-modules' jest --forceExit"
   },
   "description": "FitWithFriends",
   "author": {
