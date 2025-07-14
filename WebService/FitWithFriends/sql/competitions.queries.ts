@@ -437,14 +437,14 @@ export interface IGetCompetitionsInStateQuery {
   result: IGetCompetitionsInStateResult;
 }
 
-const getCompetitionsInStateIR: any = {"usedParamSet":{"state":true,"finishedBeforeDate":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":128,"b":134}]},{"name":"finishedBeforeDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":170}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state \nFROM competitions\nWHERE state = :state! AND end_date > :finishedBeforeDate!"};
+const getCompetitionsInStateIR: any = {"usedParamSet":{"state":true,"finishedBeforeDate":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":128,"b":134}]},{"name":"finishedBeforeDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":170}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state \nFROM competitions\nWHERE state = :state! AND end_date < :finishedBeforeDate!"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state 
  * FROM competitions
- * WHERE state = :state! AND end_date > :finishedBeforeDate!
+ * WHERE state = :state! AND end_date < :finishedBeforeDate!
  * ```
  */
 export function getCompetitionsInState(params: IGetCompetitionsInStateParams): Promise<Array<IGetCompetitionsInStateResult>> {

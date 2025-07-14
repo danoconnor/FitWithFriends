@@ -88,6 +88,14 @@ async function getPushTokenForUser(userId: string): Promise<{ userId: string, to
  * @returns The APNS certificate and key in PEM format
  */
 async function getAPNSCertAndKey(): Promise<{ cert: string, key: string }> {
+    if (isTestEnvironment()) {
+        // In test environment, use a mock certificate and key
+        return {
+            cert: '-----BEGIN CERTIFICATE-----\nYOUR_TEST_CERTIFICATE_HERE\n-----END CERTIFICATE-----',
+            key: '-----BEGIN PRIVATE KEY-----\nYOUR_TEST_KEY_HERE\n-----END PRIVATE KEY-----'
+        };
+    }
+
     // Get the APNS key from the keyvault
     const vaultUrl = process.env.AZURE_KEYVAULT_URL;
     const apnsKeyId = process.env.APNS_KEY_ID;
@@ -120,6 +128,11 @@ async function getAPNSCertAndKey(): Promise<{ cert: string, key: string }> {
  * @param key The APNS key in PEM format
  */
 async function sendPushNotification(httpsAgent: https.Agent, userId: string, pushToken: string, notificationTitle: string, notificationBody: string, cert: string, key: string) {
+    if (isTestEnvironment()) {
+        console.log(`Mock push notification to userId ${userId} with token ${pushToken}: ${notificationTitle} - ${notificationBody}`);
+        return;
+    }
+
     const options: https.RequestOptions = {
         hostname: 'api.push.apple.com',
         port: 443,
@@ -193,4 +206,8 @@ async function sendPushNotification(httpsAgent: https.Agent, userId: string, pus
         req.write(JSON.stringify(payload));
         req.end();
     });
+}
+
+function isTestEnvironment(): boolean {
+    return process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development';
 }
