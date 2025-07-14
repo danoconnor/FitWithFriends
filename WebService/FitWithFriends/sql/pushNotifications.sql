@@ -5,4 +5,8 @@ ON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLU
 
 /* @name GetPushTokensForUser */
 SELECT push_token FROM push_tokens 
-WHERE user_id = :userId! AND platform = :platform!;
+WHERE user_id = :userId!;
+
+/* @name DeletePushToken */
+DELETE FROM push_tokens 
+WHERE user_id = :userId! AND push_token = :pushToken!;

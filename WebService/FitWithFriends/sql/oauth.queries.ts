@@ -136,3 +136,33 @@ export function deleteRefreshToken(params: IDeleteRefreshTokenParams): Promise<A
 }
 
 
+/** 'DeleteExpiredRefreshTokens' parameters type */
+export interface IDeleteExpiredRefreshTokensParams {
+  currentDate: DateOrString;
+}
+
+/** 'DeleteExpiredRefreshTokens' return type */
+export type IDeleteExpiredRefreshTokensResult = void;
+
+/** 'DeleteExpiredRefreshTokens' query type */
+export interface IDeleteExpiredRefreshTokensQuery {
+  params: IDeleteExpiredRefreshTokensParams;
+  result: IDeleteExpiredRefreshTokensResult;
+}
+
+const deleteExpiredRefreshTokensIR: any = {"usedParamSet":{"currentDate":true},"params":[{"name":"currentDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":58,"b":70}]}],"statement":"DELETE FROM oauth_tokens WHERE refresh_token_expires_on < :currentDate!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM oauth_tokens WHERE refresh_token_expires_on < :currentDate!
+ * ```
+ */
+export function deleteExpiredRefreshTokens(params: IDeleteExpiredRefreshTokensParams): Promise<Array<IDeleteExpiredRefreshTokensResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const deleteExpiredRefreshTokens = new pgtyped.PreparedQuery<IDeleteExpiredRefreshTokensParams,IDeleteExpiredRefreshTokensResult>(deleteExpiredRefreshTokensIR);
+    return deleteExpiredRefreshTokens.run(params, DatabaseConnectionPool);
+  });
+}
+
+

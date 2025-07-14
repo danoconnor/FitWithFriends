@@ -35,6 +35,39 @@ export function getUsersCompetitions(params: IGetUsersCompetitionsParams): Promi
 }
 
 
+/** 'GetUsersForCompetition' parameters type */
+export interface IGetUsersForCompetitionParams {
+  competitionId: string;
+}
+
+/** 'GetUsersForCompetition' return type */
+export interface IGetUsersForCompetitionResult {
+  final_points: number | null;
+  user_id: Buffer;
+}
+
+/** 'GetUsersForCompetition' query type */
+export interface IGetUsersForCompetitionQuery {
+  params: IGetUsersForCompetitionParams;
+  result: IGetUsersForCompetitionResult;
+}
+
+const getUsersForCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":76,"b":90}]}],"statement":"SELECT user_id, final_points FROM users_competitions WHERE competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT user_id, final_points FROM users_competitions WHERE competition_id = :competitionId!
+ * ```
+ */
+export function getUsersForCompetition(params: IGetUsersForCompetitionParams): Promise<Array<IGetUsersForCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getUsersForCompetition = new pgtyped.PreparedQuery<IGetUsersForCompetitionParams,IGetUsersForCompetitionResult>(getUsersForCompetitionIR);
+    return getUsersForCompetition.run(params, DatabaseConnectionPool);
+  });
+}
+
+
 /** 'CreateCompetition' parameters type */
 export interface ICreateCompetitionParams {
   accessToken: string;
@@ -418,6 +451,71 @@ export function getCompetitionsInState(params: IGetCompetitionsInStateParams): P
   return import('@pgtyped/runtime').then(pgtyped => {
     const getCompetitionsInState = new pgtyped.PreparedQuery<IGetCompetitionsInStateParams,IGetCompetitionsInStateResult>(getCompetitionsInStateIR);
     return getCompetitionsInState.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'UpdateCompetitionState' parameters type */
+export interface IUpdateCompetitionStateParams {
+  competitionId: string;
+  newState: number;
+}
+
+/** 'UpdateCompetitionState' return type */
+export type IUpdateCompetitionStateResult = void;
+
+/** 'UpdateCompetitionState' query type */
+export interface IUpdateCompetitionStateQuery {
+  params: IUpdateCompetitionStateParams;
+  result: IUpdateCompetitionStateResult;
+}
+
+const updateCompetitionStateIR: any = {"usedParamSet":{"newState":true,"competitionId":true},"params":[{"name":"newState","required":true,"transform":{"type":"scalar"},"locs":[{"a":32,"b":41}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":66,"b":80}]}],"statement":"UPDATE competitions SET state = :newState! WHERE competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE competitions SET state = :newState! WHERE competition_id = :competitionId!
+ * ```
+ */
+export function updateCompetitionState(params: IUpdateCompetitionStateParams): Promise<Array<IUpdateCompetitionStateResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateCompetitionState = new pgtyped.PreparedQuery<IUpdateCompetitionStateParams,IUpdateCompetitionStateResult>(updateCompetitionStateIR);
+    return updateCompetitionState.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'UpdateCompetitionFinalPoints' parameters type */
+export interface IUpdateCompetitionFinalPointsParams {
+  competitionId: string;
+  finalPoints: number;
+  userId: Buffer;
+}
+
+/** 'UpdateCompetitionFinalPoints' return type */
+export type IUpdateCompetitionFinalPointsResult = void;
+
+/** 'UpdateCompetitionFinalPoints' query type */
+export interface IUpdateCompetitionFinalPointsQuery {
+  params: IUpdateCompetitionFinalPointsParams;
+  result: IUpdateCompetitionFinalPointsResult;
+}
+
+const updateCompetitionFinalPointsIR: any = {"usedParamSet":{"finalPoints":true,"userId":true,"competitionId":true},"params":[{"name":"finalPoints","required":true,"transform":{"type":"scalar"},"locs":[{"a":45,"b":57}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":75,"b":82}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":105,"b":119}]}],"statement":"UPDATE users_competitions\nSET final_points = :finalPoints!\nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users_competitions
+ * SET final_points = :finalPoints!
+ * WHERE user_id = :userId! AND competition_id = :competitionId!
+ * ```
+ */
+export function updateCompetitionFinalPoints(params: IUpdateCompetitionFinalPointsParams): Promise<Array<IUpdateCompetitionFinalPointsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateCompetitionFinalPoints = new pgtyped.PreparedQuery<IUpdateCompetitionFinalPointsParams,IUpdateCompetitionFinalPointsResult>(updateCompetitionFinalPointsIR);
+    return updateCompetitionFinalPoints.run(params, DatabaseConnectionPool);
   });
 }
 

@@ -393,6 +393,7 @@ export interface IGetUsersInCompetitionParams {
 /** 'GetUsersInCompetition' return type */
 export interface IGetUsersInCompetitionResult {
   competition_id: string;
+  final_points: number | null;
   user_id: Buffer;
 }
 

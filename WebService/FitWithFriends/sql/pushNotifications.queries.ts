@@ -38,7 +38,6 @@ export function registerPushToken(params: IRegisterPushTokenParams): Promise<Arr
 
 /** 'GetPushTokensForUser' parameters type */
 export interface IGetPushTokensForUserParams {
-  platform: number;
   userId: Buffer;
 }
 
@@ -53,19 +52,51 @@ export interface IGetPushTokensForUserQuery {
   result: IGetPushTokensForUserResult;
 }
 
-const getPushTokensForUserIR: any = {"usedParamSet":{"userId":true,"platform":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":52,"b":59}]},{"name":"platform","required":true,"transform":{"type":"scalar"},"locs":[{"a":76,"b":85}]}],"statement":"SELECT push_token FROM push_tokens \nWHERE user_id = :userId! AND platform = :platform!"};
+const getPushTokensForUserIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":52,"b":59}]}],"statement":"SELECT push_token FROM push_tokens \nWHERE user_id = :userId!"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT push_token FROM push_tokens 
- * WHERE user_id = :userId! AND platform = :platform!
+ * WHERE user_id = :userId!
  * ```
  */
 export function getPushTokensForUser(params: IGetPushTokensForUserParams): Promise<Array<IGetPushTokensForUserResult>> {
   return import('@pgtyped/runtime').then(pgtyped => {
     const getPushTokensForUser = new pgtyped.PreparedQuery<IGetPushTokensForUserParams,IGetPushTokensForUserResult>(getPushTokensForUserIR);
     return getPushTokensForUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'DeletePushToken' parameters type */
+export interface IDeletePushTokenParams {
+  pushToken: string;
+  userId: Buffer;
+}
+
+/** 'DeletePushToken' return type */
+export type IDeletePushTokenResult = void;
+
+/** 'DeletePushToken' query type */
+export interface IDeletePushTokenQuery {
+  params: IDeletePushTokenParams;
+  result: IDeletePushTokenResult;
+}
+
+const deletePushTokenIR: any = {"usedParamSet":{"userId":true,"pushToken":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":41,"b":48}]},{"name":"pushToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":67,"b":77}]}],"statement":"DELETE FROM push_tokens \nWHERE user_id = :userId! AND push_token = :pushToken!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM push_tokens 
+ * WHERE user_id = :userId! AND push_token = :pushToken!
+ * ```
+ */
+export function deletePushToken(params: IDeletePushTokenParams): Promise<Array<IDeletePushTokenResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const deletePushToken = new pgtyped.PreparedQuery<IDeletePushTokenParams,IDeletePushTokenResult>(deletePushTokenIR);
+    return deletePushToken.run(params, DatabaseConnectionPool);
   });
 }
 
