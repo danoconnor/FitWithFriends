@@ -186,7 +186,7 @@ async function sendPushNotification(httpsAgent: https.Agent, userId: string, pus
                         });
                         console.warn(`Deleted invalid push token for userId ${userId}`);
                     } catch (err) {
-                        console.error('Failed to delete invalid push token for userId ${userId}:', err);
+                        console.error(`Failed to delete invalid push token for userId ${userId}:`, err);
                     }
                     resolve();
                 } else {
