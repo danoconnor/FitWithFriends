@@ -11,7 +11,7 @@ import { getCompetitionStandings } from '../utilities/competitionStandingsHelper
 const router = express.Router();
 
 router.post('/performDailyTasks', async function (req, res) {
-    var errors: [taskName: string, error: Error][] = [];
+    let errors: [taskName: string, error: Error][] = [];
 
     const deleteExpiredTokensPromise = deleteExpiredRefreshTokens();
 

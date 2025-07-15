@@ -32,7 +32,8 @@ export async function sendPushNotifications(notifications: Notification[]) {
 
     const { cert, key } = await apnsCredentialPromise;
 
-    const httpsAgent = new https.Agent();
+    // Create an HTTPS agent to reuse the TLS connection for multiple requests
+    const httpsAgent = new https.Agent({ keepAlive: true });
 
     // Create an entry for each notification/push token pair that we are going to send
     const notificationTokenPairs: Array<{

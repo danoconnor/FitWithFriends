@@ -45,10 +45,10 @@ export async function getCompetitionStandings(
     
     // Competition is not archived, calculate points from activity data
     // Make sure we use the date that matches the competition timezone
-    let currentDateStr = new Date().toLocaleDateString('en-US', { timeZone });
-    let currentDate = new Date(currentDateStr);
+    const currentDateStr = new Date().toLocaleDateString('en-US', { timeZone });
+    const currentDate = new Date(currentDateStr);
 
-    var userPoints: { [userId: string]: UserPoints } = {};
+    const userPoints: { [userId: string]: UserPoints } = {};
     users.forEach(row => {
         userPoints[row.userId] = {
             userId: row.userId,
@@ -66,7 +66,7 @@ export async function getCompetitionStandings(
     // This will eventually change when we allow users to define custom scoring rules, but for now we will stick with Apple's rules
     const maxPointsPerDay = 600;
     activitySummaries.forEach(row => {
-        var points = 0;
+        let points = 0;
 
         // Avoid divide-by-zero errors
         if (row.calories_goal > 0) {
