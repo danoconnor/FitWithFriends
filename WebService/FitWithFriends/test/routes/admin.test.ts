@@ -67,7 +67,6 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
     test('processes competitions that recently ended', async () => {
         const competitionId = uuid();
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
         
         // Create a competition that ended yesterday but is still in NotStartedOrActive state
         await TestSQL.createCompetitionWithState({
