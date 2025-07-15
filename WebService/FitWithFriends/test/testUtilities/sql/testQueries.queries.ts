@@ -314,6 +314,44 @@ export function createCompetition(params: ICreateCompetitionParams): Promise<Arr
 }
 
 
+/** 'CreateCompetitionWithState' parameters type */
+export interface ICreateCompetitionWithStateParams {
+  accessToken: string;
+  adminUserId: Buffer;
+  competitionId: string;
+  displayName: string;
+  endDate: DateOrString;
+  ianaTimezone: string;
+  startDate: DateOrString;
+  state: number;
+}
+
+/** 'CreateCompetitionWithState' return type */
+export type ICreateCompetitionWithStateResult = void;
+
+/** 'CreateCompetitionWithState' query type */
+export interface ICreateCompetitionWithStateQuery {
+  params: ICreateCompetitionWithStateParams;
+  result: ICreateCompetitionWithStateResult;
+}
+
+const createCompetitionWithStateIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true,"state":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":138,"b":148}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":159}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":162,"b":174}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":177,"b":189}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":192,"b":204}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":207,"b":220}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":223,"b":237}]},{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":240,"b":246}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state) \nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state) 
+ * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!)
+ * ```
+ */
+export function createCompetitionWithState(params: ICreateCompetitionWithStateParams): Promise<Array<ICreateCompetitionWithStateResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const createCompetitionWithState = new pgtyped.PreparedQuery<ICreateCompetitionWithStateParams,ICreateCompetitionWithStateResult>(createCompetitionWithStateIR);
+    return createCompetitionWithState.run(params, DatabaseConnectionPool);
+  });
+}
+
+
 /** 'AddUserToCompetition' parameters type */
 export interface IAddUserToCompetitionParams {
   competitionId: string;
@@ -346,6 +384,40 @@ export function addUserToCompetition(params: IAddUserToCompetitionParams): Promi
 }
 
 
+/** 'UpdateUserCompetitionFinalPoints' parameters type */
+export interface IUpdateUserCompetitionFinalPointsParams {
+  competitionId: string;
+  finalPoints: number;
+  userId: Buffer;
+}
+
+/** 'UpdateUserCompetitionFinalPoints' return type */
+export type IUpdateUserCompetitionFinalPointsResult = void;
+
+/** 'UpdateUserCompetitionFinalPoints' query type */
+export interface IUpdateUserCompetitionFinalPointsQuery {
+  params: IUpdateUserCompetitionFinalPointsParams;
+  result: IUpdateUserCompetitionFinalPointsResult;
+}
+
+const updateUserCompetitionFinalPointsIR: any = {"usedParamSet":{"finalPoints":true,"userId":true,"competitionId":true},"params":[{"name":"finalPoints","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":58}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":84}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":107,"b":121}]}],"statement":"UPDATE users_competitions \nSET final_points = :finalPoints! \nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users_competitions 
+ * SET final_points = :finalPoints! 
+ * WHERE user_id = :userId! AND competition_id = :competitionId!
+ * ```
+ */
+export function updateUserCompetitionFinalPoints(params: IUpdateUserCompetitionFinalPointsParams): Promise<Array<IUpdateUserCompetitionFinalPointsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateUserCompetitionFinalPoints = new pgtyped.PreparedQuery<IUpdateUserCompetitionFinalPointsParams,IUpdateUserCompetitionFinalPointsResult>(updateUserCompetitionFinalPointsIR);
+    return updateUserCompetitionFinalPoints.run(params, DatabaseConnectionPool);
+  });
+}
+
+
 /** 'GetCompetition' parameters type */
 export interface IGetCompetitionParams {
   competitionId: string;
@@ -360,6 +432,7 @@ export interface IGetCompetitionResult {
   end_date: Date;
   iana_timezone: string;
   start_date: Date;
+  state: number;
 }
 
 /** 'GetCompetition' query type */
@@ -392,6 +465,7 @@ export interface IGetUsersInCompetitionParams {
 /** 'GetUsersInCompetition' return type */
 export interface IGetUsersInCompetitionResult {
   competition_id: string;
+  final_points: number | null;
   user_id: Buffer;
 }
 
@@ -486,6 +560,102 @@ export function getWorkoutsForUser(params: IGetWorkoutsForUserParams): Promise<A
   return import('@pgtyped/runtime').then(pgtyped => {
     const getWorkoutsForUser = new pgtyped.PreparedQuery<IGetWorkoutsForUserParams,IGetWorkoutsForUserResult>(getWorkoutsForUserIR);
     return getWorkoutsForUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetRefreshTokens' parameters type */
+export type IGetRefreshTokensParams = void;
+
+/** 'GetRefreshTokens' return type */
+export interface IGetRefreshTokensResult {
+  client_id: string;
+  refresh_token: string;
+  refresh_token_expires_on: Date;
+  user_id: Buffer;
+}
+
+/** 'GetRefreshTokens' query type */
+export interface IGetRefreshTokensQuery {
+  params: IGetRefreshTokensParams;
+  result: IGetRefreshTokensResult;
+}
+
+const getRefreshTokensIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT * FROM oauth_tokens"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT * FROM oauth_tokens
+ * ```
+ */
+export function getRefreshTokens(params: IGetRefreshTokensParams): Promise<Array<IGetRefreshTokensResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getRefreshTokens = new pgtyped.PreparedQuery<IGetRefreshTokensParams,IGetRefreshTokensResult>(getRefreshTokensIR);
+    return getRefreshTokens.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'DeleteAllRefreshTokens' parameters type */
+export type IDeleteAllRefreshTokensParams = void;
+
+/** 'DeleteAllRefreshTokens' return type */
+export type IDeleteAllRefreshTokensResult = void;
+
+/** 'DeleteAllRefreshTokens' query type */
+export interface IDeleteAllRefreshTokensQuery {
+  params: IDeleteAllRefreshTokensParams;
+  result: IDeleteAllRefreshTokensResult;
+}
+
+const deleteAllRefreshTokensIR: any = {"usedParamSet":{},"params":[],"statement":"DELETE FROM oauth_tokens"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM oauth_tokens
+ * ```
+ */
+export function deleteAllRefreshTokens(params: IDeleteAllRefreshTokensParams): Promise<Array<IDeleteAllRefreshTokensResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const deleteAllRefreshTokens = new pgtyped.PreparedQuery<IDeleteAllRefreshTokensParams,IDeleteAllRefreshTokensResult>(deleteAllRefreshTokensIR);
+    return deleteAllRefreshTokens.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'CreatePushToken' parameters type */
+export interface ICreatePushTokenParams {
+  appInstallId: string;
+  platform: number;
+  pushToken: string;
+  userId: Buffer;
+}
+
+/** 'CreatePushToken' return type */
+export type ICreatePushTokenResult = void;
+
+/** 'CreatePushToken' query type */
+export interface ICreatePushTokenQuery {
+  params: ICreatePushTokenParams;
+  result: ICreatePushTokenResult;
+}
+
+const createPushTokenIR: any = {"usedParamSet":{"userId":true,"pushToken":true,"platform":true,"appInstallId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":80,"b":87}]},{"name":"pushToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":90,"b":100}]},{"name":"platform","required":true,"transform":{"type":"scalar"},"locs":[{"a":103,"b":112}]},{"name":"appInstallId","required":true,"transform":{"type":"scalar"},"locs":[{"a":115,"b":128}]}],"statement":"INSERT INTO push_tokens (user_id, push_token, platform, app_install_id)\nVALUES (:userId!, :pushToken!, :platform!, :appInstallId!)\nON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLUDED.push_token"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO push_tokens (user_id, push_token, platform, app_install_id)
+ * VALUES (:userId!, :pushToken!, :platform!, :appInstallId!)
+ * ON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLUDED.push_token
+ * ```
+ */
+export function createPushToken(params: ICreatePushTokenParams): Promise<Array<ICreatePushTokenResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const createPushToken = new pgtyped.PreparedQuery<ICreatePushTokenParams,ICreatePushTokenResult>(createPushTokenIR);
+    return createPushToken.run(params, DatabaseConnectionPool);
   });
 }
 

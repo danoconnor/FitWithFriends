@@ -31,9 +31,18 @@ ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_bu
 INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) 
 VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!);
 
+/* @name CreateCompetitionWithState */
+INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state) 
+VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!);
+
 /* @name AddUserToCompetition */
 INSERT INTO users_competitions (user_id, competition_id)
 VALUES (:userId!, :competitionId!);
+
+/* @name UpdateUserCompetitionFinalPoints */
+UPDATE users_competitions 
+SET final_points = :finalPoints! 
+WHERE user_id = :userId! AND competition_id = :competitionId!;
 
 /* @name GetCompetition */
 SELECT * FROM competitions WHERE competition_id = :competitionId!;
@@ -46,3 +55,14 @@ SELECT * FROM push_tokens WHERE user_id = :userId!;
 
 /* @name GetWorkoutsForUser */
 SELECT * FROM workouts WHERE user_id = :userId!;
+
+/* @name GetRefreshTokens */
+SELECT * FROM oauth_tokens;
+
+/* @name DeleteAllRefreshTokens */
+DELETE FROM oauth_tokens;
+
+/* @name CreatePushToken */
+INSERT INTO push_tokens (user_id, push_token, platform, app_install_id)
+VALUES (:userId!, :pushToken!, :platform!, :appInstallId!)
+ON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLUDED.push_token;

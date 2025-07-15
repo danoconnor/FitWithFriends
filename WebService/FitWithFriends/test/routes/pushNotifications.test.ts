@@ -2,7 +2,7 @@ import * as TestSQL from '../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
-import PushNotificationPlatform from '../../utilities/PushNotificationPlatform';
+import PushNotificationPlatform from '../../utilities/enums/PushNotificationPlatform';
 import { v4 as uuid } from 'uuid';
 
 /*

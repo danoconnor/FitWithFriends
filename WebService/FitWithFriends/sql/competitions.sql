@@ -1,6 +1,9 @@
 /* @name GetUsersCompetitions */
 SELECT competition_id from users_competitions WHERE user_id = :userId!;
 
+/* @name GetUsersForCompetition */
+SELECT user_id, final_points FROM users_competitions WHERE competition_id = :competitionId!;
+
 /* @name CreateCompetition */
 INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!);
 
@@ -11,7 +14,7 @@ ON CONFLICT (user_id, competition_id) DO NOTHING;
 
 /* @name GetCompetition */
 /* Does not return the access_token field - we will only return that to admin users */
-SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId!;
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state FROM competitions WHERE competition_id = :competitionId!;
 
 /* @name GetCompetitionAdminDetails */
 SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!;
@@ -39,3 +42,16 @@ WHERE end_date > :currentDate!;
 
 /* @name DeleteCompetition */
 DELETE FROM competitions WHERE competition_id = :competitionId!;
+
+/* @name GetCompetitionsInState */
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state 
+FROM competitions
+WHERE state = :state! AND end_date < :finishedBeforeDate!;
+
+/* @name UpdateCompetitionState */
+UPDATE competitions SET state = :newState! WHERE competition_id = :competitionId!;
+
+/* @name UpdateCompetitionFinalPoints */
+UPDATE users_competitions
+SET final_points = :finalPoints!
+WHERE user_id = :userId! AND competition_id = :competitionId!;

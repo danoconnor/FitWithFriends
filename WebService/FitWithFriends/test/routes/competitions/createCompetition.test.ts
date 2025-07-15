@@ -2,7 +2,7 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities/userHelpers';
-import FWFErrorCodes from '../../../utilities/FWFErrorCodes';
+import FWFErrorCodes from '../../../utilities/enums/FWFErrorCodes';
 
 /*
     Tests the /competitions route for creating a new competition

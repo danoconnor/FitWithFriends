@@ -3,7 +3,7 @@ import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities/userHelpers';
 import { v4 as uuid } from 'uuid';
-import FWFErrorCodes from '../../../utilities/FWFErrorCodes';
+import FWFErrorCodes from '../../../utilities/enums/FWFErrorCodes';
 
 /*
     Tests the /competitions/join route for joining an existing competition

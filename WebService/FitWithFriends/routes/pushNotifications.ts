@@ -1,6 +1,5 @@
 'use strict';
-import PushNotificationPlatform from '../utilities/PushNotificationPlatform';
-import { DatabaseConnectionPool } from '../utilities/database';
+import PushNotificationPlatform from '../utilities/enums/PushNotificationPlatform';
 import { handleError } from '../utilities/errorHelpers';
 import * as PushNotificationQueries from '../sql/pushNotifications.queries';
 import * as express from 'express';
@@ -23,7 +22,7 @@ router.post('/register', function (req, res) {
 
     // Make sure the appInstallId is a valid UUID
     if (!uuidRegex.test(appInstallId)) {
-        handleError(null, 400, 'Invalid UUID', res);
+        handleError(null, 400, 'Invalid UUID: ' + appInstallId, res, true);
         return;
     }
 

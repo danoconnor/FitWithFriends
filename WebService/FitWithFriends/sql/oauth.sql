@@ -9,3 +9,6 @@ INSERT INTO oauth_tokens(client_id, refresh_token, refresh_token_expires_on, use
 
 /* @name DeleteRefreshToken */
 DELETE FROM oauth_tokens WHERE refresh_token = :refreshToken!;
+
+/* @name DeleteExpiredRefreshTokens */
+DELETE FROM oauth_tokens WHERE refresh_token_expires_on < :currentDate!;

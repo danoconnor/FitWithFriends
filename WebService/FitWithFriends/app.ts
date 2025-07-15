@@ -12,10 +12,12 @@ import users from './routes/users';
 import oauth from './routes/auth';
 import competitions from './routes/competitions';
 import activityData from './routes/activityData';
+import admin from './routes/admin';
 import pushNotifications from './routes/pushNotifications';
 import wellKnown from './routes/wellKnown';
 import { sendErrorDetails } from './utilities/errorHelpers';
 import HttpError from './utilities/httpError';
+import { authenticateAdmin } from './utilities/adminAuthenticator';
 
 import oauthServer from './oauth/server';
 
@@ -47,6 +49,7 @@ app.use('/users', users);
 app.use('/competitions', oauthServer.authenticate(), competitions);
 app.use('/activityData', oauthServer.authenticate(), activityData);
 app.use('/pushNotifications', oauthServer.authenticate(), pushNotifications);
+app.use('/admin', authenticateAdmin, admin);
 app.use('/.well-known', wellKnown);
 
 // catch 404 and forward to error handler

@@ -35,7 +35,7 @@ env:
   PGPORT: ${{ secrets.PGPORT }}
   PGDATABASE: ${{ secrets.PGDATABASE }}
   PGUSESSL: ${{ secrets.PGUSESSL }}
-
+  FWF_ADMIN_AUTH_SECRET: ${{ secrets.FWF_ADMIN_AUTH_SECRET }}
 
 permissions:
   contents: read
@@ -65,7 +65,7 @@ jobs:
 
     - name: Docker compose up
       run: |
-        docker-compose -f ${{ env.WEBSERVICE_ROOT_PATH }}/docker-compose-local-testing.yml up --build -d
+        docker compose -f ${{ env.WEBSERVICE_ROOT_PATH }}/docker-compose-local-testing.yml up --build -d
         
     - name: npm test
       working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
@@ -74,4 +74,4 @@ jobs:
 
     - name: Docker compose down
       run: |
-        docker-compose -f ${{ env.WEBSERVICE_ROOT_PATH }}/docker-compose-local-testing.yml down --volumes
+        docker compose -f ${{ env.WEBSERVICE_ROOT_PATH }}/docker-compose-local-testing.yml down --volumes
