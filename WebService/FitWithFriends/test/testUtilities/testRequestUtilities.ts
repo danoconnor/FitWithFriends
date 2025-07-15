@@ -51,7 +51,7 @@ export async function makeAdminGetRequest(relativeUrl: string, contentType: stri
 
 function getAdminHeaders(contentType: string | undefined): any {
     return {
-        'Authorization': 'some_admin_secret', // Use the admin secret that is hardcoded in the .env file
+        'Authorization': process.env.FWF_ADMIN_AUTH_SECRET ?? 'some_admin_secret', // Use the admin secret that is hardcoded in the .env file
         'Content-Type': contentType ? contentType : 'application/json'
     };
 }
