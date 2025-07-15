@@ -2,6 +2,7 @@ import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertUserIdToBuffer } from '../utilities/userHelpers';
+import { CompetitionState } from './enums/CompetitionState';
 
 export interface UserPoints {
     userId: string;
@@ -19,9 +20,30 @@ export interface UserPoints {
  * @returns A map of userId to UserPoints
  */
 export async function getCompetitionStandings(
-    competitionInfo: CompetitionQueries.IGetCompetitionDescriptionDetailsResult, 
-    users: Array<{ userId: string, first_name: string | undefined, last_name: string | null | undefined }>,
+    competitionInfo: CompetitionQueries.IGetCompetitionResult, 
+    users: UserQueries.IGetUsersInCompetitionResult[],
     timeZone: string): Promise<{ [userId: string]: UserPoints }> {
+    
+    // Check if this competition is archived and has final points stored
+    if (competitionInfo.state === CompetitionState.Archived) {
+        // Competition is archived, get the final points from users_competitions table
+        const userPoints: { [userId: string]: UserPoints } = {};
+        
+        // Map the users with their final points
+        users.forEach(user => {
+            userPoints[user.userId] = {
+                userId: user.userId,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                activityPoints: user.finalPoints,
+                pointsToday: 0 // No points today for archived competitions
+            };
+        });
+        
+        return userPoints;
+    }
+    
+    // Competition is not archived, calculate points from activity data
     // Make sure we use the date that matches the competition timezone
     let currentDateStr = new Date().toLocaleDateString('en-US', { timeZone });
     let currentDate = new Date(currentDateStr);

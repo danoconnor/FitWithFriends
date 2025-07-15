@@ -384,6 +384,40 @@ export function addUserToCompetition(params: IAddUserToCompetitionParams): Promi
 }
 
 
+/** 'UpdateUserCompetitionFinalPoints' parameters type */
+export interface IUpdateUserCompetitionFinalPointsParams {
+  competitionId: string;
+  finalPoints: number;
+  userId: Buffer;
+}
+
+/** 'UpdateUserCompetitionFinalPoints' return type */
+export type IUpdateUserCompetitionFinalPointsResult = void;
+
+/** 'UpdateUserCompetitionFinalPoints' query type */
+export interface IUpdateUserCompetitionFinalPointsQuery {
+  params: IUpdateUserCompetitionFinalPointsParams;
+  result: IUpdateUserCompetitionFinalPointsResult;
+}
+
+const updateUserCompetitionFinalPointsIR: any = {"usedParamSet":{"finalPoints":true,"userId":true,"competitionId":true},"params":[{"name":"finalPoints","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":58}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":84}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":107,"b":121}]}],"statement":"UPDATE users_competitions \nSET final_points = :finalPoints! \nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users_competitions 
+ * SET final_points = :finalPoints! 
+ * WHERE user_id = :userId! AND competition_id = :competitionId!
+ * ```
+ */
+export function updateUserCompetitionFinalPoints(params: IUpdateUserCompetitionFinalPointsParams): Promise<Array<IUpdateUserCompetitionFinalPointsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateUserCompetitionFinalPoints = new pgtyped.PreparedQuery<IUpdateUserCompetitionFinalPointsParams,IUpdateUserCompetitionFinalPointsResult>(updateUserCompetitionFinalPointsIR);
+    return updateUserCompetitionFinalPoints.run(params, DatabaseConnectionPool);
+  });
+}
+
+
 /** 'GetCompetition' parameters type */
 export interface IGetCompetitionParams {
   competitionId: string;
@@ -559,6 +593,34 @@ export function getRefreshTokens(params: IGetRefreshTokensParams): Promise<Array
   return import('@pgtyped/runtime').then(pgtyped => {
     const getRefreshTokens = new pgtyped.PreparedQuery<IGetRefreshTokensParams,IGetRefreshTokensResult>(getRefreshTokensIR);
     return getRefreshTokens.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'DeleteAllRefreshTokens' parameters type */
+export type IDeleteAllRefreshTokensParams = void;
+
+/** 'DeleteAllRefreshTokens' return type */
+export type IDeleteAllRefreshTokensResult = void;
+
+/** 'DeleteAllRefreshTokens' query type */
+export interface IDeleteAllRefreshTokensQuery {
+  params: IDeleteAllRefreshTokensParams;
+  result: IDeleteAllRefreshTokensResult;
+}
+
+const deleteAllRefreshTokensIR: any = {"usedParamSet":{},"params":[],"statement":"DELETE FROM oauth_tokens"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM oauth_tokens
+ * ```
+ */
+export function deleteAllRefreshTokens(params: IDeleteAllRefreshTokensParams): Promise<Array<IDeleteAllRefreshTokensResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const deleteAllRefreshTokens = new pgtyped.PreparedQuery<IDeleteAllRefreshTokensParams,IDeleteAllRefreshTokensResult>(deleteAllRefreshTokensIR);
+    return deleteAllRefreshTokens.run(params, DatabaseConnectionPool);
   });
 }
 

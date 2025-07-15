@@ -288,18 +288,17 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
             clientId: '6A773C32-5EB3-41C9-8036-B991B51F14F7'
         });
 
-        // Get initial token count
-        const initialTokens = await TestSQL.getRefreshTokens();
-        expect(initialTokens.length).toBe(2);
-
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
 
-        // Verify expired token was deleted, valid token remains
+        // Verify our specific tokens - expired token should be gone, valid token should remain
         const remainingTokens = await TestSQL.getRefreshTokens();
-        expect(remainingTokens.length).toBe(1);
-        expect(remainingTokens[0].refresh_token).toBe('valid-token');
+        const expiredTokenExists = remainingTokens.some(t => t.refresh_token === 'expired-token');
+        const validTokenExists = remainingTokens.some(t => t.refresh_token === 'valid-token');
+        
+        expect(expiredTokenExists).toBe(false);
+        expect(validTokenExists).toBe(true);
     });
 
     test('handles case with no expired tokens', async () => {
@@ -319,17 +318,17 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
             clientId: '6A773C32-5EB3-41C9-8036-B991B51F14F7'
         });
 
-        // Get initial token count
-        const initialTokens = await TestSQL.getRefreshTokens();
-        expect(initialTokens.length).toBe(2);
-
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
 
-        // Verify no tokens were deleted
+        // Verify our specific tokens still exist (should not be deleted)
         const remainingTokens = await TestSQL.getRefreshTokens();
-        expect(remainingTokens.length).toBe(2);
+        const validToken1Exists = remainingTokens.some(t => t.refresh_token === 'valid-token-1');
+        const validToken2Exists = remainingTokens.some(t => t.refresh_token === 'valid-token-2');
+        
+        expect(validToken1Exists).toBe(true);
+        expect(validToken2Exists).toBe(true);
     });
 });
 

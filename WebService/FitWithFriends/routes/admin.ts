@@ -121,7 +121,8 @@ async function archiveCompetitions() {
                 competitionUsers.map(user => ({
                     userId: UserHelpers.convertBufferToUserId(user.user_id),
                     first_name: null,
-                    last_name: null
+                    last_name: null,
+                    finalPoints: user.final_points
                 })),
                 competition.iana_timezone);
 

@@ -39,6 +39,11 @@ VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ia
 INSERT INTO users_competitions (user_id, competition_id)
 VALUES (:userId!, :competitionId!);
 
+/* @name UpdateUserCompetitionFinalPoints */
+UPDATE users_competitions 
+SET final_points = :finalPoints! 
+WHERE user_id = :userId! AND competition_id = :competitionId!;
+
 /* @name GetCompetition */
 SELECT * FROM competitions WHERE competition_id = :competitionId!;
 
@@ -53,6 +58,9 @@ SELECT * FROM workouts WHERE user_id = :userId!;
 
 /* @name GetRefreshTokens */
 SELECT * FROM oauth_tokens;
+
+/* @name DeleteAllRefreshTokens */
+DELETE FROM oauth_tokens;
 
 /* @name CreatePushToken */
 INSERT INTO push_tokens (user_id, push_token, platform, app_install_id)

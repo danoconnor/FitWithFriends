@@ -110,6 +110,7 @@ export interface IGetUsersInCompetitionParams {
 
 /** 'GetUsersInCompetition' return type */
 export interface IGetUsersInCompetitionResult {
+  finalPoints: number;
   first_name: string;
   last_name: string | null;
   userId: string;
@@ -121,13 +122,13 @@ export interface IGetUsersInCompetitionQuery {
   result: IGetUsersInCompetitionResult;
 }
 
-const getUsersInCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":172,"b":186}]}],"statement":"SELECT encode(userData.user_id::bytea, 'hex') AS \"userId!\", userData.first_name, userData.last_name FROM\n    (SELECT user_id FROM users_competitions WHERE competition_id = :competitionId!) AS usersCompetitions\n    INNER JOIN (SELECT user_id, first_name, last_name FROM users) as userData\n    ON usersCompetitions.user_id = userData.user_id"};
+const getUsersInCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":236,"b":250}]}],"statement":"SELECT encode(userData.user_id::bytea, 'hex') AS \"userId!\", userData.first_name, userData.last_name, usersCompetitions.final_points AS \"finalPoints!\" FROM\n    (SELECT user_id, final_points FROM users_competitions WHERE competition_id = :competitionId!) AS usersCompetitions\n    INNER JOIN (SELECT user_id, first_name, last_name FROM users) as userData\n    ON usersCompetitions.user_id = userData.user_id"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT encode(userData.user_id::bytea, 'hex') AS "userId!", userData.first_name, userData.last_name FROM
- *     (SELECT user_id FROM users_competitions WHERE competition_id = :competitionId!) AS usersCompetitions
+ * SELECT encode(userData.user_id::bytea, 'hex') AS "userId!", userData.first_name, userData.last_name, usersCompetitions.final_points AS "finalPoints!" FROM
+ *     (SELECT user_id, final_points FROM users_competitions WHERE competition_id = :competitionId!) AS usersCompetitions
  *     INNER JOIN (SELECT user_id, first_name, last_name FROM users) as userData
  *     ON usersCompetitions.user_id = userData.user_id
  * ```

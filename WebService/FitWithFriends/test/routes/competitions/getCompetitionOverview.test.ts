@@ -4,6 +4,8 @@ import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../../utilities/userHelpers';
 import { v4 as uuid } from 'uuid';
 import { ICreateCompetitionParams } from '../../../sql/competitions.queries';
+import { CompetitionState } from '../../../utilities/enums/CompetitionState';
+import { ICreateCompetitionWithStateParams } from '../../testUtilities/sql/testQueries.queries';
 
 /*
     Tests the /competitions/:competitionId/overview route for getting the competition overview
@@ -415,18 +417,19 @@ test('Get competition overview: competition is processing results', async () => 
     // Create a competition that recently ended (within the past 24hrs, since that is how long we wait to process results)
     // Competition processing is based off UTC dates
     const now = new Date();
-    const testCompetitionInfoProcessing: ICreateCompetitionParams = {
+    const testCompetitionInfoProcessing: ICreateCompetitionWithStateParams = {
         competitionId: uuid(),
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition Processing Results',
         startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7).toUTCString(), // 7 days ago
         endDate: now.toUTCString(), // Ends now
         accessToken: '1234',
-        ianaTimezone: 'America/New_York'
+        ianaTimezone: 'America/New_York',
+        state: CompetitionState.ProcessingResults
     };
     competitionsToCleanup.push(testCompetitionInfoProcessing.competitionId);
 
-    await TestSQL.createCompetition(testCompetitionInfoProcessing);
+    await TestSQL.createCompetitionWithState(testCompetitionInfoProcessing);
 
     // Add the user to the competition
     await TestSQL.addUserToCompetition({
@@ -442,4 +445,70 @@ test('Get competition overview: competition is processing results', async () => 
     expect(new Date(response.data.competitionStart).getUTCDate()).toBe(new Date(testCompetitionInfoProcessing.startDate).getUTCDate());
     expect(new Date(response.data.competitionEnd).getUTCDate()).toBe(new Date(testCompetitionInfoProcessing.endDate).getUTCDate());
     expect(response.data.isCompetitionProcessingResults).toBe(true); // The competition has finished but is processing final results
+});
+
+test('Get competition overview: competition is archived', async () => {
+    // Create a competition that has been archived with final points stored
+    const now = new Date();
+    const testCompetitionInfoArchived: ICreateCompetitionWithStateParams = {
+        competitionId: uuid(),
+        adminUserId: convertUserIdToBuffer(testUserId),
+        displayName: 'Test Competition Archived',
+        startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 14).toUTCString(), // 14 days ago
+        endDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7).toUTCString(), // 7 days ago
+        accessToken: '5678',
+        ianaTimezone: 'America/New_York',
+        state: CompetitionState.Archived
+    };
+    competitionsToCleanup.push(testCompetitionInfoArchived.competitionId);
+
+    await TestSQL.createCompetitionWithState(testCompetitionInfoArchived);
+
+    // Add the user to the competition
+    await TestSQL.addUserToCompetition({
+        competitionId: testCompetitionInfoArchived.competitionId,
+        userId: convertUserIdToBuffer(testUserId)
+    });
+
+    // Create activity data that should NOT be used for scoring (since competition is archived)
+    await TestSQL.insertActivitySummary({
+        userId: convertUserIdToBuffer(testUserId),
+        date: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 8), // 8 days ago (within competition range)
+        caloriesBurned: 1000, // High values that would result in high scores
+        caloriesGoal: 500,
+        exerciseTime: 300,
+        exerciseTimeGoal: 60,
+        standTime: 24,
+        standTimeGoal: 12,
+    });
+
+    // Set final points for the user in the archived competition (simulates the admin archiving process)
+    const expectedFinalPoints = 450.5;
+    await TestSQL.updateUserCompetitionFinalPoints({
+        userId: convertUserIdToBuffer(testUserId),
+        competitionId: testCompetitionInfoArchived.competitionId,
+        finalPoints: expectedFinalPoints
+    });
+    
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfoArchived.competitionId}/overview?timezone=America/New_York`, accessToken);
+
+    expect(response.status).toBe(200);
+    expect(response.data.competitionName).toBe(testCompetitionInfoArchived.displayName);
+    expect(new Date(response.data.competitionStart).getUTCDate()).toBe(new Date(testCompetitionInfoArchived.startDate).getUTCDate());
+    expect(new Date(response.data.competitionEnd).getUTCDate()).toBe(new Date(testCompetitionInfoArchived.endDate).getUTCDate());
+    expect(response.data.isCompetitionProcessingResults).toBe(false); // Archived competitions are not processing results
+
+    expect(response.data).toHaveProperty('currentResults');
+    expect(Object.keys(response.data.currentResults).length).toBe(1);
+    
+    const testUserResult = response.data.currentResults[testUserId];
+    expect(testUserResult).not.toBeUndefined();
+    expect(testUserResult.firstName).toBe(testUserName.split(' ')[0]);
+    expect(testUserResult.lastName).toBe(testUserName.split(' ')[1]);
+    
+    // For archived competitions, should return final_points instead of calculating from activity data
+    // If it were calculating from activity data, the score would be 600 (max daily score)
+    expect(testUserResult.activityPoints).toBe(expectedFinalPoints); // Should use stored final_points
+    expect(testUserResult.pointsToday).toBe(0); // No points today for archived competitions
 });

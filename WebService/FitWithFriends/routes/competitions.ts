@@ -11,12 +11,9 @@ import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
 import { getCompetitionStandings } from '../utilities/competitionStandingsHelper';
+import { CompetitionState } from '../utilities/enums/CompetitionState';
 
 const msPerDay = 1000 * 60 * 60 * 24;
-
-// We won't announce results until 24hrs after the competition ends
-// This gives time for all clients to report final data and allows different timezones to complete their days
-const competitionResultProcessingTimeMs = msPerDay * 1;
 
 // Returns the competitionIds that the currently authenticated user is a member of
 router.get('/', function (req, res) {
@@ -249,11 +246,8 @@ router.get('/:competitionId/overview', function (req, res) {
 
             getCompetitionStandings(competitionInfo, usersCompetitionsResult, timezoneParam)
                 .then(userPoints => {
-                    // We don't announce results until 24hrs after the competition has ended
-                    // This allows clients to report final data and users in different timezones to finish their days
-                    const now = new Date();
-                    const timeSinceCompetitionEnd =  now.getTime() - competitionInfo.end_date.getTime();
-                    const isCompetitionProcessingResults = timeSinceCompetitionEnd > 0 && timeSinceCompetitionEnd < competitionResultProcessingTimeMs;
+                    // Determine if the competition is processing results based on the state field
+                    const isCompetitionProcessingResults = competitionInfo.state === CompetitionState.ProcessingResults;
 
                     res.json({
                         'competitionId': competitionInfo.competition_id,
