@@ -1,0 +1,230 @@
+# FitWithFriends - Project Memory Bank
+
+## Overview
+FitWithFriends is a fitness competition app that allows users to create group fitness competitions and compare their progress. The system consists of an iOS client and a Node.js/Express.js backend web service with PostgreSQL database.
+
+## Backend Architecture (WebService/FitWithFriends/)
+
+### Technology Stack
+- **Runtime**: Node.js 21.6.x
+- **Framework**: Express.js 4.19.2
+- **Language**: TypeScript 5.4.5
+- **Database**: PostgreSQL with pg driver
+- **Authentication**: OAuth 2.0 with custom Apple ID token grant
+- **View Engine**: Pug templates
+- **Testing**: Jest with ts-jest
+
+### Core Dependencies
+- @node-oauth/express-oauth-server: OAuth 2.0 server implementation
+- @pgtyped/runtime & @pgtyped/cli: Type-safe SQL query generation
+- jsonwebtoken & jwks-rsa: JWT token handling for Apple Sign-In
+- uuid: UUID generation for competitions and tokens
+- Azure libraries: Key Vault integration for secrets management
+
+### Application Structure (app.ts)
+- Express app with middleware pipeline: morgan logging, body parsing, cookie parsing
+- Query parameter normalization (lowercase conversion)
+- Route mounting with authentication:
+  - `/` - Public routes (index)
+  - `/oauth` - Authentication endpoints
+  - `/users` - User management (mixed auth)
+  - `/competitions` - Competition management (OAuth protected)
+  - `/activityData` - Fitness data submission (OAuth protected)
+  - `/pushNotifications` - Push notification management (OAuth protected)
+  - `/admin` - Admin endpoints (admin auth)
+  - `/.well-known` - Discovery endpoints
+- Global error handling with structured error responses
+
+### Authentication System (oauth/)
+- **OAuth Server**: Custom ExpressOAuthServer with Apple ID token grant type
+- **Apple ID Integration**: Custom grant type that validates Apple ID tokens instead of passwords
+- **Token Lifecycle**: 1-hour access tokens, 1-year refresh tokens
+- **Model**: Custom authentication model handling user lookup and token management
+
+### Database Schema (PostgreSQL)
+Core tables:
+1. **users**: User profiles (user_id as bytea, first_name, last_name, pro status)
+2. **competitions**: Competition metadata (UUID IDs, dates, display_name, admin_user_id, state)
+3. **users_competitions**: Many-to-many relationship with final_points
+4. **activity_summaries**: Daily fitness data (calories, exercise_time, stand_time with goals)
+5. **workouts**: Individual workout records with type, duration, distance
+6. **oauth_tokens**: Refresh token storage
+7. **oauth_clients**: OAuth client credentials
+8. **push_tokens**: Device push notification tokens
+
+### API Routes
+
+#### Authentication (/oauth/auth.ts)
+- POST `/token`: OAuth token endpoint with extended token attributes
+
+#### Users (/routes/users.ts)
+- POST `/userFromAppleID`: User registration via Apple Sign-In
+- Validates Apple ID tokens before user creation
+- Input validation for user data (max 255 chars)
+
+#### Competitions (/routes/competitions.ts)
+- GET `/`: List user's competitions
+- POST `/`: Create new competition (user becomes admin)
+- Handles competition lifecycle and member management
+- Competition results processing with 24-hour delay
+
+#### Activity Data (/routes/activityData.ts)
+- POST `/dailySummary`: Bulk upload of daily fitness summaries
+- Processes arrays of activity data with validation
+- Stores calories burned/goal, exercise time/goal, stand time/goal
+
+### Utilities Layer
+- **database.ts**: PostgreSQL connection pool configuration via environment variables
+- **userHelpers.ts**: User ID conversion between string and buffer formats
+- **errorHelpers.ts**: Standardized error handling and response formatting
+- **appleIdAuthenticationHelpers.ts**: Apple Sign-In token validation
+- **competitionStandingsHelper.ts**: Competition scoring and ranking logic
+- **cryptoHelpers.ts**: Cryptographic utilities for secure operations
+- **adminAuthenticator.ts**: Admin authentication middleware
+- **apnsHelper.ts**: Apple Push Notification Service integration
+
+### Type Safety & Database Queries
+- Uses @pgtyped for type-safe SQL queries
+- To regenerate types:
+  ```bash
+  cd WebService/FitWithFriends/
+  pgtyped_cli/lib/index.js -c pgtypedconfig.json
+  ```
+- Generated TypeScript interfaces from SQL files
+- Separate query files for each domain:
+  - activityData.queries.ts/sql
+  - competitions.queries.ts/sql
+  - users.queries.ts/sql
+  - oauth.queries.ts/sql
+  - pushNotifications.queries.ts/sql
+
+### Development & Deployment
+- **Build**: TypeScript compilation to dist/
+- **Testing**: Jest with timezone-specific configuration (America/New_York)
+- **Environment**: Environment variable based configuration
+- **Docker**: Dockerfile for containerized deployment
+- **Azure**: Integration with Azure Key Vault for secrets
+
+### Key Business Logic
+1. **Competition Lifecycle**: Created by admin, users join via access tokens, 24-hour processing delay
+2. **Activity Tracking**: Daily summaries with ring completion goals (calories, exercise, stand)
+3. **Apple-Only Authentication**: Exclusively uses Apple Sign-In with custom OAuth grant
+4. **Scoring System**: Points-based competition scoring with final results calculation
+5. **Push Notifications**: Device registration and notification delivery system
+
+### Security Features
+- OAuth 2.0 with Apple ID token validation
+- Admin-only routes with separate authentication
+- Input validation and sanitization
+- Secure token storage and management
+- Azure Key Vault integration for sensitive data
+
+This backend serves as a RESTful API for the iOS client, handling user authentication, competition management, fitness data aggregation, and real-time push notifications.
+
+## iOS Client Architecture (Clients/iOS/FitWithFriends/)
+
+### Technology Stack
+- **Platform**: iOS (iPhone and iPad support)
+- **Language**: Swift
+- **UI Framework**: SwiftUI
+- **Architecture**: MVVM with Dependency Injection
+- **Version**: 1.0.2
+- **Dependencies**: CocoaLumberjack (logging), AuthenticationServices, HealthKit
+
+### App Structure & Entry Point
+- **Main App**: `FitWithFriendsApp.swift` with `@main` attribute
+- **App Delegate**: `AppDelegate.swift` for background tasks and HealthKit setup
+- **Root View**: `MainContentView.swift` - conditional rendering based on authentication state
+- **Dependency Injection**: `ObjectGraph.swift` implementing `IObjectGraph` protocol
+- **URL Handling**: Custom URL scheme `fitwithfriends://` for deep linking
+
+### Architecture Patterns
+
+#### Dependency Injection (ObjectGraph)
+- `IObjectGraph` protocol defines all service dependencies
+- `ObjectGraph` concrete implementation creates and wires all services
+- `MockObjectGraph` for testing and previews
+- Services include: authentication, networking, HealthKit, competition management
+
+#### MVVM Structure
+- **Views**: SwiftUI views in structured folders (Home/, Competitions/, Login/, About/)
+- **ViewModels**: Observable objects handling business logic and state management
+- **Models**: Data classes mirroring backend schema (ActivitySummary, User, Token, etc.)
+
+### Key Components
+
+#### Authentication System
+- **Apple Sign-In Only**: Exclusive authentication via AuthenticationServices framework
+- **AppleAuthenticationManager**: Handles Sign in with Apple flow and delegation
+- **Token Management**: Secure token storage using Keychain services
+- **Authentication Flow**: Validates Apple ID tokens with backend OAuth system
+
+#### HealthKit Integration
+- **HealthKitManager**: Primary interface for health data access
+- **IHealthStoreWrapper**: Abstraction layer over HKHealthStore
+- **Background Queries**: Observer queries for real-time health data updates
+- **Activity Rings**: Native HKActivitySummary integration for UI display
+- **Data Types**: Calories, exercise time, stand time, steps, flights climbed, distance
+
+#### Competition Management
+- **CompetitionManager**: Handles competition lifecycle and state
+- **Competition Views**: Overview, details, standings, and admin interfaces
+- **Join Flow**: Deep linking support for competition invitations
+- **Real-time Updates**: Push notifications for competition events
+
+#### Service Layer
+- **HTTP Connector**: RESTful API communication with backend
+- **ActivityDataService**: Bulk upload of daily fitness summaries
+- **CompetitionService**: Competition CRUD operations and member management
+- **UserService**: User registration and profile management
+- **AuthenticationService**: OAuth token management and refresh
+
+### App Capabilities & Permissions
+- **HealthKit Access**: Read health data for activity tracking
+- **Background Processing**: Scheduled background tasks for data sync
+- **Push Notifications**: Remote notifications for competition updates
+- **Apple Sign-In**: Authentication capability
+- **Associated Domains**: Deep linking from web (fitwithfriends.azurewebsites.net)
+- **Keychain Access**: Secure credential storage
+
+### Data Models
+- **ActivitySummary**: Daily fitness data with ring completion goals
+- **User**: Basic user profile information
+- **Token**: OAuth access and refresh tokens
+- **Competition Models**: Competition metadata, standings, and member info
+- **Workout**: Individual exercise session data
+
+### UI/UX Features
+- **Native Health Rings**: Apple's HKActivitySummaryView integration
+- **Navigation Customization**: Custom navigation bar styling
+- **Share Functionality**: Native iOS sharing for competition invites
+- **Accessibility Support**: Standard iOS accessibility features
+- **Error Handling**: User-friendly error messages and logging
+
+### Background Processing
+- **HealthKit Observers**: Real-time health data monitoring
+- **Data Synchronization**: Automatic upload of fitness data to backend
+- **Push Notification Handling**: Competition updates and reminders
+- **Background App Refresh**: Scheduled data sync when app is inactive
+
+### Testing & Development
+- **Mock Objects**: Complete mock implementations for all services
+- **Preview Support**: SwiftUI previews with mock data
+- **Unit Tests**: Focused testing of HealthKit integration
+- **Logging**: CocoaLumberjack for comprehensive app logging
+- **Debug Features**: Shake gesture handling for developer options
+
+### Security & Privacy
+- **Keychain Storage**: Secure token and credential management
+- **Health Data Privacy**: Explicit user consent for HealthKit access
+- **Apple Sign-In**: Privacy-focused authentication (email hiding support)
+- **Certificate Pinning**: Secure API communication
+- **App Transport Security**: HTTPS-only network communication
+
+### Key Business Workflows
+1. **Onboarding**: Apple Sign-In → HealthKit permissions → first competition join
+2. **Daily Sync**: Background HealthKit monitoring → automatic data upload
+3. **Competition Participation**: Join via link → real-time standings → push notifications
+4. **Activity Tracking**: Health rings display → goal progress → point calculation
+
+This iOS client provides a native, privacy-focused fitness competition experience with seamless Apple ecosystem integration and real-time health data synchronization.
