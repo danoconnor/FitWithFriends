@@ -31,7 +31,7 @@ env:
   NODE_VERSION: '21.x'                                          # set this to the node version to use
   PGUSER: 'testuser'                             # Docker compose will setup a local postgres database for testing using these values
   PGPASSWORD: 'testpassword'
-  PGHOST: 'localhost'
+  PGHOST: 'postgres'
   PGPORT: '5432'
   PGDATABASE: 'testdb'
   PGUSESSL: '0'
