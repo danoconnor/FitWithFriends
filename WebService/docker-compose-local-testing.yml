@@ -23,17 +23,17 @@ services:
       timeout: 5s
       retries: 5
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
-    image: postgres:16
+    image: postgres:17
     ports:
       - '${PGPORT}:${PGPORT}'
     environment:
       POSTGRES_USER: ${PGUSER}
       POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: ${PGDATABASE}
-      POSTGRES_PORT: ${PGPORT}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
       interval: 10s
