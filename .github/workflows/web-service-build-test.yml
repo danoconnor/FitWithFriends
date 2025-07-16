@@ -29,7 +29,7 @@ env:
   WEBSERVICE_DIST_PATH: './WebService/FitWithFriends/dist'
   AZURE_WEBAPP_PACKAGE_PATH: './WebService/FitWithFriends'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '21.x'                                          # set this to the node version to use
-  PGUSER: 'testuser'                             # Docker compose will setup a local postgres database for testing using these values
+  PGUSER: 'postgres'                                            # Docker compose will setup a local postgres database for testing using these values
   PGPASSWORD: 'testpassword'
   PGHOST: 'postgres'
   PGPORT: '5432'
