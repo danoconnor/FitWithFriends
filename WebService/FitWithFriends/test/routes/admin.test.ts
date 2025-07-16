@@ -3,7 +3,6 @@ import * as RequestUtilities from '../testUtilities/testRequestUtilities';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
 import { v4 as uuid } from 'uuid';
 import { CompetitionState } from '../../utilities/enums/CompetitionState';
-import { DatabaseConnectionPool } from '../../utilities/database';
 
 /*
     Integration tests for the /admin routes
@@ -40,7 +39,6 @@ beforeEach(async () => {
         usersToCleanup.push(testUserId2);
     } catch (error) {
         console.log('Test setup failed: ' + error);
-        console.log('DB connection: ' + JSON.stringify(DatabaseConnectionPool));
         throw error;
     }
 });
