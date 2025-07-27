@@ -43,9 +43,6 @@ public class HealthKitManager: IHealthKitManager {
     /// The various data points that we want to observe and report to our backend for score calculation
     /// We will observe these, plus activity summaries and workouts
     private static let quantityTypesToObserve: [HKQuantityTypeIdentifier] = [
-        .activeEnergyBurned,
-        .appleExerciseTime,
-        .appleStandTime,
         .stepCount,
         .distanceWalkingRunning,
         .flightsClimbed
@@ -136,6 +133,11 @@ public class HealthKitManager: IHealthKitManager {
         ]
         dataTypes.append(contentsOf: HealthKitManager.quantityTypesToObserve.map { HKQuantityType($0) })
 
+        // Always request permission for the three data types that make up the activity rings
+        dataTypes.append(HKQuantityType(.activeEnergyBurned))
+        dataTypes.append(HKQuantityType(.appleExerciseTime))
+        dataTypes.append(HKQuantityType(.appleStandTime))
+
         healthStoreWrapper.requestAuthorization(toShare: nil, read: Set(dataTypes)) { [weak self] success, error in
             if let error = error {
                 Logger.traceError(message: "Failed to request authorization for health data", error: error)
@@ -165,6 +167,9 @@ public class HealthKitManager: IHealthKitManager {
         var today = calendar.dateComponents([.day, .month, .year, .era], from: now)
         today.calendar = calendar
 
+        var utcCalendar = Calendar.current
+        utcCalendar.timeZone = TimeZone.gmt
+
         Logger.traceVerbose(message: "Begin get activity summary for \(today)")
 
         guard healthStoreWrapper.isHealthDataAvailable else {
@@ -191,7 +196,12 @@ public class HealthKitManager: IHealthKitManager {
                 return
             }
 
-            let summary = summaries?.first { calendar.dateComponents([.day, .month, .year, .era], from: $0.date) == today }
+            // The summaries are being returned as UTC dates, so we need to parse them with the UTC calendar to get the day to match
+            // the current day in our local timezone
+            let summary = summaries?.first {
+                let summaryDate = utcCalendar.dateComponents([.day, .month, .year, .era], from: $0.date)
+                return summaryDate.year == today.year && summaryDate.month == today.month && summaryDate.day == today.day
+            }
 
             // Update our last known goals if we were able to successfully get the summary
             // These are used when there is no data for the current day so we can show the empty rings on the homepage
@@ -574,13 +584,9 @@ public class HealthKitManager: IHealthKitManager {
 
         let hkUnitForType: HKUnit
         switch quantityTypeId {
-        case .activeEnergyBurned:
-            hkUnitForType = .largeCalorie()
-        case .appleExerciseTime:
-            hkUnitForType = .minute()
         case .distanceWalkingRunning:
             hkUnitForType = .meter()
-        case .appleStandTime, .stepCount, .flightsClimbed:
+        case .stepCount, .flightsClimbed:
             hkUnitForType = .count()
         default:
             completion(HttpError.generic, nil)

@@ -33,7 +33,7 @@
     "uuid": "^9.0.1"
   },
   "engines": {
-    "node": "~21.6.x"
+    "node": "^22.2.0"
   },
   "devDependencies": {
     "@pgtyped/cli": "^2.3.0",
