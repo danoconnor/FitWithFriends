@@ -15,7 +15,9 @@ public class MockTokenManager: ITokenManager {
                                      refreshToken: "REFRESH_TOKEN", 
                                      userId: "ABCDEF1234")
     var return_cachedTokenError: TokenError?
+    public var getCachedTokenCallCount = 0
     public func getCachedToken() throws -> Token {
+        getCachedTokenCallCount += 1
         if let token = return_token {
             return token
         } else {
@@ -23,7 +25,15 @@ public class MockTokenManager: ITokenManager {
         }
     }
 
-    public func storeToken(_ token: Token) {}
+    public var storeTokenCallCount = 0
+    public var param_storeToken: Token?
+    public func storeToken(_ token: Token) {
+        storeTokenCallCount += 1
+        param_storeToken = token
+    }
 
-    public func deleteAllTokens() {}
+    public var deleteAllTokensCallCount = 0
+    public func deleteAllTokens() {
+        deleteAllTokensCallCount += 1
+    }
 }

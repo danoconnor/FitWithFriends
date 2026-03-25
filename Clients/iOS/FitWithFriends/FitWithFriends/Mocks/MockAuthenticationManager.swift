@@ -6,34 +6,45 @@
 //
 
 import AuthenticationServices
+import Combine
 import Foundation
 
-public class MockAuthenticationManager: AuthenticationManager {
-    public init() {
-        super.init(appleAuthenticationManager: MockAppleAuthenticationManager(),
-                   authenticationService: MockAuthenticationService(),
-                   tokenManager: MockTokenManager())
-    }
+public class MockAuthenticationManager: IAuthenticationManager {
+    @Published public var loginState: LoginState = .notLoggedIn(nil)
+    public var loginStatePublisher: Published<LoginState>.Publisher { $loginState }
+    public var loggedInUserId: String?
 
-    public var return_loggedInUserId: String?
-    override public var loggedInUserId: String? {
-        get { return return_loggedInUserId }
-        set {}
-    }
+    public init() {}
 
-    public var return_error: Error?
+    public var param_beginLogin_delegate: ASAuthorizationControllerPresentationContextProviding?
+    public var param_beginLogin_userProvidedName: PersonNameComponents?
 
-    public var userToLogin: UInt = 0
-    override public func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
+    public var beginLoginCallCount = 0
+    public func beginLogin(
+        with delegate: ASAuthorizationControllerPresentationContextProviding,
+        userProvidedName: PersonNameComponents? = nil
+    ) {
+        beginLoginCallCount += 1
+        param_beginLogin_delegate = delegate
+        param_beginLogin_userProvidedName = userProvidedName
+
         loginState = .inProgress
-
-        Task.detached {
-            await MockUtilities.delayOneSecond()
-            // authenticationCompleted(result: .success(Token()))
-        }
     }
 
-    override public func logout() {
+    public var return_cancelUserInput_called: Bool = false
+
+    public var cancelUserInputCallCount = 0
+    public func cancelUserInput() {
+        cancelUserInputCallCount += 1
+        return_cancelUserInput_called = true
+    }
+
+    public var return_logout_called: Bool = false
+
+    public var logoutCallCount = 0
+    public func logout() {
+        logoutCallCount += 1
+        return_logout_called = true
         self.loginState = .notLoggedIn(nil)
         self.loggedInUserId = nil
     }

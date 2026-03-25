@@ -8,7 +8,7 @@
 import Foundation
 
 /// Manages settings related to the backend environment to connect to
-public class ServerEnvironmentManager {
+public class ServerEnvironmentManager: IServerEnvironmentManager {
     /// The key used to lookup the boolean value in UserDefautls for whether to use the local test environment or the production environment
     /// Matches what is defined in RootSettings/Settings.bundle/Root.plist
     private static let useLocalEnvironmentKey = "uselocalserverenvironment"

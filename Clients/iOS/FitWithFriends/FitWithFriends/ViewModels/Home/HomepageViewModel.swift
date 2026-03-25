@@ -10,8 +10,8 @@ import Foundation
 import HealthKit
 
 public class HomepageViewModel: ObservableObject {
-    private let authenticationManager: AuthenticationManager
-    private let competitionManager: CompetitionManager
+    private let authenticationManager: IAuthenticationManager
+    private let competitionManager: ICompetitionManager
     private let healthKitManager: IHealthKitManager
 
     @Published var loadedActivitySummary: Bool
@@ -21,8 +21,8 @@ public class HomepageViewModel: ObservableObject {
 
     private var competitionLoadListener: AnyCancellable?
 
-    init(authenticationManager: AuthenticationManager,
-         competitionManager: CompetitionManager,
+    init(authenticationManager: IAuthenticationManager,
+         competitionManager: ICompetitionManager,
          healthKitManager: IHealthKitManager) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager
@@ -34,7 +34,7 @@ public class HomepageViewModel: ObservableObject {
         Task.detached { await self.refreshTodayActivitySummary() }
 
         // Need to hold a reference to this, otherwise the sink callback will never be invoked
-        competitionLoadListener = competitionManager.$competitionOverviews.sink { [weak self] newValue in
+        competitionLoadListener = competitionManager.competitionOverviewsPublisher.sink { [weak self] newValue in
             DispatchQueue.main.async {
                 self?.currentCompetitions = newValue.map { $0.value }
                     .sorted { $0 < $1 }

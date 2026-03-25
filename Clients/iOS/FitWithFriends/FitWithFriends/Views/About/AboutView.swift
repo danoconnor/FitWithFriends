@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct AboutView: View {
-    let emailUtility: EmailUtility
-    let serverEnvironmentManager: ServerEnvironmentManager
+    let emailUtility: IEmailUtility
+    let serverEnvironmentManager: IServerEnvironmentManager
 
     var body: some View {
         NavigationView {

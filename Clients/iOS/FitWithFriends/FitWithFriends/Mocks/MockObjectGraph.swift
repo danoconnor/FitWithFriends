@@ -9,17 +9,18 @@ import Foundation
 
 public class MockObjectGraph: IObjectGraph {
     var activityDataService: IActivityDataService
-    var appProtocolHandler: AppProtocolHandler
-    var authenticationManager: AuthenticationManager
+    var appleIDProvider: IASAuthorizationAppleIDProvider
+    var appProtocolHandler: IAppProtocolHandler
+    var authenticationManager: IAuthenticationManager
     var authenticationService: IAuthenticationService
-    var competitionManager: CompetitionManager
+    var competitionManager: ICompetitionManager
     var competitionService: ICompetitionService
-    var emailUtility: EmailUtility
+    var emailUtility: IEmailUtility
     var healthKitManager: IHealthKitManager
     var httpConnector: IHttpConnector
     var keychainUtilities: IKeychainUtilities
-    var serverEnvironmentManager: ServerEnvironmentManager
-    var shakeGestureHandler: ShakeGestureHandler
+    var serverEnvironmentManager: IServerEnvironmentManager
+    var shakeGestureHandler: IShakeGestureHandler
     var tokenManager: ITokenManager
     var userDefaults: UserDefaults
     var userService: IUserService
@@ -39,7 +40,8 @@ public class MockObjectGraph: IObjectGraph {
         tokenManager = MockTokenManager()
         userDefaults = UserDefaults.standard
         userService = MockUserService()
+        appleIDProvider = MockASAuthorizationAppleIDProvider()
 
-        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults)
+        serverEnvironmentManager = MockServerEnvironmentManager() as! any IServerEnvironmentManager
     }
 }

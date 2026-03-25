@@ -11,12 +11,12 @@ import Foundation
 public class AppStateViewModel: ObservableObject {
     @Published var isLoggedIn = false
 
-    private let authenticationManager: AuthenticationManager
+    private let authenticationManager: IAuthenticationManager
     private var loginCancellable: AnyCancellable?
 
-    init(authenticationManager: AuthenticationManager) {
+    init(authenticationManager: IAuthenticationManager) {
         self.authenticationManager = authenticationManager
-        loginCancellable = authenticationManager.$loginState
+        loginCancellable = authenticationManager.loginStatePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 switch value {

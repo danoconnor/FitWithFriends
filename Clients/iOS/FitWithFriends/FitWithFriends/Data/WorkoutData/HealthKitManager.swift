@@ -24,7 +24,7 @@ public class HealthKitManager: IHealthKitManager {
 
     private let activityDataService: IActivityDataService
     private let activityUpdateDelegate: ActivityUpdateDelegate
-    private let authenticationManager: AuthenticationManager
+    private let authenticationManager: IAuthenticationManager
     private let healthStoreWrapper: IHealthStoreWrapper
     private let userDefaults: UserDefaults
 
@@ -43,6 +43,8 @@ public class HealthKitManager: IHealthKitManager {
     /// The various data points that we want to observe and report to our backend for score calculation
     /// We will observe these, plus activity summaries and workouts
     private static let quantityTypesToObserve: [HKQuantityTypeIdentifier] = [
+        .activeEnergyBurned,
+        .appleExerciseTime,
         .stepCount,
         .distanceWalkingRunning,
         .flightsClimbed
@@ -77,17 +79,17 @@ public class HealthKitManager: IHealthKitManager {
     }
 
     public init(activityDataService: IActivityDataService,
-         activityUpdateDelegate: ActivityUpdateDelegate,
-         authenticationManager: AuthenticationManager,
-         healthStoreWrapper: IHealthStoreWrapper,
-         userDefaults: UserDefaults) {
+                activityUpdateDelegate: ActivityUpdateDelegate,
+                authenticationManager: IAuthenticationManager,
+                healthStoreWrapper: IHealthStoreWrapper,
+                userDefaults: UserDefaults) {
         self.activityDataService = activityDataService
         self.activityUpdateDelegate = activityUpdateDelegate
         self.authenticationManager = authenticationManager
         self.healthStoreWrapper = healthStoreWrapper
         self.userDefaults = userDefaults
 
-        loginStateCancellable = authenticationManager.$loginState.sink { [weak self] state in
+        loginStateCancellable = authenticationManager.loginStatePublisher.sink { [weak self] state in
             switch state {
             case .loggedIn:
                 // Report the activity summaries when the user logs in

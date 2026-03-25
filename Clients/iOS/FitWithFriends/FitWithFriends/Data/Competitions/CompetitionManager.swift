@@ -8,22 +8,23 @@
 import Combine
 import Foundation
 
-public class CompetitionManager: ObservableObject {
-    private let authenticationManager: AuthenticationManager
+public class CompetitionManager: ICompetitionManager, ObservableObject {
+    private let authenticationManager: IAuthenticationManager
     private let competitionService: ICompetitionService
 
     private var loginStateCancellable: AnyCancellable?
 
     @Published private(set) var competitionOverviews: [UUID: CompetitionOverview]
+    var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { $competitionOverviews }
 
-    init(authenticationManager: AuthenticationManager,
+    init(authenticationManager: IAuthenticationManager,
          competitionService: ICompetitionService) {
         self.authenticationManager = authenticationManager
         self.competitionService = competitionService
 
         competitionOverviews = [:]
 
-        loginStateCancellable = authenticationManager.$loginState.sink { [weak self] state in
+        loginStateCancellable = authenticationManager.loginStatePublisher.sink { [weak self] state in
             switch state {
             case .loggedIn:
                 // When the user logs in we want to begin fetching the latest state of their competitions
@@ -38,8 +39,6 @@ public class CompetitionManager: ObservableObject {
     }
 
     func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws {
-
-
         do {
             try await competitionService.createCompetition(startDate: startDate,
                                                            endDate: endDate,

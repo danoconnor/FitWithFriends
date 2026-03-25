@@ -104,14 +104,13 @@ final class HealthKitManagerTests: XCTestCase {
         healthKitManager.setupObserverQueries()
 
         // Validate that we requested background updates for all the types we care about
-        XCTAssertEqual(healthStoreWrapper.requestedBackgroundTypes.count, 7)
+        XCTAssertEqual(healthStoreWrapper.requestedBackgroundTypes.count, 6)
         XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == .workoutType() && $0.frequency == .immediate }))
-        XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.activeEnergyBurned) && $0.frequency == .hourly }))
-        XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.appleExerciseTime) && $0.frequency == .hourly }))
-        XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.appleStandTime) && $0.frequency == .hourly }))
         XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.stepCount) && $0.frequency == .hourly }))
         XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.distanceWalkingRunning) && $0.frequency == .hourly }))
         XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.flightsClimbed) && $0.frequency == .hourly }))
+        XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.appleExerciseTime) && $0.frequency == .hourly }))
+        XCTAssertTrue(healthStoreWrapper.requestedBackgroundTypes.contains(where: { $0.type == HKQuantityType(.activeEnergyBurned) && $0.frequency == .hourly }))
     }
 
     func test_setupObserverQueries_validateObserverQueries() {
@@ -122,9 +121,6 @@ final class HealthKitManagerTests: XCTestCase {
         XCTAssertNotNil(healthStoreWrapper.param_updateHandler)
 
         XCTAssertTrue(healthStoreWrapper.param_queryDescriptors!.contains(where: { $0.sampleType == .workoutType() }))
-        XCTAssertTrue(healthStoreWrapper.param_queryDescriptors!.contains(where: { $0.sampleType == HKQuantityType(.activeEnergyBurned) }))
-        XCTAssertTrue(healthStoreWrapper.param_queryDescriptors!.contains(where: { $0.sampleType == HKQuantityType(.appleExerciseTime) }))
-        XCTAssertTrue(healthStoreWrapper.param_queryDescriptors!.contains(where: { $0.sampleType == HKQuantityType(.appleStandTime) }))
         XCTAssertTrue(healthStoreWrapper.param_queryDescriptors!.contains(where: { $0.sampleType == HKQuantityType(.stepCount) }))
         XCTAssertTrue(healthStoreWrapper.param_queryDescriptors!.contains(where: { $0.sampleType == HKQuantityType(.distanceWalkingRunning) }))
         XCTAssertTrue(healthStoreWrapper.param_queryDescriptors!.contains(where: { $0.sampleType == HKQuantityType(.flightsClimbed) }))

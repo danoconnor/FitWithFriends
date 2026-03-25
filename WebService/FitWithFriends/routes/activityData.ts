@@ -95,12 +95,17 @@ router.post('/workouts', function (req, res) {
         // TODO: We should translate this to a platform agnostic value
         const workoutType: number = workout['appleActivityTypeRawValue'];
         // Duration is in seconds
-        const duration: number = Math.round(workout['duration']);
+        const durationSecs: number = Math.round(workout['duration']);
         const distance: number | null = workout['distance'] === undefined ? null : Math.round(workout['distance']);
         const unit: number | null = workout['unit'] === undefined ? null : workout['unit'];
 
-        if (!startDateStr || workoutType == undefined || Number.isNaN(workoutType) || Number.isNaN(duration) || Number.isNaN(caloriesBurned)) {
+        if (!startDateStr || workoutType == undefined || Number.isNaN(workoutType) || Number.isNaN(durationSecs) || Number.isNaN(caloriesBurned)) {
             handleError(null, 400, 'Missing required parameter', res);
+            return;
+        }
+
+        if (unit !== null && Number.isNaN(unit)) {
+            handleError(null, 400, 'Invalid unit', res);
             return;
         }
 
@@ -115,7 +120,7 @@ router.post('/workouts', function (req, res) {
             startDate,
             caloriesBurned,
             workoutType,
-            duration,
+            duration: durationSecs,
             distance,
             unit
         });

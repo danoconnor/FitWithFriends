@@ -26,6 +26,13 @@ public class FWFErrorDetails: Decodable {
             return code
         }
 
-        return .unknown
+        return customErrorCode == nil ? .none : .unknown
+    }
+
+    /// Used for unit tests. Real error details are decoded from JSON responses
+    public init(context: String, errorDetails: String?, customErrorCode: Int?) {
+        self.context = context
+        self.errorDetails = errorDetails
+        self.customErrorCode = customErrorCode
     }
 }

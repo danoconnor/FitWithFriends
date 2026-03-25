@@ -16,8 +16,12 @@ public protocol AppProtocolData {
     static var action: AppProtocolAction { get }
 }
 
-public class AppProtocolHandler: ObservableObject {
+public class AppProtocolHandler: IAppProtocolHandler, ObservableObject {
     @Published public private(set) var protocolData: AppProtocolData?
+
+    public var protocolDataPublisher: Published<AppProtocolData?>.Publisher {
+        $protocolData
+    }
 
     /// Takes the appropriate actions to handle the given protocol
     /// Returns true if the protocol was handled, false otherwise

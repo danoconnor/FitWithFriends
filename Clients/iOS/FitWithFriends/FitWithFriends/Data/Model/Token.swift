@@ -25,3 +25,12 @@ public class Token: Codable {
         self.userId = userId
     }
 }
+
+extension Token: Equatable {
+    public static func == (lhs: Token, rhs: Token) -> Bool {
+        return lhs.accessToken == rhs.accessToken &&
+               lhs.accessTokenExpiry == rhs.accessTokenExpiry &&
+               lhs.refreshToken == rhs.refreshToken &&
+               lhs.userId == rhs.userId
+    }
+}

@@ -8,7 +8,7 @@
 import Foundation
 import MessageUI
 
-public class EmailUtility: NSObject, MFMailComposeViewControllerDelegate {
+public class EmailUtility: NSObject, IEmailUtility, MFMailComposeViewControllerDelegate {
     private var emailViewController: MFMailComposeViewController?
 
     public func sendLogEmail() {

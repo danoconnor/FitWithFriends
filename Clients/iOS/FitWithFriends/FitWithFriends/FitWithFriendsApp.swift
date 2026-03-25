@@ -11,7 +11,13 @@ import SwiftUI
 struct FitWithFriendsApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
-    static let objectGraph: IObjectGraph = ObjectGraph()
+    static let objectGraph: IObjectGraph = {
+        if ProcessInfo.processInfo.environment["FWF_UNIT_TESTING"] == "1" {
+            return MockObjectGraph()
+        } else {
+            return ObjectGraph()
+        }
+    }()
 
     init() {
         Logger.setupLogging()

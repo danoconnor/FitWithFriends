@@ -29,10 +29,10 @@ public class CompetitionOverviewViewModel: ObservableObject {
         }
     }
 
-    private let authenticationManager: AuthenticationManager
-    private let competitionManager: CompetitionManager
+    private let authenticationManager: IAuthenticationManager
+    private let competitionManager: ICompetitionManager
     private let competitionOverview: CompetitionOverview
-    private let serverEnvironmentManager: ServerEnvironmentManager
+    private let serverEnvironmentManager: IServerEnvironmentManager
 
     /// When false, it will only show the top three users in the competition
     private let showAllDetails: Bool
@@ -51,10 +51,10 @@ public class CompetitionOverviewViewModel: ObservableObject {
     // wants to delete the competition.
     @Published var shouldShowAlert = false
 
-    init(authenticationManager: AuthenticationManager,
-         competitionManager: CompetitionManager,
+    init(authenticationManager: IAuthenticationManager,
+         competitionManager: ICompetitionManager,
          competitionOverview: CompetitionOverview,
-         serverEnrivonmentManager: ServerEnvironmentManager,
+         serverEnrivonmentManager: IServerEnvironmentManager,
          showAllDetails: Bool) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager

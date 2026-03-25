@@ -246,15 +246,13 @@ router.get('/:competitionId/overview', function (req, res) {
 
             getCompetitionStandings(competitionInfo, usersCompetitionsResult, timezoneParam)
                 .then(userPoints => {
-                    // Determine if the competition is processing results based on the state field
-                    const isCompetitionProcessingResults = competitionInfo.state === CompetitionState.ProcessingResults;
-
                     res.json({
                         'competitionId': competitionInfo.competition_id,
                         'competitionName': competitionInfo.display_name,
                         'competitionStart': competitionInfo.start_date,
                         'competitionEnd': competitionInfo.end_date,
-                        'isCompetitionProcessingResults': isCompetitionProcessingResults,
+                        'competitionState': competitionInfo.state,
+                        'isCompetitionProcessingResults': competitionInfo.state === CompetitionState.ProcessingResults,
                         'isUserAdmin': isUserAdmin,
                         'currentResults': userPoints
                     });

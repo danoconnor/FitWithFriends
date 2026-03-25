@@ -24,3 +24,16 @@ enum TokenError: LocalizedError, CustomStringConvertible {
         }
     }
 }
+
+extension TokenError: Equatable {
+    static func == (lhs: TokenError, rhs: TokenError) -> Bool {
+        switch (lhs, rhs) {
+        case (.expired(let lhsToken), .expired(let rhsToken)):
+            return lhsToken == rhsToken
+        case (.notFound, .notFound):
+            return true
+        default:
+            return false
+        }
+    }
+}

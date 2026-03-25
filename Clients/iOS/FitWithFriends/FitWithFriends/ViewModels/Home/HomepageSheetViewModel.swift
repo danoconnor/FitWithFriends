@@ -37,12 +37,12 @@ public class HomepageSheetViewModel: ObservableObject {
         .competitionDetails: (shouldShow: false, contextData: nil),
     ]
 
-    init(appProtocolHandler: AppProtocolHandler, healthKitManager: IHealthKitManager) {
+    init(appProtocolHandler: IAppProtocolHandler, healthKitManager: IHealthKitManager) {
         if healthKitManager.shouldPromptUser {
             updateState(sheet: .permissionPrompt, state: true)
         }
 
-        appProtocolCancellable = appProtocolHandler.$protocolData.sink { [weak self] in
+        appProtocolCancellable = appProtocolHandler.protocolDataPublisher.sink { [weak self] in
             if let protocolData = $0,
                protocolData is JoinCompetitionProtocolData {
                 self?.updateState(sheet: .joinCompetition, state: true)

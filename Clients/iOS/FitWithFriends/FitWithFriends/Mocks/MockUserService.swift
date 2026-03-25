@@ -14,11 +14,14 @@ public class MockUserService: IUserService {
     public var param_createUser_idToken: String?
     public var param_createUser_authorizationCode: String?
     public var return_creatUser_error: Error?
+    public var createUserCallCount = 0
+    
     public func createUser(firstName: String,
                     lastName: String,
                     userId: String,
                     idToken: String,
                     authorizationCode: String) async throws {
+        createUserCallCount += 1
         param_createUser_firstName = firstName
         param_createUser_lastName = lastName
         param_createUser_userId = userId

@@ -9,8 +9,13 @@ import Foundation
 
 public enum FWFErrorCode: Int {
     case unknown = -1
+    case none = 0
 
     // MARK: Competition errors
     
     case tooManyActiveCompetitions = 10001
+
+    // MARK: Auth errors
+
+    case userNotFound = 20001
 }

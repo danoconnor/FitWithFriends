@@ -9,14 +9,14 @@ import Foundation
 import SwiftUI
 
 public class CreateCompetitionViewModel: ObservableObject {
-    private let authenticationManager: AuthenticationManager
-    private let competitionManager: CompetitionManager
+    private let authenticationManager: IAuthenticationManager
+    private let competitionManager: ICompetitionManager
     private let homepageSheetViewModel: HomepageSheetViewModel
 
     @Published var state: ViewOperationState = .notStarted
 
-    init(authenticationManager: AuthenticationManager,
-         competitionManager: CompetitionManager,
+    init(authenticationManager: IAuthenticationManager,
+         competitionManager: ICompetitionManager,
          homepageSheetViewModel: HomepageSheetViewModel) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager

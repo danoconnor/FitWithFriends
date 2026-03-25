@@ -51,7 +51,7 @@ struct FirstLaunchWelcomeView: View {
             Section {
                 VStack(alignment: .center) {
                     Button("Continue") {
-                        self.welcomeViewModel.dismissFirstLaunchView()
+                        self.welcomeViewModel.dismissSheet()
                     }
                     .font(.title)
                     .buttonStyle(.borderedProminent)

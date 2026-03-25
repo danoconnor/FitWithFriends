@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum Unit: Codable {
+public enum Unit: Int, Codable {
     case none
 
     case mile

@@ -9,24 +9,26 @@ import Foundation
 
 class ObjectGraph: IObjectGraph {
     let activityDataService: IActivityDataService
-    let appleAuthenticationManager: AppleAuthenticationManager
-    let appProtocolHandler: AppProtocolHandler
-    let authenticationManager: AuthenticationManager
+    let appleAuthenticationManager: IAppleAuthenticationManager
+    let appleIDProvider: IASAuthorizationAppleIDProvider
+    let appProtocolHandler: IAppProtocolHandler
+    let authenticationManager: IAuthenticationManager
     let authenticationService: IAuthenticationService
-    let competitionManager: CompetitionManager
+    let competitionManager: ICompetitionManager
     let competitionService: ICompetitionService
-    let emailUtility: EmailUtility
+    let emailUtility: IEmailUtility
     let healthKitManager: IHealthKitManager
     let healthStoreWrapper: IHealthStoreWrapper
     let httpConnector: IHttpConnector
     let keychainUtilities: IKeychainUtilities
-    let serverEnvironmentManager: ServerEnvironmentManager
-    let shakeGestureHandler: ShakeGestureHandler
+    let serverEnvironmentManager: IServerEnvironmentManager
+    let shakeGestureHandler: IShakeGestureHandler
     let tokenManager: ITokenManager
     let userDefaults: UserDefaults
     let userService: IUserService
 
     init() {
+        appleIDProvider = ASAuthorizationAppleIDProviderWrapper()
         appProtocolHandler = AppProtocolHandler()
         httpConnector = HttpConnector()
         keychainUtilities = KeychainUtilities()
@@ -34,7 +36,7 @@ class ObjectGraph: IObjectGraph {
         emailUtility = EmailUtility()
         healthStoreWrapper = HealthStoreWrapper()
 
-        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults)
+        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults) as IServerEnvironmentManager
         shakeGestureHandler = ShakeGestureHandler(emailUtility: emailUtility)
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
 
@@ -43,18 +45,20 @@ class ObjectGraph: IObjectGraph {
         competitionService = CompetitionService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
         userService = UserService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
 
-        appleAuthenticationManager = AppleAuthenticationManager(authenticationService: authenticationService,
-                                                                keychainUtilities: keychainUtilities, 
+        appleAuthenticationManager = AppleAuthenticationManager(appleIDProvider: appleIDProvider,
+                                                                authenticationService: authenticationService,
+                                                                keychainUtilities: keychainUtilities,
                                                                 serverEnvironmentManager: serverEnvironmentManager,
                                                                 userService: userService)
-        authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,
+        let authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,
                                                       authenticationService: authenticationService,
                                                       tokenManager: tokenManager)
+        self.authenticationManager = authenticationManager
         appleAuthenticationManager.authenticationDelegate = authenticationManager
 
-        competitionManager = CompetitionManager(authenticationManager: authenticationManager,
+        let competitionManager = CompetitionManager(authenticationManager: authenticationManager,
                                                 competitionService: competitionService)
-
+        self.competitionManager = competitionManager
         healthKitManager = HealthKitManager(activityDataService: activityDataService,
                                             activityUpdateDelegate: competitionManager,
                                             authenticationManager: authenticationManager,

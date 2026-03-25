@@ -13,6 +13,9 @@ public enum HttpError: LocalizedError, CustomStringConvertible, ErrorWithDetails
     case clientError(code: Int, details: FWFErrorDetails?)
     case generic
 
+    /// Used during unit tests, should not happen in prod
+    case testError
+
     public var errorDescription: String? {
         return description
     }
@@ -36,7 +39,9 @@ public enum HttpError: LocalizedError, CustomStringConvertible, ErrorWithDetails
             return "Server error. HTTP \(code)"
         case let .clientError(code, _):
             return "Client error: HTTP \(code)"
-        default:
+        case .testError:
+            return "Test error"
+        case .generic:
             return "Generic networking error"
         }
     }
