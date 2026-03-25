@@ -34,6 +34,12 @@ router.post('/userFromAppleID', function (req, res) {
         return;
     }
 
+    // Apple ID tokens are JWTs which can exceed 255 chars, so we apply a separate upper bound
+    if (idToken.length > 4096) {
+        handleError(null, 400, 'idToken too long', res);
+        return;
+    }
+
     // Validate authentication
     validateAppleIdToken(userId, idToken)
         .then(isValid => {

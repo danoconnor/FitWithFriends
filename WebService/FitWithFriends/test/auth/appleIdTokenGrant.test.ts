@@ -61,8 +61,6 @@ test('Nonexistent userId returns 400 and custom error code', async () => {
         userId: '1234567890abcdef' // Does not exist in the database
     });
 
-    console.log('Response data:', response.data); // Log the response data for debugging
-
     expect(response.status).toBe(400);
     expect(response.data.error_details).toContain('User does not exist');
     expect(response.data.custom_error_code).toEqual(FWFErrorCodes.AuthErrorCodes.UserNotFound);

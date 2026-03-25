@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import oauthServer from '../oauth/server.js';
 import FWFErrorCodes from '../utilities/enums/FWFErrorCodes.js';
 import { handleError } from '../utilities/errorHelpers.js';
@@ -15,7 +15,7 @@ router.post('/token', (_req, _res, next) => {
 }));
 
 // Error handler only for /token
-router.use('/token', (err, req, res, next) => {
+router.use('/token', (err: any, req: Request, res: Response, next: NextFunction) => {
     // Custom error handler so we include the custom error code for cases that need it
     handleError(err, err.code, err.name, res, true, err.customErrorCode);
 });

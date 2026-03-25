@@ -57,7 +57,8 @@ struct UserNameInputView: View {
                     completion(trimmedFirstName, trimmedLastName)
                     dismiss()
                 }
-                .disabled(firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                          lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .buttonStyle(.borderedProminent)
                 .padding(.horizontal)
                 

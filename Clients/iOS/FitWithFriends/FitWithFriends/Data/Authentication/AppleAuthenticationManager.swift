@@ -142,15 +142,8 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
         authenticationDelegate?.authenticationCompleted(result: .failure(error))
     }
 
-    public func handleAuthorization(with appleIdCredential: AppleAuthorizationCredential) async {
-        var userId = appleIdCredential.userId
-
-//        if serverEnvironmentManager.isLocalTesting {
-//            // This value is hardcoded in our local database setup script (SetingTestData.sql)
-//            // Local server builds skip Apple idToken validation so we can mock the userId here
-//            Logger.traceWarning(message: "Overriding Apple userId to hardcoded value")
-//            userId = "abcdef1234567890"
-//        }
+    public func handleAuthorization(with appleIdCredential: AppleAuthorizationCredential, hasRetriedAfterCreation: Bool = false) async {
+        let userId = appleIdCredential.userId
 
         // Apple will only provide the user's name when they first setup the account
         // Their docs say that the fullName property should be nil, but it appears to be
@@ -180,7 +173,7 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
             if let httpError = error as? HttpError,
                httpError.errorDetails?.fwfErrorCode == .userNotFound {
 
-                if let userProvidedName = userProvidedName {
+                if let userProvidedName = userProvidedName, !hasRetriedAfterCreation {
                     Logger.traceInfo(message: "User has provided display name, creating user then retrying auth")
                     do {
                         try await createNewUser(
@@ -188,11 +181,14 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
                             userName: userProvidedName,
                             idToken: appleIdCredential.idToken,
                             authorizationCode: appleIdCredential.authorizationCode)
-                        await handleAuthorization(with: appleIdCredential)
+                        await handleAuthorization(with: appleIdCredential, hasRetriedAfterCreation: true)
                     } catch {
                         Logger.traceError(message: "Failed to create user when a user doesn't exist", error: error)
                         authenticationDelegate?.authenticationCompleted(result: .failure(error))
                     }
+                } else if userProvidedName != nil && hasRetriedAfterCreation {
+                    Logger.traceError(message: "User not found after creation attempt, aborting to prevent infinite recursion", error: error)
+                    authenticationDelegate?.authenticationCompleted(result: .failure(error))
                 } else {
                     Logger.traceInfo(message: "Need to get display name from user")
                     authenticationDelegate?.needUserInformation()
