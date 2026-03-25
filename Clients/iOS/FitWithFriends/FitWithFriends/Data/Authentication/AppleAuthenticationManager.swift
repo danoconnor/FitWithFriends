@@ -8,7 +8,7 @@
 import AuthenticationServices
 import Foundation
 
-public class AppleAuthenticationManager: NSObject {
+public class AppleAuthenticationManager: NSObject, IAppleAuthenticationManager {
     public weak var authenticationDelegate: AppleAuthenticationDelegate?
 
     private let authenticationService: IAuthenticationService
@@ -40,8 +40,8 @@ public class AppleAuthenticationManager: NSObject {
 
     /// Acquires a token using Sign In With Apple
     /// - Parameters:
-    ///   - presentationDelegate: The delegate to use for Sign In With Apple
-    ///   - userProvidedName: Optional user-provided display name. We get user name from Apple during initial account creation, but some edge cases may require us to use custom UI to prompt the user to providet this info
+    ///   - presentationDelegate: The delegate to use for Sign In With Apple.
+    ///   - userProvidedName: Optional user-provided display name. This is used in edge cases where Apple does not provide a name during account creation.
     public func beginAppleLogin(
         presentationDelegate: ASAuthorizationControllerPresentationContextProviding,
         userProvidedName: PersonNameComponents? = nil) {
@@ -143,7 +143,8 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
         authenticationDelegate?.authenticationCompleted(result: .failure(error))
     }
 
-    private func handleAuthorization(with appleIdCredential: AppleAuthorizationCredential) async {
+    // Fileprivate to allow unit testing
+    fileprivate func handleAuthorization(with appleIdCredential: AppleAuthorizationCredential) async {
         var userId = appleIdCredential.userId
 
 //        if serverEnvironmentManager.isLocalTesting {

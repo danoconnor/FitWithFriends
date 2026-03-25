@@ -29,8 +29,8 @@ public class CompetitionOverviewViewModel: ObservableObject {
         }
     }
 
-    private let authenticationManager: AuthenticationManager
-    private let competitionManager: CompetitionManager
+    private let authenticationManager: IAuthenticationManager
+    private let competitionManager: ICompetitionManager
     private let competitionOverview: CompetitionOverview
     private let serverEnvironmentManager: ServerEnvironmentManager
 
@@ -51,8 +51,8 @@ public class CompetitionOverviewViewModel: ObservableObject {
     // wants to delete the competition.
     @Published var shouldShowAlert = false
 
-    init(authenticationManager: AuthenticationManager,
-         competitionManager: CompetitionManager,
+    init(authenticationManager: IAuthenticationManager,
+         competitionManager: ICompetitionManager,
          competitionOverview: CompetitionOverview,
          serverEnrivonmentManager: ServerEnvironmentManager,
          showAllDetails: Bool) {

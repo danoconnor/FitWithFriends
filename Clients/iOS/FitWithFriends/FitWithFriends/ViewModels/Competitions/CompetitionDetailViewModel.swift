@@ -8,10 +8,10 @@
 import Foundation
 
 public class CompetitionDetailViewModel {
-    private let competitionManager: CompetitionManager
+    private let competitionManager: ICompetitionManager
     private let homepageSheetViewModel: HomepageSheetViewModel
 
-    init(competitionManager: CompetitionManager, homepageSheetViewModel: HomepageSheetViewModel) {
+    init(competitionManager: ICompetitionManager, homepageSheetViewModel: HomepageSheetViewModel) {
         self.competitionManager = competitionManager
         self.homepageSheetViewModel = homepageSheetViewModel
     }

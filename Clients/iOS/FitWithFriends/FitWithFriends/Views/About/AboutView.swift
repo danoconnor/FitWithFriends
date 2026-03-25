@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AboutView: View {
-    let emailUtility: EmailUtility
+    let emailUtility: IEmailUtility
     let serverEnvironmentManager: ServerEnvironmentManager
 
     var body: some View {

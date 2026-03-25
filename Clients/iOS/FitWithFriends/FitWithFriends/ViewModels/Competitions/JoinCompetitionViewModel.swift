@@ -18,11 +18,11 @@ public class JoinCompetitionViewModel: ObservableObject {
     var competitionDateRange: String
     var competitionMembers: String
 
-    private let appProtocolHandler: AppProtocolHandler
-    private let competitionManager: CompetitionManager
+    private let appProtocolHandler: IAppProtocolHandler
+    private let competitionManager: ICompetitionManager
     private let homepageSheetViewModel: HomepageSheetViewModel
 
-    init(appProtocolHandler: AppProtocolHandler, competitionManager: CompetitionManager, homepageSheetViewModel: HomepageSheetViewModel) {
+    init(appProtocolHandler: IAppProtocolHandler, competitionManager: ICompetitionManager, homepageSheetViewModel: HomepageSheetViewModel) {
         self.appProtocolHandler = appProtocolHandler
         self.competitionManager = competitionManager
         self.homepageSheetViewModel = homepageSheetViewModel

@@ -8,13 +8,14 @@
 import Combine
 import Foundation
 
-public class CompetitionManager: ObservableObject {
+public class CompetitionManager: ICompetitionManager, ObservableObject {
     private let authenticationManager: AuthenticationManager
     private let competitionService: ICompetitionService
 
     private var loginStateCancellable: AnyCancellable?
 
     @Published private(set) var competitionOverviews: [UUID: CompetitionOverview]
+    var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { $competitionOverviews }
 
     init(authenticationManager: AuthenticationManager,
          competitionService: ICompetitionService) {

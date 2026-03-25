@@ -8,10 +8,10 @@
 import Foundation
 
 public class MockActivityUpdateDelegate: ActivityUpdateDelegate {
-    public var updateCalled = false
-    public func activityDataUpdated() {
-        updateCalled = true
-    }
-
     public init() {}
+
+    public func activityDataUpdated() {
+        // Mock implementation
+        print("Mock activity data updated")
+    }
 }

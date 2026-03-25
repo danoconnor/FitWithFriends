@@ -15,15 +15,15 @@ public class WelcomeViewModel: NSObject, ObservableObject {
     @Published public var loginState: LoginViewState = .notStarted
     @Published public var sheetToDisplay: LoginSheet?
 
-    private let authenticationManager: AuthenticationManager
+    private let authenticationManager: IAuthenticationManager
 
     private var loginStateCancellable: AnyCancellable?
 
-    public init(authenticationManager: AuthenticationManager) {
+    init(authenticationManager: IAuthenticationManager) {
         self.authenticationManager = authenticationManager
         super.init()
 
-        loginStateCancellable = authenticationManager.$loginState.sink { [weak self] loginState in
+        loginStateCancellable = authenticationManager.loginStatePublisher.sink { [weak self] loginState in
             switch loginState {
             case .loggedIn:
                 self?.setState(.success)
@@ -39,7 +39,7 @@ public class WelcomeViewModel: NSObject, ObservableObject {
 
     public func login() {
         setState(.inProgress)
-        authenticationManager.beginLogin(with: self)
+        authenticationManager.beginLogin(with: self, userProvidedName: nil)
     }
 
     public func dismissSheet() {

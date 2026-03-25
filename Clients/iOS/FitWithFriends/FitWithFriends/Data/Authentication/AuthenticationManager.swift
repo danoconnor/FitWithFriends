@@ -9,20 +9,24 @@ import Combine
 import Foundation
 import AuthenticationServices
 
-public class AuthenticationManager: ObservableObject {
+public class AuthenticationManager: IAuthenticationManager, ObservableObject {
     @Published public var loginState = LoginState.notLoggedIn(nil) {
         didSet {
             Logger.traceInfo(message: "Login state changed: \(loginState)")
         }
     }
 
-    private let appleAuthenticationManager: AppleAuthenticationManager
+    public var loginStatePublisher: Published<LoginState>.Publisher {
+        $loginState
+    }
+
+    private let appleAuthenticationManager: IAppleAuthenticationManager
     private let authenticationService: IAuthenticationService
     private let tokenManager: ITokenManager
 
     public var loggedInUserId: String?
 
-    public init(appleAuthenticationManager: AppleAuthenticationManager,
+    init(appleAuthenticationManager: IAppleAuthenticationManager,
          authenticationService: IAuthenticationService,
          tokenManager: ITokenManager) {
         self.appleAuthenticationManager = appleAuthenticationManager

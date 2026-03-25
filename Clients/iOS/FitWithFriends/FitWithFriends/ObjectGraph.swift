@@ -9,19 +9,19 @@ import Foundation
 
 class ObjectGraph: IObjectGraph {
     let activityDataService: IActivityDataService
-    let appleAuthenticationManager: AppleAuthenticationManager
-    let appProtocolHandler: AppProtocolHandler
-    let authenticationManager: AuthenticationManager
+    let appleAuthenticationManager: IAppleAuthenticationManager
+    let appProtocolHandler: IAppProtocolHandler
+    let authenticationManager: IAuthenticationManager
     let authenticationService: IAuthenticationService
-    let competitionManager: CompetitionManager
+    let competitionManager: ICompetitionManager
     let competitionService: ICompetitionService
-    let emailUtility: EmailUtility
+    let emailUtility: IEmailUtility
     let healthKitManager: IHealthKitManager
     let healthStoreWrapper: IHealthStoreWrapper
     let httpConnector: IHttpConnector
     let keychainUtilities: IKeychainUtilities
     let serverEnvironmentManager: ServerEnvironmentManager
-    let shakeGestureHandler: ShakeGestureHandler
+    let shakeGestureHandler: IShakeGestureHandler
     let tokenManager: ITokenManager
     let userDefaults: UserDefaults
     let userService: IUserService
@@ -47,14 +47,15 @@ class ObjectGraph: IObjectGraph {
                                                                 keychainUtilities: keychainUtilities, 
                                                                 serverEnvironmentManager: serverEnvironmentManager,
                                                                 userService: userService)
-        authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,
+        let authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,
                                                       authenticationService: authenticationService,
                                                       tokenManager: tokenManager)
+        self.authenticationManager = authenticationManager
         appleAuthenticationManager.authenticationDelegate = authenticationManager
 
-        competitionManager = CompetitionManager(authenticationManager: authenticationManager,
+        let competitionManager = CompetitionManager(authenticationManager: authenticationManager,
                                                 competitionService: competitionService)
-
+        self.competitionManager = competitionManager
         healthKitManager = HealthKitManager(activityDataService: activityDataService,
                                             activityUpdateDelegate: competitionManager,
                                             authenticationManager: authenticationManager,

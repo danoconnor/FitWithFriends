@@ -7,10 +7,14 @@
 
 import Foundation
 
-public class MockShakeGestureHandler: ShakeGestureHandler {
-    init() {
-        super.init(emailUtility: MockEmailUtility())
-    }
+public class MockShakeGestureHandler: IShakeGestureHandler {
+    public init() {}
 
-    override func handleShakeGesture() {}
+    public var return_handleShakeGesture_error: Error?
+
+    public func handleShakeGesture() {
+        if let error = return_handleShakeGesture_error {
+            // Handle mock error
+        }
+    }
 }

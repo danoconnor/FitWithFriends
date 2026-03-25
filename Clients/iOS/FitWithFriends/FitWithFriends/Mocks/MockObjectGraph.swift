@@ -9,17 +9,17 @@ import Foundation
 
 public class MockObjectGraph: IObjectGraph {
     var activityDataService: IActivityDataService
-    var appProtocolHandler: AppProtocolHandler
-    var authenticationManager: AuthenticationManager
+    var appProtocolHandler: IAppProtocolHandler
+    var authenticationManager: IAuthenticationManager
     var authenticationService: IAuthenticationService
-    var competitionManager: CompetitionManager
+    var competitionManager: ICompetitionManager
     var competitionService: ICompetitionService
-    var emailUtility: EmailUtility
+    var emailUtility: IEmailUtility
     var healthKitManager: IHealthKitManager
     var httpConnector: IHttpConnector
     var keychainUtilities: IKeychainUtilities
     var serverEnvironmentManager: ServerEnvironmentManager
-    var shakeGestureHandler: ShakeGestureHandler
+    var shakeGestureHandler: IShakeGestureHandler
     var tokenManager: ITokenManager
     var userDefaults: UserDefaults
     var userService: IUserService

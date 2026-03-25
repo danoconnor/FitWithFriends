@@ -8,10 +8,10 @@
 import Foundation
 import UIKit
 
-public class ShakeGestureHandler {
-    private let emailUtility: EmailUtility
+public class ShakeGestureHandler: IShakeGestureHandler {
+    private let emailUtility: IEmailUtility
 
-    init(emailUtility: EmailUtility) {
+    init(emailUtility: IEmailUtility) {
         self.emailUtility = emailUtility
     }
 
