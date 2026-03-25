@@ -1,5 +1,6 @@
 import { AbstractGrantType, ServerOptions, BaseModel, InvalidRequestError, Client, Falsey, Request, Token, User} from "@node-oauth/oauth2-server";
 import { validateAppleIdToken } from '../utilities/appleIdAuthenticationHelpers';
+import FWFErrorCodes from '../utilities/enums/FWFErrorCodes';
 import * as UserQueries from '../sql/users.queries';
 import { convertUserIdToBuffer } from "../utilities/userHelpers";
 
@@ -31,7 +32,7 @@ class AppleIdTokenGrant extends AbstractGrantType {
             .then(([userExists, tokenValid]) => {
                 if (!userExists) {
                     console.error('Invalid request: User does not exist');
-                    throw new InvalidRequestError('Invalid request: User does not exist');
+                    throw new InvalidRequestError('Invalid request: User does not exist', { customErrorCode: FWFErrorCodes.AuthErrorCodes.UserNotFound });
                 }
 
                 if (!tokenValid) {

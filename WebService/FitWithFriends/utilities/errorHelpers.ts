@@ -3,7 +3,7 @@ import { Response } from 'express';
 // A single entry point to decide how to respond to the client in case of an error
 // It will always return the given status code to the client 
 // and will optionally return the errorMessage depending on global config and the alwaysSendDetails param
-export function handleError(error: Error | null, statusCode: number, errorMessage: string | null, res: Response<any>, alwaysSendDetails = false, customErrorCode: number | null = null) {
+export function handleError(error: Error | null, statusCode: number, errorMessage: string | null, res: Response<any>, alwaysSendDetails = false, customErrorCode: number | null | undefined = null) {
     res.status(statusCode);
     console.error(error != null ? error.message : errorMessage);
 

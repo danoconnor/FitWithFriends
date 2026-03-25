@@ -11,7 +11,8 @@ const server = new ExpressOAuthServer({
     refreshTokenLifetime: 60 * 60 * 24 * 365, // 1 year
     allowEmptyState: true,
     allowExtendedTokenAttributes: true,
-    alwaysIssueNewRefreshToken: false
+    alwaysIssueNewRefreshToken: false,
+    useErrorHandler: true,
 });
 
 export default server;

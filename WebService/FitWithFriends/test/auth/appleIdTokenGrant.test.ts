@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as TestSQL from '../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../testUtilities/testRequestUtilities';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
+import FWFErrorCodes from '../../utilities/enums/FWFErrorCodes';
 
 /*
     Tests the Apple idToken grant
@@ -48,19 +49,23 @@ test('Missing userId', async () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.data.error_description).toContain('Missing parameter');
-    expect(response.data.error_description).toContain('userId');
+    expect(response.data.error_details).toContain('Missing parameter');
+    expect(response.data.error_details).toContain('userId');
 });
 
-test('Nonexistent userId', async () => {
+
+test('Nonexistent userId returns 400 and custom error code', async () => {
     const response = await makeOauthRequest({
         grant_type: 'apple_id_token',
         idToken: 'test',
         userId: '1234567890abcdef' // Does not exist in the database
     });
 
+    console.log('Response data:', response.data); // Log the response data for debugging
+
     expect(response.status).toBe(400);
-    expect(response.data.error_description).toContain('User does not exist');
+    expect(response.data.error_details).toContain('User does not exist');
+    expect(response.data.custom_error_code).toEqual(FWFErrorCodes.AuthErrorCodes.UserNotFound);
 });
 
 test('Missing idToken', async () => {
@@ -70,8 +75,8 @@ test('Missing idToken', async () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.data.error_description).toContain('Missing parameter');
-    expect(response.data.error_description).toContain('idToken');
+    expect(response.data.error_details).toContain('Missing parameter');
+    expect(response.data.error_details).toContain('idToken');
 });
 
 async function makeOauthRequest(requestBody: any): Promise<axios.AxiosResponse<any, any>> {
