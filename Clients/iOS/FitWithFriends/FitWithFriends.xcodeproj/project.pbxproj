@@ -118,6 +118,7 @@
 		0BACBE602E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE5F2E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift */; };
 		0BACBE622E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */; };
 		0BACBE642E4F4992000FE0ED /* AppProtocolHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE632E4F4992000FE0ED /* AppProtocolHandlerTests.swift */; };
+		0BACBE662E516A67000FE0ED /* TokenManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE652E516A67000FE0ED /* TokenManagerTests.swift */; };
 		0BB2CC482E3EF4C50042FB3F /* AppleAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */; };
 		0BB2CC4A2E3EFDB10042FB3F /* AppleAuthenticationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */; };
 		0BB2CC4C2E3EFFEC0042FB3F /* LoginViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */; };
@@ -283,6 +284,7 @@
 		0BACBE5F2E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IASAuthorizationAppleIDProvider.swift; sourceTree = "<group>"; };
 		0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockASAuthorizationControllerPresentationContextProviding.swift; sourceTree = "<group>"; };
 		0BACBE632E4F4992000FE0ED /* AppProtocolHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProtocolHandlerTests.swift; sourceTree = "<group>"; };
+		0BACBE652E516A67000FE0ED /* TokenManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManagerTests.swift; sourceTree = "<group>"; };
 		0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthorization.swift; sourceTree = "<group>"; };
 		0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationDelegate.swift; sourceTree = "<group>"; };
 		0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewState.swift; sourceTree = "<group>"; };
@@ -348,6 +350,7 @@
 		0B08797E2BB3A8E80073AB09 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				0BACBE652E516A67000FE0ED /* TokenManagerTests.swift */,
 				0BACBE632E4F4992000FE0ED /* AppProtocolHandlerTests.swift */,
 				0BACBE592E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift */,
 				0BACBE572E4EC87C000FE0ED /* AuthenticationManagerTests.swift */,
@@ -938,6 +941,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BACBE662E516A67000FE0ED /* TokenManagerTests.swift in Sources */,
 				0BACBE642E4F4992000FE0ED /* AppProtocolHandlerTests.swift in Sources */,
 				0BACBE582E4EC87C000FE0ED /* AuthenticationManagerTests.swift in Sources */,
 				0B0879872BB3A9B90073AB09 /* HealthKitManagerTests.swift in Sources */,
