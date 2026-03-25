@@ -30,14 +30,14 @@ class AppleIdTokenGrant extends AbstractGrantType {
     
         return Promise.all([this.validateUserExists(userId), validateAppleIdToken(userId, idToken)])
             .then(([userExists, tokenValid]) => {
-                if (!userExists) {
-                    console.error('Invalid request: User does not exist');
-                    throw new InvalidRequestError('Invalid request: User does not exist', { customErrorCode: FWFErrorCodes.AuthErrorCodes.UserNotFound });
-                }
-
                 if (!tokenValid) {
                     console.error('Token validation failed');
                     throw new InvalidRequestError('Token validation failed');
+                }
+
+                if (!userExists) {
+                    console.error('Invalid request: User does not exist');
+                    throw new InvalidRequestError('Invalid request: User does not exist', { customErrorCode: FWFErrorCodes.AuthErrorCodes.UserNotFound });
                 }
 
                 // The userId will be something like 002261.abcdef123456789002479ef472f717857.2341

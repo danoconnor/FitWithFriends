@@ -167,6 +167,11 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
                                                                             authorizationCode: authorizationCode)
             authenticationDelegate?.authenticationCompleted(result: .success(token))
         } catch {
+            if let httpError = error as? HttpError,
+               httpError.errorDetails?.fwfErrorCode == .userNotFound {
+                // TODO: Create the user if we tried to auth but the user was not found, then retry the token acquisition
+            }
+
             authenticationDelegate?.authenticationCompleted(result: .failure(error))
         }
     }

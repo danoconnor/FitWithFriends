@@ -13,4 +13,8 @@ public enum FWFErrorCode: Int {
     // MARK: Competition errors
     
     case tooManyActiveCompetitions = 10001
+
+    // MARK: Auth errors
+
+    case userNotFound = 20001
 }
