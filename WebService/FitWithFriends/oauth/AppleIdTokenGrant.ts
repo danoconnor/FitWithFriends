@@ -27,8 +27,13 @@ class AppleIdTokenGrant extends AbstractGrantType {
     
         const userId: string = request.body.userId;
         const idToken: string = request.body.idToken;
+
+        // The userId will be something like 002261.abcdef123456789002479ef472f717857.2341
+        // We want the database to handle it as hex to save on storage space, so we'll remove the '.' chars
+        // which leaves only valid hex chars remaining
+        const hexUserId = userId.replace(/\./g, '');
     
-        return Promise.all([this.validateUserExists(userId), validateAppleIdToken(userId, idToken)])
+        return Promise.all([this.validateUserExists(hexUserId), validateAppleIdToken(userId, idToken)])
             .then(([userExists, tokenValid]) => {
                 if (!tokenValid) {
                     console.error('Token validation failed');
@@ -39,11 +44,6 @@ class AppleIdTokenGrant extends AbstractGrantType {
                     console.error('Invalid request: User does not exist');
                     throw new InvalidRequestError('Invalid request: User does not exist', { customErrorCode: FWFErrorCodes.AuthErrorCodes.UserNotFound });
                 }
-
-                // The userId will be something like 002261.abcdef123456789002479ef472f717857.2341
-                // We want the database to handle it as hex to save on storage space, so we'll remove the '.' chars
-                // which leaves only valid hex chars remaining
-                const hexUserId = userId.replace(/\./g, '');
 
                 return this.saveToken({ id: hexUserId }, client, scope);
             })

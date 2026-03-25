@@ -24,7 +24,7 @@ public class MockAuthenticationManager: AuthenticationManager {
     public var return_error: Error?
 
     public var userToLogin: UInt = 0
-    override public func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
+    override public func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding, userProvidedName: PersonNameComponents? = nil) {
         loginState = .inProgress
 
         Task.detached {

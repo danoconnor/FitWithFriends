@@ -27,6 +27,7 @@ public class MockAuthenticationService: IAuthenticationService {
     public var param_getTokenFromAppleId_idToken: String?
     public var param_getTokenFromAppleId_authorizationCode: String?
     public var return_getTokenFromAppleId: Token?
+    public var return_getTokenFromAppleId_error: Error?
     public func getTokenFromAppleId(userId: String, idToken: String, authorizationCode: String) async throws -> Token {
         param_getTokenFromAppleId_userId = userId
         param_getTokenFromAppleId_idToken = idToken
@@ -34,6 +35,10 @@ public class MockAuthenticationService: IAuthenticationService {
 
         // Simulate a network delay
         await MockUtilities.delayOneSecond()
+
+        if let errorToThrow = return_getTokenFromAppleId_error {
+            throw errorToThrow
+        }
 
         if let retVal = return_getTokenFromAppleId {
             return retVal

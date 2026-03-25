@@ -18,12 +18,12 @@ struct WelcomeView: View {
 
     var body: some View {
         VStack {
-            if viewModel.state.isFailed {
+            if viewModel.loginState.isFailed {
                 HStack {
                     Image(systemName: "exclamationmark.circle")
                         .padding(.leading)
 
-                    Text(viewModel.state.errorMessage)
+                    Text(viewModel.loginState.errorMessage)
                         .padding()
 
                     Spacer()
@@ -51,12 +51,22 @@ struct WelcomeView: View {
             Spacer()
         }
         .background(Color("FwFBrandingColor"))
-        .sheet(isPresented: $viewModel.shouldShowFirstLaunchView, onDismiss: {
+        .sheet(item: $viewModel.sheetToDisplay, onDismiss: {
             // If the user swipes down to dismiss the view, instead of using the button,
             // then make sure we mark the view as completed
-            viewModel.dismissFirstLaunchView()
-        }) {
-            FirstLaunchWelcomeView(welcomeViewModel: viewModel)
+            viewModel.dismissSheet()
+        }) { state in
+            switch state {
+            case .firstLaunchWelcomeView:
+                FirstLaunchWelcomeView(welcomeViewModel: viewModel)
+            case .userInputView:
+                UserNameInputView { firstName, lastName in
+                    self.viewModel.createUserAndLogin(firstName: firstName, lastName: lastName)
+                }
+            case .none:
+                // Should not happen
+                EmptyView()
+            }
         }
     }
 }

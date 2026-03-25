@@ -108,15 +108,3 @@ test('userFromAppleID lastName too long', async () => {
     expect(response.status).toBe(400);
     expect(response.data.context).toContain('Parameter too long');
 });
-
-test('userFromAppleID idToken too long', async () => {
-    const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
-        userId: appleUserId,
-        firstName: 'Test',
-        lastName: 'User',
-        idToken: 'a'.repeat(256)
-    });
-
-    expect(response.status).toBe(400);
-    expect(response.data.context).toContain('Parameter too long');
-});

@@ -32,11 +32,17 @@ public class AuthenticationManager: ObservableObject {
         setInitialLoginState()
     }
 
-    public func beginLogin(with delegate: ASAuthorizationControllerPresentationContextProviding) {
+    public func beginLogin(
+        with delegate: ASAuthorizationControllerPresentationContextProviding,
+        userProvidedName: PersonNameComponents? = nil) {
         loginState = .inProgress
 
         Logger.traceInfo(message: "Beginning Apple login")
-        appleAuthenticationManager.beginAppleLogin(presentationDelegate: delegate)
+        appleAuthenticationManager.beginAppleLogin(presentationDelegate: delegate, userProvidedName: userProvidedName)
+    }
+
+    public func cancelUserInput() {
+        loginState = .notLoggedIn(nil)
     }
 
     public func logout() {
@@ -103,5 +109,10 @@ extension AuthenticationManager: AppleAuthenticationDelegate {
             loggedInUserId = nil
             loginState = .notLoggedIn(error)
         }
+    }
+
+    public func needUserInformation() {
+        Logger.traceInfo(message: "Setting login state to needUserInfo")
+        loginState = .needUserInfo
     }
 }

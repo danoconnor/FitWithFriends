@@ -57,8 +57,8 @@ test('Missing refreshToken', async () => {
     }, undefined, 'application/x-www-form-urlencoded');
 
     expect(response.status).toBe(400);
-    expect(response.data.error_description).toContain('Missing parameter');
-    expect(response.data.error_description).toContain('refresh_token');
+    expect(response.data.error_details).toContain('Missing parameter');
+    expect(response.data.error_details).toContain('refresh_token');
 });
 
 test('Nonexistent refreshToken', async () => {
@@ -88,5 +88,5 @@ test('Expired refreshToken', async () => {
     }, undefined, 'application/x-www-form-urlencoded');
 
     expect(response.status).toBe(400);
-    expect(response.data.error_description).toContain('refresh token has expired');
+    expect(response.data.error_details).toContain('refresh token has expired');
 });

@@ -9,6 +9,7 @@ import Foundation
 
 public enum LoginState {
     case notLoggedIn(Error?)
+    case needUserInfo
     case inProgress
     case loggedIn
 }

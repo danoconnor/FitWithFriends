@@ -8,10 +8,6 @@
 import AuthenticationServices
 import Foundation
 
-public protocol AppleAuthenticationDelegate: AnyObject {
-    func authenticationCompleted(result: Result<Token, Error>)
-}
-
 public class AppleAuthenticationManager: NSObject {
     public weak var authenticationDelegate: AppleAuthenticationDelegate?
 
@@ -26,6 +22,9 @@ public class AppleAuthenticationManager: NSObject {
     private static let appleUserKeychainService = "com.danoconnor.FitWithFriends"
     private static let appleUserKeychainAccount = "appleUserId"
 
+    // The user display name provided via custom UI and used to create a new user
+    private var userProvidedName: PersonNameComponents?
+
     public init(authenticationService: IAuthenticationService,
                 keychainUtilities: IKeychainUtilities,
                 serverEnvironmentManager: ServerEnvironmentManager,
@@ -38,7 +37,16 @@ public class AppleAuthenticationManager: NSObject {
         appleIdProvider = ASAuthorizationAppleIDProvider()
     }
 
-    public func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {
+
+    /// Acquires a token using Sign In With Apple
+    /// - Parameters:
+    ///   - presentationDelegate: The delegate to use for Sign In With Apple
+    ///   - userProvidedName: Optional user-provided display name. We get user name from Apple during initial account creation, but some edge cases may require us to use custom UI to prompt the user to providet this info
+    public func beginAppleLogin(
+        presentationDelegate: ASAuthorizationControllerPresentationContextProviding,
+        userProvidedName: PersonNameComponents? = nil) {
+        self.userProvidedName = userProvidedName
+
         let request = appleIdProvider.createRequest()
         request.requestedScopes = [.fullName]
 
@@ -114,7 +122,19 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
         Logger.traceInfo(message: "Got Apple authorization controller response")
 
         Task.detached { [weak self] in
-            await self?.handleAuthorization(authorization)
+            guard let asCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                let credentialType = String(describing: type(of: authorization.credential))
+                self?.authenticationDelegate?.authenticationCompleted(result: .failure(AppleAuthenticationError.unexpectedCredentialType(credentialType)))
+                return
+            }
+
+            do {
+                let appleAuthorizationCredential = try AppleAuthorizationCredential(appleIdCredential: asCredential)
+                await self?.handleAuthorization(with: appleAuthorizationCredential)
+            } catch {
+                self?.authenticationDelegate?.authenticationCompleted(result: .failure(error))
+                return
+            }
         }
     }
 
@@ -123,60 +143,70 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
         authenticationDelegate?.authenticationCompleted(result: .failure(error))
     }
 
-    private func handleAuthorization(_ authorization: ASAuthorization) async {
-        guard let appleIdCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-            let credentialType = String(describing: type(of: authorization.credential))
-            authenticationDelegate?.authenticationCompleted(result: .failure(AppleAuthenticationError.unexpectedCredentialType(credentialType)))
-            return
-        }
-        
-        guard let idTokenData = appleIdCredential.identityToken,
-              let idToken = String(data: idTokenData, encoding: .utf8),
-              let authorizationCodeData = appleIdCredential.authorizationCode,
-              let authorizationCode = String(data: authorizationCodeData, encoding: .utf8) else {
-            let error: AppleAuthenticationError = appleIdCredential.identityToken == nil ? .noTokenReturned : .noAuthorizationReturned
-            authenticationDelegate?.authenticationCompleted(result: .failure(error))
-            return
-        }
+    private func handleAuthorization(with appleIdCredential: AppleAuthorizationCredential) async {
+        var userId = appleIdCredential.userId
 
-        var userId = appleIdCredential.user
-
-        if serverEnvironmentManager.isLocalTesting {
-            // This value is hardcoded in our local database setup script (SetingTestData.sql)
-            // Local server builds skip Apple idToken validation so we can mock the userId here
-            Logger.traceWarning(message: "Overriding Apple userId to hardcoded value")
-            userId = "abcdef1234567890"
-        }
+//        if serverEnvironmentManager.isLocalTesting {
+//            // This value is hardcoded in our local database setup script (SetingTestData.sql)
+//            // Local server builds skip Apple idToken validation so we can mock the userId here
+//            Logger.traceWarning(message: "Overriding Apple userId to hardcoded value")
+//            userId = "abcdef1234567890"
+//        }
 
         // Apple will only provide the user's name when they first setup the account
         // Their docs say that the fullName property should be nil, but it appears to be
         // a not-nil object with nil/empty strings for all properties. So we need to check
         // the description to see if there's actually any data in there
-        if let userName = appleIdCredential.fullName,
+        if let userName = appleIdCredential.displayName,
             userName.description.count > 0 {
-            await createNewUser(userId: userId,
-                                userName: userName,
-                                idToken: idToken,
-                                authorizationCode: authorizationCode)
+
+            do {
+                try await createNewUser(userId: userId,
+                                        userName: userName,
+                                        idToken: appleIdCredential.idToken,
+                                        authorizationCode: appleIdCredential.authorizationCode)
+            } catch {
+                // Swallow the error here because it is possible that the user already exists and we should continue to try to acquire a token
+                Logger.traceError(message: "Failed to create user as part of auth flow. Ignoring error and attempting auth", error: error)
+            }
         }
 
-        Logger.traceInfo(message: "Attempting to fetch token for user with ID \(appleIdCredential.user)")
+        Logger.traceInfo(message: "Attempting to fetch token for user with ID \(appleIdCredential.userId)")
         do {
             let token = try await authenticationService.getTokenFromAppleId(userId: userId,
-                                                                            idToken: idToken,
-                                                                            authorizationCode: authorizationCode)
+                                                                            idToken: appleIdCredential.idToken,
+                                                                            authorizationCode: appleIdCredential.authorizationCode)
             authenticationDelegate?.authenticationCompleted(result: .success(token))
         } catch {
             if let httpError = error as? HttpError,
                httpError.errorDetails?.fwfErrorCode == .userNotFound {
-                // TODO: Create the user if we tried to auth but the user was not found, then retry the token acquisition
+
+                if let userProvidedName = userProvidedName {
+                    Logger.traceInfo(message: "User has provided display name, creating user then retrying auth")
+                    do {
+                        try await createNewUser(
+                            userId: userId,
+                            userName: userProvidedName,
+                            idToken: appleIdCredential.idToken,
+                            authorizationCode: appleIdCredential.authorizationCode)
+                        await handleAuthorization(with: appleIdCredential)
+                    } catch {
+                        Logger.traceError(message: "Failed to create user when a user doesn't exist", error: error)
+                        authenticationDelegate?.authenticationCompleted(result: .failure(error))
+                    }
+                } else {
+                    Logger.traceInfo(message: "Need to get display name from user")
+                    authenticationDelegate?.needUserInformation()
+                }
+
+                return
             }
 
             authenticationDelegate?.authenticationCompleted(result: .failure(error))
         }
     }
 
-    private func createNewUser(userId: String, userName: PersonNameComponents, idToken: String, authorizationCode: String) async {
+    private func createNewUser(userId: String, userName: PersonNameComponents, idToken: String, authorizationCode: String) async throws {
         Logger.traceInfo(message: "Apple provided user name - creating new user with ID \(userId)")
 
         // Try to use nickname as the first name for more familiarity, if available
@@ -189,11 +219,8 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
 
             Logger.traceVerbose(message: "Successfully created user with id \(userId)")
         } catch {
-            // Don't throw if there is an error creating the user,
-            // it's possible that the user already exists so we should continue
-            // and attempt to get a token
             Logger.traceError(message: "Failed to create user for ID \(userId)", error: error)
-            return
+            throw error
         }
 
         do {

@@ -103,6 +103,11 @@
 		0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72425ABAB4F0064CE5C /* ShakeGestureHandler.swift */; };
 		0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72725ABACD70064CE5C /* EmailUtility.swift */; };
 		0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */; };
+		0BB2CC482E3EF4C50042FB3F /* AppleAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */; };
+		0BB2CC4A2E3EFDB10042FB3F /* AppleAuthenticationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */; };
+		0BB2CC4C2E3EFFEC0042FB3F /* LoginViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */; };
+		0BB2CC4E2E3FD9DC0042FB3F /* LoginSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC4D2E3FD9CD0042FB3F /* LoginSheet.swift */; };
+		0BBB23522E4A42C200DE66D7 /* UserNameInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBB23512E4A42C200DE66D7 /* UserNameInputView.swift */; };
 		0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */; };
 		0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */; };
 		0BBD788D259A4A9400E08EB2 /* ServiceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */; };
@@ -248,6 +253,11 @@
 		0BABC72425ABAB4F0064CE5C /* ShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeGestureHandler.swift; sourceTree = "<group>"; };
 		0BABC72725ABACD70064CE5C /* EmailUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUtility.swift; sourceTree = "<group>"; };
 		0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+Extensions.swift"; sourceTree = "<group>"; };
+		0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthorization.swift; sourceTree = "<group>"; };
+		0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationDelegate.swift; sourceTree = "<group>"; };
+		0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewState.swift; sourceTree = "<group>"; };
+		0BB2CC4D2E3FD9CD0042FB3F /* LoginSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSheet.swift; sourceTree = "<group>"; };
+		0BBB23512E4A42C200DE66D7 /* UserNameInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNameInputView.swift; sourceTree = "<group>"; };
 		0BBD78842593F51100E08EB2 /* Encodable+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Extension.swift"; sourceTree = "<group>"; };
 		0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverview.swift; sourceTree = "<group>"; };
 		0BBD788C259A4A9400E08EB2 /* ServiceBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceBase.swift; sourceTree = "<group>"; };
@@ -524,6 +534,7 @@
 		0B99FC15256A208E00673133 /* Authentication */ = {
 			isa = PBXGroup;
 			children = (
+				0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */,
 				0B99FC16256A20A800673133 /* AuthenticationManager.swift */,
 				0B99FC33256A3BA600673133 /* TokenManager.swift */,
 				0B8445E0275C464500F78480 /* LoginState.swift */,
@@ -564,6 +575,7 @@
 			isa = PBXGroup;
 			children = (
 				0B1CBEC827C3F3A90008C72A /* Competitions */,
+				0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */,
 				0B47A221279C90EB00C2970E /* User.swift */,
 				0B67532925745CF60032835D /* ActivitySummary.swift */,
 				0B99FC2D256A2CFB00673133 /* Token.swift */,
@@ -612,6 +624,7 @@
 		0BBD78B225A280B300E08EB2 /* Login */ = {
 			isa = PBXGroup;
 			children = (
+				0BBB23512E4A42C200DE66D7 /* UserNameInputView.swift */,
 				0B9BADC3256AE44600EB1B60 /* WelcomeView.swift */,
 			);
 			path = Login;
@@ -655,6 +668,8 @@
 		0BBD78BD25A282F200E08EB2 /* Login */ = {
 			isa = PBXGroup;
 			children = (
+				0BB2CC4D2E3FD9CD0042FB3F /* LoginSheet.swift */,
+				0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */,
 				0B8D65E327DEE1A000934E18 /* WelcomeViewModel.swift */,
 			);
 			path = Login;
@@ -913,6 +928,7 @@
 				0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */,
 				0B0879782BB254250073AB09 /* IUserService.swift in Sources */,
 				0B47A22D279CACB600C2970E /* MockKeychainUtilities.swift in Sources */,
+				0BBB23522E4A42C200DE66D7 /* UserNameInputView.swift in Sources */,
 				0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */,
 				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
 				0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */,
@@ -962,6 +978,7 @@
 				0BC4C645293407BE004F1ADC /* FWFErrorDetails.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,
 				0B0879762BB2541B0073AB09 /* ICompetitionService.swift in Sources */,
+				0BB2CC482E3EF4C50042FB3F /* AppleAuthorization.swift in Sources */,
 				0B9058C927B0844800AE1712 /* Error+Extensions.swift in Sources */,
 				0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */,
 				0B1CBECA27C3F3B80008C72A /* CompetitionDescription.swift in Sources */,
@@ -984,6 +1001,7 @@
 				0BD8B5BD27D42C79009BA5F2 /* CompetitionDetailViewModel.swift in Sources */,
 				0B0879692BAFC1410073AB09 /* HealthStoreWrapper.swift in Sources */,
 				0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */,
+				0BB2CC4E2E3FD9DC0042FB3F /* LoginSheet.swift in Sources */,
 				0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */,
 				0B99FBEB256A070F00673133 /* HttpMethod.swift in Sources */,
 				0B9BADC4256AE44600EB1B60 /* WelcomeView.swift in Sources */,
@@ -996,6 +1014,7 @@
 				0BCF64882BCA29C0004E98C7 /* ValueArrayDTO.swift in Sources */,
 				0B47A233279CB24200C2970E /* MockObjectGraph.swift in Sources */,
 				0B8445D2275C22E100F78480 /* JSONEncoder+Extension.swift in Sources */,
+				0BB2CC4A2E3EFDB10042FB3F /* AppleAuthenticationDelegate.swift in Sources */,
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,
 				0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */,
 				0BD8B5BF27D42C92009BA5F2 /* CompetitionDetailView.swift in Sources */,
@@ -1003,6 +1022,7 @@
 				0B47A235279CB2ED00C2970E /* IObjectGraph.swift in Sources */,
 				0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */,
 				0B9BADAF256AD88100EB1B60 /* RequestConstants.swift in Sources */,
+				0BB2CC4C2E3EFFEC0042FB3F /* LoginViewState.swift in Sources */,
 				0B1CBEBA27C1C0CC0008C72A /* MockUtilities.swift in Sources */,
 				0BBD78A1259A537100E08EB2 /* CompetitionManager.swift in Sources */,
 				0B6752DA25715ED80032835D /* PermissionPromptView.swift in Sources */,

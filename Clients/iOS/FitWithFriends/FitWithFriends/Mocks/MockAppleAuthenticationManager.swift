@@ -13,7 +13,7 @@ public class MockAppleAuthenticationManager: AppleAuthenticationManager {
         super.init(authenticationService: MockAuthenticationService(), keychainUtilities: MockKeychainUtilities(), serverEnvironmentManager: ServerEnvironmentManager(userDefaults: UserDefaults.standard), userService: MockUserService())
     }
 
-    override public func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding) {}
+    override public func beginAppleLogin(presentationDelegate: ASAuthorizationControllerPresentationContextProviding, userProvidedName: PersonNameComponents? = nil) {}
 
     public var return_isAppleAccountValid = true
     override public func isAppleAccountValid() -> Bool {

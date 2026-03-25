@@ -26,6 +26,6 @@ public class FWFErrorDetails: Decodable {
             return code
         }
 
-        return .unknown
+        return customErrorCode == nil ? .none : .unknown
     }
 }

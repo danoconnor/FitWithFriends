@@ -29,8 +29,7 @@ router.post('/userFromAppleID', function (req, res) {
     const maxLength = 255;
     if (userId.length > maxLength ||
         firstName.length > maxLength ||
-        lastName.length > maxLength ||
-        idToken.length > maxLength) {
+        lastName.length > maxLength) {
         handleError(null, 400, 'Parameter too long', res);
         return;
     }

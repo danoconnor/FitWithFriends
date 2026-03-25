@@ -9,6 +9,7 @@ import Foundation
 
 public enum FWFErrorCode: Int {
     case unknown = -1
+    case none = 0
 
     // MARK: Competition errors
     
