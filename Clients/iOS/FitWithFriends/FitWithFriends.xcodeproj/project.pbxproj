@@ -111,6 +111,12 @@
 		0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72425ABAB4F0064CE5C /* ShakeGestureHandler.swift */; };
 		0BABC72825ABACD70064CE5C /* EmailUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72725ABACD70064CE5C /* EmailUtility.swift */; };
 		0BABC72B25ABAF570064CE5C /* UIWindow+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */; };
+		0BACBE582E4EC87C000FE0ED /* AuthenticationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE572E4EC87C000FE0ED /* AuthenticationManagerTests.swift */; };
+		0BACBE5A2E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE592E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift */; };
+		0BACBE5C2E4ECE8B000FE0ED /* MockASAuthorizationAppleIDProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE5B2E4ECE8B000FE0ED /* MockASAuthorizationAppleIDProvider.swift */; };
+		0BACBE5E2E4ECEA6000FE0ED /* ASAuthorizationAppleIDProviderWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE5D2E4ECEA6000FE0ED /* ASAuthorizationAppleIDProviderWrapper.swift */; };
+		0BACBE602E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE5F2E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift */; };
+		0BACBE622E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */; };
 		0BB2CC482E3EF4C50042FB3F /* AppleAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */; };
 		0BB2CC4A2E3EFDB10042FB3F /* AppleAuthenticationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */; };
 		0BB2CC4C2E3EFFEC0042FB3F /* LoginViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */; };
@@ -269,6 +275,12 @@
 		0BABC72425ABAB4F0064CE5C /* ShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakeGestureHandler.swift; sourceTree = "<group>"; };
 		0BABC72725ABACD70064CE5C /* EmailUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailUtility.swift; sourceTree = "<group>"; };
 		0BABC72A25ABAF570064CE5C /* UIWindow+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+Extensions.swift"; sourceTree = "<group>"; };
+		0BACBE572E4EC87C000FE0ED /* AuthenticationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManagerTests.swift; sourceTree = "<group>"; };
+		0BACBE592E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationManagerTests.swift; sourceTree = "<group>"; };
+		0BACBE5B2E4ECE8B000FE0ED /* MockASAuthorizationAppleIDProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockASAuthorizationAppleIDProvider.swift; sourceTree = "<group>"; };
+		0BACBE5D2E4ECEA6000FE0ED /* ASAuthorizationAppleIDProviderWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASAuthorizationAppleIDProviderWrapper.swift; sourceTree = "<group>"; };
+		0BACBE5F2E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IASAuthorizationAppleIDProvider.swift; sourceTree = "<group>"; };
+		0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockASAuthorizationControllerPresentationContextProviding.swift; sourceTree = "<group>"; };
 		0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthorization.swift; sourceTree = "<group>"; };
 		0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationDelegate.swift; sourceTree = "<group>"; };
 		0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewState.swift; sourceTree = "<group>"; };
@@ -334,6 +346,8 @@
 		0B08797E2BB3A8E80073AB09 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				0BACBE592E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift */,
+				0BACBE572E4EC87C000FE0ED /* AuthenticationManagerTests.swift */,
 				0B0879862BB3A9B90073AB09 /* HealthKitManagerTests.swift */,
 			);
 			path = UnitTests;
@@ -422,6 +436,8 @@
 		0B47A223279CA88800C2970E /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
+				0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */,
+				0BACBE5B2E4ECE8B000FE0ED /* MockASAuthorizationAppleIDProvider.swift */,
 				0B47A226279CA8EF00C2970E /* MockAuthenticationManager.swift */,
 				0B47A228279CAB6E00C2970E /* MockAuthenticationService.swift */,
 				0B47A22A279CAC1E00C2970E /* MockTokenManager.swift */,
@@ -555,6 +571,8 @@
 		0B99FC15256A208E00673133 /* Authentication */ = {
 			isa = PBXGroup;
 			children = (
+				0BACBE5F2E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift */,
+				0BACBE5D2E4ECEA6000FE0ED /* ASAuthorizationAppleIDProviderWrapper.swift */,
 				0B329F0C2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift */,
 				0B329F0D2E4C2CAA0082D211 /* IAuthenticationManager.swift */,
 				0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */,
@@ -917,7 +935,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BACBE582E4EC87C000FE0ED /* AuthenticationManagerTests.swift in Sources */,
 				0B0879872BB3A9B90073AB09 /* HealthKitManagerTests.swift in Sources */,
+				0BACBE5A2E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -935,6 +955,7 @@
 				0B50BA4327F012C50066134D /* MockAppleAuthenticationManager.swift in Sources */,
 				0B99FC34256A3BA600673133 /* TokenManager.swift in Sources */,
 				0BCF647C2BC17EDB004E98C7 /* WorkoutSampleDTO.swift in Sources */,
+				0BACBE602E4ECEBA000FE0ED /* IASAuthorizationAppleIDProvider.swift in Sources */,
 				0B99FBE8256A068700673133 /* HttpError.swift in Sources */,
 				0B62E66F25EB356100189702 /* CreateCompetitionView.swift in Sources */,
 				0BC4C6492934103B004F1ADC /* FWFErrorCode.swift in Sources */,
@@ -953,12 +974,14 @@
 				0B3597782571502A006D956A /* HealthKitManager.swift in Sources */,
 				0B99FBE5256A04A200673133 /* HttpConnector.swift in Sources */,
 				0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */,
+				0BACBE5C2E4ECE8B000FE0ED /* MockASAuthorizationAppleIDProvider.swift in Sources */,
 				0B0879782BB254250073AB09 /* IUserService.swift in Sources */,
 				0B47A22D279CACB600C2970E /* MockKeychainUtilities.swift in Sources */,
 				0BBB23522E4A42C200DE66D7 /* UserNameInputView.swift in Sources */,
 				0B67532A25745CF60032835D /* ActivitySummary.swift in Sources */,
 				0BBD7890259A4AE300E08EB2 /* AuthenticationService.swift in Sources */,
 				0BD8B5BB27D41F2E009BA5F2 /* UserPosition.swift in Sources */,
+				0BACBE622E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift in Sources */,
 				0B47A22F279CADBC00C2970E /* MockHttpConnector.swift in Sources */,
 				0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */,
 				0BABC72525ABAB4F0064CE5C /* ShakeGestureHandler.swift in Sources */,
@@ -1001,6 +1024,7 @@
 				0B329F092E4C2C890082D211 /* IEmailUtility.swift in Sources */,
 				0B329F0A2E4C2C890082D211 /* IShakeGestureHandler.swift in Sources */,
 				0B0B414028145CE80053541A /* AboutHealthDataView.swift in Sources */,
+				0BACBE5E2E4ECEA6000FE0ED /* ASAuthorizationAppleIDProviderWrapper.swift in Sources */,
 				0BC4C64729340F3D004F1ADC /* ErrorWithDetails.swift in Sources */,
 				0B99FC13256A1BDE00673133 /* EmptyResponse.swift in Sources */,
 				0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */,

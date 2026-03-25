@@ -10,6 +10,7 @@ import Foundation
 class ObjectGraph: IObjectGraph {
     let activityDataService: IActivityDataService
     let appleAuthenticationManager: IAppleAuthenticationManager
+    let appleIDProvider: IASAuthorizationAppleIDProvider
     let appProtocolHandler: IAppProtocolHandler
     let authenticationManager: IAuthenticationManager
     let authenticationService: IAuthenticationService
@@ -27,6 +28,7 @@ class ObjectGraph: IObjectGraph {
     let userService: IUserService
 
     init() {
+        appleIDProvider = ASAuthorizationAppleIDProviderWrapper()
         appProtocolHandler = AppProtocolHandler()
         httpConnector = HttpConnector()
         keychainUtilities = KeychainUtilities()
@@ -43,8 +45,9 @@ class ObjectGraph: IObjectGraph {
         competitionService = CompetitionService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
         userService = UserService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
 
-        appleAuthenticationManager = AppleAuthenticationManager(authenticationService: authenticationService,
-                                                                keychainUtilities: keychainUtilities, 
+        appleAuthenticationManager = AppleAuthenticationManager(appleIDProvider: appleIDProvider,
+                                                                authenticationService: authenticationService,
+                                                                keychainUtilities: keychainUtilities,
                                                                 serverEnvironmentManager: serverEnvironmentManager,
                                                                 userService: userService)
         let authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,

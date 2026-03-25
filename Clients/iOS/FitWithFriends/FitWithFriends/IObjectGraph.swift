@@ -23,4 +23,5 @@ protocol IObjectGraph {
     var tokenManager: ITokenManager { get }
     var userDefaults: UserDefaults { get }
     var userService: IUserService { get }
+    var appleIDProvider: IASAuthorizationAppleIDProvider { get }
 }

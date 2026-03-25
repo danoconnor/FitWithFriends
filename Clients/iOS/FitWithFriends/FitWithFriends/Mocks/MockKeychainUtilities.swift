@@ -24,8 +24,10 @@ public class MockKeychainUtilities: IKeychainUtilities {
     }
 
     public var writeKeychainItemCallCount = 0
+    public var writeKeychainItemLastValueSet: Codable? = nil
     public func writeKeychainItem<T: Codable>(_ item: T, accessGroup: String, service: String, account: String, updateExistingItemIfNecessary: Bool) throws {
         writeKeychainItemCallCount += 1
+        writeKeychainItemLastValueSet = item
         if let error = return_error {
             throw error
         }

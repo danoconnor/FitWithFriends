@@ -11,12 +11,11 @@ import Foundation
 public class AppleAuthenticationManager: NSObject, IAppleAuthenticationManager {
     public weak var authenticationDelegate: AppleAuthenticationDelegate?
 
+    private let appleIDProvider: IASAuthorizationAppleIDProvider
     private let authenticationService: IAuthenticationService
     private let keychainUtilities: IKeychainUtilities
     private let serverEnvironmentManager: ServerEnvironmentManager
     private let userService: IUserService
-
-    private let appleIdProvider: ASAuthorizationAppleIDProvider
 
     private static let appleUserKeychainGroup = "com.danoconnor.FitWithFriends"
     private static let appleUserKeychainService = "com.danoconnor.FitWithFriends"
@@ -25,16 +24,16 @@ public class AppleAuthenticationManager: NSObject, IAppleAuthenticationManager {
     // The user display name provided via custom UI and used to create a new user
     private var userProvidedName: PersonNameComponents?
 
-    public init(authenticationService: IAuthenticationService,
+    public init(appleIDProvider: IASAuthorizationAppleIDProvider,
+                authenticationService: IAuthenticationService,
                 keychainUtilities: IKeychainUtilities,
                 serverEnvironmentManager: ServerEnvironmentManager,
                 userService: IUserService) {
+        self.appleIDProvider = appleIDProvider
         self.authenticationService = authenticationService
         self.keychainUtilities = keychainUtilities
         self.serverEnvironmentManager = serverEnvironmentManager
         self.userService = userService
-
-        appleIdProvider = ASAuthorizationAppleIDProvider()
     }
 
 
@@ -47,7 +46,7 @@ public class AppleAuthenticationManager: NSObject, IAppleAuthenticationManager {
         userProvidedName: PersonNameComponents? = nil) {
         self.userProvidedName = userProvidedName
 
-        let request = appleIdProvider.createRequest()
+        let request = appleIDProvider.createRequest()
         request.requestedScopes = [.fullName]
 
         do {
@@ -85,7 +84,7 @@ public class AppleAuthenticationManager: NSObject, IAppleAuthenticationManager {
         }
 
         let dispatchSemaphore = DispatchSemaphore(value: 0)
-        appleIdProvider.getCredentialState(forUserID: userId) { [weak self] credentialState, error in
+        appleIDProvider.getCredentialState(forUserID: userId) { [weak self] credentialState, error in
             defer {
                 dispatchSemaphore.signal()
             }
@@ -143,8 +142,7 @@ extension AppleAuthenticationManager: ASAuthorizationControllerDelegate {
         authenticationDelegate?.authenticationCompleted(result: .failure(error))
     }
 
-    // Fileprivate to allow unit testing
-    fileprivate func handleAuthorization(with appleIdCredential: AppleAuthorizationCredential) async {
+    public func handleAuthorization(with appleIdCredential: AppleAuthorizationCredential) async {
         var userId = appleIdCredential.userId
 
 //        if serverEnvironmentManager.isLocalTesting {

@@ -9,6 +9,7 @@ import Foundation
 
 public class MockObjectGraph: IObjectGraph {
     var activityDataService: IActivityDataService
+    var appleIDProvider: IASAuthorizationAppleIDProvider
     var appProtocolHandler: IAppProtocolHandler
     var authenticationManager: IAuthenticationManager
     var authenticationService: IAuthenticationService
@@ -39,6 +40,7 @@ public class MockObjectGraph: IObjectGraph {
         tokenManager = MockTokenManager()
         userDefaults = UserDefaults.standard
         userService = MockUserService()
+        appleIDProvider = MockASAuthorizationAppleIDProvider()
 
         serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults)
     }
