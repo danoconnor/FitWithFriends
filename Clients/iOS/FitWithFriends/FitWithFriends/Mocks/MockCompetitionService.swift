@@ -74,7 +74,7 @@ public class MockCompetitionService: ICompetitionService {
         removeUserFromCompetitionCallCount += 1
         param_removeUserFromCompetition_userId = userId
         param_removeUserFromCompetition_competitionId = competitionId
-        
+
         if let error = return_removeUserFromCompetition_error {
             throw error
         }

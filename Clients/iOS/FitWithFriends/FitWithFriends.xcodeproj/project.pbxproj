@@ -23,6 +23,9 @@
 		0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413C281453E30053541A /* AboutCompetitionsView.swift */; };
 		0B0B414028145CE80053541A /* AboutHealthDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413F28145CE80053541A /* AboutHealthDataView.swift */; };
 		0B0B4142281499BF0053541A /* NavigationBarColorModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */; };
+		0B109F2C2E51733B00F5C534 /* ServiceBaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B109F2B2E51733B00F5C534 /* ServiceBaseTests.swift */; };
+		0B109F2E2E5175AF00F5C534 /* IServerEnvironmentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B109F2D2E5175AF00F5C534 /* IServerEnvironmentManager.swift */; };
+		0B109F302E5175B700F5C534 /* MockServerEnvironmentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B109F2F2E5175B700F5C534 /* MockServerEnvironmentManager.swift */; };
 		0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */; };
 		0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */; };
 		0B1CBEBA27C1C0CC0008C72A /* MockUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */; };
@@ -119,6 +122,7 @@
 		0BACBE622E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */; };
 		0BACBE642E4F4992000FE0ED /* AppProtocolHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE632E4F4992000FE0ED /* AppProtocolHandlerTests.swift */; };
 		0BACBE662E516A67000FE0ED /* TokenManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE652E516A67000FE0ED /* TokenManagerTests.swift */; };
+		0BACBE682E516CAB000FE0ED /* CompetitionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BACBE672E516CAB000FE0ED /* CompetitionManagerTests.swift */; };
 		0BB2CC482E3EF4C50042FB3F /* AppleAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */; };
 		0BB2CC4A2E3EFDB10042FB3F /* AppleAuthenticationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */; };
 		0BB2CC4C2E3EFFEC0042FB3F /* LoginViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */; };
@@ -188,6 +192,9 @@
 		0B0B413C281453E30053541A /* AboutCompetitionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutCompetitionsView.swift; sourceTree = "<group>"; };
 		0B0B413F28145CE80053541A /* AboutHealthDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutHealthDataView.swift; sourceTree = "<group>"; };
 		0B0B4141281499BF0053541A /* NavigationBarColorModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarColorModifier.swift; sourceTree = "<group>"; };
+		0B109F2B2E51733B00F5C534 /* ServiceBaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceBaseTests.swift; sourceTree = "<group>"; };
+		0B109F2D2E5175AF00F5C534 /* IServerEnvironmentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IServerEnvironmentManager.swift; sourceTree = "<group>"; };
+		0B109F2F2E5175B700F5C534 /* MockServerEnvironmentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockServerEnvironmentManager.swift; sourceTree = "<group>"; };
 		0B1CBEA527C0827F0008C72A /* ActivityUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityUpdateDelegate.swift; sourceTree = "<group>"; };
 		0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentifiableBase.swift; sourceTree = "<group>"; };
 		0B1CBEB927C1C0CC0008C72A /* MockUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUtilities.swift; sourceTree = "<group>"; };
@@ -285,6 +292,7 @@
 		0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockASAuthorizationControllerPresentationContextProviding.swift; sourceTree = "<group>"; };
 		0BACBE632E4F4992000FE0ED /* AppProtocolHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppProtocolHandlerTests.swift; sourceTree = "<group>"; };
 		0BACBE652E516A67000FE0ED /* TokenManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManagerTests.swift; sourceTree = "<group>"; };
+		0BACBE672E516CAB000FE0ED /* CompetitionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionManagerTests.swift; sourceTree = "<group>"; };
 		0BB2CC472E3EF4C00042FB3F /* AppleAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthorization.swift; sourceTree = "<group>"; };
 		0BB2CC492E3EFDAB0042FB3F /* AppleAuthenticationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationDelegate.swift; sourceTree = "<group>"; };
 		0BB2CC4B2E3EFFE80042FB3F /* LoginViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewState.swift; sourceTree = "<group>"; };
@@ -350,6 +358,8 @@
 		0B08797E2BB3A8E80073AB09 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				0B109F2B2E51733B00F5C534 /* ServiceBaseTests.swift */,
+				0BACBE672E516CAB000FE0ED /* CompetitionManagerTests.swift */,
 				0BACBE652E516A67000FE0ED /* TokenManagerTests.swift */,
 				0BACBE632E4F4992000FE0ED /* AppProtocolHandlerTests.swift */,
 				0BACBE592E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift */,
@@ -442,6 +452,7 @@
 		0B47A223279CA88800C2970E /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
+				0B109F2F2E5175B700F5C534 /* MockServerEnvironmentManager.swift */,
 				0BACBE612E4ED04D000FE0ED /* MockASAuthorizationControllerPresentationContextProviding.swift */,
 				0BACBE5B2E4ECE8B000FE0ED /* MockASAuthorizationAppleIDProvider.swift */,
 				0B47A226279CA8EF00C2970E /* MockAuthenticationManager.swift */,
@@ -756,6 +767,7 @@
 		0BCF64892BCC25B2004E98C7 /* Environment */ = {
 			isa = PBXGroup;
 			children = (
+				0B109F2D2E5175AF00F5C534 /* IServerEnvironmentManager.swift */,
 				0BCF648A2BCC25CC004E98C7 /* ServerEnvironmentManager.swift */,
 				0BCF649A2BCCB790004E98C7 /* ServerEnvironment.swift */,
 			);
@@ -943,7 +955,9 @@
 			files = (
 				0BACBE662E516A67000FE0ED /* TokenManagerTests.swift in Sources */,
 				0BACBE642E4F4992000FE0ED /* AppProtocolHandlerTests.swift in Sources */,
+				0B109F2C2E51733B00F5C534 /* ServiceBaseTests.swift in Sources */,
 				0BACBE582E4EC87C000FE0ED /* AuthenticationManagerTests.swift in Sources */,
+				0BACBE682E516CAB000FE0ED /* CompetitionManagerTests.swift in Sources */,
 				0B0879872BB3A9B90073AB09 /* HealthKitManagerTests.swift in Sources */,
 				0BACBE5A2E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift in Sources */,
 			);
@@ -1007,6 +1021,7 @@
 				0BBD7893259A4B4800E08EB2 /* UserService.swift in Sources */,
 				0B99FC0D256A170D00673133 /* DDLogFlag+Extensions.swift in Sources */,
 				0B1CBEA627C0827F0008C72A /* ActivityUpdateDelegate.swift in Sources */,
+				0B109F2E2E5175AF00F5C534 /* IServerEnvironmentManager.swift in Sources */,
 				0B47A23D279CB69400C2970E /* MockEmailUtility.swift in Sources */,
 				0BCF64852BC76C1F004E98C7 /* IKeychainUtilities.swift in Sources */,
 				0B1CBEC527C30F390008C72A /* MockAppProtocolHandler.swift in Sources */,
@@ -1038,6 +1053,7 @@
 				0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */,
 				0BBD7899259A4B9300E08EB2 /* ActivityDataService.swift in Sources */,
 				0BC4C645293407BE004F1ADC /* FWFErrorDetails.swift in Sources */,
+				0B109F302E5175B700F5C534 /* MockServerEnvironmentManager.swift in Sources */,
 				0B99FBFF256A09F500673133 /* Logger.swift in Sources */,
 				0B0879762BB2541B0073AB09 /* ICompetitionService.swift in Sources */,
 				0BB2CC482E3EF4C50042FB3F /* AppleAuthorization.swift in Sources */,
@@ -1116,9 +1132,10 @@
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.danoconnor.FitWithFriends-UnitTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -1139,9 +1156,10 @@
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.danoconnor.FitWithFriends-UnitTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1283,7 +1301,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1307,7 +1325,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = FitWithFriends/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

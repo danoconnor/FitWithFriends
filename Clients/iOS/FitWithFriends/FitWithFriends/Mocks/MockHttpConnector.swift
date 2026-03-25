@@ -33,7 +33,7 @@ public class MockHttpConnector: IHttpConnector {
         if let data = return_data as? T {
             return data
         } else {
-            throw return_error ?? HttpError.generic
+            throw return_error ?? HttpError.testError
         }
     }
 }

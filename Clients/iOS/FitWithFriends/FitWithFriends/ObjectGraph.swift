@@ -21,7 +21,7 @@ class ObjectGraph: IObjectGraph {
     let healthStoreWrapper: IHealthStoreWrapper
     let httpConnector: IHttpConnector
     let keychainUtilities: IKeychainUtilities
-    let serverEnvironmentManager: ServerEnvironmentManager
+    let serverEnvironmentManager: IServerEnvironmentManager
     let shakeGestureHandler: IShakeGestureHandler
     let tokenManager: ITokenManager
     let userDefaults: UserDefaults
@@ -36,7 +36,7 @@ class ObjectGraph: IObjectGraph {
         emailUtility = EmailUtility()
         healthStoreWrapper = HealthStoreWrapper()
 
-        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults)
+        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults) as IServerEnvironmentManager
         shakeGestureHandler = ShakeGestureHandler(emailUtility: emailUtility)
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
 

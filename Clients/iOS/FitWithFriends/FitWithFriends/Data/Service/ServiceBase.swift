@@ -9,14 +9,13 @@ import Foundation
 
 public class ServiceBase {
     private let httpConnector: IHttpConnector
+    internal let serverEnvironmentManager: IServerEnvironmentManager
     private let tokenManager: ITokenManager
 
     private static var activeRefreshTokenTask: Task<Token, Error>?
 
-    let serverEnvironmentManager: ServerEnvironmentManager
-
     public init(httpConnector: IHttpConnector,
-                serverEnvironmentManager: ServerEnvironmentManager,
+                serverEnvironmentManager: IServerEnvironmentManager,
                 tokenManager: ITokenManager) {
         self.httpConnector = httpConnector
         self.serverEnvironmentManager = serverEnvironmentManager
@@ -50,20 +49,26 @@ public class ServiceBase {
                 RequestConstants.Body.refreshToken: refreshToken
             ]
 
-            let result: Token = try await self.makeRequestWithClientAuthentication(url: "\(serverEnvironmentManager.baseUrl)/oauth/token",
-                                                                                   method: .post,
-                                                                                   body: requestBody)
-
-            ServiceBase.activeRefreshTokenTask = nil
-            return result
+            do {
+                let result: Token = try await self.makeRequestWithClientAuthentication(url: "\(serverEnvironmentManager.baseUrl)/oauth/token",
+                                                                                       method: .post,
+                                                                                       body: requestBody)
+                return result
+            } catch {
+                ServiceBase.activeRefreshTokenTask = nil
+                throw error
+            }
         }
 
         ServiceBase.activeRefreshTokenTask = task
 
         do {
-            return try await task.value
+            let result = try await task.value
+            ServiceBase.activeRefreshTokenTask = nil
+            return result
         } catch {
             Logger.traceError(message: "Failed to wait for refresh token task", error: error)
+            ServiceBase.activeRefreshTokenTask = nil
             throw error
         }
     }

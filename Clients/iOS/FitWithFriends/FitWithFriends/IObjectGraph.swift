@@ -18,7 +18,7 @@ protocol IObjectGraph {
     var healthKitManager: IHealthKitManager { get }
     var httpConnector: IHttpConnector { get }
     var keychainUtilities: IKeychainUtilities { get }
-    var serverEnvironmentManager: ServerEnvironmentManager { get }
+    var serverEnvironmentManager: IServerEnvironmentManager { get }
     var shakeGestureHandler: IShakeGestureHandler { get }
     var tokenManager: ITokenManager { get }
     var userDefaults: UserDefaults { get }

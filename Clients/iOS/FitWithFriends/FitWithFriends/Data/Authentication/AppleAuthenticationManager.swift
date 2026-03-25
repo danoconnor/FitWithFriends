@@ -14,7 +14,7 @@ public class AppleAuthenticationManager: NSObject, IAppleAuthenticationManager {
     private let appleIDProvider: IASAuthorizationAppleIDProvider
     private let authenticationService: IAuthenticationService
     private let keychainUtilities: IKeychainUtilities
-    private let serverEnvironmentManager: ServerEnvironmentManager
+    private let serverEnvironmentManager: IServerEnvironmentManager
     private let userService: IUserService
 
     private static let appleUserKeychainGroup = "com.danoconnor.FitWithFriends"
@@ -27,7 +27,7 @@ public class AppleAuthenticationManager: NSObject, IAppleAuthenticationManager {
     public init(appleIDProvider: IASAuthorizationAppleIDProvider,
                 authenticationService: IAuthenticationService,
                 keychainUtilities: IKeychainUtilities,
-                serverEnvironmentManager: ServerEnvironmentManager,
+                serverEnvironmentManager: IServerEnvironmentManager,
                 userService: IUserService) {
         self.appleIDProvider = appleIDProvider
         self.authenticationService = authenticationService

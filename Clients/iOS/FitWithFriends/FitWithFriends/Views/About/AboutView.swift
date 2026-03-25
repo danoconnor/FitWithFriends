@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AboutView: View {
     let emailUtility: IEmailUtility
-    let serverEnvironmentManager: ServerEnvironmentManager
+    let serverEnvironmentManager: IServerEnvironmentManager
 
     var body: some View {
         NavigationView {

@@ -26,8 +26,10 @@ public class MockTokenManager: ITokenManager {
     }
 
     public var storeTokenCallCount = 0
+    public var param_storeToken: Token?
     public func storeToken(_ token: Token) {
         storeTokenCallCount += 1
+        param_storeToken = token
     }
 
     public var deleteAllTokensCallCount = 0

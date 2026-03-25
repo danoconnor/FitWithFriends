@@ -19,7 +19,7 @@ public class MockObjectGraph: IObjectGraph {
     var healthKitManager: IHealthKitManager
     var httpConnector: IHttpConnector
     var keychainUtilities: IKeychainUtilities
-    var serverEnvironmentManager: ServerEnvironmentManager
+    var serverEnvironmentManager: IServerEnvironmentManager
     var shakeGestureHandler: IShakeGestureHandler
     var tokenManager: ITokenManager
     var userDefaults: UserDefaults
@@ -42,6 +42,6 @@ public class MockObjectGraph: IObjectGraph {
         userService = MockUserService()
         appleIDProvider = MockASAuthorizationAppleIDProvider()
 
-        serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults)
+        serverEnvironmentManager = MockServerEnvironmentManager() as! any IServerEnvironmentManager
     }
 }

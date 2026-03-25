@@ -47,6 +47,15 @@ npm start        # Run compiled app
 - Open `Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace` in Xcode
 - Uses CocoaLumberjack for logging, HealthKit for data, Keychain for secure storage
 
+## Running Tests
+To run the tests for the `FitWithFriends` project, use the following command:
+
+```fish
+xcodebuild -workspace FitWithFriends.xcworkspace -scheme FitWithFriends -sdk iphonesimulator -destination 'platform=iOS Simulator,id=24F417EA-AE27-47CB-B70D-6DF943F5760E' test
+```
+
+This command ensures that the tests are executed on the specified iOS Simulator.
+
 ## Common Patterns
 - **Error Responses**: Use `handleError()` helper with custom FWF error codes
 - **Date Handling**: All times in UTC, client converts to user timezone
