@@ -39,6 +39,8 @@
 		0B329F0F2E4C2CAA0082D211 /* IAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F0D2E4C2CAA0082D211 /* IAuthenticationManager.swift */; };
 		0B329F112E4C2CB20082D211 /* ICompetitionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F102E4C2CB20082D211 /* ICompetitionManager.swift */; };
 		0B329F132E4C2CBE0082D211 /* IAppProtocolHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F122E4C2CBE0082D211 /* IAppProtocolHandler.swift */; };
+		0B329F152E4D789F0082D211 /* CompetitionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F142E4D789F0082D211 /* CompetitionState.swift */; };
+		0B329F172E4D79900082D211 /* UserCompetitionPoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F162E4D79900082D211 /* UserCompetitionPoints.swift */; };
 		0B359721256C731A006D956A /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359720256C731A006D956A /* MainContentView.swift */; };
 		0B359724256C7357006D956A /* AppStateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B359723256C7357006D956A /* AppStateViewModel.swift */; };
 		0B35972C257046FC006D956A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35972B257046FC006D956A /* AppDelegate.swift */; };
@@ -194,6 +196,8 @@
 		0B329F0D2E4C2CAA0082D211 /* IAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B329F102E4C2CB20082D211 /* ICompetitionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICompetitionManager.swift; sourceTree = "<group>"; };
 		0B329F122E4C2CBE0082D211 /* IAppProtocolHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppProtocolHandler.swift; sourceTree = "<group>"; };
+		0B329F142E4D789F0082D211 /* CompetitionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionState.swift; sourceTree = "<group>"; };
+		0B329F162E4D79900082D211 /* UserCompetitionPoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionPoints.swift; sourceTree = "<group>"; };
 		0B35971E256B4506006D956A /* FitWithFriends.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitWithFriends.entitlements; sourceTree = "<group>"; };
 		0B359720256C731A006D956A /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		0B359723256C7357006D956A /* AppStateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateViewModel.swift; sourceTree = "<group>"; };
@@ -368,9 +372,11 @@
 		0B1CBEC827C3F3A90008C72A /* Competitions */ = {
 			isa = PBXGroup;
 			children = (
+				0B329F162E4D79900082D211 /* UserCompetitionPoints.swift */,
 				0BBD7887259A3FF600E08EB2 /* CompetitionOverview.swift */,
 				0B1CBEC927C3F3B80008C72A /* CompetitionDescription.swift */,
 				0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */,
+				0B329F142E4D789F0082D211 /* CompetitionState.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -940,6 +946,7 @@
 				0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */,
 				0B329F0E2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift in Sources */,
 				0B329F0F2E4C2CAA0082D211 /* IAuthenticationManager.swift in Sources */,
+				0B329F172E4D79900082D211 /* UserCompetitionPoints.swift in Sources */,
 				0B47A229279CAB6E00C2970E /* MockAuthenticationService.swift in Sources */,
 				0B0879672BAFBE9C0073AB09 /* IHealthStoreWrapper.swift in Sources */,
 				0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */,
@@ -972,6 +979,7 @@
 				0B47A23D279CB69400C2970E /* MockEmailUtility.swift in Sources */,
 				0BCF64852BC76C1F004E98C7 /* IKeychainUtilities.swift in Sources */,
 				0B1CBEC527C30F390008C72A /* MockAppProtocolHandler.swift in Sources */,
+				0B329F152E4D789F0082D211 /* CompetitionState.swift in Sources */,
 				0B47A23F279CB6D600C2970E /* MockHealthKitManager.swift in Sources */,
 				0B1CBEC327C309B20008C72A /* JoinCompetitionProtocolData.swift in Sources */,
 				0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */,
