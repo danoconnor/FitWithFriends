@@ -252,8 +252,9 @@ router.get('/:competitionId/overview', function (req, res) {
                         'competitionStart': competitionInfo.start_date,
                         'competitionEnd': competitionInfo.end_date,
                         'competitionState': competitionInfo.state,
+                        'isCompetitionProcessingResults': competitionInfo.state === CompetitionState.ProcessingResults,
                         'isUserAdmin': isUserAdmin,
-                        'currentResults': Object.values(userPoints) // flatten the userId -> result map to just an array of results
+                        'currentResults': userPoints
                     });
                 })
                 .catch(error => {

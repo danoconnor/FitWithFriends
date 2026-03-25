@@ -9,7 +9,7 @@ services:
       - '9229:9229'
     environment:
       - PGHOST=postgres
-      - PGPORT=${PGPORT}
+      - PGPORT=5432
       - PGUSER=${PGUSER}
       - PGPASSWORD=${PGPASSWORD}
       - PGDATABASE=${PGDATABASE}
@@ -29,7 +29,7 @@ services:
   postgres:
     image: postgres:17
     ports:
-      - '5432:5432'
+      - '5433:5432'
     environment:
       POSTGRES_USER: ${PGUSER}
       POSTGRES_PASSWORD: ${PGPASSWORD}
