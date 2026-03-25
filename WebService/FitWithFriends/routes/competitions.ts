@@ -249,6 +249,16 @@ router.get('/:competitionId/overview', function (req, res) {
                     // Determine if the competition is processing results based on the state field
                     const isCompetitionProcessingResults = competitionInfo.state === CompetitionState.ProcessingResults;
 
+                    console.log(JSON.stringify({
+                        'competitionId': competitionInfo.competition_id,
+                        'competitionName': competitionInfo.display_name,
+                        'competitionStart': competitionInfo.start_date,
+                        'competitionEnd': competitionInfo.end_date,
+                        'isCompetitionProcessingResults': isCompetitionProcessingResults,
+                        'isUserAdmin': isUserAdmin,
+                        'currentResults': Object.values(userPoints) // flatten the userId -> result map to just an array of results
+                    }));
+
                     res.json({
                         'competitionId': competitionInfo.competition_id,
                         'competitionName': competitionInfo.display_name,
@@ -256,7 +266,7 @@ router.get('/:competitionId/overview', function (req, res) {
                         'competitionEnd': competitionInfo.end_date,
                         'isCompetitionProcessingResults': isCompetitionProcessingResults,
                         'isUserAdmin': isUserAdmin,
-                        'currentResults': userPoints
+                        'currentResults': Object.values(userPoints) // flatten the userId -> result map to just an array of results
                     });
                 })
                 .catch(error => {
