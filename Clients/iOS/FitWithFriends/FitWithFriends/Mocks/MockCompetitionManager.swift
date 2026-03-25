@@ -37,7 +37,9 @@ public class MockCompetitionManager: ICompetitionManager {
     public var param_createCompetition_competitionName: String?
     public var return_createCompetition_error: Error?
 
+    public var createCompetitionCallCount = 0
     public func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws {
+        createCompetitionCallCount += 1
         param_createCompetition_startDate = startDate
         param_createCompetition_endDate = endDate
         param_createCompetition_competitionName = competitionName
@@ -49,13 +51,18 @@ public class MockCompetitionManager: ICompetitionManager {
         }
     }
 
-    public func refreshCompetitionOverviews() async {}
+    public var refreshCompetitionOverviewsCallCount = 0
+    public func refreshCompetitionOverviews() async {
+        refreshCompetitionOverviewsCallCount += 1
+    }
 
     public var param_joinCompetition_competitionId: UUID?
     public var param_joinCompetition_competitionToken: String?
     public var return_joinCompetition_error: Error?
 
+    public var joinCompetitionCallCount = 0
     public func joinCompetition(competitionId: UUID, competitionToken: String) async throws {
+        joinCompetitionCallCount += 1
         param_joinCompetition_competitionId = competitionId
         param_joinCompetition_competitionToken = competitionToken
 
@@ -67,7 +74,9 @@ public class MockCompetitionManager: ICompetitionManager {
     public var param_leaveCompetition_competitionId: UUID?
     public var return_leaveCompetition_error: Error?
 
+    public var leaveCompetitionCallCount = 0
     public func leaveCompetition(competitionId: UUID) async throws {
+        leaveCompetitionCallCount += 1
         param_leaveCompetition_competitionId = competitionId
 
         if let error = return_leaveCompetition_error {
@@ -79,7 +88,9 @@ public class MockCompetitionManager: ICompetitionManager {
     public var param_removeUserFromCompetition_targetUser: String?
     public var return_removeUserFromCompetition_error: Error?
 
+    public var removeUserFromCompetitionCallCount = 0
     public func removeUserFromCompetition(competitionId: UUID, targetUser: String) async throws {
+        removeUserFromCompetitionCallCount += 1
         param_removeUserFromCompetition_competitionId = competitionId
         param_removeUserFromCompetition_targetUser = targetUser
 
@@ -93,7 +104,9 @@ public class MockCompetitionManager: ICompetitionManager {
     public var return_getCompetitionDescription: CompetitionDescription?
     public var return_getCompetitionDescription_error: Error?
 
+    public var getCompetitionDescriptionCallCount = 0
     public func getCompetitionDescription(for competitionId: UUID, competitionToken: String) async throws -> CompetitionDescription {
+        getCompetitionDescriptionCallCount += 1
         param_getCompetitionDescription_competitionId = competitionId
         param_getCompetitionDescription_competitionToken = competitionToken
 
@@ -108,12 +121,16 @@ public class MockCompetitionManager: ICompetitionManager {
         return description
     }
 
+    public var getCompetitionAdminDetailCallCount = 0
     public func getCompetitionAdminDetail(for competitionId: UUID) async throws -> CompetitionAdminDetails {
+        getCompetitionAdminDetailCallCount += 1
         // Mock implementation
         throw NSError(domain: "Mock", code: 0, userInfo: nil)
     }
 
+    public var deleteCompetitionCallCount = 0
     public func deleteCompetition(competitionId: UUID) async throws {
+        deleteCompetitionCallCount += 1
         // Mock implementation
     }
 }

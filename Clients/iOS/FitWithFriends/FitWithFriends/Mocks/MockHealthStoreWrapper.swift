@@ -17,9 +17,11 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     public var param_typesToRead: Set<HKObjectType>?
     public var return_authorizationSuccess: Bool = true
     public var return_authorizationError: Error?
+    public var requestAuthorizationCallCount = 0
     public func requestAuthorization(toShare typesToShare: Set<HKSampleType>?,
                               read typesToRead: Set<HKObjectType>?, 
                               completion: @escaping (Bool, (any Error)?) -> Void) {
+        requestAuthorizationCallCount += 1
         param_typesToShare = typesToShare
         param_typesToRead = typesToRead
 
@@ -34,7 +36,9 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     public var param_backgroundDelivery_frequency: HKUpdateFrequency?
     public var return_enableBackgroundDeliverySuccess: Bool = true
     public var return_enableBackgroundDeliveryError: Error?
+    public var enableBackgroundDeliveryCallCount = 0
     public func enableBackgroundDelivery(for type: HKObjectType, frequency: HKUpdateFrequency, withCompletion completion: @escaping (Bool, (any Error)?) -> Void) {
+        enableBackgroundDeliveryCallCount += 1
         param_backgroundDelivery_type = type
         param_backgroundDelivery_frequency = frequency
 
@@ -49,7 +53,9 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     public var param_queryDescriptors: [HKQueryDescriptor]?
     public var param_updateHandler: ((HKObserverQuery, Set<HKSampleType>?, @escaping HKObserverQueryCompletionHandler, (any Error)?) -> Void)?
     public var return_observerQuery: HKObserverQuery?
+    public var executeObserverQueryCallCount = 0
     public func executeObserverQuery(queryDescriptors: [HKQueryDescriptor], updateHandler: @escaping (HKObserverQuery, Set<HKSampleType>?, @escaping HKObserverQueryCompletionHandler, (any Error)?) -> Void) -> HKObserverQuery {
+        executeObserverQueryCallCount += 1
         param_queryDescriptors = queryDescriptors
         param_updateHandler = updateHandler
 
@@ -65,7 +71,9 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     public var param_sampleQuery_resultsHandler: ((HKSampleQuery, [WorkoutSampleDTO]?, (any Error)?) -> Void)?
     public var return_sampleQuery_samples: [WorkoutSampleDTO]?
     public var return_sampleQuery_error: Error?
+    public var executeWorkoutSampleQueryCallCount = 0
     public func executeWorkoutSampleQuery(predicate: NSPredicate?, limit: Int, sortDescriptors: [NSSortDescriptor]?, resultsHandler: @escaping (HKSampleQuery, [WorkoutSampleDTO]?, (any Error)?) -> Void) {
+        executeWorkoutSampleQueryCallCount += 1
         param_sampleQuery_predicate = predicate
         param_sampleQuery_limit = limit
         param_sampleQuery_sortDescriptors = sortDescriptors
@@ -86,7 +94,9 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     public var param_activitySummaryQuery_handler: ((HKActivitySummaryQuery, [ActivitySummaryDTO]?, (any Error)?) -> Void)?
     public var return_activitySummaryQuery_activitySummaries: [ActivitySummaryDTO]?
     public var return_activitySummaryQuery_error: Error?
+    public var executeActivitySummaryQueryCallCount = 0
     public func executeActivitySummaryQuery(predicate: NSPredicate?, resultsHandler handler: @escaping (HKActivitySummaryQuery, [ActivitySummaryDTO]?, (any Error)?) -> Void) {
+        executeActivitySummaryQueryCallCount += 1
         param_activitySummaryQuery_predicate = predicate
         param_activitySummaryQuery_handler = handler
 
@@ -108,7 +118,9 @@ public class MockHealthStoreWrapper: IHealthStoreWrapper {
     public var param_statisticsQuery_handler: ((HKStatisticsQuery, StatisticDTO?, (any Error)?) -> Void)?
     public var return_statisticsQuery_statistics: [HKQuantityType: StatisticDTO] = [:]
     public var return_statisticsQuery_error: Error?
+    public var executeStatisticsQueryCallCount = 0
     public func executeStatisticsQuery(quantityType: HKQuantityType, resultUnit: HKUnit, quantitySamplePredicate: NSPredicate?, options: HKStatisticsOptions, completionHandler handler: @escaping (HKStatisticsQuery, StatisticDTO?, (any Error)?) -> Void) {
+        executeStatisticsQueryCallCount += 1
         param_statisticsQuery_quantityType = quantityType
         param_statisticsQuery_resultUnit = resultUnit
         param_statisticsQuery_quantitySamplePredicate = quantitySamplePredicate

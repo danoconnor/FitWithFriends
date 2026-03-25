@@ -16,14 +16,18 @@ public class MockAppProtocolHandler: IAppProtocolHandler {
     public var param_handleProtocol_url: URL?
     public var return_handleProtocol: Bool = true
 
+    public var handleProtocolCallCount = 0
     public func handleProtocol(url: URL) -> Bool {
+        handleProtocolCallCount += 1
         param_handleProtocol_url = url
         return return_handleProtocol
     }
 
     public var return_clearProtocolData_called: Bool = false
 
+    public var clearProtocolDataCallCount = 0
     public func clearProtocolData() {
+        clearProtocolDataCallCount += 1
         return_clearProtocolData_called = true
     }
 }

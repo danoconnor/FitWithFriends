@@ -16,10 +16,13 @@ public class MockHttpConnector: IHttpConnector {
     public var param_method: HttpMethod?
     public var return_data: Decodable?
     public var return_error: Error?
+    public var makeRequestCallCount = 0
+
     public func makeRequest<T>(url: String,
                                headers: [String : String]?,
                                body: Encodable?,
                                method: HttpMethod) async throws -> T where T : Decodable {
+        makeRequestCallCount += 1
         param_url = url
         param_headers = headers
         param_body = body

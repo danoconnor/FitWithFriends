@@ -12,7 +12,9 @@ public class MockActivityDataService: IActivityDataService {
 
     public var param_reportActivitySummaries_activitySummaries: [ActivitySummary]?
     public var return_reportActivitySummaries_error: Error?
+    public var reportActivitySummariesCallCount = 0
     public func reportActivitySummaries(_ activitySummaries: [ActivitySummary], completion: @escaping (Error?) -> Void) {
+        reportActivitySummariesCallCount += 1
         param_reportActivitySummaries_activitySummaries = activitySummaries
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
@@ -22,7 +24,9 @@ public class MockActivityDataService: IActivityDataService {
 
     public var param_reportWorkouts_workouts: [Workout]?
     public var return_reportWorkouts_error: Error?
+    public var reportWorkoutsCallCount = 0
     public func reportWorkouts(_ workouts: [Workout], completion: @escaping ((any Error)?) -> Void) {
+        reportWorkoutsCallCount += 1
         param_reportWorkouts_workouts = workouts
 
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) {

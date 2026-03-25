@@ -12,7 +12,10 @@ public class MockEmailUtility: IEmailUtility {
 
     public var return_sendLogEmail_error: Error?
 
-    public func sendLogEmail() {}
+    public var sendLogEmailCallCount = 0
+    public func sendLogEmail() {
+        sendLogEmailCallCount += 1
+    }
 
     public var param_sendEmailWithTextAttachement_subject: String?
     public var param_sendEmailWithTextAttachement_body: String?
@@ -20,7 +23,10 @@ public class MockEmailUtility: IEmailUtility {
     public var param_sendEmailWithTextAttachement_attachmentText: String?
     public var param_sendEmailWithTextAttachement_attachementFileName: String?
 
+    public var sendEmailWithTextAttachementCallCount = 0
     public func sendEmailWithTextAttachement(subject: String, body: String, to: String, attachmentText: String, attachementFileName: String) {
+        sendEmailWithTextAttachementCallCount += 1
+
         param_sendEmailWithTextAttachement_subject = subject
         param_sendEmailWithTextAttachement_body = body
         param_sendEmailWithTextAttachement_to = to
