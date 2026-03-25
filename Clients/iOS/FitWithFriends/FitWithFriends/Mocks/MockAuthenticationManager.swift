@@ -6,11 +6,12 @@
 //
 
 import AuthenticationServices
+import Combine
 import Foundation
 
 public class MockAuthenticationManager: IAuthenticationManager {
     @Published public var loginState: LoginState = .notLoggedIn(nil)
-    var loginStatePublisher: Published<LoginState>.Publisher { $loginState }
+    public var loginStatePublisher: Published<LoginState>.Publisher { $loginState }
     public var loggedInUserId: String?
 
     public init() {}

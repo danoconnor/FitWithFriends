@@ -4,7 +4,7 @@ import AuthenticationServices
 /**
  A protocol defining the interface for managing user authentication.
  */
-protocol IAuthenticationManager: AnyObject {
+public protocol IAuthenticationManager: AnyObject {
     /// A publisher for the current login state of the user.
     var loginStatePublisher: Published<LoginState>.Publisher { get }
 
