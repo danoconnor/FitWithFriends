@@ -12,36 +12,41 @@
     "name": ""
   },
   "dependencies": {
-    "@azure/identity": "^4.1.0",
+    "@azure/identity": "^4.13.1",
     "@azure/keyvault-certificates": "^4.8.0",
     "@azure/keyvault-keys": "^4.8.0",
     "@azure/keyvault-secrets": "^4.8.0",
-    "@node-oauth/express-oauth-server": "^4.0.0",
+    "@node-oauth/express-oauth-server": "^4.1.5",
     "@pgtyped/runtime": "^2.3.0",
-    "@types/pg": "^8.11.5",
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.4",
     "cookie-parser": "1.4.7",
-    "debug": "^4.3.4",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
+    "debug": "^4.4.3",
+    "express": "^4.22.1",
+    "jsonwebtoken": "^9.0.3",
     "jwks-rsa": "3.1.0",
-    "morgan": "^1.10.0",
-    "pg": "^8.11.5",
-    "pug": "^3.0.2",
+    "morgan": "^1.10.1",
+    "pg": "^8.20.0",
+    "pug": "^3.0.4",
     "serve-favicon": "^2.5.0",
-    "typescript": "^5.4.5",
     "uuid": "^9.0.1"
   },
   "engines": {
-    "node": "^22.2.0"
+    "node": "^24.0.0"
+  },
+  "overrides": {
+    "brace-expansion": "^5.0.5",
+    "minimatch": "^10.2.4"
   },
   "devDependencies": {
     "@pgtyped/cli": "^2.3.0",
     "@types/jest": "^29.5.12",
+    "@types/pg": "^8.20.0",
     "@types/uuid": "^9.0.8",
     "axios": "^1.6.8",
+    "brace-expansion": "^5.0.5",
     "jest": "^29.7.0",
-    "ts-jest": "^29.1.2",
-    "ts-node": "^10.9.2"
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

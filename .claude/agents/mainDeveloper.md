@@ -1,7 +1,7 @@
 ---
 name: mainDeveloper
 description: "Use this agent when you are making changes to the FitWithFriends codebase"
-model: sonnet
+model: inherit
 memory: project
 ---
 
