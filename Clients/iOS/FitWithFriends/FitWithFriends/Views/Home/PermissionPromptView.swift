@@ -19,53 +19,67 @@ struct PermissionPromptView: View {
 
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading) {
+            VStack(spacing: 0) {
                 ScrollView {
-                    VStack {
-                        Text("Please grant access to all requested permissions on the next screen")
-                            .font(.title2)
-                            .padding(.top)
-                            .padding(.leading)
-                            .padding(.trailing)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(spacing: 24) {
+                        // Icon header
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 56))
+                            .foregroundStyle(.red)
+                            .padding(24)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .fill(Color.red.opacity(0.1))
+                            )
+                            .padding(.top, 16)
 
+                        // Feature rows
+                        VStack(alignment: .leading, spacing: 20) {
+                            FWFFeatureRow(
+                                icon: "checkmark.shield.fill",
+                                color: .green,
+                                title: "Grant Access",
+                                description: "Please grant access to all requested permissions on the next screen so we can count your activity towards competition points."
+                            )
 
-                        Text("We need to access your activity and workout data in order to count it towards your competition points. If you don't grant access, then your workout data recorded from this device will not earn you points.")
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            FWFFeatureRow(
+                                icon: "lock.fill",
+                                color: Color("FwFBrandingColor"),
+                                title: "Your Privacy",
+                                description: "We take your privacy seriously and do not share your data with any 3rd parties or advertisers. Only you and the people in your competition group will have access."
+                            )
 
-                        Text("We take your privacy seriously and do not share your data with any 3rd parties or advertisers. Only you and the people in your competition group will have access to it.")
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Text("If you wish to change your mind later, you can make changes in the iOS Settings app > Privacy > Health > Fit with Friends.")
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            FWFFeatureRow(
+                                icon: "gearshape.fill",
+                                color: .gray,
+                                title: "Change Anytime",
+                                description: "You can update permissions later in iOS Settings > Privacy > Health > Fit with Friends."
+                            )
+                        }
+                        .padding(.horizontal, 8)
                     }
+                    .padding(.horizontal, 16)
                 }
 
-                Spacer()
-
-                Section {
-                    VStack(alignment: .center) {
-                        Button("Next") {
-                            permissionPromptViewModel.requestHealthPermission()
-                        }
-                        .font(.title)
-                        .buttonStyle(.borderedProminent)
-
-                        Button("Not now") {
-                            permissionPromptViewModel.dismiss()
-                        }
-                        .font(.footnote)
-                        .padding(.top, 5)
+                // Buttons
+                VStack(spacing: 8) {
+                    FWFPrimaryButton("Next") {
+                        permissionPromptViewModel.requestHealthPermission()
                     }
-                    .frame(maxWidth: .infinity)
+
+                    Button("Not now") {
+                        permissionPromptViewModel.dismiss()
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 4)
                 }
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
             .navigationTitle("Health data access")
         }
+        .presentationDragIndicator(.visible)
     }
 }
 

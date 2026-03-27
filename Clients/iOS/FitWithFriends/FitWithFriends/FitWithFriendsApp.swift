@@ -14,6 +14,8 @@ struct FitWithFriendsApp: App {
     static let objectGraph: IObjectGraph = {
         if ProcessInfo.processInfo.environment["FWF_UNIT_TESTING"] == "1" {
             return MockObjectGraph()
+        } else if ProcessInfo.processInfo.environment["FWF_UI_TESTING"] == "1" {
+            return UITestingObjectGraph()
         } else {
             return ObjectGraph()
         }

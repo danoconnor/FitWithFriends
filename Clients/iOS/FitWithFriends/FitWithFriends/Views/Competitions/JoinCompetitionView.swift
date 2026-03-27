@@ -26,53 +26,63 @@ struct JoinCompetitionView: View {
 
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading) {
+            VStack(spacing: 0) {
                 if viewModel.isLoading {
                     Spacer()
-
-                    HStack {
-                        Spacer()
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .padding()
-                        Spacer()
-                    }
-
+                    ProgressView("Loading competition...")
+                        .padding()
                     Spacer()
                 } else {
                     if viewModel.state.isFailed {
-                        Section {
-                            HStack {
-                                Image(systemName: "exclamationmark.circle")
+                        FWFErrorBanner(message: viewModel.state.errorMessage)
+                            .padding(.top, 8)
+                    }
 
-                                Text(viewModel.state.errorMessage)
-                                    .font(.subheadline)
-
-                                Spacer()
-                            }
-                            .padding()
+                    // Competition info card
+                    VStack(alignment: .leading, spacing: 14) {
+                        Label {
+                            Text(viewModel.competitionName)
+                                .font(.title3.weight(.semibold))
+                        } icon: {
+                            Image(systemName: "trophy.fill")
+                                .foregroundStyle(Color("FwFBrandingColor"))
                         }
-                        .background(Color.red)
-                    }
 
-                    VStack(alignment: .leading) {
-                        Text(viewModel.competitionName)
-                            .font(.title3)
-                        Text(viewModel.adminName)
-                            .font(.title3)
-                            .padding(.bottom)
+                        Label {
+                            Text(viewModel.adminName)
+                        } icon: {
+                            Image(systemName: "person.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
 
-                        Text(viewModel.competitionDateRange)
-                            .font(.title3)
-                        Text(viewModel.competitionMembers)
-                            .font(.title3)
+                        Divider()
+
+                        Label {
+                            Text(viewModel.competitionDateRange)
+                        } icon: {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(.secondary)
+                        }
+                        .font(.subheadline)
+
+                        Label {
+                            Text(viewModel.competitionMembers)
+                        } icon: {
+                            Image(systemName: "person.3.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .font(.subheadline)
                     }
-                    .padding()
+                    .fwfCard()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
 
                     Spacer()
 
-                    VStack(alignment: .center) {
-                        Button("Join") {
+                    VStack(spacing: 12) {
+                        FWFPrimaryButton("Join") {
                             joinLoading = true
                             Task.detached {
                                 await self.viewModel.joinCompetition()
@@ -82,22 +92,22 @@ struct JoinCompetitionView: View {
                                 }
                             }
                         }
-                        .font(.title2)
-                        .padding(.bottom)
                         .disabled(joinLoading)
 
                         Button("No thanks") {
                             objectGraph.appProtocolHandler.clearProtocolData()
                             homepageSheetViewModel.updateState(sheet: .joinCompetition, state: false)
                         }
-                        .padding(.bottom)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                     }
-                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
-
             }
             .navigationTitle("Join this competition?")
         }
+        .presentationDragIndicator(.visible)
     }
 }
 

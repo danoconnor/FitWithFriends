@@ -16,6 +16,10 @@ VALUES ('\xabcdef1234567890', '12345678-1234-1234-1234-123456789012')
 ON CONFLICT (user_id, competition_id) DO NOTHING;
 
 -- Add a push token for the test user
-INSERT INTO push_tokens (user_id, push_token, platform, app_install_id) 
+INSERT INTO push_tokens (user_id, push_token, platform, app_install_id)
 VALUES ('\xabcdef1234567890', 'TEST_PUSH_TOKEN', 1, '12345678-1234-1234-1234-123456789012')
 ON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLUDED.push_token;
+
+-- Add a well-known refresh token for UI testing so the XCUITest runner can exchange it for an access token
+INSERT INTO oauth_tokens (refresh_token, refresh_token_expires_on, user_id, client_id)
+VALUES ('UI_TEST_REFRESH_TOKEN', '2030-01-01 00:00:00.000', '\xabcdef1234567890', '6A773C32-5EB3-41C9-8036-B991B51F14F7');

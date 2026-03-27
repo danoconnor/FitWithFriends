@@ -28,25 +28,35 @@ struct CompetitionOverviewView: View {
     }
 
     var body: some View {
-        VStack {
-            HStack(alignment: .center) {
-                Text(viewModel.competitionName)
-                    .font(.title)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading)
-                    .padding(.trailing)
-                    .padding(.top)
-                    .onTapGesture {
-                        if !self.showAllDetails {
-                            self.homepageSheetViewModel.updateState(sheet: .competitionDetails,
-                                                                    state: true,
-                                                                    contextData: self.competitionOverview)
+        VStack(alignment: .leading, spacing: 12) {
+            // Header: title + menu
+            HStack(alignment: .top) {
+                // Tappable title with chevron
+                Button {
+                    if !showAllDetails {
+                        homepageSheetViewModel.updateState(sheet: .competitionDetails,
+                                                           state: true,
+                                                           contextData: competitionOverview)
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(viewModel.competitionName)
+                            .font(.title2.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        if !showAllDetails {
+                            Image(systemName: "chevron.right")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.tertiary)
                         }
                     }
-                
+                }
+                .buttonStyle(.plain)
 
                 Spacer()
 
+                // Action menu
                 Menu {
                     ForEach(viewModel.availableActions.sorted(), id: \.self) { action in
                         Button(action.description) {
@@ -62,32 +72,43 @@ struct CompetitionOverviewView: View {
                         .disabled(actionInProgress)
                     }
                 } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .font(.title2)
-                        .foregroundColor(.blue)
-                        .padding(.leading)
-                        .padding(.trailing)
-                        .padding(.top)
+                    Image(systemName: "ellipsis")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 36, height: 36)
+                        .background(
+                            Circle()
+                                .fill(Color(.tertiarySystemFill))
+                        )
                 }
             }
 
-            HStack {
+            // Metadata: position pill + dates
+            HStack(spacing: 10) {
                 Text(viewModel.userPositionDescription)
-                    .padding(.leading)
-                    .padding(.trailing)
-                    .padding(.bottom)
-                    .font(.subheadline)
+                    .font(.subheadline.weight(.medium))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color("FwFBrandingColor").opacity(0.12))
+                    )
 
                 Spacer()
 
-                Text(viewModel.competitionDatesDescription)
-                    .padding(.leading)
-                    .padding(.trailing)
-                    .padding(.bottom)
-                    .font(.subheadline)
+                HStack(spacing: 4) {
+                    Image(systemName: "calendar")
+                        .font(.caption)
+                    Text(viewModel.competitionDatesDescription)
+                        .font(.caption)
+                }
+                .foregroundStyle(.secondary)
             }
 
-            VStack {
+            Divider()
+
+            // Leaderboard
+            VStack(spacing: 2) {
                 ForEach(0 ..< viewModel.results.count, id: \.self) { position in
                     let result = viewModel.results[position]
                     UserCompetitionResultView(result: result,
@@ -105,30 +126,21 @@ struct CompetitionOverviewView: View {
                         }
                 }
             }
-            .padding()
         }
-        .background(showAllDetails ? Color.systemBackground : Color.secondarySystemBackground)
         .sheet(isPresented: $viewModel.shouldShowSheet, content: {
             if let shareUrl = viewModel.shareUrl {
                 ShareSheet(url: shareUrl)
             }
         })
-        .alert(isPresented: $viewModel.shouldShowAlert) {
-            // We currently only have one case where we show an alert:
-            // when we want to confirm that the user wants to delete
-            // a competition
-            let titleText = Text("Are you sure?")
-            let bodyText = Text("This will permanently delete the competition for all users.")
-            let confirmButton: Alert.Button = .destructive(Text("Confirm")) {
+        .alert("Are you sure?", isPresented: $viewModel.shouldShowAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Confirm", role: .destructive) {
                 Task.detached {
                     await self.viewModel.deleteCompetitionConfirmed()
                 }
             }
-
-            return Alert(title: titleText,
-                         message: bodyText,
-                         primaryButton: .cancel(),
-                         secondaryButton: confirmButton)
+        } message: {
+            Text("This will permanently delete the competition for all users.")
         }
     }
 }
@@ -153,9 +165,13 @@ struct CompetitionOverviewView_Previews: PreviewProvider {
         CompetitionOverviewView(objectGraph: MockObjectGraph(),
                                 competitionOverview: competitionOverview, homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
                                 showAllDetails: true)
+            .fwfCard()
+            .padding(.horizontal, 16)
 
         CompetitionOverviewView(objectGraph: MockObjectGraph(),
                                 competitionOverview: competitionOverview, homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
                                 showAllDetails: false)
+            .fwfCard()
+            .padding(.horizontal, 16)
     }
 }
