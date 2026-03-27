@@ -181,8 +181,8 @@ class FWFUITestBase: XCTestCase {
         let json = try JSONSerialization.jsonObject(with: responseData) as! [String: Any]
         guard let token = json["access_token"] as? String,
               let user = json["userId"] as? String else {
-            XCTFail("Failed to parse token response: \(String(data: responseData, encoding: .utf8) ?? "nil")")
-            return
+            let body = String(data: responseData, encoding: .utf8) ?? "nil"
+            throw NSError(domain: "FWFUITest", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to parse token response: \(body)"])
         }
 
         accessToken = token
