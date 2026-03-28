@@ -35,18 +35,14 @@ class FWFUITestBase: XCTestCase {
 
         // Obtain an access token from the backend
         try obtainAccessToken()
+
+        // Delete any competitions left over from previous tests or runs
+        deleteAllCompetitions()
     }
 
     override func tearDownWithError() throws {
-        // Delete all competitions owned by the test user so each test starts with a clean state
-        guard accessToken != nil else { return }
-
-        if let (data, _) = try? makeAuthenticatedRequest(method: "GET", path: "competitions"),
-           let competitionIds = try? JSONSerialization.jsonObject(with: data) as? [String] {
-            for competitionId in competitionIds {
-                try? makeAuthenticatedRequest(method: "POST", path: "competitions/delete", body: ["competitionId": competitionId])
-            }
-        }
+        // Clean up after the test so the next test starts with a clean state
+        deleteAllCompetitions()
     }
 
     // MARK: - App Launch Helpers
@@ -142,6 +138,16 @@ class FWFUITestBase: XCTestCase {
     }
 
     // MARK: - Private
+
+    private func deleteAllCompetitions() {
+        guard accessToken != nil else { return }
+        if let (data, _) = try? makeAuthenticatedRequest(method: "GET", path: "competitions"),
+           let competitionIds = try? JSONSerialization.jsonObject(with: data) as? [String] {
+            for competitionId in competitionIds {
+                try? makeAuthenticatedRequest(method: "POST", path: "competitions/delete", body: ["competitionId": competitionId])
+            }
+        }
+    }
 
     private func checkBackendIsRunning() throws {
         let url = URL(string: Self.backendBaseURL)!
