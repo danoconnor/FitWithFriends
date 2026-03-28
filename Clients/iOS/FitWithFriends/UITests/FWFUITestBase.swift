@@ -37,6 +37,18 @@ class FWFUITestBase: XCTestCase {
         try obtainAccessToken()
     }
 
+    override func tearDownWithError() throws {
+        // Delete all competitions owned by the test user so each test starts with a clean state
+        guard accessToken != nil else { return }
+
+        if let (data, _) = try? makeAuthenticatedRequest(method: "GET", path: "competitions"),
+           let competitionIds = try? JSONSerialization.jsonObject(with: data) as? [String] {
+            for competitionId in competitionIds {
+                try? makeAuthenticatedRequest(method: "POST", path: "competitions/delete", body: ["competitionId": competitionId])
+            }
+        }
+    }
+
     // MARK: - App Launch Helpers
 
     /// Launch the app in UI testing mode

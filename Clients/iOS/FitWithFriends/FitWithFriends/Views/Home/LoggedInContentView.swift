@@ -153,6 +153,7 @@ struct LoggedInContentView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            guard ProcessInfo.processInfo.environment["FWF_UI_TESTING"] != "1" else { return }
             Task.detached {
                 await self.homepageViewModel.refreshData()
             }
