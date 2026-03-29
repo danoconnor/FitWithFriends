@@ -762,5 +762,7 @@ const allIANATimezones = [
     'Pacific/Efate',
     'Pacific/Wallis',
     'Pacific/Apia',
-    'Africa/Johannesburg'
+    'Africa/Johannesburg',
+    'UTC',
+    'GMT'
 ];
