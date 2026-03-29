@@ -7,14 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FWF00002000000000000001A /* IPushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000001B /* IPushNotificationService.swift */; };
-		FWF00002000000000000002A /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000002B /* PushNotificationService.swift */; };
-		FWF00002000000000000003A /* IPushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000003B /* IPushNotificationManager.swift */; };
-		FWF00002000000000000004A /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000004B /* PushNotificationManager.swift */; };
-		FWF00002000000000000005A /* MockPushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000005B /* MockPushNotificationService.swift */; };
-		FWF00002000000000000006A /* MockPushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000006B /* MockPushNotificationManager.swift */; };
-		FWF00002000000000000007A /* PushNotificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000007B /* PushNotificationServiceTests.swift */; };
-		FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000008B /* PushNotificationManagerTests.swift */; };
 		0B0879672BAFBE9C0073AB09 /* IHealthStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0879662BAFBE9C0073AB09 /* IHealthStoreWrapper.swift */; };
 		0B0879692BAFC1410073AB09 /* HealthStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0879682BAFC1410073AB09 /* HealthStoreWrapper.swift */; };
 		0B08796B2BB06CF80073AB09 /* MockHealthStoreWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B08796A2BB06CF80073AB09 /* MockHealthStoreWrapper.swift */; };
@@ -168,7 +160,6 @@
 		0BF759C525B67CD00098AE13 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0BF759C425B67CD00098AE13 /* Colors.xcassets */; };
 		0BF759C825B67D5C0098AE13 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */; };
 		0BFBCA2725F48C710004658C /* HomepageSheetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */; };
-		FWF00001000000000000001A /* FWFStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00001000000000000001B /* FWFStyles.swift */; };
 		FE00000100000000000001B1 /* FWFUITestBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001B0 /* FWFUITestBase.swift */; };
 		FE00000100000000000001B3 /* WelcomeScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001B2 /* WelcomeScreenTests.swift */; };
 		FE00000100000000000001B5 /* HomeScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001B4 /* HomeScreenTests.swift */; };
@@ -176,6 +167,15 @@
 		FE00000100000000000001B9 /* AboutScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001B8 /* AboutScreenTests.swift */; };
 		FE00000100000000000001BB /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001BA /* AuthenticationTests.swift */; };
 		FE00000100000000000001C1 /* UITestingObjectGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001C0 /* UITestingObjectGraph.swift */; };
+		FWF00001000000000000001A /* FWFStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00001000000000000001B /* FWFStyles.swift */; };
+		FWF00002000000000000001A /* IPushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000001B /* IPushNotificationService.swift */; };
+		FWF00002000000000000002A /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000002B /* PushNotificationService.swift */; };
+		FWF00002000000000000003A /* IPushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000003B /* IPushNotificationManager.swift */; };
+		FWF00002000000000000004A /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000004B /* PushNotificationManager.swift */; };
+		FWF00002000000000000005A /* MockPushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000005B /* MockPushNotificationService.swift */; };
+		FWF00002000000000000006A /* MockPushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000006B /* MockPushNotificationManager.swift */; };
+		FWF00002000000000000007A /* PushNotificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000007B /* PushNotificationServiceTests.swift */; };
+		FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000008B /* PushNotificationManagerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -352,7 +352,6 @@
 		0BF759C425B67CD00098AE13 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageSheetViewModel.swift; sourceTree = "<group>"; };
-		FWF00001000000000000001B /* FWFStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FWFStyles.swift; sourceTree = "<group>"; };
 		FE00000100000000000001A1 /* FitWithFriends_UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitWithFriends_UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE00000100000000000001B0 /* FWFUITestBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FWFUITestBase.swift; sourceTree = "<group>"; };
 		FE00000100000000000001B2 /* WelcomeScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreenTests.swift; sourceTree = "<group>"; };
@@ -361,6 +360,7 @@
 		FE00000100000000000001B8 /* AboutScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreenTests.swift; sourceTree = "<group>"; };
 		FE00000100000000000001BA /* AuthenticationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
 		FE00000100000000000001C0 /* UITestingObjectGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestingObjectGraph.swift; sourceTree = "<group>"; };
+		FWF00001000000000000001B /* FWFStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FWFStyles.swift; sourceTree = "<group>"; };
 		FWF00002000000000000001B /* IPushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPushNotificationService.swift; sourceTree = "<group>"; };
 		FWF00002000000000000002B /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
 		FWF00002000000000000003B /* IPushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPushNotificationManager.swift; sourceTree = "<group>"; };
@@ -398,20 +398,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-				FE00000100000000000001AA /* UITests */ = {
-			isa = PBXGroup;
-			children = (
-				FE00000100000000000001B0 /* FWFUITestBase.swift */,
-				FE00000100000000000001B2 /* WelcomeScreenTests.swift */,
-				FE00000100000000000001B4 /* HomeScreenTests.swift */,
-				FE00000100000000000001B6 /* CompetitionTests.swift */,
-				FE00000100000000000001B8 /* AboutScreenTests.swift */,
-				FE00000100000000000001BA /* AuthenticationTests.swift */,
-			);
-			path = UITests;
-			sourceTree = "<group>";
-		};
-0B08797E2BB3A8E80073AB09 /* UnitTests */ = {
+		0B08797E2BB3A8E80073AB09 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
 				0B109F2B2E51733B00F5C534 /* ServiceBaseTests.swift */,
@@ -506,15 +493,6 @@
 				0B35977625715018006D956A /* WorkoutData */,
 			);
 			path = Data;
-			sourceTree = "<group>";
-		};
-		FWF00002000000000000009A /* PushNotifications */ = {
-			isa = PBXGroup;
-			children = (
-				FWF00002000000000000003B /* IPushNotificationManager.swift */,
-				FWF00002000000000000004B /* PushNotificationManager.swift */,
-			);
-			path = PushNotifications;
 			sourceTree = "<group>";
 		};
 		0B47A223279CA88800C2970E /* Mocks */ = {
@@ -871,6 +849,28 @@
 				0B35977325714E7D006D956A /* HealthKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FE00000100000000000001AA /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				FE00000100000000000001B0 /* FWFUITestBase.swift */,
+				FE00000100000000000001B2 /* WelcomeScreenTests.swift */,
+				FE00000100000000000001B4 /* HomeScreenTests.swift */,
+				FE00000100000000000001B6 /* CompetitionTests.swift */,
+				FE00000100000000000001B8 /* AboutScreenTests.swift */,
+				FE00000100000000000001BA /* AuthenticationTests.swift */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
+		FWF00002000000000000009A /* PushNotifications */ = {
+			isa = PBXGroup;
+			children = (
+				FWF00002000000000000003B /* IPushNotificationManager.swift */,
+				FWF00002000000000000004B /* PushNotificationManager.swift */,
+			);
+			path = PushNotifications;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1418,6 +1418,7 @@
 		0B99FBDA256A016900673133 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APS_ENVIRONMENT = development;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FitWithFriends/FitWithFriends.entitlements;
@@ -1442,6 +1443,7 @@
 		0B99FBDB256A016900673133 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APS_ENVIRONMENT = production;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FitWithFriends/FitWithFriends.entitlements;
