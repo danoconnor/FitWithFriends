@@ -24,6 +24,8 @@ public class MockObjectGraph: IObjectGraph {
     var tokenManager: ITokenManager
     var userDefaults: UserDefaults
     var userService: IUserService
+    var pushNotificationManager: IPushNotificationManager
+    var pushNotificationService: IPushNotificationService
 
     init() {
         activityDataService = MockActivityDataService()
@@ -41,6 +43,8 @@ public class MockObjectGraph: IObjectGraph {
         userDefaults = UserDefaults.standard
         userService = MockUserService()
         appleIDProvider = MockASAuthorizationAppleIDProvider()
+        pushNotificationManager = MockPushNotificationManager()
+        pushNotificationService = MockPushNotificationService()
 
         serverEnvironmentManager = MockServerEnvironmentManager() as! any IServerEnvironmentManager
     }
