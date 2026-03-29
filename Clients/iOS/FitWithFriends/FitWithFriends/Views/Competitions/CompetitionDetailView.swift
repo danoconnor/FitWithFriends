@@ -25,17 +25,20 @@ struct CompetitionDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack {
+        NavigationView {
+            ScrollView {
                 CompetitionOverviewView(objectGraph: objectGraph,
                                         competitionOverview: competitionOverview,
                                         homepageSheetViewModel: homepageSheetViewModel,
                                         showAllDetails: true)
-                    .padding()
-
-                Spacer()
+                    .fwfCard()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
             }
+            .navigationTitle("Competition Details")
+            .navigationBarTitleDisplayMode(.inline)
         }
+        .presentationDragIndicator(.visible)
     }
 }
 

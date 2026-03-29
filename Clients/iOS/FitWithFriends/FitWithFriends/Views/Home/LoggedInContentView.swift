@@ -6,12 +6,9 @@
 //
 
 import HealthKitUI
-import Refresher
 import SwiftUI
 
 struct LoggedInContentView: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     private let objectGraph: IObjectGraph
 
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
@@ -30,63 +27,78 @@ struct LoggedInContentView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack {
+                VStack(spacing: 16) {
+                    // Today's activity section
                     if let activitySummary = homepageViewModel.todayActivitySummary {
                         TodaySummaryView(activitySummary: activitySummary,
                                          homepageSheetViewModel: homepageSheetViewModel,
                                          objectGraph: objectGraph)
-                            .cornerRadius(10)
-                            .padding(.top)
-                            .padding(.leading)
-                            .padding(.trailing)
+                            .fwfCard()
+                            .padding(.horizontal, 16)
                     } else if homepageViewModel.loadedActivitySummary {
-                        // We have completed the call to HealthKit but there is no data returned
-                        // We probably don't have health data access, so show the user some troubleshooting message
-                        VStack {
+                        // Health data access issue
+                        VStack(spacing: 12) {
+                            Image(systemName: "heart.text.square")
+                                .font(.system(size: 32))
+                                .foregroundStyle(.secondary)
+
                             Text("We're having trouble reading your activity information. Please check permissions in iOS Settings > Privacy > Health > Fit w/ Friends.")
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .multilineTextAlignment(.leading)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
                         }
-                        .frame(maxWidth: .infinity)
-                        .background(Color.secondarySystemBackground)
-                        .cornerRadius(10)
-                        .padding(.top)
-                        .padding(.leading)
-                        .padding(.trailing)
+                        .fwfCard()
+                        .padding(.horizontal, 16)
                     }
 
-                    if let competitions = homepageViewModel.currentCompetitions {
+                    // Competitions section
+                    if let competitions = homepageViewModel.currentCompetitions, !competitions.isEmpty {
+                        HStack {
+                            Text("Your Competitions")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 4)
+
                         ForEach(competitions) { competitionOverview in
                             CompetitionOverviewView(objectGraph: objectGraph,
                                                     competitionOverview: competitionOverview,
                                                     homepageSheetViewModel: homepageSheetViewModel,
                                                     showAllDetails: false)
-                                .cornerRadius(10)
-                                .padding(.top)
-                                .padding(.leading)
-                                .padding(.trailing)
+                                .fwfCard()
+                                .padding(.horizontal, 16)
                         }
+                    } else if homepageViewModel.currentCompetitions != nil {
+                        // Empty state
+                        VStack(spacing: 12) {
+                            Image(systemName: "trophy")
+                                .font(.system(size: 48))
+                                .foregroundStyle(.secondary)
+
+                            Text("No competitions yet")
+                                .font(.headline)
+
+                            Text("Create a competition and invite your friends to get started!")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .fwfCard()
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
                     }
 
-                    HStack {
-                        Spacer()
-
-                        Button(action: {
-                            homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-                        }, label: {
-                            Text("Create new competition")
-                        })
-                        .padding()
-
-                        Spacer()
+                    // Create competition button
+                    FWFPrimaryButton("New Competition", icon: "plus.circle.fill") {
+                        homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
                     }
-                    .background(Color.secondarySystemBackground)
-                    .cornerRadius(10)
-                    .padding()
-
-                    Spacer()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 4)
+                    .padding(.bottom, 24)
                 }
+                .padding(.top, 8)
                 .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
                     homepageSheetViewModel.dismissCurrentSheet()
                 }, content: {
@@ -120,7 +132,9 @@ struct LoggedInContentView: View {
                 await homepageViewModel.refreshData()
             }
             .navigationTitle("Fit with Friends")
-            .navigationBarColor(backgroundColor: UIColor(named: "FwFBrandingColor"))
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(Color("FwFBrandingColor"), for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 Menu {
                     Button("Logout") {
@@ -132,19 +146,14 @@ struct LoggedInContentView: View {
                                                                 state: true)
                     }
                 } label: {
-                    VStack {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title3)
-                            .foregroundColor(colorScheme == .dark ? .white : .black)
-                            .padding()
-                    }
+                    Image(systemName: "gearshape.fill")
+                        .font(.body)
+                        .foregroundStyle(.white)
                 }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            // If the user navigates away from the app, then
-            // returns later while it is still in memory, we
-            // want to refresh the data automatically
+            guard ProcessInfo.processInfo.environment["FWF_UI_TESTING"] != "1" else { return }
             Task.detached {
                 await self.homepageViewModel.refreshData()
             }

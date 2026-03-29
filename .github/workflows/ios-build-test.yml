@@ -17,6 +17,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: WebService/FitWithFriends/package-lock.json
+
+      - name: Start UI test backend
+        run: Scripts/start-ui-test-backend-native.sh
+
       - name: Build
         env:
           scheme: ${{ 'FitWithFriends' }}
@@ -26,6 +37,7 @@ jobs:
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
           xcodebuild build-for-testing -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,name=$device"
+
       - name: Test
         env:
           scheme: ${{ 'FitWithFriends' }}
@@ -35,3 +47,7 @@ jobs:
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
           xcodebuild test-without-building -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,name=$device"
+
+      - name: Stop UI test backend
+        if: always()
+        run: Scripts/stop-ui-test-backend-native.sh

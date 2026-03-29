@@ -11,54 +11,61 @@ struct FirstLaunchWelcomeView: View {
     let welcomeViewModel: WelcomeViewModel
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(spacing: 0) {
             ScrollView {
-                VStack {
-                    HStack {
-                        Spacer()
+                VStack(spacing: 0) {
+                    // Gradient header
+                    ZStack {
+                        LinearGradient(
+                            colors: [
+                                Color("FwFBrandingColor"),
+                                Color("FwFBrandingColor").opacity(0.7)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
 
-                        Text("Welcome to Fit with Friends!")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .padding(.top, 32)
-                            .padding(.leading)
-                            .padding(.trailing)
-                            .padding(.bottom)
-                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text("Welcome to\nFit with Friends!")
+                            .font(.largeTitle.bold())
+                            .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
-
-                        Spacer()
+                            .padding(.vertical, 32)
+                            .padding(.horizontal)
                     }
-                    .background(Color("FwFBrandingColor"))
 
+                    // Feature rows
+                    VStack(alignment: .leading, spacing: 24) {
+                        FWFFeatureRow(
+                            icon: "figure.run",
+                            color: .red,
+                            title: "Compete with Friends",
+                            description: "Earn points by closing your Apple activity rings each day. You can earn up to 600 points per day, so get out there and get active!"
+                        )
 
-                    Text("This app allows you to compete in fitness competitions with groups of friends. You earn points by closing your Apple activity rings each day. You can earn up to 600 points per day, so get out there and get active!")
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        FWFFeatureRow(
+                            icon: "applewatch",
+                            color: Color("FwFBrandingColor"),
+                            title: "Apple Watch Required",
+                            description: "You'll need an Apple Watch to participate. Wear it throughout the day so your move, exercise, and stand rings progress."
+                        )
 
-                    Text("You will need an Apple Watch to be able to participate in competitions - it's how you earn progress on your rings. So be sure to wear your Watch throughout the day so your move, exercise, and stand rings progress and you get credit for your hard work.")
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    Text("Login on the next page to get started. From there you can create a new competition group and invite your friends. Or you can join an existing group by getting an access link from the person who created the competition.")
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        FWFFeatureRow(
+                            icon: "person.3.fill",
+                            color: .green,
+                            title: "Create or Join",
+                            description: "Create a new competition and invite your friends, or join an existing group with an access link."
+                        )
+                    }
+                    .padding(24)
                 }
             }
 
-            Spacer()
-
-            Section {
-                VStack(alignment: .center) {
-                    Button("Continue") {
-                        self.welcomeViewModel.dismissSheet()
-                    }
-                    .font(.title)
-                    .buttonStyle(.borderedProminent)
-                }
-                .frame(maxWidth: .infinity)
+            // Continue button
+            FWFPrimaryButton("Continue") {
+                self.welcomeViewModel.dismissSheet()
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
         }
     }
 }

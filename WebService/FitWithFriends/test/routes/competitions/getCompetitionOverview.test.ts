@@ -122,9 +122,9 @@ test('Get competition overview: validate score calculation', async () => {
     expect(response.data.isCompetitionProcessingResults).toBe(false); // The competition is active and is not processing results
 
     expect(response.data).toHaveProperty('currentResults');
-    expect(Object.keys(response.data.currentResults).length).toBe(1);
+    expect(response.data.currentResults.length).toBe(1);
     
-    const testUserResult = response.data.currentResults[testUserId];
+    const testUserResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
     expect(testUserResult).not.toBeUndefined();
     expect(testUserResult.firstName).toBe(testUserName.split(' ')[0]);
     expect(testUserResult.lastName).toBe(testUserName.split(' ')[1]);
@@ -138,9 +138,9 @@ test('Get competition overview: validate score calculation with no activity data
 
     expect(response.status).toBe(200);
     expect(response.data).toHaveProperty('currentResults');
-    expect(Object.keys(response.data.currentResults).length).toBe(1);
+    expect(response.data.currentResults.length).toBe(1);
     
-    const testUserResult = response.data.currentResults[testUserId];
+    const testUserResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
     expect(testUserResult).not.toBeUndefined();
     expect(testUserResult.firstName).toBe(testUserName.split(' ')[0]);
     expect(testUserResult.lastName).toBe(testUserName.split(' ')[1]);
@@ -169,9 +169,9 @@ test('Get competition overview: validate score calculation with no activity data
 
     expect(response.status).toBe(200);
     expect(response.data).toHaveProperty('currentResults');
-    expect(Object.keys(response.data.currentResults).length).toBe(1);
+    expect(response.data.currentResults.length).toBe(1);
     
-    const testUserResult = response.data.currentResults[testUserId];
+    const testUserResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
     expect(testUserResult).not.toBeUndefined();
     expect(testUserResult.firstName).toBe(testUserName.split(' ')[0]);
     expect(testUserResult.lastName).toBe(testUserName.split(' ')[1]);
@@ -281,16 +281,16 @@ test('Get competition overview: validate score calculation for multiple users', 
 
     expect(response.status).toBe(200);
     expect(response.data).toHaveProperty('currentResults');
-    expect(Object.keys(response.data.currentResults).length).toBe(2);
+    expect(response.data.currentResults.length).toBe(2);
     
-    const testUser1Result = response.data.currentResults[testUserId];
+    const testUser1Result = response.data.currentResults.find((r: any) => r.userId === testUserId);
     expect(testUser1Result).not.toBeUndefined();
     expect(testUser1Result.firstName).toBe(testUserName.split(' ')[0]);
     expect(testUser1Result.lastName).toBe(testUserName.split(' ')[1]);
     expect(testUser1Result.activityPoints).toBeCloseTo(expectedTodayScoreUser1 + expectedNowMinusOneDayScoreUser1 + expectedNowMinusTwoDaysScoreUser1);
     expect(testUser1Result.pointsToday).toBeCloseTo(expectedTodayScoreUser1);
 
-    const testUser2Result = response.data.currentResults[testUserId2];
+    const testUser2Result = response.data.currentResults.find((r: any) => r.userId === testUserId2);
     expect(testUser2Result).not.toBeUndefined();
     expect(testUser2Result.firstName).toBe(testUserName2.split(' ')[0]);
     expect(testUser2Result.lastName).toBe(testUserName2.split(' ')[1]);
@@ -306,9 +306,9 @@ test('Get competition overview: no activity data for users', async () => {
 
     expect(response.status).toBe(200);
     expect(response.data).toHaveProperty('currentResults');
-    expect(Object.keys(response.data.currentResults).length).toBe(1);
+    expect(response.data.currentResults.length).toBe(1);
 
-    const testUserResult = response.data.currentResults[testUserId];
+    const testUserResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
     expect(testUserResult).not.toBeUndefined();
     expect(testUserResult.firstName).toBe(testUserName.split(' ')[0]);
     expect(testUserResult.lastName).toBe(testUserName.split(' ')[1]);
@@ -361,9 +361,9 @@ test('Get competition overview: does not include users who are not in the compet
 
     expect(response.status).toBe(200);
     expect(response.data).toHaveProperty('currentResults');
-    expect(Object.keys(response.data.currentResults).length).toBe(1);
-    expect(response.data.currentResults[testUserId]).not.toBeUndefined();
-    expect(response.data.currentResults[testUserId2]).toBeUndefined();
+    expect(response.data.currentResults.length).toBe(1);
+    expect(response.data.currentResults.find((r: any) => r.userId === testUserId)).not.toBeUndefined();
+    expect(response.data.currentResults.find((r: any) => r.userId === testUserId2)).toBeUndefined();
 });
 
 test('Get competition overview: user is not part of competition', async () => {
@@ -500,9 +500,9 @@ test('Get competition overview: competition is archived', async () => {
     expect(response.data.isCompetitionProcessingResults).toBe(false); // Archived competitions are not processing results
 
     expect(response.data).toHaveProperty('currentResults');
-    expect(Object.keys(response.data.currentResults).length).toBe(1);
+    expect(response.data.currentResults.length).toBe(1);
     
-    const testUserResult = response.data.currentResults[testUserId];
+    const testUserResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
     expect(testUserResult).not.toBeUndefined();
     expect(testUserResult.firstName).toBe(testUserName.split(' ')[0]);
     expect(testUserResult.lastName).toBe(testUserName.split(' ')[1]);

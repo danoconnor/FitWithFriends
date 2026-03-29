@@ -12,7 +12,7 @@ public class UserCompetitionPoints: IdentifiableBase, Codable, Comparable {
         case firstName
         case lastName
         case totalPoints = "activityPoints"
-        case pointsToday = "dailyPoints"
+        case pointsToday
     }
 
     let userId: String

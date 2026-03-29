@@ -254,7 +254,7 @@ router.get('/:competitionId/overview', function (req, res) {
                         'competitionState': competitionInfo.state,
                         'isCompetitionProcessingResults': competitionInfo.state === CompetitionState.ProcessingResults,
                         'isUserAdmin': isUserAdmin,
-                        'currentResults': userPoints
+                        'currentResults': Object.values(userPoints)
                     });
                 })
                 .catch(error => {
@@ -762,5 +762,7 @@ const allIANATimezones = [
     'Pacific/Efate',
     'Pacific/Wallis',
     'Pacific/Apia',
-    'Africa/Johannesburg'
+    'Africa/Johannesburg',
+    'UTC',
+    'GMT'
 ];
