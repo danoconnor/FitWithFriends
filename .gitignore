@@ -9,6 +9,9 @@ Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace/xcuserdata
 Clients/iOS/FitWithFriends/FitWithFriends.xcworkspace/xcshareddata
 WebService/.env
 
+# Claude - don't want agent memory publicly available
+.claude/agent-memory/
+
 # Compiled typescript output
 WebService/FitWithFriends/dist
 

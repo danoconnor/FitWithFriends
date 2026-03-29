@@ -18,8 +18,18 @@ extension AppDelegate: UIApplicationDelegate {
         // properly when the app is launched in the background
         // https://developer.apple.com/documentation/healthkit/hkobserverquery/executing_observer_queries
         FitWithFriendsApp.objectGraph.healthKitManager.setupObserverQueries()
+        FitWithFriendsApp.objectGraph.pushNotificationManager.requestPushPermissionsAndRegister()
 
         return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Logger.traceInfo(message: "Successfully registered for remote notifications")
+        FitWithFriendsApp.objectGraph.pushNotificationManager.handleDeviceToken(deviceToken)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        Logger.traceError(message: "Failed to register for remote notifications", error: error)
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {

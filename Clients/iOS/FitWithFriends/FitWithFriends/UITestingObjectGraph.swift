@@ -27,6 +27,8 @@ class UITestingObjectGraph: IObjectGraph {
     let tokenManager: ITokenManager
     let userDefaults: UserDefaults
     let userService: IUserService
+    let pushNotificationManager: IPushNotificationManager
+    let pushNotificationService: IPushNotificationService
 
     init() {
         let env = ProcessInfo.processInfo.environment
@@ -89,6 +91,10 @@ class UITestingObjectGraph: IObjectGraph {
         authenticationService = AuthenticationService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
         competitionService = CompetitionService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
         userService = UserService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
+        pushNotificationService = PushNotificationService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
+
+        // Use mock push notification manager in UI tests - we don't want to prompt for permission
+        pushNotificationManager = MockPushNotificationManager()
 
         // Wire up authentication with mock Apple auth (always valid)
         let mockAppleAuth = MockAppleAuthenticationManager()
