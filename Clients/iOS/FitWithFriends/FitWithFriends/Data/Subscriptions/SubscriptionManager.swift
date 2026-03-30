@@ -41,7 +41,7 @@ public class SubscriptionManager: ISubscriptionManager, ObservableObject {
         case .success(let verification):
             let transaction = try verification.payloadValue
 
-            let status = try await subscriptionService.validateTransaction(signedTransaction: transaction.jwsRepresentation)
+            let status = try await subscriptionService.validateTransaction(signedTransaction: verification.jwsRepresentation)
             Logger.traceInfo(message: "Transaction validated by server, isPro: \(status.isPro)")
 
             await MainActor.run {
@@ -104,6 +104,7 @@ public class SubscriptionManager: ISubscriptionManager, ObservableObject {
             for await update in Transaction.updates {
                 guard let self = self else { return }
 
+                let jwsRepresentation = update.jwsRepresentation
                 guard case .verified(let transaction) = update else {
                     Logger.traceWarning(message: "Received unverified transaction update, skipping")
                     continue
@@ -121,7 +122,7 @@ public class SubscriptionManager: ISubscriptionManager, ObservableObject {
                 } else {
                     Logger.traceInfo(message: "Received valid transaction update, validating with server")
                     do {
-                        let status = try await self.subscriptionService.validateTransaction(signedTransaction: transaction.jwsRepresentation)
+                        let status = try await self.subscriptionService.validateTransaction(signedTransaction: jwsRepresentation)
                         Logger.traceInfo(message: "Background transaction validated, isPro: \(status.isPro)")
                         await MainActor.run {
                             self.isUserPro = status.isPro

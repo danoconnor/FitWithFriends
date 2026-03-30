@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct PublicCompetition: Decodable, Identifiable {
+public struct PublicCompetition: Decodable, Identifiable {
     let competitionId: UUID
     let displayName: String
     let startDate: Date
@@ -12,10 +12,10 @@ struct PublicCompetition: Decodable, Identifiable {
     let memberCount: Int
     let isUserMember: Bool
 
-    var id: UUID { competitionId }
+    public var id: UUID { competitionId }
 }
 
-struct PublicCompetitionsResponse: Decodable {
+public struct PublicCompetitionsResponse: Decodable {
     let competitions: [PublicCompetition]
     let isUserPro: Bool
 }

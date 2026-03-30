@@ -733,3 +733,34 @@ export function updateUserProStatus(params: IUpdateUserProStatusParams): Promise
 }
 
 
+/** 'UpdateCompetitionState' parameters type */
+export interface IUpdateCompetitionStateParams {
+  competitionId: string;
+  state: number;
+}
+
+/** 'UpdateCompetitionState' return type */
+export type IUpdateCompetitionStateResult = void;
+
+/** 'UpdateCompetitionState' query type */
+export interface IUpdateCompetitionStateQuery {
+  params: IUpdateCompetitionStateParams;
+  result: IUpdateCompetitionStateResult;
+}
+
+const updateCompetitionStateIR: any = {"usedParamSet":{"state":true,"competitionId":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":32,"b":38}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":63,"b":77}]}],"statement":"UPDATE competitions SET state = :state! WHERE competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE competitions SET state = :state! WHERE competition_id = :competitionId!
+ * ```
+ */
+export function updateCompetitionState(params: IUpdateCompetitionStateParams): Promise<Array<IUpdateCompetitionStateResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateCompetitionState = new pgtyped.PreparedQuery<IUpdateCompetitionStateParams,IUpdateCompetitionStateResult>(updateCompetitionStateIR);
+    return updateCompetitionState.run(params, DatabaseConnectionPool);
+  });
+}
+
+

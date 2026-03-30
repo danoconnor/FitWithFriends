@@ -45,7 +45,7 @@ final class PublicCompetitionTests: FWFUITestBase {
         XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Sheet Test"].waitForExistence(timeout: 10))
 
-        let upgradeButton = app.buttons["Upgrade to Pro"]
+        let upgradeButton = app.buttons["Upgrade to Pro"].firstMatch
         XCTAssertTrue(upgradeButton.waitForExistence(timeout: 5))
         upgradeButton.tap()
 
@@ -65,7 +65,7 @@ final class PublicCompetitionTests: FWFUITestBase {
         XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Dismiss Test"].waitForExistence(timeout: 10))
 
-        app.buttons["Upgrade to Pro"].tap()
+        app.buttons["Upgrade to Pro"].firstMatch.tap()
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
 
         app.buttons["Done"].tap()

@@ -209,7 +209,7 @@ private struct PublicCompetitionCard: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                Label(competition.endDate, format: .dateTime.month().day())
+                Label(competition.endDate.formatted(.dateTime.month().day()), systemImage: "calendar")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

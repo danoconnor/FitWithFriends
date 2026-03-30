@@ -74,3 +74,6 @@ VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ia
 /* @name UpdateUserProStatus */
 UPDATE users SET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!
 WHERE user_id = :userId!;
+
+/* @name UpdateCompetitionState */
+UPDATE competitions SET state = :state! WHERE competition_id = :competitionId!;

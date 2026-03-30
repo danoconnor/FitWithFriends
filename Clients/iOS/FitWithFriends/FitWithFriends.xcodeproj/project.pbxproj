@@ -178,6 +178,17 @@
 		FWF00002000000000000006A /* MockPushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000006B /* MockPushNotificationManager.swift */; };
 		FWF00002000000000000007A /* PushNotificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000007B /* PushNotificationServiceTests.swift */; };
 		FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000008B /* PushNotificationManagerTests.swift */; };
+		FWF0000200000000000000CA /* SubscriptionAndPublicCompetitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */; };
+		FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000CD /* PublicCompetitionTests.swift */; };
+		FWF0000200000000000000D2 /* ISubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D1 /* ISubscriptionManager.swift */; };
+		FWF0000200000000000000D4 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D3 /* SubscriptionManager.swift */; };
+		FWF0000200000000000000D6 /* PublicCompetition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D5 /* PublicCompetition.swift */; };
+		FWF0000200000000000000D8 /* SubscriptionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D7 /* SubscriptionStatus.swift */; };
+		FWF0000200000000000000DA /* ISubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D9 /* ISubscriptionService.swift */; };
+		FWF0000200000000000000DC /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000DB /* SubscriptionService.swift */; };
+		FWF0000200000000000000DF /* ProUpgradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000DE /* ProUpgradeView.swift */; };
+		FWF0000200000000000000E1 /* MockSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E0 /* MockSubscriptionManager.swift */; };
+		FWF0000200000000000000E3 /* MockSubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E2 /* MockSubscriptionService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -373,6 +384,17 @@
 		FWF00002000000000000006B /* MockPushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPushNotificationManager.swift; sourceTree = "<group>"; };
 		FWF00002000000000000007B /* PushNotificationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationServiceTests.swift; sourceTree = "<group>"; };
 		FWF00002000000000000008B /* PushNotificationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManagerTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAndPublicCompetitionTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000CD /* PublicCompetitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D1 /* ISubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISubscriptionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D3 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D5 /* PublicCompetition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetition.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D7 /* SubscriptionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionStatus.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D9 /* ISubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISubscriptionService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000DB /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000DE /* ProUpgradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUpgradeView.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E0 /* MockSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubscriptionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E2 /* MockSubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubscriptionService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -415,6 +437,7 @@
 				0B0879862BB3A9B90073AB09 /* HealthKitManagerTests.swift */,
 				FWF00002000000000000007B /* PushNotificationServiceTests.swift */,
 				FWF00002000000000000008B /* PushNotificationManagerTests.swift */,
+				FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -457,6 +480,7 @@
 				0B1CBEC927C3F3B80008C72A /* CompetitionDescription.swift */,
 				0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */,
 				0B329F142E4D789F0082D211 /* CompetitionState.swift */,
+				FWF0000200000000000000D5 /* PublicCompetition.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -495,9 +519,19 @@
 				0B99FC25256A290900673133 /* Model */,
 				FWF00002000000000000009A /* PushNotifications */,
 				0B99FC19256A250D00673133 /* Service */,
+				FWF0000200000000000000D0 /* Subscriptions */,
 				0B35977625715018006D956A /* WorkoutData */,
 			);
 			path = Data;
+			sourceTree = "<group>";
+		};
+		FWF0000200000000000000D0 /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000D1 /* ISubscriptionManager.swift */,
+				FWF0000200000000000000D3 /* SubscriptionManager.swift */,
+			);
+			path = Subscriptions;
 			sourceTree = "<group>";
 		};
 		0B47A223279CA88800C2970E /* Mocks */ = {
@@ -526,6 +560,8 @@
 				0B0879FF2BB3B4D10073AB09 /* MockActivityUpdateDelegate.swift */,
 				FWF00002000000000000005B /* MockPushNotificationService.swift */,
 				FWF00002000000000000006B /* MockPushNotificationManager.swift */,
+				FWF0000200000000000000E0 /* MockSubscriptionManager.swift */,
+				FWF0000200000000000000E2 /* MockSubscriptionService.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -675,6 +711,8 @@
 				0B0879752BB2541B0073AB09 /* ICompetitionService.swift */,
 				0B0879772BB254250073AB09 /* IUserService.swift */,
 				FWF00002000000000000001B /* IPushNotificationService.swift */,
+				FWF0000200000000000000D9 /* ISubscriptionService.swift */,
+				FWF0000200000000000000DB /* SubscriptionService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -700,6 +738,7 @@
 				0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */,
 				0BC4C644293407BE004F1ADC /* FWFErrorDetails.swift */,
 				0BCF647D2BC75F57004E98C7 /* Unit.swift */,
+				FWF0000200000000000000D7 /* SubscriptionStatus.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -725,9 +764,18 @@
 				0BBD78B825A282C600E08EB2 /* Competitions */,
 				0BBD78B325A280C300E08EB2 /* Home */,
 				0BBD78B225A280B300E08EB2 /* Login */,
+				FWF0000200000000000000DD /* Subscriptions */,
 				0B359720256C731A006D956A /* MainContentView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		FWF0000200000000000000DD /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000DE /* ProUpgradeView.swift */,
+			);
+			path = Subscriptions;
 			sourceTree = "<group>";
 		};
 		0BBD789F259A536000E08EB2 /* Competitions */ = {
@@ -867,6 +915,7 @@
 				FE00000100000000000001B6 /* CompetitionTests.swift */,
 				FE00000100000000000001B8 /* AboutScreenTests.swift */,
 				FE00000100000000000001BA /* AuthenticationTests.swift */,
+				FWF0000200000000000000CD /* PublicCompetitionTests.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -1069,6 +1118,7 @@
 				0BACBE5A2E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift in Sources */,
 				FWF00002000000000000007A /* PushNotificationServiceTests.swift in Sources */,
 				FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */,
+				FWF0000200000000000000CA /* SubscriptionAndPublicCompetitionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1224,6 +1274,15 @@
 				FWF00002000000000000004A /* PushNotificationManager.swift in Sources */,
 				FWF00002000000000000005A /* MockPushNotificationService.swift in Sources */,
 				FWF00002000000000000006A /* MockPushNotificationManager.swift in Sources */,
+				FWF0000200000000000000D2 /* ISubscriptionManager.swift in Sources */,
+				FWF0000200000000000000D4 /* SubscriptionManager.swift in Sources */,
+				FWF0000200000000000000D6 /* PublicCompetition.swift in Sources */,
+				FWF0000200000000000000D8 /* SubscriptionStatus.swift in Sources */,
+				FWF0000200000000000000DA /* ISubscriptionService.swift in Sources */,
+				FWF0000200000000000000DC /* SubscriptionService.swift in Sources */,
+				FWF0000200000000000000DF /* ProUpgradeView.swift in Sources */,
+				FWF0000200000000000000E1 /* MockSubscriptionManager.swift in Sources */,
+				FWF0000200000000000000E3 /* MockSubscriptionService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1237,6 +1296,7 @@
 				FE00000100000000000001B7 /* CompetitionTests.swift in Sources */,
 				FE00000100000000000001B9 /* AboutScreenTests.swift in Sources */,
 				FE00000100000000000001BB /* AuthenticationTests.swift in Sources */,
+				FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

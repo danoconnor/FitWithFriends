@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct SubscriptionStatus: Decodable {
+public struct SubscriptionStatus: Decodable {
     let isPro: Bool
     let maxActiveCompetitions: Int
 }
