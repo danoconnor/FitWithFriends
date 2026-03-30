@@ -17,6 +17,7 @@ public class HomepageSheetViewModel: ObservableObject {
         case joinCompetition
         case createCompetition
         case competitionDetails
+        case proUpgrade
         case about
 
         case none
@@ -35,6 +36,7 @@ public class HomepageSheetViewModel: ObservableObject {
         .joinCompetition: (shouldShow: false, contextData: nil),
         .createCompetition: (shouldShow: false, contextData: nil),
         .competitionDetails: (shouldShow: false, contextData: nil),
+        .proUpgrade: (shouldShow: false, contextData: nil),
     ]
 
     init(appProtocolHandler: IAppProtocolHandler, healthKitManager: IHealthKitManager) {

@@ -29,6 +29,8 @@ class UITestingObjectGraph: IObjectGraph {
     let userService: IUserService
     let pushNotificationManager: IPushNotificationManager
     let pushNotificationService: IPushNotificationService
+    let subscriptionManager: ISubscriptionManager
+    let subscriptionService: ISubscriptionService
 
     init() {
         let env = ProcessInfo.processInfo.environment
@@ -95,6 +97,10 @@ class UITestingObjectGraph: IObjectGraph {
 
         // Use mock push notification manager in UI tests - we don't want to prompt for permission
         pushNotificationManager = MockPushNotificationManager()
+
+        // Use real subscription service but mock manager in UI tests - StoreKit is not available in test environment
+        subscriptionService = SubscriptionService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
+        subscriptionManager = MockSubscriptionManager()
 
         // Wire up authentication with mock Apple auth (always valid)
         let mockAppleAuth = MockAppleAuthenticationManager()

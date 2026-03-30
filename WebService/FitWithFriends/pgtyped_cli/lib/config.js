@@ -34,6 +34,7 @@ const configParser = t.type({
     failOnError: t.union([t.boolean, t.undefined]),
     camelCaseColumnNames: t.union([t.boolean, t.undefined]),
     hungarianNotation: t.union([t.boolean, t.undefined]),
+    nonEmptyArrayParams: t.union([t.boolean, t.undefined]),
     dbUrl: t.union([t.string, t.undefined]),
     db: t.union([
         t.type({
@@ -112,7 +113,7 @@ export function parseConfig(path, argConnectionUri) {
         port: process.env.PGPORT ? Number(process.env.PGPORT) : undefined,
         uri: (_a = process.env.PGURI) !== null && _a !== void 0 ? _a : process.env.DATABASE_URL,
     };
-    const { maxWorkerThreads, db = defaultDBConfig, dbUrl: configDbUri, transforms, srcDir, failOnError, camelCaseColumnNames, hungarianNotation, typesOverrides, } = configObject;
+    const { maxWorkerThreads, db = defaultDBConfig, dbUrl: configDbUri, transforms, srcDir, failOnError, camelCaseColumnNames, hungarianNotation, nonEmptyArrayParams, typesOverrides, } = configObject;
     // CLI connectionUri flag takes precedence over the env and config one
     const dbUri = argConnectionUri || envDBConfig.uri || configDbUri;
     const urlDBConfig = dbUri
@@ -147,6 +148,7 @@ export function parseConfig(path, argConnectionUri) {
         failOnError: failOnError !== null && failOnError !== void 0 ? failOnError : false,
         camelCaseColumnNames: camelCaseColumnNames !== null && camelCaseColumnNames !== void 0 ? camelCaseColumnNames : false,
         hungarianNotation: hungarianNotation !== null && hungarianNotation !== void 0 ? hungarianNotation : true,
+        nonEmptyArrayParams: nonEmptyArrayParams !== null && nonEmptyArrayParams !== void 0 ? nonEmptyArrayParams : false,
         typesOverrides: parsedTypesOverrides,
         maxWorkerThreads,
     };

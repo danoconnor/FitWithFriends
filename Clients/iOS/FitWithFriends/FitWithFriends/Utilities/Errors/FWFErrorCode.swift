@@ -18,4 +18,9 @@ public enum FWFErrorCode: Int {
     // MARK: Auth errors
 
     case userNotFound = 20001
+
+    // MARK: Subscription errors
+
+    case proSubscriptionRequired = 30001
+    case invalidTransaction = 30002
 }

@@ -13,20 +13,27 @@ public class HomepageViewModel: ObservableObject {
     private let authenticationManager: IAuthenticationManager
     private let competitionManager: ICompetitionManager
     private let healthKitManager: IHealthKitManager
+    private let subscriptionManager: ISubscriptionManager
 
     @Published var loadedActivitySummary: Bool
     @Published var todayActivitySummary: ActivitySummary?
 
     @Published var currentCompetitions: [CompetitionOverview]?
+    @Published var publicCompetitions: [PublicCompetition]?
+    @Published var isUserPro: Bool = false
 
     private var competitionLoadListener: AnyCancellable?
+    private var publicCompetitionLoadListener: AnyCancellable?
+    private var proStatusListener: AnyCancellable?
 
     init(authenticationManager: IAuthenticationManager,
          competitionManager: ICompetitionManager,
-         healthKitManager: IHealthKitManager) {
+         healthKitManager: IHealthKitManager,
+         subscriptionManager: ISubscriptionManager) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager
         self.healthKitManager = healthKitManager
+        self.subscriptionManager = subscriptionManager
 
         loadedActivitySummary = false
 
@@ -40,6 +47,21 @@ public class HomepageViewModel: ObservableObject {
                     .sorted { $0 < $1 }
             }
         }
+
+        publicCompetitionLoadListener = competitionManager.publicCompetitionsPublisher.sink { [weak self] newValue in
+            DispatchQueue.main.async {
+                self?.publicCompetitions = newValue
+            }
+        }
+
+        proStatusListener = subscriptionManager.isUserProPublisher.sink { [weak self] newValue in
+            DispatchQueue.main.async {
+                self?.isUserPro = newValue
+            }
+        }
+
+        // Check subscription status on init
+        Task.detached { await subscriptionManager.checkSubscriptionStatus() }
     }
 
     func refreshData() async {

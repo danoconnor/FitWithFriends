@@ -28,6 +28,8 @@ class ObjectGraph: IObjectGraph {
     let userService: IUserService
     let pushNotificationManager: IPushNotificationManager
     let pushNotificationService: IPushNotificationService
+    let subscriptionManager: ISubscriptionManager
+    let subscriptionService: ISubscriptionService
 
     init() {
         appleIDProvider = ASAuthorizationAppleIDProviderWrapper()
@@ -48,6 +50,8 @@ class ObjectGraph: IObjectGraph {
         userService = UserService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
         pushNotificationService = PushNotificationService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
         pushNotificationManager = PushNotificationManager(pushNotificationService: pushNotificationService, userDefaults: userDefaults)
+        subscriptionService = SubscriptionService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
+        subscriptionManager = SubscriptionManager(subscriptionService: subscriptionService)
 
         appleAuthenticationManager = AppleAuthenticationManager(appleIDProvider: appleIDProvider,
                                                                 authenticationService: authenticationService,

@@ -133,4 +133,29 @@ public class MockCompetitionManager: ICompetitionManager {
         deleteCompetitionCallCount += 1
         // Mock implementation
     }
+
+    @Published var return_publicCompetitions: [PublicCompetition] = []
+    var publicCompetitions: [PublicCompetition] {
+        return return_publicCompetitions
+    }
+
+    var publicCompetitionsPublisher: Published<[PublicCompetition]>.Publisher { $return_publicCompetitions }
+
+    public var refreshPublicCompetitionsCallCount = 0
+    public func refreshPublicCompetitions() async {
+        refreshPublicCompetitionsCallCount += 1
+    }
+
+    public var param_joinPublicCompetition_competitionId: UUID?
+    public var return_joinPublicCompetition_error: Error?
+
+    public var joinPublicCompetitionCallCount = 0
+    public func joinPublicCompetition(competitionId: UUID) async throws {
+        joinPublicCompetitionCallCount += 1
+        param_joinPublicCompetition_competitionId = competitionId
+
+        if let error = return_joinPublicCompetition_error {
+            throw error
+        }
+    }
 }

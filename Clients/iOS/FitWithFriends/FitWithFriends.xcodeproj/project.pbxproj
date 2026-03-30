@@ -49,6 +49,8 @@
 		0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B35977325714E7D006D956A /* HealthKit.framework */; };
 		0B3597782571502A006D956A /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3597772571502A006D956A /* HealthKitManager.swift */; };
 		0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35977A25715567006D956A /* LoggedInContentView.swift */; };
+		0B4693AF2F79A72600AAD94C /*  Friends.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0B4693AE2F79A72600AAD94C /*  Friends.storekit */; };
+		0B4693B12F79A73300AAD94C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4693B02F79A73300AAD94C /* StoreKit.framework */; };
 		0B47A220279C893100C2970E /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0B47A21F279C893100C2970E /* CocoaLumberjackSwift */; };
 		0B47A222279C90EC00C2970E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A221279C90EB00C2970E /* User.swift */; };
 		0B47A227279CA8EF00C2970E /* MockAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A226279CA8EF00C2970E /* MockAuthenticationManager.swift */; };
@@ -240,6 +242,8 @@
 		0B35977325714E7D006D956A /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		0B3597772571502A006D956A /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		0B35977A25715567006D956A /* LoggedInContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInContentView.swift; sourceTree = "<group>"; };
+		0B4693AE2F79A72600AAD94C /*  Friends.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = " Friends.storekit"; path = "FitWithFriends/ Friends.storekit"; sourceTree = "<group>"; };
+		0B4693B02F79A73300AAD94C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		0B47A221279C90EB00C2970E /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0B47A226279CA8EF00C2970E /* MockAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B47A228279CAB6E00C2970E /* MockAuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAuthenticationService.swift; sourceTree = "<group>"; };
@@ -383,6 +387,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B4693B12F79A73300AAD94C /* StoreKit.framework in Frameworks */,
 				0B47A220279C893100C2970E /* CocoaLumberjackSwift in Frameworks */,
 				0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */,
 			);
@@ -528,6 +533,7 @@
 		0B99FBC1256A016900673133 = {
 			isa = PBXGroup;
 			children = (
+				0B4693AE2F79A72600AAD94C /*  Friends.storekit */,
 				0B99FBCC256A016900673133 /* FitWithFriends */,
 				0B08797E2BB3A8E80073AB09 /* UnitTests */,
 				FE00000100000000000001AA /* UITests */,
@@ -846,6 +852,7 @@
 		EDAFADCA82B7C1A16B9EAE74 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0B4693B02F79A73300AAD94C /* StoreKit.framework */,
 				0B35977325714E7D006D956A /* HealthKit.framework */,
 			);
 			name = Frameworks;
@@ -992,6 +999,7 @@
 				0B99FBD5256A016900673133 /* Preview Assets.xcassets in Resources */,
 				0B99FBD2256A016900673133 /* Assets.xcassets in Resources */,
 				0BCF64972BCC3F55004E98C7 /* Settings.bundle in Resources */,
+				0B4693AF2F79A72600AAD94C /*  Friends.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

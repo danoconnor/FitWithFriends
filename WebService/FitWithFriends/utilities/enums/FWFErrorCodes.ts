@@ -9,5 +9,12 @@ export default {
     AuthErrorCodes: {
         // The user does not exist in the database
         UserNotFound: 20001,
+    },
+
+    SubscriptionErrorCodes: {
+        // The user needs an active Pro subscription to perform this action
+        ProSubscriptionRequired: 30001,
+        // The App Store transaction could not be validated
+        InvalidTransaction: 30002,
     }
 };

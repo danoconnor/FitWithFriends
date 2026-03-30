@@ -66,3 +66,11 @@ DELETE FROM oauth_tokens;
 INSERT INTO push_tokens (user_id, push_token, platform, app_install_id)
 VALUES (:userId!, :pushToken!, :platform!, :appInstallId!)
 ON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLUDED.push_token;
+
+/* @name CreatePublicCompetition */
+INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public)
+VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true);
+
+/* @name UpdateUserProStatus */
+UPDATE users SET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!
+WHERE user_id = :userId!;

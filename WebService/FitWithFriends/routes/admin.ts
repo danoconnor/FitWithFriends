@@ -7,8 +7,67 @@ import { CompetitionState } from '../utilities/enums/CompetitionState';
 import { handleError } from '../utilities/errorHelpers';
 import * as UserHelpers from '../utilities/userHelpers';
 import { getCompetitionStandings } from '../utilities/competitionStandingsHelper';
+import * as cryptoHelpers from '../utilities/cryptoHelpers';
+import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
+
+router.post('/createPublicCompetition', function (req, res) {
+    const startDate = new Date(req.body['startDate']);
+    const endDate = new Date(req.body['endDate']);
+    const displayName: string = req.body['displayName'];
+    const timezone: string = req.body['ianaTimezone'];
+    const adminUserId: string = req.body['adminUserId'];
+
+    if (!startDate || !endDate || !displayName || !timezone || !adminUserId) {
+        handleError(null, 400, 'Missing required parameter', res);
+        return;
+    }
+
+    if (displayName.length > 255) {
+        handleError(null, 400, 'Display name is too long', res);
+        return;
+    }
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        handleError(null, 400, 'Invalid date format', res);
+        return;
+    }
+
+    if (endDate < new Date()) {
+        handleError(null, 400, 'End date must be in the future', res);
+        return;
+    }
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const maxCompetitionLengthInMs = 30 * msPerDay;
+    const competitionLengthInMs = endDate.getTime() - startDate.getTime();
+    if (competitionLengthInMs < msPerDay || competitionLengthInMs > maxCompetitionLengthInMs) {
+        handleError(null, 400, 'Competition length must be between 1 and 30 days', res, true);
+        return;
+    }
+
+    const startDateUTC = new Date(startDate.toUTCString());
+    const endDateUTC = new Date(endDate.toUTCString());
+    const accessToken = cryptoHelpers.getRandomToken();
+    const competitionId = uuid();
+
+    CompetitionQueries.createPublicCompetition({
+        startDate: startDateUTC,
+        endDate: endDateUTC,
+        displayName,
+        adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
+        accessToken,
+        ianaTimezone: timezone,
+        competitionId
+    })
+        .then((_result) => {
+            res.json({ 'competition_id': competitionId });
+        })
+        .catch(error => {
+            handleError(error, 500, 'Error creating public competition', res);
+        });
+});
 
 router.post('/performDailyTasks', async function (req, res) {
     let errors: [taskName: string, error: Error][] = [];

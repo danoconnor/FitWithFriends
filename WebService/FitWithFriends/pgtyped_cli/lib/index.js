@@ -12,7 +12,7 @@ import { startup } from '@pgtyped/query';
 import { AsyncQueue } from '@pgtyped/wire';
 import chokidar from 'chokidar';
 import nun from 'nunjucks';
-import PiscinaPool from 'piscina';
+import { Piscina as PiscinaPool } from 'piscina';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { parseConfig } from './config.js';
@@ -28,6 +28,7 @@ export class WorkerPool {
             filename: new URL('./worker.js', import.meta.url).href,
             maxThreads: config.maxWorkerThreads,
             workerData: config,
+            recordTiming: false,
         });
         console.log(`Using a pool of ${this.pool.threads.length} threads.`);
     }
@@ -128,7 +129,7 @@ if (isWatchMode && fileOverride) {
     process.exit(0);
 }
 try {
-    chokidar.watch(configPath).on('change', () => {
+    chokidar.watch(configPath, {}).on('change', () => {
         console.log('Config file changed. Exiting.');
         process.exit();
     });

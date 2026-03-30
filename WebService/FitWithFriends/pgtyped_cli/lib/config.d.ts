@@ -54,6 +54,7 @@ declare const configParser: t.TypeC<{
     failOnError: t.UnionC<[t.BooleanC, t.UndefinedC]>;
     camelCaseColumnNames: t.UnionC<[t.BooleanC, t.UndefinedC]>;
     hungarianNotation: t.UnionC<[t.BooleanC, t.UndefinedC]>;
+    nonEmptyArrayParams: t.UnionC<[t.BooleanC, t.UndefinedC]>;
     dbUrl: t.UnionC<[t.StringC, t.UndefinedC]>;
     db: t.UnionC<[t.TypeC<{
         host: t.UnionC<[t.StringC, t.UndefinedC]>;
@@ -82,6 +83,7 @@ export interface ParsedConfig {
     failOnError: boolean;
     camelCaseColumnNames: boolean;
     hungarianNotation: boolean;
+    nonEmptyArrayParams: boolean;
     transforms: IConfig['transforms'];
     srcDir: IConfig['srcDir'];
     typesOverrides: Record<string, Partial<TypeDefinition>>;

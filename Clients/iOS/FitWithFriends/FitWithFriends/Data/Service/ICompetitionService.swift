@@ -57,4 +57,11 @@ public protocol ICompetitionService {
     /// Delete the given competition. The user must be the admin of the competition, otherwise this will result in an error
     /// - Parameter competitionId: The competitionId to delete
     func deleteCompetition(competitionId: UUID) async throws
+
+    /// Get the list of active public competitions
+    func getPublicCompetitions() async throws -> PublicCompetitionsResponse
+
+    /// Join a public competition (requires Pro subscription)
+    /// - Parameter competitionId: The competition to join
+    func joinPublicCompetition(competitionId: UUID) async throws
 }

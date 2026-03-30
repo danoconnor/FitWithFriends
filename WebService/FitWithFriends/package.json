@@ -22,6 +22,7 @@
     "cookie-parser": "1.4.7",
     "debug": "^4.4.3",
     "express": "^4.22.1",
+    "jose": "^6.2.2",
     "jsonwebtoken": "^9.0.3",
     "jwks-rsa": "3.1.0",
     "morgan": "^1.10.1",
@@ -38,7 +39,7 @@
     "minimatch": "^10.2.4"
   },
   "devDependencies": {
-    "@pgtyped/cli": "^2.3.0",
+    "@pgtyped/cli": "file:./pgtyped_cli",
     "@types/jest": "^29.5.12",
     "@types/pg": "^8.20.0",
     "@types/uuid": "^9.0.8",

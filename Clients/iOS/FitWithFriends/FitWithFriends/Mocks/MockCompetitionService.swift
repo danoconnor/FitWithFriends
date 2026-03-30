@@ -116,8 +116,32 @@ public class MockCompetitionService: ICompetitionService {
     public func deleteCompetition(competitionId: UUID) async throws {
         deleteCompetitionCallCount += 1
         param_deleteCompetition_competitionId = competitionId
-        
+
         if let error = return_deleteCompetition {
+            throw error
+        }
+    }
+
+    public var return_getPublicCompetitions: PublicCompetitionsResponse?
+    public var getPublicCompetitionsCallCount = 0
+    public func getPublicCompetitions() async throws -> PublicCompetitionsResponse {
+        getPublicCompetitionsCallCount += 1
+
+        if let retVal = return_getPublicCompetitions {
+            return retVal
+        } else {
+            throw HttpError.generic
+        }
+    }
+
+    public var param_joinPublicCompetition_competitionId: UUID?
+    public var return_joinPublicCompetition_error: Error?
+    public var joinPublicCompetitionCallCount = 0
+    public func joinPublicCompetition(competitionId: UUID) async throws {
+        joinPublicCompetitionCallCount += 1
+        param_joinPublicCompetition_competitionId = competitionId
+
+        if let error = return_joinPublicCompetition_error {
             throw error
         }
     }

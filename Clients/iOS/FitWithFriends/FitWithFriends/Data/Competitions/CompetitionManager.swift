@@ -17,6 +17,9 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
     @Published private(set) var competitionOverviews: [UUID: CompetitionOverview]
     var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { $competitionOverviews }
 
+    @Published private(set) var publicCompetitions: [PublicCompetition] = []
+    var publicCompetitionsPublisher: Published<[PublicCompetition]>.Publisher { $publicCompetitions }
+
     init(authenticationManager: IAuthenticationManager,
          competitionService: ICompetitionService) {
         self.authenticationManager = authenticationManager
@@ -31,6 +34,7 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
                 guard let self = self else { return }
                 Task.detached {
                     await self.refreshCompetitionOverviews()
+                    await self.refreshPublicCompetitions()
                 }
             default:
                 break
@@ -99,6 +103,8 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
         await MainActor.run {
             self.competitionOverviews = refreshedData
         }
+
+        await refreshPublicCompetitions()
     }
 
     func joinCompetition(competitionId: UUID, competitionToken: String) async throws {
@@ -128,6 +134,30 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
 
     func deleteCompetition(competitionId: UUID) async throws {
         return try await competitionService.deleteCompetition(competitionId: competitionId)
+    }
+
+    func refreshPublicCompetitions() async {
+        Logger.traceInfo(message: "Starting public competitions refresh")
+
+        do {
+            let response = try await competitionService.getPublicCompetitions()
+            await MainActor.run {
+                self.publicCompetitions = response.competitions
+            }
+        } catch {
+            Logger.traceError(message: "Failed to fetch public competitions", error: error)
+        }
+    }
+
+    func joinPublicCompetition(competitionId: UUID) async throws {
+        try await competitionService.joinPublicCompetition(competitionId: competitionId)
+
+        // Refresh both lists so the newly joined competition appears in the user's overviews
+        // and the public list reflects the updated membership state
+        Task.detached {
+            await self.refreshCompetitionOverviews()
+            await self.refreshPublicCompetitions()
+        }
     }
 }
 

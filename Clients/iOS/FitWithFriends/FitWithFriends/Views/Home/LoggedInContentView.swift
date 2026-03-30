@@ -20,8 +20,8 @@ struct LoggedInContentView: View {
                                                         healthKitManager: objectGraph.healthKitManager)
         homepageViewModel = HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
                                               competitionManager: objectGraph.competitionManager,
-
-                                              healthKitManager: objectGraph.healthKitManager)
+                                              healthKitManager: objectGraph.healthKitManager,
+                                              subscriptionManager: objectGraph.subscriptionManager)
     }
 
     var body: some View {
@@ -49,6 +49,35 @@ struct LoggedInContentView: View {
                         }
                         .fwfCard()
                         .padding(.horizontal, 16)
+                    }
+
+                    // Public competitions section
+                    if let publicCompetitions = homepageViewModel.publicCompetitions, !publicCompetitions.isEmpty {
+                        HStack {
+                            Text("Public Competitions")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 4)
+
+                        ForEach(publicCompetitions) { competition in
+                            PublicCompetitionCard(
+                                competition: competition,
+                                isUserPro: homepageViewModel.isUserPro,
+                                onJoin: {
+                                    Task {
+                                        try? await objectGraph.competitionManager.joinPublicCompetition(competitionId: competition.competitionId)
+                                    }
+                                },
+                                onUpgrade: {
+                                    homepageSheetViewModel.updateState(sheet: .proUpgrade, state: true)
+                                }
+                            )
+                            .fwfCard()
+                            .padding(.horizontal, 16)
+                        }
                     }
 
                     // Competitions section
@@ -123,6 +152,9 @@ struct LoggedInContentView: View {
                     case .about:
                         AboutView(emailUtility: objectGraph.emailUtility,
                                   serverEnvironmentManager: objectGraph.serverEnvironmentManager)
+                    case .proUpgrade:
+                        ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
+                                       subscriptionManager: objectGraph.subscriptionManager)
                     default:
                         Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                     }
@@ -156,6 +188,54 @@ struct LoggedInContentView: View {
             guard ProcessInfo.processInfo.environment["FWF_UI_TESTING"] != "1" else { return }
             Task.detached {
                 await self.homepageViewModel.refreshData()
+            }
+        }
+    }
+}
+
+private struct PublicCompetitionCard: View {
+    let competition: PublicCompetition
+    let isUserPro: Bool
+    let onJoin: () -> Void
+    let onUpgrade: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(competition.displayName)
+                .font(.headline)
+
+            HStack(spacing: 16) {
+                Label("\(competition.memberCount)", systemImage: "person.2.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Label(competition.endDate, format: .dateTime.month().day())
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            if competition.isUserMember {
+                Label("Joined", systemImage: "checkmark.circle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(Color("FwFBrandingColor"))
+            } else if isUserPro {
+                Button(action: onJoin) {
+                    Text("Join")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(Color("FwFBrandingColor"))
+                        )
+                }
+            } else {
+                Button(action: onUpgrade) {
+                    Label("Upgrade to Pro", systemImage: "star.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color("FwFBrandingColor"))
+                }
             }
         }
     }
