@@ -1,6 +1,7 @@
 'use strict';
 import * as express from 'express';
 import * as CompetitionQueries from '../sql/competitions.queries';
+import * as UserQueries from '../sql/users.queries';
 import * as OAuthQueries from '../sql/oauth.queries';
 import { sendPushNotifications } from '../utilities/apnsHelper';
 import { CompetitionState } from '../utilities/enums/CompetitionState';
@@ -241,5 +242,27 @@ async function deleteExpiredRefreshTokens() {
     const now = new Date();
     await OAuthQueries.deleteExpiredRefreshTokens({ currentDate: now });
 }
+
+router.post('/setUserProStatus', function (req, res) {
+    const userId: string = req.body['userId'];
+    const isPro: boolean = req.body['isPro'];
+
+    if (!userId || isPro === undefined || isPro === null) {
+        handleError(null, 400, 'Missing required parameter', res);
+        return;
+    }
+
+    UserQueries.updateUserProStatus({
+        userId: UserHelpers.convertUserIdToBuffer(userId),
+        isPro,
+        maxActiveCompetitions: isPro ? 10 : 1
+    })
+        .then(() => {
+            res.sendStatus(200);
+        })
+        .catch(error => {
+            handleError(error, 500, 'Error updating user pro status', res);
+        });
+});
 
 export default router;

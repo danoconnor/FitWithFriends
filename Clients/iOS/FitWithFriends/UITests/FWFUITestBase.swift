@@ -137,6 +137,30 @@ class FWFUITestBase: XCTestCase {
         return json["competition_id"] as! String
     }
 
+    /// Make the test user a Pro subscriber via the admin endpoint
+    func makeUserPro() throws {
+        guard let userId else { return }
+
+        let url = URL(string: "http://localhost:3000/admin/setUserProStatus")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("some_admin_secret", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = ["userId": userId, "isPro": true]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        var httpResponse: HTTPURLResponse?
+        let semaphore = DispatchSemaphore(value: 0)
+        URLSession.shared.dataTask(with: request) { _, response, _ in
+            httpResponse = response as? HTTPURLResponse
+            semaphore.signal()
+        }.resume()
+        semaphore.wait()
+
+        XCTAssertEqual(httpResponse?.statusCode, 200, "Failed to make test user pro")
+    }
+
     // MARK: - Private
 
     private func deleteAllCompetitions() {

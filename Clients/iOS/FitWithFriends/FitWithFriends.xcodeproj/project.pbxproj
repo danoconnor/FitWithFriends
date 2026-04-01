@@ -73,6 +73,7 @@
 		0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */; };
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
 		0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A251279E424300C2970E /* CompetitionOverviewView.swift */; };
+		FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E4 /* PublicCompetitionCard.swift */; };
 		0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */; };
 		0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */; };
 		0B50BA4127EFEB410066134D /* AppleAuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */; };
@@ -276,6 +277,7 @@
 		0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKActivitySummary+Extensions.swift"; sourceTree = "<group>"; };
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
 		0B47A251279E424300C2970E /* CompetitionOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverviewView.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E4 /* PublicCompetitionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionCard.swift; sourceTree = "<group>"; };
 		0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionResultView.swift; sourceTree = "<group>"; };
 		0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationError.swift; sourceTree = "<group>"; };
@@ -817,6 +819,7 @@
 				0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */,
 				0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */,
 				0BD8B5BE27D42C92009BA5F2 /* CompetitionDetailView.swift */,
+				FWF0000200000000000000E4 /* PublicCompetitionCard.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -1146,6 +1149,7 @@
 				0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */,
 				0BC192AF2B12E6C300C3F4FA /* SecretConstants.swift in Sources */,
 				0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */,
+				FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */,
 				0B329F0E2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift in Sources */,
 				0B329F0F2E4C2CAA0082D211 /* IAuthenticationManager.swift in Sources */,
 				0B329F172E4D79900082D211 /* UserCompetitionPoints.swift in Sources */,

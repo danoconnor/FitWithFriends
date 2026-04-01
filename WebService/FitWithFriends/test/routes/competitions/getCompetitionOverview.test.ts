@@ -146,6 +146,7 @@ test('Get competition overview: validate score calculation with no activity data
     expect(testUserResult.lastName).toBe(testUserName.split(' ')[1]);
     expect(testUserResult.activityPoints).toBe(0);
     expect(testUserResult.pointsToday).toBe(0);
+    expect(response.data.isPublic).toBe(false);
 });
 
 test('Get competition overview: validate score calculation with no activity data for today', async () => {
@@ -403,6 +404,33 @@ test('Get competition overview: invalid timezone', async () => {
 
     expect(response.status).toBe(400);
     expect(response.data.context).toContain('Invalid timezone query param');
+});
+
+test('Get competition overview: returns isPublic true for public competition', async () => {
+    // Create a public competition and add the test user to it
+    const publicCompetitionId = uuid();
+    const now = new Date();
+    await TestSQL.createPublicCompetition({
+        competitionId: publicCompetitionId,
+        displayName: 'Public Test Competition',
+        startDate: now,
+        endDate: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+        adminUserId: convertUserIdToBuffer(testUserId),
+        accessToken: 'unused',
+        ianaTimezone: 'America/New_York'
+    });
+    competitionsToCleanup.push(publicCompetitionId);
+
+    await TestSQL.addUserToCompetition({
+        competitionId: publicCompetitionId,
+        userId: convertUserIdToBuffer(testUserId)
+    });
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${publicCompetitionId}/overview?timezone=America/New_York`, accessToken);
+
+    expect(response.status).toBe(200);
+    expect(response.data.isPublic).toBe(true);
 });
 
 test('Get competition overview: missing access token', async () => {

@@ -28,6 +28,15 @@ struct LoggedInContentView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
+                    // App title
+                    HStack {
+                        Text("Fit with Friends")
+                            .font(.largeTitle.bold())
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 4)
+
                     // Today's activity section
                     if let activitySummary = homepageViewModel.todayActivitySummary {
                         TodaySummaryView(activitySummary: activitySummary,
@@ -163,7 +172,6 @@ struct LoggedInContentView: View {
             .refreshable {
                 await homepageViewModel.refreshData()
             }
-            .navigationTitle("Fit with Friends")
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(Color("FwFBrandingColor"), for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
@@ -188,54 +196,6 @@ struct LoggedInContentView: View {
             guard ProcessInfo.processInfo.environment["FWF_UI_TESTING"] != "1" else { return }
             Task.detached {
                 await self.homepageViewModel.refreshData()
-            }
-        }
-    }
-}
-
-private struct PublicCompetitionCard: View {
-    let competition: PublicCompetition
-    let isUserPro: Bool
-    let onJoin: () -> Void
-    let onUpgrade: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(competition.displayName)
-                .font(.headline)
-
-            HStack(spacing: 16) {
-                Label("\(competition.memberCount)", systemImage: "person.2.fill")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                Label(competition.endDate.formatted(.dateTime.month().day()), systemImage: "calendar")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            if competition.isUserMember {
-                Label("Joined", systemImage: "checkmark.circle.fill")
-                    .font(.subheadline)
-                    .foregroundStyle(Color("FwFBrandingColor"))
-            } else if isUserPro {
-                Button(action: onJoin) {
-                    Text("Join")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Color("FwFBrandingColor"))
-                        )
-                }
-            } else {
-                Button(action: onUpgrade) {
-                    Label("Upgrade to Pro", systemImage: "star.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color("FwFBrandingColor"))
-                }
             }
         }
     }

@@ -183,4 +183,83 @@ final class HomepageViewModelTests: XCTestCase {
         XCTAssertEqual(homepageViewModel.publicCompetitions?.count, 1, "publicCompetitions should contain one competition")
         XCTAssertEqual(homepageViewModel.publicCompetitions?.first?.competitionId, competitionId, "The competition ID should match")
     }
+
+    func test_publicCompetitions_shouldExcludeCompetitionsUserHasJoined() {
+        // Arrange - one competition the user is a member of, one they're not
+        let notMemberCompetitionId = UUID()
+        let notMemberCompetition = PublicCompetition(
+            competitionId: notMemberCompetitionId,
+            displayName: "Not A Member",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(TimeInterval.xtDays(7)),
+            memberCount: 5,
+            isUserMember: false
+        )
+        let memberCompetition = PublicCompetition(
+            competitionId: UUID(),
+            displayName: "Already Joined",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(TimeInterval.xtDays(7)),
+            memberCount: 10,
+            isUserMember: true
+        )
+
+        let expectation = XCTestExpectation(description: "publicCompetitions should only include the competition the user has not joined")
+
+        homepageViewModel.$publicCompetitions
+            .sink { competitions in
+                if let competitions = competitions, competitions.contains(where: { $0.competitionId == notMemberCompetitionId }) {
+                    expectation.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        // Act
+        mockCompetitionManager.return_publicCompetitions = [notMemberCompetition, memberCompetition]
+
+        // Assert
+        wait(for: [expectation], timeout: 2)
+        XCTAssertEqual(homepageViewModel.publicCompetitions?.count, 1, "Only the non-member competition should be shown")
+        XCTAssertEqual(homepageViewModel.publicCompetitions?.first?.competitionId, notMemberCompetitionId)
+        XCTAssertFalse(homepageViewModel.publicCompetitions?.contains(where: { $0.isUserMember }) ?? false, "No joined competitions should appear")
+    }
+
+    func test_publicCompetitions_shouldExcludeEndedCompetitions() {
+        // Arrange - one active competition, one that ended in the past
+        let activeCompetitionId = UUID()
+        let activeCompetition = PublicCompetition(
+            competitionId: activeCompetitionId,
+            displayName: "Active Competition",
+            startDate: Date(),
+            endDate: Date().addingTimeInterval(TimeInterval.xtDays(7)),
+            memberCount: 5,
+            isUserMember: false
+        )
+        let endedCompetition = PublicCompetition(
+            competitionId: UUID(),
+            displayName: "Ended Competition",
+            startDate: Date().addingTimeInterval(-TimeInterval.xtDays(14)),
+            endDate: Date().addingTimeInterval(-TimeInterval.xtDays(7)),
+            memberCount: 3,
+            isUserMember: false
+        )
+
+        let expectation = XCTestExpectation(description: "publicCompetitions should only include active competitions")
+
+        homepageViewModel.$publicCompetitions
+            .sink { competitions in
+                if let competitions = competitions, competitions.contains(where: { $0.competitionId == activeCompetitionId }) {
+                    expectation.fulfill()
+                }
+            }
+            .store(in: &cancellables)
+
+        // Act
+        mockCompetitionManager.return_publicCompetitions = [activeCompetition, endedCompetition]
+
+        // Assert
+        wait(for: [expectation], timeout: 2)
+        XCTAssertEqual(homepageViewModel.publicCompetitions?.count, 1, "Only the active competition should be shown")
+        XCTAssertEqual(homepageViewModel.publicCompetitions?.first?.competitionId, activeCompetitionId)
+    }
 }

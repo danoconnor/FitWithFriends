@@ -12,7 +12,7 @@ final class AboutScreenTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load
-        XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
 
         // Open the toolbar menu and tap About
         let menuButton = app.buttons["More"]

@@ -51,6 +51,7 @@ public class HomepageViewModel: ObservableObject {
         publicCompetitionLoadListener = competitionManager.publicCompetitionsPublisher.sink { [weak self] newValue in
             DispatchQueue.main.async {
                 self?.publicCompetitions = newValue
+                    .filter { !$0.isUserMember && $0.endDate > Date() } // If the user is a member, it will be listed in currentCompetitions
             }
         }
 

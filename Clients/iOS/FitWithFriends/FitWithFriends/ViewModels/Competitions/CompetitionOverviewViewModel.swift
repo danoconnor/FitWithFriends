@@ -122,7 +122,7 @@ public class CompetitionOverviewViewModel: ObservableObject {
                 userPositionDescription = "\(userPositionPrefix) \(userPosition)\(userPositionString)"
             }
         } else {
-            userPositionDescription = "Competition hasn't started"
+            userPositionDescription = "Not started"
         }
     }
 
