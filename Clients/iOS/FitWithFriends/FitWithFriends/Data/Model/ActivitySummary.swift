@@ -8,7 +8,7 @@
 import Foundation
 import HealthKit
 
-public class ActivitySummary: IdentifiableBase, Encodable {
+public class ActivitySummary: IdentifiableBase, Encodable, @unchecked Sendable {
     public let date: Date
 
     public let activeCaloriesGoal: UInt

@@ -18,7 +18,7 @@ public struct WorkoutSampleDTO {
 
     public init(workout: HKWorkout) {
         startDate = workout.startDate
-        caloriesBurned = round(workout.totalEnergyBurned?.doubleValue(for: .largeCalorie()) ?? 0)
+        caloriesBurned = round(workout.statistics(for: HKQuantityType(.activeEnergyBurned))?.sumQuantity()?.doubleValue(for: .largeCalorie()) ?? 0)
         duration = round(workout.duration)
         activityType = workout.workoutActivityType
 
@@ -38,7 +38,7 @@ public struct WorkoutSampleDTO {
         case .stairs,
              .stairClimbing:
             // For stair workouts, we measure distance in terms of stairs climbed instead of distance
-            distance = round(workout.totalFlightsClimbed?.doubleValue(for: .count()) ?? 0)
+            distance = round(workout.statistics(for: HKQuantityType(.flightsClimbed))?.sumQuantity()?.doubleValue(for: .count()) ?? 0)
             unit = .count
         default:
             distance = nil

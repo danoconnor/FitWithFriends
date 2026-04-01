@@ -50,6 +50,6 @@ public class MockObjectGraph: IObjectGraph {
         subscriptionManager = MockSubscriptionManager()
         subscriptionService = MockSubscriptionService()
 
-        serverEnvironmentManager = MockServerEnvironmentManager() as! any IServerEnvironmentManager
+        serverEnvironmentManager = MockServerEnvironmentManager() as any IServerEnvironmentManager
     }
 }

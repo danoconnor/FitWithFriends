@@ -9,6 +9,7 @@ import Combine
 import Foundation
 import HealthKit
 
+@MainActor
 public class HomepageViewModel: ObservableObject {
     private let authenticationManager: IAuthenticationManager
     private let competitionManager: ICompetitionManager
@@ -41,25 +42,25 @@ public class HomepageViewModel: ObservableObject {
         Task.detached { await self.refreshTodayActivitySummary() }
 
         // Need to hold a reference to this, otherwise the sink callback will never be invoked
-        competitionLoadListener = competitionManager.competitionOverviewsPublisher.sink { [weak self] newValue in
-            DispatchQueue.main.async {
+        competitionLoadListener = competitionManager.competitionOverviewsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newValue in
                 self?.currentCompetitions = newValue.map { $0.value }
                     .sorted { $0 < $1 }
             }
-        }
 
-        publicCompetitionLoadListener = competitionManager.publicCompetitionsPublisher.sink { [weak self] newValue in
-            DispatchQueue.main.async {
+        publicCompetitionLoadListener = competitionManager.publicCompetitionsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newValue in
                 self?.publicCompetitions = newValue
                     .filter { !$0.isUserMember && $0.endDate > Date() } // If the user is a member, it will be listed in currentCompetitions
             }
-        }
 
-        proStatusListener = subscriptionManager.isUserProPublisher.sink { [weak self] newValue in
-            DispatchQueue.main.async {
+        proStatusListener = subscriptionManager.isUserProPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newValue in
                 self?.isUserPro = newValue
             }
-        }
 
         // Check subscription status on init
         Task.detached { await subscriptionManager.checkSubscriptionStatus() }
@@ -78,15 +79,12 @@ public class HomepageViewModel: ObservableObject {
     }
 
     private func refreshTodayActivitySummary() async {
-        return await withCheckedContinuation { continuation in
+        let summary: ActivitySummary? = await withCheckedContinuation { continuation in
             healthKitManager.getCurrentActivitySummary { summary in
-                DispatchQueue.main.async {
-                    self.todayActivitySummary = summary
-                    self.loadedActivitySummary = true
-                    continuation.resume()
-                }
+                continuation.resume(returning: summary)
             }
         }
-
+        todayActivitySummary = summary
+        loadedActivitySummary = true
     }
 }
