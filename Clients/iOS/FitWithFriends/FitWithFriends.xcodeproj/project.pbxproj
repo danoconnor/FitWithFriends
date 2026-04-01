@@ -74,6 +74,16 @@
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
 		0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A251279E424300C2970E /* CompetitionOverviewView.swift */; };
 		FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E4 /* PublicCompetitionCard.swift */; };
+		FWF0000200000000000000F0 /* IosBuildVersionsDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */; };
+		FWF0000200000000000000F2 /* SemanticVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F3 /* SemanticVersion.swift */; };
+		FWF0000200000000000000F4 /* IAppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F5 /* IAppMetadataService.swift */; };
+		FWF0000200000000000000F6 /* AppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F7 /* AppMetadataService.swift */; };
+		FWF0000200000000000000F8 /* IAppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F9 /* IAppVersionManager.swift */; };
+		FWF0000200000000000000FA /* AppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FB /* AppVersionManager.swift */; };
+		FWF0000200000000000000FC /* MockAppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FD /* MockAppMetadataService.swift */; };
+		FWF0000200000000000000FE /* MockAppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FF /* MockAppVersionManager.swift */; };
+		FWF00002000000000000010A /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010B /* AppVersionViewModel.swift */; };
+		FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010D /* AppVersionManagerTests.swift */; };
 		0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */; };
 		0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */; };
 		0B50BA4127EFEB410066134D /* AppleAuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */; };
@@ -278,6 +288,16 @@
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
 		0B47A251279E424300C2970E /* CompetitionOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverviewView.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000E4 /* PublicCompetitionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionCard.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosBuildVersionsDTO.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F3 /* SemanticVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticVersion.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F5 /* IAppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppMetadataService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F7 /* AppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetadataService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F9 /* IAppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppVersionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000FB /* AppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000FD /* MockAppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppMetadataService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000FF /* MockAppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppVersionManager.swift; sourceTree = "<group>"; };
+		FWF00002000000000000010B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
+		FWF00002000000000000010D /* AppVersionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManagerTests.swift; sourceTree = "<group>"; };
 		0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionResultView.swift; sourceTree = "<group>"; };
 		0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationError.swift; sourceTree = "<group>"; };
@@ -440,6 +460,7 @@
 				FWF00002000000000000007B /* PushNotificationServiceTests.swift */,
 				FWF00002000000000000008B /* PushNotificationManagerTests.swift */,
 				FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */,
+				FWF00002000000000000010D /* AppVersionManagerTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -495,6 +516,7 @@
 				0BBD78BC25A282EC00E08EB2 /* Home */,
 				0B359723256C7357006D956A /* AppStateViewModel.swift */,
 				0BCB29DB256B3B23008FE93C /* ViewState.swift */,
+				FWF00002000000000000010B /* AppVersionViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -516,6 +538,7 @@
 			isa = PBXGroup;
 			children = (
 				0B1CBEBD27C308FA0008C72A /* AppProtocol */,
+				FWF00002000000000000010E /* AppVersion */,
 				0B99FC15256A208E00673133 /* Authentication */,
 				0BBD789F259A536000E08EB2 /* Competitions */,
 				0B99FC25256A290900673133 /* Model */,
@@ -534,6 +557,15 @@
 				FWF0000200000000000000D3 /* SubscriptionManager.swift */,
 			);
 			path = Subscriptions;
+			sourceTree = "<group>";
+		};
+		FWF00002000000000000010E /* AppVersion */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000F9 /* IAppVersionManager.swift */,
+				FWF0000200000000000000FB /* AppVersionManager.swift */,
+			);
+			path = AppVersion;
 			sourceTree = "<group>";
 		};
 		0B47A223279CA88800C2970E /* Mocks */ = {
@@ -564,6 +596,8 @@
 				FWF00002000000000000006B /* MockPushNotificationManager.swift */,
 				FWF0000200000000000000E0 /* MockSubscriptionManager.swift */,
 				FWF0000200000000000000E2 /* MockSubscriptionService.swift */,
+				FWF0000200000000000000FD /* MockAppMetadataService.swift */,
+				FWF0000200000000000000FF /* MockAppVersionManager.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -625,6 +659,7 @@
 			isa = PBXGroup;
 			children = (
 				0BC192AE2B12E6C300C3F4FA /* SecretConstants.swift */,
+				FWF0000200000000000000F3 /* SemanticVersion.swift */,
 				0B99FC36256A3DE100673133 /* Errors */,
 				0B99FC1E256A26D500673133 /* Keychain */,
 				0B99FC0B256A170000673133 /* Extensions */,
@@ -701,6 +736,8 @@
 			isa = PBXGroup;
 			children = (
 				0BCF64862BCA29A7004E98C7 /* DTOs */,
+				FWF0000200000000000000F5 /* IAppMetadataService.swift */,
+				FWF0000200000000000000F7 /* AppMetadataService.swift */,
 				0BBD788F259A4AE300E08EB2 /* AuthenticationService.swift */,
 				0BBD7898259A4B9300E08EB2 /* ActivityDataService.swift */,
 				0BBD789B259A4BB600E08EB2 /* CompetitionService.swift */,
@@ -870,6 +907,7 @@
 			isa = PBXGroup;
 			children = (
 				0BCF64872BCA29C0004E98C7 /* ValueArrayDTO.swift */,
+				FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */,
 			);
 			path = DTOs;
 			sourceTree = "<group>";
@@ -962,6 +1000,7 @@
 				0B99FBC7256A016900673133 /* Frameworks */,
 				0B99FBC8256A016900673133 /* Resources */,
 				0BCF64992BCCB4F4004E98C7 /* Remove Settings bundle from Release builds */,
+				0B2ACCFF2EC04000004966FF /* Set Bundle Version */,
 			);
 			buildRules = (
 			);
@@ -1105,6 +1144,20 @@
 			shellScript = "# Set the below environment variables to insert the secrets into SecretsConstants.swift \n# FWF_KEYCHAIN_PREFIX\n# FWF_SUPPORT_EMAIL\n# FWF_APP_PROTOCOL\n# FWF_DEVELOPER_NAME\n# FWF_LOCAL_SERVER_URL\n# FWF_LOCAL_CLIENT_SECRET\n# FWF_LOCAL_CLIENT_ID\n# FWF_PROD_SERVER_URL\n# FWF_PROD_CLIENT_SECRET\n# FWF_PROD_CLIENT_ID\n\nif [ -z \"$FWF_KEYCHAIN_PREFIX\" ]; then\n  if [ ! -f \"$PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\" ]; then\n    cp \"$PROJECT_DIR/FitWithFriends/Utilities/SecretConstantsTemplate.swift\" \"$PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\"\n  fi\n  exit 0\nfi\n\n# Copy the template into the real file, then replace all the empty vars with our actual values\ncp $PROJECT_DIR/FitWithFriends/Utilities/SecretConstantsTemplate.swift $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let keychainPrefix = \"\"/static let keychainPrefix = \"'\"$FWF_KEYCHAIN_PREFIX\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let supportEmail = \"\"/static let supportEmail = \"'\"$FWF_SUPPORT_EMAIL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let baseAppProtocol = \"\"/static let baseAppProtocol = \"'\"$FWF_APP_PROTOCOL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let developerName = \"\"/static let developerName = \"'\"$FWF_DEVELOPER_NAME\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localServiceBaseUrl = \"\"/static let localServiceBaseUrl = \"'\"$FWF_LOCAL_SERVER_URL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localClientSecret = \"\"/static let localClientSecret = \"'\"$FWF_LOCAL_CLIENT_SECRET\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localClientId = \"\"/static let localClientId = \"'\"$FWF_LOCAL_CLIENT_ID\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodServiceBaseUrl = \"\"/static let prodServiceBaseUrl = \"'\"$FWF_PROD_SERVER_URL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodClientSecret = \"\"/static let prodClientSecret = \"'\"$FWF_PROD_CLIENT_SECRET\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodClientId = \"\"/static let prodClientId = \"'\"$FWF_PROD_CLIENT_ID\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n";
 			showEnvVarsInLog = 0;
 		};
+		0B2ACCFF2EC04000004966FF /* Set Bundle Version */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Set Bundle Version";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nfi\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1122,6 +1175,7 @@
 				FWF00002000000000000007A /* PushNotificationServiceTests.swift in Sources */,
 				FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */,
 				FWF0000200000000000000CA /* SubscriptionAndPublicCompetitionTests.swift in Sources */,
+				FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1287,6 +1341,15 @@
 				FWF0000200000000000000DF /* ProUpgradeView.swift in Sources */,
 				FWF0000200000000000000E1 /* MockSubscriptionManager.swift in Sources */,
 				FWF0000200000000000000E3 /* MockSubscriptionService.swift in Sources */,
+				FWF0000200000000000000F0 /* IosBuildVersionsDTO.swift in Sources */,
+				FWF0000200000000000000F2 /* SemanticVersion.swift in Sources */,
+				FWF0000200000000000000F4 /* IAppMetadataService.swift in Sources */,
+				FWF0000200000000000000F6 /* AppMetadataService.swift in Sources */,
+				FWF0000200000000000000F8 /* IAppVersionManager.swift in Sources */,
+				FWF0000200000000000000FA /* AppVersionManager.swift in Sources */,
+				FWF0000200000000000000FC /* MockAppMetadataService.swift in Sources */,
+				FWF0000200000000000000FE /* MockAppVersionManager.swift in Sources */,
+				FWF00002000000000000010A /* AppVersionViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

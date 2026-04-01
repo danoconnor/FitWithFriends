@@ -28,6 +28,8 @@ public class MockObjectGraph: IObjectGraph {
     var pushNotificationService: IPushNotificationService
     var subscriptionManager: ISubscriptionManager
     var subscriptionService: ISubscriptionService
+    var appMetadataService: IAppMetadataService
+    var appVersionManager: IAppVersionManager
 
     init() {
         activityDataService = MockActivityDataService()
@@ -49,6 +51,8 @@ public class MockObjectGraph: IObjectGraph {
         pushNotificationService = MockPushNotificationService()
         subscriptionManager = MockSubscriptionManager()
         subscriptionService = MockSubscriptionService()
+        appMetadataService = MockAppMetadataService()
+        appVersionManager = MockAppVersionManager()
 
         serverEnvironmentManager = MockServerEnvironmentManager() as! any IServerEnvironmentManager
     }

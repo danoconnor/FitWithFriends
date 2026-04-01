@@ -16,6 +16,8 @@ services:
       - PGUSESSL=0
       - FWF_AUTH_USE_LOCAL_KEYPAIR=1
       - FWF_ADMIN_AUTH_SECRET=${FWF_ADMIN_AUTH_SECRET}
+      - FWF_IOS_RECOMMENDED_BUILD=20260401.1200
+      - FWF_IOS_REQUIRED_BUILD=20260301.0900
       - NODE_ENV=test
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]

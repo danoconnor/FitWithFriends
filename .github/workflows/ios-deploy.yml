@@ -1,0 +1,115 @@
+name: Deploy iOS app to App Store Connect
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'Clients/iOS/**'
+  workflow_dispatch:
+
+env:
+  XCODE_PROJECT_DIR: ./Clients/iOS/FitWithFriends
+  WORKSPACE_NAME: FitWithFriends.xcworkspace
+  SCHEME: FitWithFriends
+  TEAM_ID: U7MJ9CBUMD
+  BUNDLE_ID: com.danoconnor.FitWithFriends
+
+jobs:
+  deploy:
+    name: Build and upload to App Store Connect
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install distribution certificate and provisioning profile
+        env:
+          DISTRIBUTION_CERTIFICATE_P12_BASE64: ${{ secrets.DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          APP_STORE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APP_STORE_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Create and configure a temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          # Import distribution certificate into the keychain
+          CERT_PATH=$RUNNER_TEMP/distribution.p12
+          echo "$DISTRIBUTION_CERTIFICATE_P12_BASE64" | base64 -d > "$CERT_PATH"
+          security import "$CERT_PATH" -P "$DISTRIBUTION_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+          # Install provisioning profile, using its UUID as the filename
+          PP_PATH=$RUNNER_TEMP/provisioning_profile.mobileprovision
+          echo "$APP_STORE_PROVISIONING_PROFILE_BASE64" | base64 -d > "$PP_PATH"
+          PP_UUID=$(security cms -D -i "$PP_PATH" | plutil -extract UUID raw -)
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/${PP_UUID}.mobileprovision
+          echo "PROVISIONING_PROFILE_UUID=$PP_UUID" >> $GITHUB_ENV
+
+      - name: Build archive
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
+        run: |
+          xcodebuild archive \
+            -workspace "$WORKSPACE_NAME" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$RUNNER_TEMP/FitWithFriends.xcarchive" \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            PROVISIONING_PROFILE="$PROVISIONING_PROFILE_UUID"
+
+      - name: Upload to App Store Connect
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT_BASE64 }}
+        run: |
+          # Install App Store Connect API key
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY_CONTENT_BASE64" | base64 -d > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+
+          cat > "$RUNNER_TEMP/ExportOptions.plist" << PLIST_EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>destination</key>
+              <string>upload</string>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>$PROVISIONING_PROFILE_UUID</string>
+              </dict>
+          </dict>
+          </plist>
+          PLIST_EOF
+
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/FitWithFriends.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8 \
+            -authenticationKeyID "$APP_STORE_CONNECT_API_KEY_ID" \
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_API_KEY_ISSUER_ID"
+
+      - name: Clean up keychain and API key
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db" || true
+          rm -f ~/.appstoreconnect/private_keys/AuthKey_*.p8 || true
