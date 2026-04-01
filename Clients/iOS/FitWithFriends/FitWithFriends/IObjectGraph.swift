@@ -28,4 +28,6 @@ protocol IObjectGraph {
     var pushNotificationService: IPushNotificationService { get }
     var subscriptionManager: ISubscriptionManager { get }
     var subscriptionService: ISubscriptionService { get }
+    var appMetadataService: IAppMetadataService { get }
+    var appVersionManager: IAppVersionManager { get }
 }

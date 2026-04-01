@@ -30,6 +30,8 @@ class ObjectGraph: IObjectGraph {
     let pushNotificationService: IPushNotificationService
     let subscriptionManager: ISubscriptionManager
     let subscriptionService: ISubscriptionService
+    let appMetadataService: IAppMetadataService
+    let appVersionManager: IAppVersionManager
 
     init() {
         appleIDProvider = ASAuthorizationAppleIDProviderWrapper()
@@ -42,6 +44,8 @@ class ObjectGraph: IObjectGraph {
 
         serverEnvironmentManager = ServerEnvironmentManager(userDefaults: userDefaults) as IServerEnvironmentManager
         shakeGestureHandler = ShakeGestureHandler(emailUtility: emailUtility)
+        appMetadataService = AppMetadataService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager)
+        appVersionManager = AppVersionManager(appMetadataService: appMetadataService)
         tokenManager = TokenManager(keychainUtilities: keychainUtilities)
 
         activityDataService = ActivityDataService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
