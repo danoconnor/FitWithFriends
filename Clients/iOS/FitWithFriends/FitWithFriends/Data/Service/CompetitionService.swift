@@ -87,4 +87,19 @@ public class CompetitionService: ServiceBase, ICompetitionService {
                                                                            method: .post,
                                                                            body: requestBody)
     }
+
+    public func getPublicCompetitions() async throws -> PublicCompetitionsResponse {
+        return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/public",
+                                                           method: .get)
+    }
+
+    public func joinPublicCompetition(competitionId: UUID) async throws {
+        let requestBody: [String: String] = [
+            "competitionId": competitionId.uuidString
+        ]
+
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/joinPublic",
+                                                                           method: .post,
+                                                                           body: requestBody)
+    }
 }

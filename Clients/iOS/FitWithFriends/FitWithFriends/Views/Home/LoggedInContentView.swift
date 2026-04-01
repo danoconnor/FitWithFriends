@@ -20,14 +20,23 @@ struct LoggedInContentView: View {
                                                         healthKitManager: objectGraph.healthKitManager)
         homepageViewModel = HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
                                               competitionManager: objectGraph.competitionManager,
-
-                                              healthKitManager: objectGraph.healthKitManager)
+                                              healthKitManager: objectGraph.healthKitManager,
+                                              subscriptionManager: objectGraph.subscriptionManager)
     }
 
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
+                    // App title
+                    HStack {
+                        Text("Fit with Friends")
+                            .font(.largeTitle.bold())
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 4)
+
                     // Today's activity section
                     if let activitySummary = homepageViewModel.todayActivitySummary {
                         TodaySummaryView(activitySummary: activitySummary,
@@ -49,6 +58,35 @@ struct LoggedInContentView: View {
                         }
                         .fwfCard()
                         .padding(.horizontal, 16)
+                    }
+
+                    // Public competitions section
+                    if let publicCompetitions = homepageViewModel.publicCompetitions, !publicCompetitions.isEmpty {
+                        HStack {
+                            Text("Public Competitions")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 4)
+
+                        ForEach(publicCompetitions) { competition in
+                            PublicCompetitionCard(
+                                competition: competition,
+                                isUserPro: homepageViewModel.isUserPro,
+                                onJoin: {
+                                    Task {
+                                        try? await objectGraph.competitionManager.joinPublicCompetition(competitionId: competition.competitionId)
+                                    }
+                                },
+                                onUpgrade: {
+                                    homepageSheetViewModel.updateState(sheet: .proUpgrade, state: true)
+                                }
+                            )
+                            .fwfCard()
+                            .padding(.horizontal, 16)
+                        }
                     }
 
                     // Competitions section
@@ -123,6 +161,9 @@ struct LoggedInContentView: View {
                     case .about:
                         AboutView(emailUtility: objectGraph.emailUtility,
                                   serverEnvironmentManager: objectGraph.serverEnvironmentManager)
+                    case .proUpgrade:
+                        ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
+                                       subscriptionManager: objectGraph.subscriptionManager)
                     default:
                         Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                     }
@@ -131,7 +172,6 @@ struct LoggedInContentView: View {
             .refreshable {
                 await homepageViewModel.refreshData()
             }
-            .navigationTitle("Fit with Friends")
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(Color("FwFBrandingColor"), for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

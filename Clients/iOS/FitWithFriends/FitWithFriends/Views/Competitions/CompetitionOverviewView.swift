@@ -45,6 +45,22 @@ struct CompetitionOverviewView: View {
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.leading)
 
+                        if competitionOverview.isPublic {
+                            Label("Public", systemImage: "globe")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(Color("FwFBrandingColor"))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Capsule().fill(Color("FwFBrandingColor").opacity(0.12)))
+                        } else {
+                            Label("Private", systemImage: "lock.fill")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Capsule().fill(Color(.tertiarySystemFill)))
+                        }
+
                         if !showAllDetails {
                             Image(systemName: "chevron.right")
                                 .font(.subheadline.weight(.semibold))
@@ -83,7 +99,7 @@ struct CompetitionOverviewView: View {
                 }
             }
 
-            // Metadata: position pill + dates
+            // Metadata: position pill + visibility badge + dates
             HStack(spacing: 10) {
                 Text(viewModel.userPositionDescription)
                     .font(.subheadline.weight(.medium))
@@ -156,9 +172,11 @@ struct CompetitionOverviewView_Previews: PreviewProvider {
             UserCompetitionPoints(userId: "user_5", firstName: "Test", lastName: "User 5", total: 10, today: 10)
         ]
 
-        return CompetitionOverview(start: Date(),
-                                   end: Date().addingTimeInterval(TimeInterval.xtDays(7)),
-                                   currentResults: results)
+        return CompetitionOverview(
+            //name: "Really really really long competition name",
+            start: Date(),
+            end: Date().addingTimeInterval(TimeInterval.xtDays(7)),
+            currentResults: results)
     }
 
     static var previews: some View {

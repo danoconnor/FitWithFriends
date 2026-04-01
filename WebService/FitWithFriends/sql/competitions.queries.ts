@@ -149,6 +149,7 @@ export interface IGetCompetitionResult {
   display_name: string;
   end_date: Date;
   iana_timezone: string;
+  is_public: boolean;
   start_date: Date;
   state: number;
 }
@@ -159,13 +160,13 @@ export interface IGetCompetitionQuery {
   result: IGetCompetitionResult;
 }
 
-const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":223,"b":237}]}],"statement":"                                                                                      \nSELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state FROM competitions WHERE competition_id = :competitionId!"};
+const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":234,"b":248}]}],"statement":"                                                                                      \nSELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public FROM competitions WHERE competition_id = :competitionId!"};
 
 /**
  * Query generated from SQL:
  * ```
  *                                                                                       
- * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state FROM competitions WHERE competition_id = :competitionId!
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public FROM competitions WHERE competition_id = :competitionId!
  * ```
  */
 export function getCompetition(params: IGetCompetitionParams): Promise<Array<IGetCompetitionResult>> {
@@ -363,15 +364,16 @@ export interface IGetNumberOfActiveCompetitionsForUserQuery {
   result: IGetNumberOfActiveCompetitionsForUserResult;
 }
 
-const getNumberOfActiveCompetitionsForUserIR: any = {"usedParamSet":{"userId":true,"currentDate":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":126,"b":133}]},{"name":"currentDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":341,"b":353}]}],"statement":"SELECT COUNT(competitionData.competition_id)::INTEGER FROM\n    (SELECT competition_id FROM users_competitions WHERE user_id = :userId!) as usersCompetitions\n    INNER JOIN\n        (SELECT competition_id, end_date FROM competitions) as competitionData\n    ON usersCompetitions.competition_id = competitionData.competition_id\nWHERE end_date > :currentDate!"};
+const getNumberOfActiveCompetitionsForUserIR: any = {"usedParamSet":{"userId":true,"currentDate":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":224,"b":231}]},{"name":"currentDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":463,"b":475}]}],"statement":"                                                                                                 \nSELECT COUNT(competitionData.competition_id)::INTEGER FROM\n    (SELECT competition_id FROM users_competitions WHERE user_id = :userId!) as usersCompetitions\n    INNER JOIN\n        (SELECT competition_id, end_date FROM competitions WHERE is_public = false) as competitionData\n    ON usersCompetitions.competition_id = competitionData.competition_id\nWHERE end_date > :currentDate!"};
 
 /**
  * Query generated from SQL:
  * ```
+ *                                                                                                  
  * SELECT COUNT(competitionData.competition_id)::INTEGER FROM
  *     (SELECT competition_id FROM users_competitions WHERE user_id = :userId!) as usersCompetitions
  *     INNER JOIN
- *         (SELECT competition_id, end_date FROM competitions) as competitionData
+ *         (SELECT competition_id, end_date FROM competitions WHERE is_public = false) as competitionData
  *     ON usersCompetitions.competition_id = competitionData.competition_id
  * WHERE end_date > :currentDate!
  * ```
@@ -427,6 +429,7 @@ export interface IGetCompetitionsInStateResult {
   display_name: string;
   end_date: Date;
   iana_timezone: string;
+  is_public: boolean;
   start_date: Date;
   state: number;
 }
@@ -437,12 +440,12 @@ export interface IGetCompetitionsInStateQuery {
   result: IGetCompetitionsInStateResult;
 }
 
-const getCompetitionsInStateIR: any = {"usedParamSet":{"state":true,"finishedBeforeDate":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":128,"b":134}]},{"name":"finishedBeforeDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":170}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state \nFROM competitions\nWHERE state = :state! AND end_date < :finishedBeforeDate!"};
+const getCompetitionsInStateIR: any = {"usedParamSet":{"state":true,"finishedBeforeDate":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":138,"b":144}]},{"name":"finishedBeforeDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":161,"b":180}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public\nFROM competitions\nWHERE state = :state! AND end_date < :finishedBeforeDate!"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state 
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
  * FROM competitions
  * WHERE state = :state! AND end_date < :finishedBeforeDate!
  * ```
@@ -516,6 +519,161 @@ export function updateCompetitionFinalPoints(params: IUpdateCompetitionFinalPoin
   return import('@pgtyped/runtime').then(pgtyped => {
     const updateCompetitionFinalPoints = new pgtyped.PreparedQuery<IUpdateCompetitionFinalPointsParams,IUpdateCompetitionFinalPointsResult>(updateCompetitionFinalPointsIR);
     return updateCompetitionFinalPoints.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetPublicCompetitions' parameters type */
+export interface IGetPublicCompetitionsParams {
+  activeState: number;
+}
+
+/** 'GetPublicCompetitions' return type */
+export interface IGetPublicCompetitionsResult {
+  competition_id: string;
+  display_name: string;
+  end_date: Date;
+  iana_timezone: string;
+  member_count: number;
+  start_date: Date;
+  state: number;
+}
+
+/** 'GetPublicCompetitions' query type */
+export interface IGetPublicCompetitionsQuery {
+  params: IGetPublicCompetitionsParams;
+  result: IGetPublicCompetitionsResult;
+}
+
+const getPublicCompetitionsIR: any = {"usedParamSet":{"activeState":true},"params":[{"name":"activeState","required":true,"transform":{"type":"scalar"},"locs":[{"a":277,"b":289}]}],"statement":"SELECT c.competition_id, c.display_name, c.start_date, c.end_date, c.iana_timezone, c.state,\n       COUNT(uc.user_id)::INTEGER AS \"member_count!\"\nFROM competitions c\nLEFT JOIN users_competitions uc ON c.competition_id = uc.competition_id\nWHERE c.is_public = true AND c.state = :activeState!\nGROUP BY c.competition_id"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT c.competition_id, c.display_name, c.start_date, c.end_date, c.iana_timezone, c.state,
+ *        COUNT(uc.user_id)::INTEGER AS "member_count!"
+ * FROM competitions c
+ * LEFT JOIN users_competitions uc ON c.competition_id = uc.competition_id
+ * WHERE c.is_public = true AND c.state = :activeState!
+ * GROUP BY c.competition_id
+ * ```
+ */
+export function getPublicCompetitions(params: IGetPublicCompetitionsParams): Promise<Array<IGetPublicCompetitionsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getPublicCompetitions = new pgtyped.PreparedQuery<IGetPublicCompetitionsParams,IGetPublicCompetitionsResult>(getPublicCompetitionsIR);
+    return getPublicCompetitions.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'CreatePublicCompetition' parameters type */
+export interface ICreatePublicCompetitionParams {
+  accessToken: string;
+  adminUserId: Buffer;
+  competitionId: string;
+  displayName: string;
+  endDate: DateOrString;
+  ianaTimezone: string;
+  startDate: DateOrString;
+}
+
+/** 'CreatePublicCompetition' return type */
+export type ICreatePublicCompetitionResult = void;
+
+/** 'CreatePublicCompetition' query type */
+export interface ICreatePublicCompetitionQuery {
+  params: ICreatePublicCompetitionParams;
+  result: ICreatePublicCompetitionResult;
+}
+
+const createPublicCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":141,"b":151}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":154,"b":162}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":165,"b":177}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":180,"b":192}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":195,"b":207}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":210,"b":223}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":226,"b":240}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public)\nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public)
+ * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true)
+ * ```
+ */
+export function createPublicCompetition(params: ICreatePublicCompetitionParams): Promise<Array<ICreatePublicCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const createPublicCompetition = new pgtyped.PreparedQuery<ICreatePublicCompetitionParams,ICreatePublicCompetitionResult>(createPublicCompetitionIR);
+    return createPublicCompetition.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetPublicCompetition' parameters type */
+export interface IGetPublicCompetitionParams {
+  competitionId: string;
+}
+
+/** 'GetPublicCompetition' return type */
+export interface IGetPublicCompetitionResult {
+  admin_user_id: Buffer;
+  competition_id: string;
+  display_name: string;
+  end_date: Date;
+  iana_timezone: string;
+  is_public: boolean;
+  start_date: Date;
+  state: number;
+}
+
+/** 'GetPublicCompetition' query type */
+export interface IGetPublicCompetitionQuery {
+  params: IGetPublicCompetitionParams;
+  result: IGetPublicCompetitionResult;
+}
+
+const getPublicCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":147,"b":161}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public\nFROM competitions\nWHERE competition_id = :competitionId! AND is_public = true"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
+ * FROM competitions
+ * WHERE competition_id = :competitionId! AND is_public = true
+ * ```
+ */
+export function getPublicCompetition(params: IGetPublicCompetitionParams): Promise<Array<IGetPublicCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getPublicCompetition = new pgtyped.PreparedQuery<IGetPublicCompetitionParams,IGetPublicCompetitionResult>(getPublicCompetitionIR);
+    return getPublicCompetition.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'IsUserInCompetition' parameters type */
+export interface IIsUserInCompetitionParams {
+  competitionId: string;
+  userId: Buffer;
+}
+
+/** 'IsUserInCompetition' return type */
+export interface IIsUserInCompetitionResult {
+  count: number;
+}
+
+/** 'IsUserInCompetition' query type */
+export interface IIsUserInCompetitionQuery {
+  params: IIsUserInCompetitionParams;
+  result: IIsUserInCompetitionResult;
+}
+
+const isUserInCompetitionIR: any = {"usedParamSet":{"userId":true,"competitionId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":84}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":107,"b":121}]}],"statement":"SELECT COUNT(*)::INTEGER AS \"count!\" FROM users_competitions\nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT COUNT(*)::INTEGER AS "count!" FROM users_competitions
+ * WHERE user_id = :userId! AND competition_id = :competitionId!
+ * ```
+ */
+export function isUserInCompetition(params: IIsUserInCompetitionParams): Promise<Array<IIsUserInCompetitionResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const isUserInCompetition = new pgtyped.PreparedQuery<IIsUserInCompetitionParams,IIsUserInCompetitionResult>(isUserInCompetitionIR);
+    return isUserInCompetition.run(params, DatabaseConnectionPool);
   });
 }
 

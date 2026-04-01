@@ -12,3 +12,19 @@ SELECT encode(userData.user_id::bytea, 'hex') AS "userId!", userData.first_name,
     (SELECT user_id, final_points FROM users_competitions WHERE competition_id = :competitionId!) AS usersCompetitions
     INNER JOIN (SELECT user_id, first_name, last_name FROM users) as userData
     ON usersCompetitions.user_id = userData.user_id;
+
+/* @name GetUserProStatus */
+SELECT is_pro FROM users WHERE user_id = :userId!;
+
+/* @name UpdateUserProStatus */
+UPDATE users SET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!
+WHERE user_id = :userId!;
+
+/* @name UpdateUserSubscriptionInfo */
+UPDATE users
+SET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!,
+    apple_original_transaction_id = :originalTransactionId, subscription_expires_date = :expiresDate
+WHERE user_id = :userId!;
+
+/* @name GetUserByOriginalTransactionId */
+SELECT user_id FROM users WHERE apple_original_transaction_id = :originalTransactionId!;

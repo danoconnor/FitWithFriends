@@ -12,7 +12,7 @@ final class CompetitionTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load
-        XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
 
         // Tap "New Competition" button
         let newCompButton = app.buttons["New Competition"]
@@ -36,7 +36,7 @@ final class CompetitionTests: FWFUITestBase {
         createButton.tap()
 
         // Verify the sheet dismisses and we return to the home screen
-        XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
 
         // The new competition should appear
         XCTAssertTrue(app.staticTexts["My Test Competition"].waitForExistence(timeout: 10))
@@ -49,7 +49,7 @@ final class CompetitionTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load and competition to appear
-        XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Detail Test Competition"]
         XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
 
@@ -60,5 +60,17 @@ final class CompetitionTests: FWFUITestBase {
         XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
 
         takeScreenshot(name: "05_CompetitionDetail")
+    }
+
+    func testPrivateBadgeShown() throws {
+        try createTestCompetition(name: "Private Badge Test")
+
+        launchApp(loggedIn: true)
+
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Private Badge Test"].waitForExistence(timeout: 10))
+
+        // Private competitions should show a "Private" badge
+        XCTAssertTrue(app.staticTexts["Private"].waitForExistence(timeout: 5))
     }
 }

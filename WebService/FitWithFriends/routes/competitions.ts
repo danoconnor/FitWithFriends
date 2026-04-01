@@ -15,6 +15,95 @@ import { CompetitionState } from '../utilities/enums/CompetitionState';
 
 const msPerDay = 1000 * 60 * 60 * 24;
 
+// Returns a list of active public competitions with member counts
+// Also includes the user's pro status and whether they are already a member of each competition
+router.get('/public', function (req, res) {
+    const userId = res.locals.oauth.token.user.id;
+    const userIdBuffer = convertUserIdToBuffer(userId);
+
+    Promise.all([
+        CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive }),
+        UserQueries.getUserProStatus({ userId: userIdBuffer }),
+        CompetitionQueries.getUsersCompetitions({ userId: userIdBuffer })
+    ])
+        .then(([publicCompetitions, proStatusResult, userCompetitions]) => {
+            const isUserPro = proStatusResult.length > 0 && proStatusResult[0].is_pro;
+            const userCompetitionIds = new Set(userCompetitions.map(c => c.competition_id));
+
+            const competitions = publicCompetitions.map(competition => ({
+                competitionId: competition.competition_id,
+                displayName: competition.display_name,
+                startDate: competition.start_date,
+                endDate: competition.end_date,
+                memberCount: competition.member_count,
+                isUserMember: userCompetitionIds.has(competition.competition_id)
+            }));
+
+            res.json({
+                competitions,
+                isUserPro
+            });
+        })
+        .catch(error => {
+            handleError(error, 500, 'Error getting public competitions', res);
+        });
+});
+
+// Join a public competition
+// Requires the user to have an active Pro subscription
+// Expects a competitionId in the request body
+router.post('/joinPublic', function (req, res) {
+    const competitionId: string = req.body['competitionId'];
+    if (!competitionId) {
+        handleError(null, 400, 'Missing required parameter competitionId', res);
+        return;
+    }
+
+    const userId: string = res.locals.oauth.token.user.id;
+    const userIdBuffer = convertUserIdToBuffer(userId);
+
+    // Verify the competition exists and is public
+    CompetitionQueries.getPublicCompetition({ competitionId })
+        .then(result => {
+            if (!result.length) {
+                handleError(null, 404, 'Public competition not found', res);
+                return;
+            }
+
+            const competition = result[0];
+
+            // Verify competition is still active
+            if (competition.state !== CompetitionState.NotStartedOrActive) {
+                handleError(null, 400, 'Competition is no longer active', res);
+                return;
+            }
+
+            // Check the user's pro status
+            UserQueries.getUserProStatus({ userId: userIdBuffer })
+                .then(proStatusResult => {
+                    if (!proStatusResult.length || !proStatusResult[0].is_pro) {
+                        handleError(null, 403, 'Pro subscription required to join public competitions', res, true, FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
+                        return;
+                    }
+
+                    // Add user to competition
+                    CompetitionQueries.addUserToCompetition({ userId: userIdBuffer, competitionId })
+                        .then((_result) => {
+                            res.sendStatus(200);
+                        })
+                        .catch(error => {
+                            handleError(error, 500, 'Error joining public competition', res);
+                        });
+                })
+                .catch(error => {
+                    handleError(error, 500, 'Error checking user pro status', res);
+                });
+        })
+        .catch(error => {
+            handleError(error, 500, 'Error finding public competition', res);
+        });
+});
+
 // Returns the competitionIds that the currently authenticated user is a member of
 router.get('/', function (req, res) {
     CompetitionQueries.getUsersCompetitions({ userId: convertUserIdToBuffer(res.locals.oauth.token.user.id) })
@@ -254,6 +343,7 @@ router.get('/:competitionId/overview', function (req, res) {
                         'competitionState': competitionInfo.state,
                         'isCompetitionProcessingResults': competitionInfo.state === CompetitionState.ProcessingResults,
                         'isUserAdmin': isUserAdmin,
+                        'isPublic': competitionInfo.is_public,
                         'currentResults': Object.values(userPoints)
                     });
                 })

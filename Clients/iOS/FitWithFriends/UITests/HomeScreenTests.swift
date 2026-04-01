@@ -15,7 +15,7 @@ final class HomeScreenTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load
-        XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
 
         // Verify the competition is visible
         XCTAssertTrue(app.staticTexts["Screenshot Competition"].waitForExistence(timeout: 10))
@@ -30,7 +30,7 @@ final class HomeScreenTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load
-        XCTAssertTrue(app.navigationBars["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
 
         // Verify empty state message
         XCTAssertTrue(app.staticTexts["No competitions yet"].waitForExistence(timeout: 5))

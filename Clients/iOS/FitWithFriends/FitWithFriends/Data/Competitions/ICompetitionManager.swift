@@ -58,4 +58,16 @@ protocol ICompetitionManager: AnyObject {
     /// - Parameter competitionId: The unique identifier of the competition to delete.
     /// - Throws: An error if the operation fails.
     func deleteCompetition(competitionId: UUID) async throws
+
+    /// Public competitions available on homescreen
+    var publicCompetitions: [PublicCompetition] { get }
+
+    /// Publisher for public competitions changes
+    var publicCompetitionsPublisher: Published<[PublicCompetition]>.Publisher { get }
+
+    /// Refresh the list of public competitions
+    func refreshPublicCompetitions() async
+
+    /// Join a public competition
+    func joinPublicCompetition(competitionId: UUID) async throws
 }

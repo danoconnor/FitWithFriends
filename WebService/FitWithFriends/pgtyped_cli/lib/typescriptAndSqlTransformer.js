@@ -11,6 +11,7 @@ import chokidar from 'chokidar';
 import { globSync } from 'glob';
 import path from 'path';
 import { debug } from './util.js';
+import { minimatch } from 'minimatch';
 // tslint:disable:no-console
 export class TypescriptAndSqlTransformer {
     constructor(pool, config, transform) {
@@ -28,8 +29,9 @@ export class TypescriptAndSqlTransformer {
                 return this.processFile(fileName);
             });
             chokidar
-                .watch(this.includePattern, {
+                .watch(this.config.srcDir, {
                 persistent: true,
+                ignored: (fileName, stats) => !!(stats === null || stats === void 0 ? void 0 : stats.isFile()) && !minimatch(fileName, this.transform.include),
             })
                 .on('add', cb)
                 .on('change', cb);

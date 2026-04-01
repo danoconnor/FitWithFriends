@@ -54,7 +54,8 @@ CREATE TABLE public.competitions (
     iana_timezone text NOT NULL,
     competition_id uuid NOT NULL,
     admin_user_id bytea NOT NULL,
-    state smallint DEFAULT 1 NOT NULL
+    state smallint DEFAULT 1 NOT NULL,
+    is_public boolean DEFAULT false NOT NULL
 );
 
 
@@ -115,7 +116,9 @@ CREATE TABLE public.users (
     last_name text,
     max_active_competitions smallint DEFAULT 1 NOT NULL,
     is_pro boolean DEFAULT false NOT NULL,
-    created_date date NOT NULL
+    created_date date NOT NULL,
+    apple_original_transaction_id text,
+    subscription_expires_date timestamp
 );
 
 

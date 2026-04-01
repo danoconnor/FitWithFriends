@@ -14,7 +14,7 @@ ON CONFLICT (user_id, competition_id) DO NOTHING;
 
 /* @name GetCompetition */
 /* Does not return the access_token field - we will only return that to admin users */
-SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state FROM competitions WHERE competition_id = :competitionId!;
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public FROM competitions WHERE competition_id = :competitionId!;
 
 /* @name GetCompetitionAdminDetails */
 SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!;
@@ -33,10 +33,11 @@ DELETE FROM users_competitions WHERE user_id = :userId! AND competition_id = :co
 UPDATE competitions SET access_token = :newAccessToken! WHERE competition_id = :competitionId!;
 
 /* @name GetNumberOfActiveCompetitionsForUser */
+/* Only counts private competitions - public competitions do not count toward the user's limit */
 SELECT COUNT(competitionData.competition_id)::INTEGER FROM
     (SELECT competition_id FROM users_competitions WHERE user_id = :userId!) as usersCompetitions
     INNER JOIN
-        (SELECT competition_id, end_date FROM competitions) as competitionData
+        (SELECT competition_id, end_date FROM competitions WHERE is_public = false) as competitionData
     ON usersCompetitions.competition_id = competitionData.competition_id
 WHERE end_date > :currentDate!;
 
@@ -44,7 +45,7 @@ WHERE end_date > :currentDate!;
 DELETE FROM competitions WHERE competition_id = :competitionId!;
 
 /* @name GetCompetitionsInState */
-SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state 
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
 FROM competitions
 WHERE state = :state! AND end_date < :finishedBeforeDate!;
 
@@ -54,4 +55,25 @@ UPDATE competitions SET state = :newState! WHERE competition_id = :competitionId
 /* @name UpdateCompetitionFinalPoints */
 UPDATE users_competitions
 SET final_points = :finalPoints!
+WHERE user_id = :userId! AND competition_id = :competitionId!;
+
+/* @name GetPublicCompetitions */
+SELECT c.competition_id, c.display_name, c.start_date, c.end_date, c.iana_timezone, c.state,
+       COUNT(uc.user_id)::INTEGER AS "member_count!"
+FROM competitions c
+LEFT JOIN users_competitions uc ON c.competition_id = uc.competition_id
+WHERE c.is_public = true AND c.state = :activeState!
+GROUP BY c.competition_id;
+
+/* @name CreatePublicCompetition */
+INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public)
+VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true);
+
+/* @name GetPublicCompetition */
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
+FROM competitions
+WHERE competition_id = :competitionId! AND is_public = true;
+
+/* @name IsUserInCompetition */
+SELECT COUNT(*)::INTEGER AS "count!" FROM users_competitions
 WHERE user_id = :userId! AND competition_id = :competitionId!;

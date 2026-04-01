@@ -49,6 +49,8 @@
 		0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B35977325714E7D006D956A /* HealthKit.framework */; };
 		0B3597782571502A006D956A /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3597772571502A006D956A /* HealthKitManager.swift */; };
 		0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35977A25715567006D956A /* LoggedInContentView.swift */; };
+		0B4693AF2F79A72600AAD94C /*  Friends.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0B4693AE2F79A72600AAD94C /*  Friends.storekit */; };
+		0B4693B12F79A73300AAD94C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4693B02F79A73300AAD94C /* StoreKit.framework */; };
 		0B47A220279C893100C2970E /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0B47A21F279C893100C2970E /* CocoaLumberjackSwift */; };
 		0B47A222279C90EC00C2970E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A221279C90EB00C2970E /* User.swift */; };
 		0B47A227279CA8EF00C2970E /* MockAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A226279CA8EF00C2970E /* MockAuthenticationManager.swift */; };
@@ -71,6 +73,7 @@
 		0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */; };
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
 		0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A251279E424300C2970E /* CompetitionOverviewView.swift */; };
+		FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E4 /* PublicCompetitionCard.swift */; };
 		0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */; };
 		0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */; };
 		0B50BA4127EFEB410066134D /* AppleAuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */; };
@@ -176,6 +179,17 @@
 		FWF00002000000000000006A /* MockPushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000006B /* MockPushNotificationManager.swift */; };
 		FWF00002000000000000007A /* PushNotificationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000007B /* PushNotificationServiceTests.swift */; };
 		FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000008B /* PushNotificationManagerTests.swift */; };
+		FWF0000200000000000000CA /* SubscriptionAndPublicCompetitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */; };
+		FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000CD /* PublicCompetitionTests.swift */; };
+		FWF0000200000000000000D2 /* ISubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D1 /* ISubscriptionManager.swift */; };
+		FWF0000200000000000000D4 /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D3 /* SubscriptionManager.swift */; };
+		FWF0000200000000000000D6 /* PublicCompetition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D5 /* PublicCompetition.swift */; };
+		FWF0000200000000000000D8 /* SubscriptionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D7 /* SubscriptionStatus.swift */; };
+		FWF0000200000000000000DA /* ISubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000D9 /* ISubscriptionService.swift */; };
+		FWF0000200000000000000DC /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000DB /* SubscriptionService.swift */; };
+		FWF0000200000000000000DF /* ProUpgradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000DE /* ProUpgradeView.swift */; };
+		FWF0000200000000000000E1 /* MockSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E0 /* MockSubscriptionManager.swift */; };
+		FWF0000200000000000000E3 /* MockSubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E2 /* MockSubscriptionService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -240,6 +254,8 @@
 		0B35977325714E7D006D956A /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		0B3597772571502A006D956A /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		0B35977A25715567006D956A /* LoggedInContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInContentView.swift; sourceTree = "<group>"; };
+		0B4693AE2F79A72600AAD94C /*  Friends.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = " Friends.storekit"; path = "FitWithFriends/ Friends.storekit"; sourceTree = "<group>"; };
+		0B4693B02F79A73300AAD94C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		0B47A221279C90EB00C2970E /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0B47A226279CA8EF00C2970E /* MockAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B47A228279CAB6E00C2970E /* MockAuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAuthenticationService.swift; sourceTree = "<group>"; };
@@ -261,6 +277,7 @@
 		0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKActivitySummary+Extensions.swift"; sourceTree = "<group>"; };
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
 		0B47A251279E424300C2970E /* CompetitionOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverviewView.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E4 /* PublicCompetitionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionCard.swift; sourceTree = "<group>"; };
 		0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionResultView.swift; sourceTree = "<group>"; };
 		0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationError.swift; sourceTree = "<group>"; };
@@ -369,6 +386,17 @@
 		FWF00002000000000000006B /* MockPushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPushNotificationManager.swift; sourceTree = "<group>"; };
 		FWF00002000000000000007B /* PushNotificationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationServiceTests.swift; sourceTree = "<group>"; };
 		FWF00002000000000000008B /* PushNotificationManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManagerTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAndPublicCompetitionTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000CD /* PublicCompetitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D1 /* ISubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISubscriptionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D3 /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D5 /* PublicCompetition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetition.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D7 /* SubscriptionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionStatus.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000D9 /* ISubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISubscriptionService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000DB /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000DE /* ProUpgradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUpgradeView.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E0 /* MockSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubscriptionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E2 /* MockSubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubscriptionService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -383,6 +411,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B4693B12F79A73300AAD94C /* StoreKit.framework in Frameworks */,
 				0B47A220279C893100C2970E /* CocoaLumberjackSwift in Frameworks */,
 				0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */,
 			);
@@ -410,6 +439,7 @@
 				0B0879862BB3A9B90073AB09 /* HealthKitManagerTests.swift */,
 				FWF00002000000000000007B /* PushNotificationServiceTests.swift */,
 				FWF00002000000000000008B /* PushNotificationManagerTests.swift */,
+				FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -452,6 +482,7 @@
 				0B1CBEC927C3F3B80008C72A /* CompetitionDescription.swift */,
 				0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */,
 				0B329F142E4D789F0082D211 /* CompetitionState.swift */,
+				FWF0000200000000000000D5 /* PublicCompetition.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -490,9 +521,19 @@
 				0B99FC25256A290900673133 /* Model */,
 				FWF00002000000000000009A /* PushNotifications */,
 				0B99FC19256A250D00673133 /* Service */,
+				FWF0000200000000000000D0 /* Subscriptions */,
 				0B35977625715018006D956A /* WorkoutData */,
 			);
 			path = Data;
+			sourceTree = "<group>";
+		};
+		FWF0000200000000000000D0 /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000D1 /* ISubscriptionManager.swift */,
+				FWF0000200000000000000D3 /* SubscriptionManager.swift */,
+			);
+			path = Subscriptions;
 			sourceTree = "<group>";
 		};
 		0B47A223279CA88800C2970E /* Mocks */ = {
@@ -521,6 +562,8 @@
 				0B0879FF2BB3B4D10073AB09 /* MockActivityUpdateDelegate.swift */,
 				FWF00002000000000000005B /* MockPushNotificationService.swift */,
 				FWF00002000000000000006B /* MockPushNotificationManager.swift */,
+				FWF0000200000000000000E0 /* MockSubscriptionManager.swift */,
+				FWF0000200000000000000E2 /* MockSubscriptionService.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -528,6 +571,7 @@
 		0B99FBC1256A016900673133 = {
 			isa = PBXGroup;
 			children = (
+				0B4693AE2F79A72600AAD94C /*  Friends.storekit */,
 				0B99FBCC256A016900673133 /* FitWithFriends */,
 				0B08797E2BB3A8E80073AB09 /* UnitTests */,
 				FE00000100000000000001AA /* UITests */,
@@ -669,6 +713,8 @@
 				0B0879752BB2541B0073AB09 /* ICompetitionService.swift */,
 				0B0879772BB254250073AB09 /* IUserService.swift */,
 				FWF00002000000000000001B /* IPushNotificationService.swift */,
+				FWF0000200000000000000D9 /* ISubscriptionService.swift */,
+				FWF0000200000000000000DB /* SubscriptionService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -694,6 +740,7 @@
 				0B1CBEA727C09FEC0008C72A /* IdentifiableBase.swift */,
 				0BC4C644293407BE004F1ADC /* FWFErrorDetails.swift */,
 				0BCF647D2BC75F57004E98C7 /* Unit.swift */,
+				FWF0000200000000000000D7 /* SubscriptionStatus.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -719,9 +766,18 @@
 				0BBD78B825A282C600E08EB2 /* Competitions */,
 				0BBD78B325A280C300E08EB2 /* Home */,
 				0BBD78B225A280B300E08EB2 /* Login */,
+				FWF0000200000000000000DD /* Subscriptions */,
 				0B359720256C731A006D956A /* MainContentView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		FWF0000200000000000000DD /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000DE /* ProUpgradeView.swift */,
+			);
+			path = Subscriptions;
 			sourceTree = "<group>";
 		};
 		0BBD789F259A536000E08EB2 /* Competitions */ = {
@@ -763,6 +819,7 @@
 				0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */,
 				0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */,
 				0BD8B5BE27D42C92009BA5F2 /* CompetitionDetailView.swift */,
+				FWF0000200000000000000E4 /* PublicCompetitionCard.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -846,6 +903,7 @@
 		EDAFADCA82B7C1A16B9EAE74 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0B4693B02F79A73300AAD94C /* StoreKit.framework */,
 				0B35977325714E7D006D956A /* HealthKit.framework */,
 			);
 			name = Frameworks;
@@ -860,6 +918,7 @@
 				FE00000100000000000001B6 /* CompetitionTests.swift */,
 				FE00000100000000000001B8 /* AboutScreenTests.swift */,
 				FE00000100000000000001BA /* AuthenticationTests.swift */,
+				FWF0000200000000000000CD /* PublicCompetitionTests.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -992,6 +1051,7 @@
 				0B99FBD5256A016900673133 /* Preview Assets.xcassets in Resources */,
 				0B99FBD2256A016900673133 /* Assets.xcassets in Resources */,
 				0BCF64972BCC3F55004E98C7 /* Settings.bundle in Resources */,
+				0B4693AF2F79A72600AAD94C /*  Friends.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1061,6 +1121,7 @@
 				0BACBE5A2E4ECBEC000FE0ED /* AppleAuthenticationManagerTests.swift in Sources */,
 				FWF00002000000000000007A /* PushNotificationServiceTests.swift in Sources */,
 				FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */,
+				FWF0000200000000000000CA /* SubscriptionAndPublicCompetitionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1088,6 +1149,7 @@
 				0B62E67225EB399600189702 /* CreateCompetitionViewModel.swift in Sources */,
 				0BC192AF2B12E6C300C3F4FA /* SecretConstants.swift in Sources */,
 				0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */,
+				FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */,
 				0B329F0E2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift in Sources */,
 				0B329F0F2E4C2CAA0082D211 /* IAuthenticationManager.swift in Sources */,
 				0B329F172E4D79900082D211 /* UserCompetitionPoints.swift in Sources */,
@@ -1216,6 +1278,15 @@
 				FWF00002000000000000004A /* PushNotificationManager.swift in Sources */,
 				FWF00002000000000000005A /* MockPushNotificationService.swift in Sources */,
 				FWF00002000000000000006A /* MockPushNotificationManager.swift in Sources */,
+				FWF0000200000000000000D2 /* ISubscriptionManager.swift in Sources */,
+				FWF0000200000000000000D4 /* SubscriptionManager.swift in Sources */,
+				FWF0000200000000000000D6 /* PublicCompetition.swift in Sources */,
+				FWF0000200000000000000D8 /* SubscriptionStatus.swift in Sources */,
+				FWF0000200000000000000DA /* ISubscriptionService.swift in Sources */,
+				FWF0000200000000000000DC /* SubscriptionService.swift in Sources */,
+				FWF0000200000000000000DF /* ProUpgradeView.swift in Sources */,
+				FWF0000200000000000000E1 /* MockSubscriptionManager.swift in Sources */,
+				FWF0000200000000000000E3 /* MockSubscriptionService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1229,6 +1300,7 @@
 				FE00000100000000000001B7 /* CompetitionTests.swift in Sources */,
 				FE00000100000000000001B9 /* AboutScreenTests.swift in Sources */,
 				FE00000100000000000001BB /* AuthenticationTests.swift in Sources */,
+				FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

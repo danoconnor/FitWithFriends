@@ -16,6 +16,7 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
         case currentResults
         case isUserAdmin
         case competitionState
+        case isPublic
     }
 
     let competitionId: UUID
@@ -24,6 +25,7 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
     let competitionStart: Date
     let competitionEnd: Date
     let competitionState: CompetitionState
+    let isPublic: Bool
 
     /// If the current user is the admin of the competition
     let isUserAdmin: Bool
@@ -53,7 +55,7 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
     }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
-    init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false, competitionState: CompetitionState = .notStartedOrActive) {
+    init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false, competitionState: CompetitionState = .notStartedOrActive, isPublic: Bool = false) {
         competitionId = id
         competitionName = name
         competitionStart = start
@@ -61,6 +63,7 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
         self.currentResults = currentResults
         self.isUserAdmin = isUserAdmin
         self.competitionState = competitionState
+        self.isPublic = isPublic
     }
 
     // MARK: Comparable

@@ -26,4 +26,6 @@ protocol IObjectGraph {
     var appleIDProvider: IASAuthorizationAppleIDProvider { get }
     var pushNotificationManager: IPushNotificationManager { get }
     var pushNotificationService: IPushNotificationService { get }
+    var subscriptionManager: ISubscriptionManager { get }
+    var subscriptionService: ISubscriptionService { get }
 }

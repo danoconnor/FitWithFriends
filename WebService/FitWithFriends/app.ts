@@ -14,6 +14,8 @@ import competitions from './routes/competitions';
 import activityData from './routes/activityData';
 import admin from './routes/admin';
 import pushNotifications from './routes/pushNotifications';
+import subscriptions from './routes/subscriptions';
+import appStoreNotifications from './routes/appStoreNotifications';
 import wellKnown from './routes/wellKnown';
 import { sendErrorDetails } from './utilities/errorHelpers';
 import HttpError from './utilities/httpError';
@@ -49,6 +51,8 @@ app.use('/users', users);
 app.use('/competitions', oauthServer.authenticate(), competitions);
 app.use('/activityData', oauthServer.authenticate(), activityData);
 app.use('/pushNotifications', oauthServer.authenticate(), pushNotifications);
+app.use('/subscriptions', oauthServer.authenticate(), subscriptions);
+app.use('/appstore', appStoreNotifications);
 app.use('/admin', authenticateAdmin, admin);
 app.use('/.well-known', wellKnown);
 

@@ -141,3 +141,137 @@ export function getUsersInCompetition(params: IGetUsersInCompetitionParams): Pro
 }
 
 
+/** 'GetUserProStatus' parameters type */
+export interface IGetUserProStatusParams {
+  userId: Buffer;
+}
+
+/** 'GetUserProStatus' return type */
+export interface IGetUserProStatusResult {
+  is_pro: boolean;
+}
+
+/** 'GetUserProStatus' query type */
+export interface IGetUserProStatusQuery {
+  params: IGetUserProStatusParams;
+  result: IGetUserProStatusResult;
+}
+
+const getUserProStatusIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":41,"b":48}]}],"statement":"SELECT is_pro FROM users WHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT is_pro FROM users WHERE user_id = :userId!
+ * ```
+ */
+export function getUserProStatus(params: IGetUserProStatusParams): Promise<Array<IGetUserProStatusResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getUserProStatus = new pgtyped.PreparedQuery<IGetUserProStatusParams,IGetUserProStatusResult>(getUserProStatusIR);
+    return getUserProStatus.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'UpdateUserProStatus' parameters type */
+export interface IUpdateUserProStatusParams {
+  isPro: boolean;
+  maxActiveCompetitions: number;
+  userId: Buffer;
+}
+
+/** 'UpdateUserProStatus' return type */
+export type IUpdateUserProStatusResult = void;
+
+/** 'UpdateUserProStatus' query type */
+export interface IUpdateUserProStatusQuery {
+  params: IUpdateUserProStatusParams;
+  result: IUpdateUserProStatusResult;
+}
+
+const updateUserProStatusIR: any = {"usedParamSet":{"isPro":true,"maxActiveCompetitions":true,"userId":true},"params":[{"name":"isPro","required":true,"transform":{"type":"scalar"},"locs":[{"a":26,"b":32}]},{"name":"maxActiveCompetitions","required":true,"transform":{"type":"scalar"},"locs":[{"a":61,"b":83}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":101,"b":108}]}],"statement":"UPDATE users SET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!\nWHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users SET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!
+ * WHERE user_id = :userId!
+ * ```
+ */
+export function updateUserProStatus(params: IUpdateUserProStatusParams): Promise<Array<IUpdateUserProStatusResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateUserProStatus = new pgtyped.PreparedQuery<IUpdateUserProStatusParams,IUpdateUserProStatusResult>(updateUserProStatusIR);
+    return updateUserProStatus.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'UpdateUserSubscriptionInfo' parameters type */
+export interface IUpdateUserSubscriptionInfoParams {
+  expiresDate?: DateOrString | null | void;
+  isPro: boolean;
+  maxActiveCompetitions: number;
+  originalTransactionId?: string | null | void;
+  userId: Buffer;
+}
+
+/** 'UpdateUserSubscriptionInfo' return type */
+export type IUpdateUserSubscriptionInfoResult = void;
+
+/** 'UpdateUserSubscriptionInfo' query type */
+export interface IUpdateUserSubscriptionInfoQuery {
+  params: IUpdateUserSubscriptionInfoParams;
+  result: IUpdateUserSubscriptionInfoResult;
+}
+
+const updateUserSubscriptionInfoIR: any = {"usedParamSet":{"isPro":true,"maxActiveCompetitions":true,"originalTransactionId":true,"expiresDate":true,"userId":true},"params":[{"name":"isPro","required":true,"transform":{"type":"scalar"},"locs":[{"a":26,"b":32}]},{"name":"maxActiveCompetitions","required":true,"transform":{"type":"scalar"},"locs":[{"a":61,"b":83}]},{"name":"originalTransactionId","required":false,"transform":{"type":"scalar"},"locs":[{"a":122,"b":143}]},{"name":"expiresDate","required":false,"transform":{"type":"scalar"},"locs":[{"a":174,"b":185}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":203,"b":210}]}],"statement":"UPDATE users\nSET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!,\n    apple_original_transaction_id = :originalTransactionId, subscription_expires_date = :expiresDate\nWHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users
+ * SET is_pro = :isPro!, max_active_competitions = :maxActiveCompetitions!,
+ *     apple_original_transaction_id = :originalTransactionId, subscription_expires_date = :expiresDate
+ * WHERE user_id = :userId!
+ * ```
+ */
+export function updateUserSubscriptionInfo(params: IUpdateUserSubscriptionInfoParams): Promise<Array<IUpdateUserSubscriptionInfoResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateUserSubscriptionInfo = new pgtyped.PreparedQuery<IUpdateUserSubscriptionInfoParams,IUpdateUserSubscriptionInfoResult>(updateUserSubscriptionInfoIR);
+    return updateUserSubscriptionInfo.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetUserByOriginalTransactionId' parameters type */
+export interface IGetUserByOriginalTransactionIdParams {
+  originalTransactionId: string;
+}
+
+/** 'GetUserByOriginalTransactionId' return type */
+export interface IGetUserByOriginalTransactionIdResult {
+  user_id: Buffer;
+}
+
+/** 'GetUserByOriginalTransactionId' query type */
+export interface IGetUserByOriginalTransactionIdQuery {
+  params: IGetUserByOriginalTransactionIdParams;
+  result: IGetUserByOriginalTransactionIdResult;
+}
+
+const getUserByOriginalTransactionIdIR: any = {"usedParamSet":{"originalTransactionId":true},"params":[{"name":"originalTransactionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":64,"b":86}]}],"statement":"SELECT user_id FROM users WHERE apple_original_transaction_id = :originalTransactionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT user_id FROM users WHERE apple_original_transaction_id = :originalTransactionId!
+ * ```
+ */
+export function getUserByOriginalTransactionId(params: IGetUserByOriginalTransactionIdParams): Promise<Array<IGetUserByOriginalTransactionIdResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getUserByOriginalTransactionId = new pgtyped.PreparedQuery<IGetUserByOriginalTransactionIdParams,IGetUserByOriginalTransactionIdResult>(getUserByOriginalTransactionIdIR);
+    return getUserByOriginalTransactionId.run(params, DatabaseConnectionPool);
+  });
+}
+
+
