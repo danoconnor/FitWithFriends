@@ -22,7 +22,13 @@ name: Web servce build/test/deploy to Azure (on push to main)
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'WebService/**'
   workflow_dispatch:
+
+concurrency:
+  group: web-service-deploy
+  cancel-in-progress: false
 
 env:
   WEBSERVICE_ROOT_PATH: './WebService'
