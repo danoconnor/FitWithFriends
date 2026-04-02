@@ -179,6 +179,7 @@
 		FE00000100000000000001B7 /* CompetitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001B6 /* CompetitionTests.swift */; };
 		FE00000100000000000001B9 /* AboutScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001B8 /* AboutScreenTests.swift */; };
 		FE00000100000000000001BB /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001BA /* AuthenticationTests.swift */; };
+		FE00000100000000000001BD /* FirstLaunchScreenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001BC /* FirstLaunchScreenTests.swift */; };
 		FE00000100000000000001C1 /* UITestingObjectGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00000100000000000001C0 /* UITestingObjectGraph.swift */; };
 		FWF00001000000000000001A /* FWFStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00001000000000000001B /* FWFStyles.swift */; };
 		FWF00002000000000000001A /* IPushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000001B /* IPushNotificationService.swift */; };
@@ -396,6 +397,7 @@
 		FE00000100000000000001B6 /* CompetitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionTests.swift; sourceTree = "<group>"; };
 		FE00000100000000000001B8 /* AboutScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreenTests.swift; sourceTree = "<group>"; };
 		FE00000100000000000001BA /* AuthenticationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
+		FE00000100000000000001BC /* FirstLaunchScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchScreenTests.swift; sourceTree = "<group>"; };
 		FE00000100000000000001C0 /* UITestingObjectGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestingObjectGraph.swift; sourceTree = "<group>"; };
 		FWF00001000000000000001B /* FWFStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FWFStyles.swift; sourceTree = "<group>"; };
 		FWF00002000000000000001B /* IPushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPushNotificationService.swift; sourceTree = "<group>"; };
@@ -956,6 +958,7 @@
 				FE00000100000000000001B6 /* CompetitionTests.swift */,
 				FE00000100000000000001B8 /* AboutScreenTests.swift */,
 				FE00000100000000000001BA /* AuthenticationTests.swift */,
+				FE00000100000000000001BC /* FirstLaunchScreenTests.swift */,
 				FWF0000200000000000000CD /* PublicCompetitionTests.swift */,
 			);
 			path = UITests;
@@ -1363,6 +1366,7 @@
 				FE00000100000000000001B7 /* CompetitionTests.swift in Sources */,
 				FE00000100000000000001B9 /* AboutScreenTests.swift in Sources */,
 				FE00000100000000000001BB /* AuthenticationTests.swift in Sources */,
+				FE00000100000000000001BD /* FirstLaunchScreenTests.swift in Sources */,
 				FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

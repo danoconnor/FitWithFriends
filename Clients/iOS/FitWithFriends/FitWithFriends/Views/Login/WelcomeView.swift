@@ -69,14 +69,26 @@ struct WelcomeView: View {
 
                 Spacer()
 
-                // Sign in button
-                Button(action: {
-                    self.viewModel.login()
-                }, label: {
-                    SignInWithAppleButton()
-                        .frame(height: 50)
-                        .cornerRadius(12)
-                })
+                // Sign in button / progress indicator
+                Group {
+                    if viewModel.loginState == .inProgress {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(.white)
+                            .scaleEffect(1.5)
+                            .frame(height: 50)
+                            .accessibilityIdentifier("loginProgressSpinner")
+                    } else {
+                        Button(action: {
+                            self.viewModel.login()
+                        }, label: {
+                            SignInWithAppleButton()
+                                .frame(height: 50)
+                                .cornerRadius(12)
+                        })
+                        .accessibilityIdentifier("signInButton")
+                    }
+                }
                 .padding(.horizontal, 40)
                 .padding(.bottom, 48)
             }
