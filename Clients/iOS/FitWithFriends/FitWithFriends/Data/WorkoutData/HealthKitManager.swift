@@ -245,7 +245,7 @@ public class HealthKitManager: IHealthKitManager {
             Logger.traceVerbose(message: "Completed data queries for activity summary for \(today)")
 
             let resultActivitySummaryDTO = resultActivitySummaryDTO ?? ActivitySummaryDTO(date: now)
-            let activitySummary = ActivitySummary(activitySummary: resultActivitySummaryDTO)
+            var activitySummary = ActivitySummary(activitySummary: resultActivitySummaryDTO)
 
             for quantity in resultQuantities {
                 activitySummary.updateStatistic(quantityType: quantity.key, value: quantity.value)
@@ -458,7 +458,7 @@ public class HealthKitManager: IHealthKitManager {
                 // If we didn't get an ActivitySummary for this day, then create an empty one
                 // We may have additional data for this date that isn't included in the HKActivitySummary
                 let summaryDTO = activitySummaries[date] ?? ActivitySummaryDTO(date: date)
-                let activitySummary = ActivitySummary(activitySummary: summaryDTO)
+                var activitySummary = ActivitySummary(activitySummary: summaryDTO)
 
                 // If we have any additional data for this day (step count, stairs climbed, etc.),
                 // then add it to the ActivitySummary

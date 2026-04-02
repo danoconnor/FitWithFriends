@@ -8,7 +8,8 @@
 import Foundation
 import HealthKit
 
-public class ActivitySummary: IdentifiableBase, Encodable, @unchecked Sendable {
+public struct ActivitySummary: Identifiable, Encodable {
+    public let id = UUID()
     public let date: Date
 
     public let activeCaloriesGoal: UInt
@@ -52,7 +53,7 @@ public class ActivitySummary: IdentifiableBase, Encodable, @unchecked Sendable {
         self.hkActivitySummary = activitySummary.hkActivitySummary
     }
 
-    public func updateStatistic(quantityType: HKQuantityTypeIdentifier, value: StatisticDTO) {
+    public mutating func updateStatistic(quantityType: HKQuantityTypeIdentifier, value: StatisticDTO) {
         switch quantityType {
         case .activeEnergyBurned:
             activeCaloriesBurned = value.sumValue
