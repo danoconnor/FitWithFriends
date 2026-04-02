@@ -54,6 +54,6 @@ public class MockObjectGraph: IObjectGraph {
         appMetadataService = MockAppMetadataService()
         appVersionManager = MockAppVersionManager()
 
-        serverEnvironmentManager = MockServerEnvironmentManager() as! any IServerEnvironmentManager
+        serverEnvironmentManager = MockServerEnvironmentManager() as any IServerEnvironmentManager
     }
 }

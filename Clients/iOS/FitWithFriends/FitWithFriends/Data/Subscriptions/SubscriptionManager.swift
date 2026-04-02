@@ -92,8 +92,9 @@ public class SubscriptionManager: ISubscriptionManager, ObservableObject {
             break
         }
 
+        let validEntitlement = foundValidEntitlement
         await MainActor.run {
-            isUserPro = foundValidEntitlement
+            isUserPro = validEntitlement
         }
     }
 

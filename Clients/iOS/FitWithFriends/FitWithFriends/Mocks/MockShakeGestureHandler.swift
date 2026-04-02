@@ -15,7 +15,7 @@ public class MockShakeGestureHandler: IShakeGestureHandler {
 
     public func handleShakeGesture() {
         handleShakeGestureCallCount += 1
-        if let error = return_handleShakeGesture_error {
+        if return_handleShakeGesture_error != nil {
             // Handle mock error
         }
     }

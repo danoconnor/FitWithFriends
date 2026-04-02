@@ -95,6 +95,7 @@ final class PublicCompetitionTests: XCTestCase {
 
 // MARK: - HomepageViewModelTests
 
+@MainActor
 final class HomepageViewModelTests: XCTestCase {
     private var homepageViewModel: HomepageViewModel!
     private var mockAuthenticationManager: MockAuthenticationManager!

@@ -3,6 +3,7 @@
 //  FitWithFriends
 //
 
+import Combine
 import Foundation
 
 public class MockSubscriptionManager: ISubscriptionManager {
