@@ -48,16 +48,40 @@ class FWFUITestBase: XCTestCase {
     // MARK: - App Launch Helpers
 
     /// Launch the app in UI testing mode
-    /// - Parameter loggedIn: If true, inject access token so the app starts in logged-in state
-    func launchApp(loggedIn: Bool = true) {
+    /// - Parameters:
+    ///   - loggedIn: If true, inject access token so the app starts in logged-in state.
+    ///   - loginOutcome: Optional outcome for the sign-in button tap. Pass `"success"` or
+    ///     `"failure"` to have the mock Apple auth immediately resolve instead of staying in progress.
+    ///   - showFirstLaunchScreen: If true, do NOT suppress the first-launch welcome sheet.
+    ///     Defaults to false so the sheet never blocks unrelated tests.
+    func launchApp(loggedIn: Bool = true, loginOutcome: String? = nil, showFirstLaunchScreen: Bool = false) {
         app = XCUIApplication()
         app.launchEnvironment["FWF_UI_TESTING"] = "1"
+
+        if showFirstLaunchScreen {
+            // Signal the app to reset the first-launch UserDefault before the view model
+            // reads it, so the sheet always appears. Using an env var (not a launch arg)
+            // avoids the volatile-domain problem where launch args prevent programmatic
+            // UserDefaults writes from being visible within the same session.
+            app.launchEnvironment["FWF_UI_TEST_SHOW_FIRST_LAUNCH"] = "1"
+        } else {
+            // Skip the first-launch welcome sheet via a launch arg so it never
+            // blocks interactions in tests that don't care about it.
+            app.launchArguments += ["-HasShownFirstLaunch", "YES"]
+        }
 
         if loggedIn, let accessToken, let accessTokenExpiry, let refreshToken, let userId {
             app.launchEnvironment["FWF_UI_TEST_ACCESS_TOKEN"] = accessToken
             app.launchEnvironment["FWF_UI_TEST_ACCESS_TOKEN_EXPIRY"] = accessTokenExpiry
             app.launchEnvironment["FWF_UI_TEST_REFRESH_TOKEN"] = refreshToken
             app.launchEnvironment["FWF_UI_TEST_USER_ID"] = userId
+        }
+
+        if let loginOutcome {
+            app.launchEnvironment["FWF_UI_TEST_LOGIN_OUTCOME"] = loginOutcome
+            // Do NOT inject token env vars for loginOutcome tests — the mock uses its own
+            // built-in fallback token on success, and we need MockTokenManager.return_token
+            // to be nil so the app starts on the WelcomeView (not already logged in).
         }
 
         app.launch()

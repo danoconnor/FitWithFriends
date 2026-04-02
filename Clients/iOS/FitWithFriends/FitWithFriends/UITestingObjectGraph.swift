@@ -55,6 +55,14 @@ class UITestingObjectGraph: IObjectGraph {
         mockServerEnv.isLocalTesting = true
         serverEnvironmentManager = mockServerEnv
 
+        // Reset the first-launch flag in the persistent store so the welcome sheet
+        // appears and can be properly dismissed in tests that exercise it.
+        // We can't use a launch arg for this because launch args create a volatile
+        // UserDefaults domain that overrides any programmatic writes during the session.
+        if env["FWF_UI_TEST_SHOW_FIRST_LAUNCH"] == "1" {
+            UserDefaults.standard.removeObject(forKey: "HasShownFirstLaunch")
+        }
+
         // Configure token manager with injected tokens from test runner
         let mockTokenManager = MockTokenManager()
         if let accessToken = env["FWF_UI_TEST_ACCESS_TOKEN"],
@@ -111,6 +119,20 @@ class UITestingObjectGraph: IObjectGraph {
         // Wire up authentication with mock Apple auth (always valid)
         let mockAppleAuth = MockAppleAuthenticationManager()
         mockAppleAuth.return_isAppleAccountValid = true
+
+        // Configure login outcome for UI tests that exercise the sign-in flow
+        if let outcome = env["FWF_UI_TEST_LOGIN_OUTCOME"] {
+            switch outcome {
+            case "success":
+                mockAppleAuth.return_loginOutcome = .success
+                // Re-use the same injected token so the app lands on the home screen
+                mockAppleAuth.return_loginToken = (mockTokenManager as? MockTokenManager)?.return_token
+            case "failure":
+                mockAppleAuth.return_loginOutcome = .failure
+            default:
+                break
+            }
+        }
 
         let authManager = AuthenticationManager(appleAuthenticationManager: mockAppleAuth,
                                                  authenticationService: authenticationService,

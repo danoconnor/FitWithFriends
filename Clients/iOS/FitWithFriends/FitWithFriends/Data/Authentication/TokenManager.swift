@@ -46,6 +46,10 @@ public class TokenManager: ITokenManager {
 
             Logger.traceInfo(message: "Found token data in keychain")
 
+            // Populate the in-memory cache so that storeToken can carry over the refresh token
+            // if a token refresh occurs (the server omits the refresh token in refresh responses)
+            cachedToken = keychainToken
+
             if keychainToken.isAccessTokenExpired {
                 throw TokenError.expired(token: keychainToken)
             }
