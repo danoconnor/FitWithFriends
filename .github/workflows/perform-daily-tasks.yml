@@ -13,7 +13,7 @@ jobs:
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" \
             -X POST \
-            -H "Authorization: ${{ secrets.FWF_ADMIN_AUTH_SECRET }}" \
+            -H 'Authorization: ${{ secrets.FWF_ADMIN_AUTH_SECRET }}' \
             -H "Content-Type: application/json" \
             -d '{}' \
             "https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/admin/performDailyTasks")
