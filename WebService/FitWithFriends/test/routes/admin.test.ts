@@ -1,5 +1,6 @@
 import * as TestSQL from '../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../testUtilities/testRequestUtilities';
+import * as CompetitionQueries from '../../sql/competitions.queries';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
 import { v4 as uuid } from 'uuid';
 import { CompetitionState } from '../../utilities/enums/CompetitionState';
@@ -19,6 +20,10 @@ var competitionsToCleanup: string[] = [];
 
 beforeEach(async () => {
     try {
+        // Clean up any public competitions left over from previous test runs
+        const existingPublicCompetitions = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
+        await Promise.all(existingPublicCompetitions.map(c => TestSQL.clearDataForCompetition({ competitionId: c.competition_id })));
+
         // Create test users
         await TestSQL.createUser({
             userId: convertUserIdToBuffer(testUserId1),
@@ -46,6 +51,10 @@ beforeEach(async () => {
 afterEach(async () => {
     await Promise.all(usersToCleanup.map(userId => TestSQL.clearDataForUser({ userId: convertUserIdToBuffer(userId) })));
     await Promise.all(competitionsToCleanup.map(competitionId => TestSQL.clearDataForCompetition({ competitionId })));
+
+    // Clean up any public competitions auto-created by performDailyTasks during tests
+    const activePublicCompetitions = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
+    await Promise.all(activePublicCompetitions.map(c => TestSQL.clearDataForCompetition({ competitionId: c.competition_id })));
 
     usersToCleanup = [];
     competitionsToCleanup = [];
@@ -329,6 +338,72 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
         
         expect(validToken1Exists).toBe(true);
         expect(validToken2Exists).toBe(true);
+    });
+});
+
+const isSunOrMon = [0, 1].includes(new Date().getUTCDay());
+
+describe('performDailyTasks - createWeeklyPublicCompetition', () => {
+    (isSunOrMon ? test : test.skip)('creates a weekly public competition on Sunday or Monday when none exists', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response.status).toBe(200);
+
+        const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
+            activeState: CompetitionState.NotStartedOrActive
+        });
+        expect(publicCompetitions.length).toBe(1);
+
+        const competition = publicCompetitions[0];
+        competitionsToCleanup.push(competition.competition_id);
+
+        const startDate = new Date(competition.start_date);
+        expect(startDate.getUTCDay()).toBe(1); // starts on Monday
+
+        const durationDays = (new Date(competition.end_date).getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+        expect(durationDays).toBe(7);
+
+        expect(competition.display_name).toBe('Weekly challenge - see how you stack up');
+    });
+
+    (!isSunOrMon ? test : test.skip)('does not create a competition on weekdays', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response.status).toBe(200);
+
+        const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
+            activeState: CompetitionState.NotStartedOrActive
+        });
+        expect(publicCompetitions.length).toBe(0);
+    });
+
+    test('does not create a duplicate when a competition for the upcoming week already exists', async () => {
+        const competitionId = uuid();
+        const now = new Date();
+        const dayOfWeek = now.getUTCDay();
+        const daysUntilMonday = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
+        const startDate = new Date(now);
+        startDate.setUTCDate(now.getUTCDate() + daysUntilMonday);
+        startDate.setUTCHours(0, 0, 0, 0);
+        const endDate = new Date(startDate);
+        endDate.setUTCDate(startDate.getUTCDate() + 7);
+
+        await TestSQL.createPublicCompetition({
+            competitionId,
+            displayName: 'Existing Weekly Challenge',
+            startDate,
+            endDate,
+            adminUserId: convertUserIdToBuffer(testUserId1),
+            accessToken: 'test-access-token',
+            ianaTimezone: 'UTC'
+        });
+        competitionsToCleanup.push(competitionId);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response.status).toBe(200);
+
+        const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
+            activeState: CompetitionState.NotStartedOrActive
+        });
+        expect(publicCompetitions.length).toBe(1); // still only the one we pre-created
     });
 });
 

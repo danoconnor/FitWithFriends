@@ -96,6 +96,12 @@ router.post('/performDailyTasks', async function (req, res) {
         errors.push(['deleteExpiredRefreshTokens', err]);
     }
 
+    try {
+        await createWeeklyPublicCompetition();
+    } catch (err) {
+        errors.push(['createWeeklyPublicCompetition', err]);
+    }
+
     if (errors.length > 0) {
         const errorDetails = errors.map(e => `${e[0]}: ${e[1].message}`).join(', ');
         console.error('Error performing daily tasks:', errorDetails);
@@ -241,6 +247,61 @@ async function archiveCompetitions() {
 async function deleteExpiredRefreshTokens() {
     const now = new Date();
     await OAuthQueries.deleteExpiredRefreshTokens({ currentDate: now });
+}
+
+function getNextMondayStartDate(from: Date): Date {
+    const dayOfWeek = from.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const daysUntilMonday = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
+    const monday = new Date(from);
+    monday.setUTCDate(from.getUTCDate() + daysUntilMonday);
+    monday.setUTCHours(0, 0, 0, 0);
+    return monday;
+}
+
+async function createWeeklyPublicCompetition() {
+    const now = new Date();
+    const dayOfWeek = now.getUTCDay();
+
+    // Only create on Sunday (preview day) or Monday (fallback if Sunday task failed)
+    if (dayOfWeek !== 0 && dayOfWeek !== 1) {
+        console.log('Not Sunday or Monday, skipping weekly competition creation');
+        return;
+    }
+
+    const upcomingMonday = getNextMondayStartDate(now);
+
+    // Check if a competition for the upcoming week already exists
+    const activePublicCompetitions = await CompetitionQueries.getPublicCompetitions({
+        activeState: CompetitionState.NotStartedOrActive
+    });
+    const alreadyScheduled = activePublicCompetitions.some(c =>
+        new Date(c.start_date).getTime() >= upcomingMonday.getTime()
+    );
+    if (alreadyScheduled) {
+        console.log('Public competition for upcoming week already exists, skipping creation');
+        return;
+    }
+
+    const adminUserId = process.env.FWF_SYSTEM_ADMIN_USER_ID;
+    if (!adminUserId) {
+        throw new Error('FWF_SYSTEM_ADMIN_USER_ID environment variable is not set');
+    }
+
+    const endDate = new Date(upcomingMonday);
+    endDate.setUTCDate(upcomingMonday.getUTCDate() + 7);
+    const competitionId = uuid();
+
+    await CompetitionQueries.createPublicCompetition({
+        startDate: upcomingMonday,
+        endDate,
+        displayName: 'Weekly challenge - see how you stack up',
+        adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
+        accessToken: cryptoHelpers.getRandomToken(),
+        ianaTimezone: 'UTC',
+        competitionId
+    });
+
+    console.log(`Created weekly public competition ${competitionId} starting ${upcomingMonday.toISOString()}`);
 }
 
 router.post('/setUserProStatus', function (req, res) {
