@@ -18,6 +18,10 @@ const testUserId2 = Math.random().toString().slice(2, 8);
 var usersToCleanup: string[] = [];
 var competitionsToCleanup: string[] = [];
 
+function getTaskResult(response: any, taskName: string): string | undefined {
+    return response.data?.tasks?.find((t: any) => t.name === taskName)?.result;
+}
+
 beforeEach(async () => {
     try {
         // Clean up any public competitions left over from previous test runs
@@ -117,6 +121,8 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('Moved 1 competition(s) to processing state');
 
         // Verify the competition state was updated to ProcessingResults
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -143,6 +149,8 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('No competitions to process');
 
         // Verify the competition state was NOT changed
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -217,6 +225,8 @@ describe('performDailyTasks - archiveCompetitions', () => {
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'archiveCompetitions')).toBe('Archived 1 competition(s)');
 
         // Verify the competition state was updated to Archived
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -243,6 +253,8 @@ describe('performDailyTasks - archiveCompetitions', () => {
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'archiveCompetitions')).toBe('No competitions to archive');
 
         // Verify the competition state was NOT changed
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -269,6 +281,8 @@ describe('performDailyTasks - archiveCompetitions', () => {
         // Run the admin task (should not crash)
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'archiveCompetitions')).toBe('Archived 1 competition(s)');
 
         // Competition should still be archived even with no users
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -300,6 +314,8 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'deleteExpiredRefreshTokens')).toBe('Deleted expired refresh tokens');
 
         // Verify our specific tokens - expired token should be gone, valid token should remain
         const remainingTokens = await TestSQL.getRefreshTokens();
@@ -330,6 +346,8 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'deleteExpiredRefreshTokens')).toBe('Deleted expired refresh tokens');
 
         // Verify our specific tokens still exist (should not be deleted)
         const remainingTokens = await TestSQL.getRefreshTokens();
@@ -347,6 +365,8 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
     (isSunOrMon ? test : test.skip)('creates a weekly public competition on Sunday or Monday when none exists', async () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created weekly competition starting /);
 
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
@@ -368,6 +388,8 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
     (!isSunOrMon ? test : test.skip)('does not create a competition on weekdays', async () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBe('Skipped: not Sunday or Monday');
 
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
@@ -399,6 +421,11 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
 
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        // On Sun/Mon the day check passes so we reach the duplicate check; on other days we skip earlier
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBe(
+            isSunOrMon ? 'Skipped: competition for upcoming week already exists' : 'Skipped: not Sunday or Monday'
+        );
 
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
@@ -471,6 +498,11 @@ describe('performDailyTasks - comprehensive integration', () => {
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'archiveCompetitions')).toBe('Archived 1 competition(s)');
+        expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('Moved 1 competition(s) to processing state');
+        expect(getTaskResult(response, 'deleteExpiredRefreshTokens')).toBe('Deleted expired refresh tokens');
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBeDefined();
 
         // Verify all operations completed successfully
         

@@ -71,6 +71,7 @@ router.post('/createPublicCompetition', function (req, res) {
 });
 
 router.post('/performDailyTasks', async function (req, res) {
+    let taskResults: { name: string; result: string }[] = [];
     let errors: [taskName: string, error: Error][] = [];
 
     const deleteExpiredTokensPromise = deleteExpiredRefreshTokens();
@@ -79,52 +80,50 @@ router.post('/performDailyTasks', async function (req, res) {
     // because we do not want to move a competition to processing to archiving in the same run
     // This should not happen but could happen if the cron job has not been run recently
     try {
-        await archiveCompetitions();
+        taskResults.push({ name: 'archiveCompetitions', result: await archiveCompetitions() });
     } catch (err) {
         errors.push(['archiveCompetitions', err]);
     }
 
     try {
-        await processesRecentlyEndedCompetitions();
+        taskResults.push({ name: 'processRecentlyEndedCompetitions', result: await processesRecentlyEndedCompetitions() });
     } catch (err) {
         errors.push(['processRecentlyEndedCompetitions', err]);
     }
 
     try {
-        await deleteExpiredTokensPromise;
+        taskResults.push({ name: 'deleteExpiredRefreshTokens', result: await deleteExpiredTokensPromise });
     } catch (err) {
         errors.push(['deleteExpiredRefreshTokens', err]);
     }
 
     try {
-        await createWeeklyPublicCompetition();
+        taskResults.push({ name: 'createWeeklyPublicCompetition', result: await createWeeklyPublicCompetition() });
     } catch (err) {
         errors.push(['createWeeklyPublicCompetition', err]);
     }
 
-    if (errors.length > 0) {
-        const errorDetails = errors.map(e => `${e[0]}: ${e[1].message}`).join(', ');
-        console.error('Error performing daily tasks:', errorDetails);
+    const summary = {
+        tasks: taskResults,
+        errors: errors.map(([name, error]) => ({ name, error: error.message }))
+    };
 
-        return handleError(
-            errors[0][1], // Use the first error for the response
-            500,
-            errorDetails,
-            res
-        );
+    if (errors.length > 0) {
+        console.error('Error performing daily tasks:', summary);
+        return res.status(500).json(summary);
     } else {
-        console.log('Daily tasks completed');
-        res.sendStatus(200);
+        console.log('Daily tasks completed:', summary);
+        return res.status(200).json(summary);
     }
 });
 
 // Get recently ended competitions
 // Move them to the processing state
 // Send push notifications to users
-async function processesRecentlyEndedCompetitions() {
+async function processesRecentlyEndedCompetitions(): Promise<string> {
     const now = new Date();
-    const competitionsToMoveToProcessing = await CompetitionQueries.getCompetitionsInState({ 
-        state: CompetitionState.NotStartedOrActive, 
+    const competitionsToMoveToProcessing = await CompetitionQueries.getCompetitionsInState({
+        state: CompetitionState.NotStartedOrActive,
         finishedBeforeDate: now
      });
 
@@ -134,8 +133,7 @@ async function processesRecentlyEndedCompetitions() {
      }));
 
      if (competitionsToMoveToProcessing.length === 0) {
-        console.log('No competitions to process');
-        return;
+        return 'No competitions to process';
      }
 
      // For each competition, get the users and send a notification
@@ -154,22 +152,23 @@ async function processesRecentlyEndedCompetitions() {
      if (notifications.length > 0) {
          await sendPushNotifications(notifications);
      }
+
+     return `Moved ${competitionsToMoveToProcessing.length} competition(s) to processing state`;
 }
 
 // Get competitions that have been in the processing state for more than 24 hours
 // Move them to the archived state and archive results
 // Send final results push notifications
-async function archiveCompetitions() {
+async function archiveCompetitions(): Promise<string> {
     const now = new Date();
     const olderThan24Hrs = new Date(now.getTime() - (24 * 60 * 60 * 1000));
-     const competitionsToArchive = await CompetitionQueries.getCompetitionsInState({ 
+     const competitionsToArchive = await CompetitionQueries.getCompetitionsInState({
         state: CompetitionState.ProcessingResults,
         finishedBeforeDate: olderThan24Hrs
      });
 
     if (competitionsToArchive.length === 0) {
-        console.log('No competitions to archive');
-        return;
+        return 'No competitions to archive';
     }
 
     // Calculate the final results for each competition
@@ -242,11 +241,14 @@ async function archiveCompetitions() {
     await Promise.all(competitionsToArchive.map(competition => {
         return CompetitionQueries.updateCompetitionState({ competitionId: competition.competition_id, newState: CompetitionState.Archived });
     }));
+
+    return `Archived ${competitionsToArchive.length} competition(s)`;
 }
 
-async function deleteExpiredRefreshTokens() {
+async function deleteExpiredRefreshTokens(): Promise<string> {
     const now = new Date();
     await OAuthQueries.deleteExpiredRefreshTokens({ currentDate: now });
+    return 'Deleted expired refresh tokens';
 }
 
 function getNextMondayStartDate(from: Date): Date {
@@ -258,14 +260,13 @@ function getNextMondayStartDate(from: Date): Date {
     return monday;
 }
 
-async function createWeeklyPublicCompetition() {
+async function createWeeklyPublicCompetition(): Promise<string> {
     const now = new Date();
     const dayOfWeek = now.getUTCDay();
 
     // Only create on Sunday (preview day) or Monday (fallback if Sunday task failed)
     if (dayOfWeek !== 0 && dayOfWeek !== 1) {
-        console.log('Not Sunday or Monday, skipping weekly competition creation');
-        return;
+        return 'Skipped: not Sunday or Monday';
     }
 
     const upcomingMonday = getNextMondayStartDate(now);
@@ -278,8 +279,7 @@ async function createWeeklyPublicCompetition() {
         new Date(c.start_date).getTime() >= upcomingMonday.getTime()
     );
     if (alreadyScheduled) {
-        console.log('Public competition for upcoming week already exists, skipping creation');
-        return;
+        return 'Skipped: competition for upcoming week already exists';
     }
 
     const adminUserId = process.env.FWF_SYSTEM_ADMIN_USER_ID;
@@ -301,7 +301,7 @@ async function createWeeklyPublicCompetition() {
         competitionId
     });
 
-    console.log(`Created weekly public competition ${competitionId} starting ${upcomingMonday.toISOString()}`);
+    return `Created weekly competition starting ${upcomingMonday.toISOString()}`;
 }
 
 router.post('/setUserProStatus', function (req, res) {
