@@ -1,9 +1,50 @@
 extends layout
 
 block content
-  h1="Get the Fit With Friends app"
-  <br>
-  a(class='primary-button' href=appStoreUrl) Download from App Store
-  <br><br>
-  p Already have the app? <br>
-    a(href=appDeeplink) Open it now
+  .join-container
+    .join-card
+      .app-brand
+        .app-icon-wrap
+          svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' width='44' height='44')
+            path(d='M13 2L3 14h9l-1 8 10-12h-9l1-8z')
+        .brand-name Fit With Friends
+      .invite-section
+        h1 You've been invited to a competition!
+        p.invite-body Challenge yourself alongside friends. Track your activity, earn points, and see who comes out on top.
+      .features
+        .feature-row
+          .feature-icon
+            svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' width='20' height='20')
+              circle(cx='12' cy='12' r='10')
+              polyline(points='12 6 12 12 16 14')
+          .feature-text Daily activity tracking
+        .feature-row
+          .feature-icon
+            svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' width='20' height='20')
+              path(d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2')
+              circle(cx='9' cy='7' r='4')
+              path(d='M23 21v-2a4 4 0 0 0-3-3.87')
+              path(d='M16 3.13a4 4 0 0 1 0 7.75')
+          .feature-text Compete with friends
+        .feature-row
+          .feature-icon
+            svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' width='20' height='20')
+              polyline(points='22 12 18 12 15 21 9 3 6 12 2 12')
+          .feature-text Live leaderboard
+      if isIOS
+        .cta-section
+          a.appstore-btn(href=appStoreUrl)
+            svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' width='22' height='22')
+              path(d='M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z')
+            span Download on the App Store
+          .already-have
+            p Already have the app?
+            a.open-link(href=appDeeplink) Open Fit With Friends →
+      else
+        .ios-only-banner
+          svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' width='28' height='28')
+            circle(cx='12' cy='12' r='10')
+            line(x1='12' y1='8' x2='12' y2='12')
+            line(x1='12' y1='16' x2='12.01' y2='16')
+          p.ios-only-title iOS only
+          p.ios-only-body Fit With Friends is currently available on iPhone and iPad. Open this link on your iOS device to join the competition.
