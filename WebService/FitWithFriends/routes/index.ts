@@ -8,6 +8,10 @@ router.get('/', function (req, res) {
     res.render('index', { title: 'Fit With Friends' });
 });
 
+router.get('/privacyPolicy', function (req, res) {
+    res.render('privacyPolicy', { title: 'Fit With Friends Privacy Policy' });
+});
+
 // TODO: should we show an error/warning if the user agent isn't for iOS?
 // For now we'll just assume that this page is running on an iOS device
 router.get('/joinCompetition', function (req, res) {
