@@ -12,6 +12,9 @@ WebService/.env
 # Claude - don't want agent memory publicly available
 .claude/agent-memory/
 
+# Don't include the directory where we will create worktrees
+.worktrees
+
 # Compiled typescript output
 WebService/FitWithFriends/dist
 
