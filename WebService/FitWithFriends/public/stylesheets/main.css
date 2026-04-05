@@ -42,14 +42,10 @@ a {
     gap: 12px;
 }
 
-.app-icon-wrap {
+.app-icon {
     width: 80px;
     height: 80px;
-    background: rgba(255, 255, 255, 0.20);
     border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .brand-name {
