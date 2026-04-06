@@ -7,8 +7,9 @@ INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pr
 VALUES ('\xabcdef1234567890', 'Test', 'User', 10, true, '2024-01-01 00:00:00.000');
 
 -- Add a competition for the test user
+-- End date far into the future to avoid conflicting with some of our automated tests that run against this test db
 INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) 
-VALUES ('2024-01-01 00:00:00.000', '2024-01-31 23:59:59.999', 'Test Competition', '\xabcdef1234567890', 'TEST_ACCESS_TOKEN', 'America/New_York', '12345678-1234-1234-1234-123456789012');
+VALUES ('2024-01-01 00:00:00.000', '2035-01-31 23:59:59.999', 'Test Competition', '\xabcdef1234567890', 'TEST_ACCESS_TOKEN', 'America/New_York', '12345678-1234-1234-1234-123456789012');
 
 -- Add the test user to the competition
 INSERT INTO users_competitions (user_id, competition_id) 
@@ -23,3 +24,9 @@ ON CONFLICT (user_id, platform, app_install_id) DO UPDATE SET push_token = EXCLU
 -- Add a well-known refresh token for UI testing so the XCUITest runner can exchange it for an access token
 INSERT INTO oauth_tokens (refresh_token, refresh_token_expires_on, user_id, client_id)
 VALUES ('UI_TEST_REFRESH_TOKEN', '2030-01-01 00:00:00.000', '\xabcdef1234567890', '6A773C32-5EB3-41C9-8036-B991B51F14F7');
+
+-- Add an admin user that will be marked as the owner of any public competitions
+-- Need this in the DB because of foreign key restraints
+-- This value will be set as the FWF_SYSTEM_ADMIN_USER_ID env variable when running the backend locally for testing
+INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date)
+VALUES ('\x9f3c7a2e4b8d41c6a5e0f2d9b7c1348e', 'Admin', 'User', 10, true, '2024-01-01 00:00:00.000');
