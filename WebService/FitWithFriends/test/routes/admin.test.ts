@@ -112,7 +112,7 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
 
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        console.log(response);
+        console.log('danocon_test: ' + response.data.errors);
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('Moved 1 competition(s) to processing state');
