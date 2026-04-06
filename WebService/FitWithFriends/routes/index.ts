@@ -6,7 +6,8 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', function (req, res) {
-    res.render('index', { title: 'Fit With Friends' });
+const appStoreUrl = 'https://itunes.apple.com/app/apple-store/id1620795451';
+    res.render('index', { title: 'Fit With Friends', appStoreUrl });
 });
 
 router.get('/joinCompetition', function (req, res) {
@@ -24,8 +25,7 @@ router.get('/joinCompetition', function (req, res) {
     // iPadOS 13+ reports the same UA as macOS, so treat Mac as potentially iOS
     const isIOS = os === 'iOS' || os === 'macOS';
 
-    // TODO: Need the actual app store ID
-    const appStoreUrl = 'itms-apps://itunes.apple.com/app/apple-store/id983156458';
+const appStoreUrl = 'itms-apps://itunes.apple.com/app/apple-store/id1620795451';
     const appDeeplink = 'fitwithfriends://joinCompetition?competitionToken=' + competitionToken + '&competitionId=' + competitionID;
 
     res.render('joinCompetition', {

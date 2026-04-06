@@ -163,6 +163,16 @@ a {
     text-decoration: underline;
 }
 
+.privacy-link {
+    font-size: 13px;
+    color: #8e8e93;
+    text-decoration: none;
+}
+
+.privacy-link:hover {
+    text-decoration: underline;
+}
+
 /* iOS-only blocking message */
 .ios-only-banner {
     margin: 0 24px 32px;
