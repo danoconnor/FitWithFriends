@@ -42,7 +42,7 @@ env:
   PGDATABASE: ${{ secrets.PGDATABASE }}
   PGUSESSL: ${{ secrets.PGUSESSL }}
   FWF_ADMIN_AUTH_SECRET: ${{ secrets.FWF_ADMIN_AUTH_SECRET }}
-
+  FWF_SYSTEM_ADMIN_USER_ID: ${{ secrets.FWF_SYSTEM_ADMIN_USER_ID }}
 
 permissions:
   contents: read
