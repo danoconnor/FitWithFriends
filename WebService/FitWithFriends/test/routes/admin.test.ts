@@ -71,15 +71,15 @@ describe('Admin authentication', () => {
 describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
     test('processes competitions that recently ended', async () => {
         const competitionId = uuid();
-        const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+        const oneDayInFuture = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+        const twoDaysInFuture = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         
         // Create a competition that ended yesterday but is still in NotStartedOrActive state
         await TestSQL.createCompetitionWithState({
             competitionId,
             displayName: 'Test Competition',
-            startDate: threeDaysAgo,
-            endDate: threeDaysAgo,
+            startDate: oneDayInFuture,
+            endDate: oneDayInFuture,
             adminUserId: convertUserIdToBuffer(testUserId1),
             accessToken: 'test-token',
             ianaTimezone: 'America/New_York',
@@ -112,10 +112,10 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
         });
 
         // Run the admin task
-        // Mock running it two days ago so it picks up the contest that ended three days ago as a recently ended contest
+        // Mock running it two days in the future so it picks up the contest that ended one day in the future as a recently ended contest
         // Do it this way to avoid conflicts with the 'handles multiple operations in single run' test when running concurrently
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
-            currentDate: twoDaysAgo.toISOString()
+            currentDate: twoDaysInFuture.toISOString()
         });
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
