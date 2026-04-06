@@ -10,6 +10,10 @@ const appStoreUrl = 'https://itunes.apple.com/app/apple-store/id1620795451';
     res.render('index', { title: 'Fit With Friends', appStoreUrl });
 });
 
+router.get('/privacyPolicy', function (req, res) {
+    res.render('privacyPolicy', { title: 'Fit With Friends Privacy Policy' });
+});
+
 router.get('/joinCompetition', function (req, res) {
     // All incoming query params are lowercased
     const competitionID = req.query['competitionid'];
