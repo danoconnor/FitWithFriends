@@ -114,10 +114,10 @@ router.post('/performDailyTasks', async function (req, res) {
 
     if (errors.length > 0) {
         console.error('Error performing daily tasks:', summary);
-        return res.status(500).json(summary);
+        return res.status(500).json(JSON.stringify(summary));
     } else {
         console.log('Daily tasks completed:', summary);
-        return res.status(200).json(summary);
+        return res.status(200).json(JSON.stringify(summary));
     }
 });
 
