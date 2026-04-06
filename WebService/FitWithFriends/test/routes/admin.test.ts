@@ -24,10 +24,6 @@ function getTaskResult(response: any, taskName: string): string | undefined {
 
 beforeEach(async () => {
     try {
-        // Clean up any public competitions left over from previous test runs
-        const existingPublicCompetitions = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
-        await Promise.all(existingPublicCompetitions.map(c => TestSQL.clearDataForCompetition({ competitionId: c.competition_id })));
-
         // Create test users
         await TestSQL.createUser({
             userId: convertUserIdToBuffer(testUserId1),
@@ -56,10 +52,6 @@ afterEach(async () => {
     await Promise.all(usersToCleanup.map(userId => TestSQL.clearDataForUser({ userId: convertUserIdToBuffer(userId) })));
     await Promise.all(competitionsToCleanup.map(competitionId => TestSQL.clearDataForCompetition({ competitionId })));
 
-    // Clean up any public competitions auto-created by performDailyTasks during tests
-    const activePublicCompetitions = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
-    await Promise.all(activePublicCompetitions.map(c => TestSQL.clearDataForCompetition({ competitionId: c.competition_id })));
-
     usersToCleanup = [];
     competitionsToCleanup = [];
 });
@@ -79,14 +71,15 @@ describe('Admin authentication', () => {
 describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
     test('processes competitions that recently ended', async () => {
         const competitionId = uuid();
-        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const oneDayInFuture = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+        const twoDaysInFuture = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         
         // Create a competition that ended yesterday but is still in NotStartedOrActive state
         await TestSQL.createCompetitionWithState({
             competitionId,
             displayName: 'Test Competition',
-            startDate: yesterday,
-            endDate: yesterday, // Ended yesterday
+            startDate: oneDayInFuture,
+            endDate: oneDayInFuture,
             adminUserId: convertUserIdToBuffer(testUserId1),
             accessToken: 'test-token',
             ianaTimezone: 'America/New_York',
@@ -119,7 +112,11 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
         });
 
         // Run the admin task
-        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        // Mock running it two days in the future so it picks up the contest that ended one day in the future as a recently ended contest
+        // Do it this way to avoid conflicts with the 'handles multiple operations in single run' test when running concurrently
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
+            currentDate: twoDaysInFuture.toISOString()
+        });
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('Moved 1 competition(s) to processing state');
@@ -359,11 +356,55 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
     });
 });
 
-const isSunOrMon = [0, 1].includes(new Date().getUTCDay());
-
 describe('performDailyTasks - createWeeklyPublicCompetition', () => {
-    (isSunOrMon ? test : test.skip)('creates a weekly public competition on Sunday or Monday when none exists', async () => {
-        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+    // Compute the upcoming Monday in UTC (same algorithm as the server's getNextMondayStartDate).
+    // These are describe-scope constants so all tests in this block share the same reference dates.
+    const setupNow = new Date();
+    const setupDayOfWeek = setupNow.getUTCDay();
+    const setupDaysUntilMonday = setupDayOfWeek === 1 ? 0 : (8 - setupDayOfWeek) % 7;
+    const upcomingMondayUTC = new Date(setupNow);
+    upcomingMondayUTC.setUTCDate(setupNow.getUTCDate() + setupDaysUntilMonday);
+    upcomingMondayUTC.setUTCHours(0, 0, 0, 0);
+
+    // A Sunday at noon UTC — the server will see getUTCDay()===0 and compute upcomingMondayUTC.
+    const sundayNoonUTC = new Date(upcomingMondayUTC.getTime() - 12 * 60 * 60 * 1000);
+
+    // A past weekday (not Sun/Mon) at noon UTC — the server returns "Skipped: not Sunday or Monday".
+    // Must be in the past so deleteExpiredRefreshTokens doesn't delete tokens created by concurrent
+    // test files (those tokens expire ~1 day from now; starting 3 days back keeps us safely clear).
+    const pastWeekdayNoonUTC = (() => {
+        const d = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+        d.setUTCHours(12, 0, 0, 0);
+        // Step back until we land on a day that is not Sunday (0) or Monday (1).
+        while (d.getUTCDay() === 0 || d.getUTCDay() === 1) {
+            d.setUTCDate(d.getUTCDate() - 1);
+        }
+        return d;
+    })();
+
+    // The Monday date as the pg library will return it to the test worker.
+    // pg deserializes a PostgreSQL `date` column as local midnight, so we construct
+    // local midnight for the same calendar date as upcomingMondayUTC.
+    const expectedMonday = new Date(
+        upcomingMondayUTC.getUTCFullYear(),
+        upcomingMondayUTC.getUTCMonth(),
+        upcomingMondayUTC.getUTCDate()
+    );
+
+    beforeEach(async () => {
+        // Clean up any competitions scheduled for the upcoming Monday that may have been
+        // left over from a previous crashed test run.
+        const publicComps = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
+        const upcomingWeekComps = publicComps.filter(c =>
+            new Date(c.start_date).getTime() >= expectedMonday.getTime()
+        );
+        await Promise.all(upcomingWeekComps.map(c => TestSQL.clearDataForCompetition({ competitionId: c.competition_id })));
+    });
+
+    test('creates a weekly public competition when none exists', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
+            currentDate: sundayNoonUTC.toISOString()
+        });
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created weekly competition starting /);
@@ -371,13 +412,14 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
         });
-        expect(publicCompetitions.length).toBe(1);
-
-        const competition = publicCompetitions[0];
+        const competition = publicCompetitions.find(c =>
+            new Date(c.start_date).getTime() === expectedMonday.getTime()
+        );
+        expect(competition).toBeDefined();
         competitionsToCleanup.push(competition.competition_id);
 
         const startDate = new Date(competition.start_date);
-        expect(startDate.getUTCDay()).toBe(1); // starts on Monday
+        expect(startDate.getDay()).toBe(1); // starts on Monday (local)
 
         const durationDays = (new Date(competition.end_date).getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
         expect(durationDays).toBe(7);
@@ -385,8 +427,10 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         expect(competition.display_name).toBe('Weekly challenge - see how you stack up');
     });
 
-    (!isSunOrMon ? test : test.skip)('does not create a competition on weekdays', async () => {
-        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+    test('does not create a competition on weekdays', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
+            currentDate: pastWeekdayNoonUTC.toISOString()
+        });
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBe('Skipped: not Sunday or Monday');
@@ -394,24 +438,23 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
         });
-        expect(publicCompetitions.length).toBe(0);
+        const upcomingWeekComps = publicCompetitions.filter(c =>
+            new Date(c.start_date).getTime() >= expectedMonday.getTime()
+        );
+        expect(upcomingWeekComps.length).toBe(0);
     });
 
     test('does not create a duplicate when a competition for the upcoming week already exists', async () => {
         const competitionId = uuid();
-        const now = new Date();
-        const dayOfWeek = now.getUTCDay();
-        const daysUntilMonday = dayOfWeek === 1 ? 0 : (8 - dayOfWeek) % 7;
-        const startDate = new Date(now);
-        startDate.setUTCDate(now.getUTCDate() + daysUntilMonday);
-        startDate.setUTCHours(0, 0, 0, 0);
-        const endDate = new Date(startDate);
-        endDate.setUTCDate(startDate.getUTCDate() + 7);
+        // Use expectedMonday (local midnight) as startDate so pg serializes the correct calendar
+        // date regardless of the test worker's timezone offset.
+        const endDate = new Date(expectedMonday);
+        endDate.setDate(expectedMonday.getDate() + 7);
 
         await TestSQL.createPublicCompetition({
             competitionId,
             displayName: 'Existing Weekly Challenge',
-            startDate,
+            startDate: expectedMonday,
             endDate,
             adminUserId: convertUserIdToBuffer(testUserId1),
             accessToken: 'test-access-token',
@@ -419,18 +462,20 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         });
         competitionsToCleanup.push(competitionId);
 
-        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
+            currentDate: sundayNoonUTC.toISOString()
+        });
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
-        // On Sun/Mon the day check passes so we reach the duplicate check; on other days we skip earlier
-        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBe(
-            isSunOrMon ? 'Skipped: competition for upcoming week already exists' : 'Skipped: not Sunday or Monday'
-        );
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBe('Skipped: competition for upcoming week already exists');
 
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
         });
-        expect(publicCompetitions.length).toBe(1); // still only the one we pre-created
+        const upcomingWeekComps = publicCompetitions.filter(c =>
+            new Date(c.start_date).getTime() >= expectedMonday.getTime()
+        );
+        expect(upcomingWeekComps.length).toBe(1); // still only the one we pre-created
     });
 });
 
@@ -517,5 +562,9 @@ describe('performDailyTasks - comprehensive integration', () => {
         // 3. Expired refresh token should be deleted
         const remainingTokens = await TestSQL.getRefreshTokens();
         expect(remainingTokens.filter(t => t.refresh_token === 'expired-test-token')).toHaveLength(0);
+
+        // Track any public competition created by createWeeklyPublicCompetition so afterEach can clean it up
+        const createdPublicComps = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
+        createdPublicComps.forEach(c => competitionsToCleanup.push(c.competition_id));
     });
 });

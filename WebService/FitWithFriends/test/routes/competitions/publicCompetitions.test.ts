@@ -276,7 +276,6 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        console.log(response);
         expect(response.status).toBe(200);
         expect(response.data.competition_id).toBeDefined();
         competitionsToCleanup.push(response.data.competition_id);
