@@ -36,6 +36,7 @@ env:
   PGDATABASE: 'testdb'
   PGUSESSL: '0'
   FWF_ADMIN_AUTH_SECRET: 'testsecret'
+  FWF_SYSTEM_ADMIN_USER_ID: '9f3c7a2e4b8d41c6a5e0f2d9b7c1348e' # Matches hardcoded value in SetupTestData.sql
 
 permissions:
   contents: read
