@@ -48,7 +48,7 @@ struct AboutView: View {
                         Label("Send diagnostic logs", systemImage: "envelope")
                     }
 
-                    Link(destination: URL(string: "\(serverEnvironmentManager.baseUrl)/FitWithFriendsPrivacyPolicy.docx")!) {
+                    Link(destination: URL(string: "\(serverEnvironmentManager.baseUrl)/privacyPolicy")!) {
                         Label("Privacy policy", systemImage: "hand.raised")
                     }
                 }
