@@ -24,6 +24,17 @@ export async function makeGetRequest(relativeUrl: string, authToken: string | un
     }
 }
 
+export async function makeGetRequestWithUserAgent(relativeUrl: string, userAgent: string): Promise<any> {
+    try {
+        const response = await axios.get('http://localhost:3000/' + relativeUrl, {
+            headers: { 'User-Agent': userAgent }
+        });
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
 // Admin request helpers that use the special admin authorization header
 export async function makeAdminPostRequest(relativeUrl: string, requestBody: any, contentType: string | undefined = undefined): Promise<any> {
     try {
