@@ -4,6 +4,7 @@ import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities/userHelpers';
 import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../../../utilities/enums/FWFErrorCodes';
+import { CompetitionState } from '../../../utilities/enums/CompetitionState';
 
 /*
     Tests the /competitions/join route for joining an existing competition
@@ -210,14 +211,15 @@ test('Join competition with user who has joined past competitions', async () => 
     // Create a second test competition that has already completed
     const testCompetitionId2 = uuid();
     const now = new Date();
-    await TestSQL.createCompetition({
+    await TestSQL.createCompetitionWithState({
         competitionId: testCompetitionId2,
         adminUserId: convertUserIdToBuffer(testUserId2),
         displayName: 'Test Competition 2',
         startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
         endDate: new Date(now.getTime() - 1000 * 60 * 60 * 24), // 1 day ago
         accessToken: '5678',
-        ianaTimezone: 'America/New_York'
+        ianaTimezone: 'America/New_York',
+        state: CompetitionState.Archived  // Archived so admin tasks don't pick it up
     });
     competitionsToCleanup.push(testCompetitionId2);
 

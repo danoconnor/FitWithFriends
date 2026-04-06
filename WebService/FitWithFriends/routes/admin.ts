@@ -74,19 +74,23 @@ router.post('/performDailyTasks', async function (req, res) {
     let taskResults: { name: string; result: string }[] = [];
     let errors: [taskName: string, error: Error][] = [];
 
-    const deleteExpiredTokensPromise = deleteExpiredRefreshTokens();
+    // Optional currentDate override — allows callers (e.g. tests) to specify what
+    // "now" means for this run without restarting the server.
+    const now = req.body['currentDate'] ? new Date(req.body['currentDate']) : new Date();
+
+    const deleteExpiredTokensPromise = deleteExpiredRefreshTokens(now);
 
     // Do not parallelize the competition tasks
     // because we do not want to move a competition to processing to archiving in the same run
     // This should not happen but could happen if the cron job has not been run recently
     try {
-        taskResults.push({ name: 'archiveCompetitions', result: await archiveCompetitions() });
+        taskResults.push({ name: 'archiveCompetitions', result: await archiveCompetitions(now) });
     } catch (err) {
         errors.push(['archiveCompetitions', err]);
     }
 
     try {
-        taskResults.push({ name: 'processRecentlyEndedCompetitions', result: await processesRecentlyEndedCompetitions() });
+        taskResults.push({ name: 'processRecentlyEndedCompetitions', result: await processesRecentlyEndedCompetitions(now) });
     } catch (err) {
         errors.push(['processRecentlyEndedCompetitions', err]);
     }
@@ -98,7 +102,7 @@ router.post('/performDailyTasks', async function (req, res) {
     }
 
     try {
-        taskResults.push({ name: 'createWeeklyPublicCompetition', result: await createWeeklyPublicCompetition() });
+        taskResults.push({ name: 'createWeeklyPublicCompetition', result: await createWeeklyPublicCompetition(now) });
     } catch (err) {
         errors.push(['createWeeklyPublicCompetition', err]);
     }
@@ -120,8 +124,7 @@ router.post('/performDailyTasks', async function (req, res) {
 // Get recently ended competitions
 // Move them to the processing state
 // Send push notifications to users
-async function processesRecentlyEndedCompetitions(): Promise<string> {
-    const now = new Date();
+async function processesRecentlyEndedCompetitions(now: Date): Promise<string> {
     const competitionsToMoveToProcessing = await CompetitionQueries.getCompetitionsInState({
         state: CompetitionState.NotStartedOrActive,
         finishedBeforeDate: now
@@ -159,8 +162,7 @@ async function processesRecentlyEndedCompetitions(): Promise<string> {
 // Get competitions that have been in the processing state for more than 24 hours
 // Move them to the archived state and archive results
 // Send final results push notifications
-async function archiveCompetitions(): Promise<string> {
-    const now = new Date();
+async function archiveCompetitions(now: Date): Promise<string> {
     const olderThan24Hrs = new Date(now.getTime() - (24 * 60 * 60 * 1000));
      const competitionsToArchive = await CompetitionQueries.getCompetitionsInState({
         state: CompetitionState.ProcessingResults,
@@ -245,8 +247,7 @@ async function archiveCompetitions(): Promise<string> {
     return `Archived ${competitionsToArchive.length} competition(s)`;
 }
 
-async function deleteExpiredRefreshTokens(): Promise<string> {
-    const now = new Date();
+async function deleteExpiredRefreshTokens(now: Date): Promise<string> {
     await OAuthQueries.deleteExpiredRefreshTokens({ currentDate: now });
     return 'Deleted expired refresh tokens';
 }
@@ -260,8 +261,7 @@ function getNextMondayStartDate(from: Date): Date {
     return monday;
 }
 
-async function createWeeklyPublicCompetition(): Promise<string> {
-    const now = new Date();
+async function createWeeklyPublicCompetition(now: Date): Promise<string> {
     const dayOfWeek = now.getUTCDay();
 
     // Only create on Sunday (preview day) or Monday (fallback if Sunday task failed)
