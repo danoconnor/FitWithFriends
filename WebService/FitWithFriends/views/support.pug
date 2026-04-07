@@ -1,0 +1,128 @@
+extends layout
+
+block content
+  style.
+    .support-container {
+      width: 100%;
+      max-width: 800px;
+      padding: 40px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #222;
+    }
+    .support-container h1 {
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+    .support-container .subtitle {
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 40px;
+    }
+    .support-container h2 {
+      font-size: 20px;
+      margin-top: 40px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
+    }
+    .support-container p {
+      font-size: 15px;
+      margin: 12px 0;
+      color: #444;
+    }
+    .faq-card {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .faq-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1c1c1e;
+      margin-bottom: 8px;
+    }
+    .faq-card p {
+      margin: 6px 0;
+    }
+    .faq-card code {
+      background: #e5e5ea;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 13px;
+    }
+    .contact-block {
+      background: #f5f5f7;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .contact-block p {
+      margin: 4px 0;
+    }
+
+  .support-container
+    h1 Fit With Friends Support
+    p.subtitle Get help with competitions, activity data, and more.
+
+    h2 Competitions
+
+    .faq-card
+      h3 How do I create a competition?
+      p
+        | Go to the home screen and tap
+        strong  Create new competition.
+        |  Give it a name and set the duration (1–30 days). Once created, tap the
+        strong  &hellip;
+        |  button on the competition and select
+        strong  Share
+        |  to generate an invite link you can send to friends.
+
+    .faq-card
+      h3 How do I join a competition?
+      p Ask the competition admin to share the invite link with you. Tapping the link will open Fit with Friends and show a confirmation screen. Confirm to join and you'll appear on the leaderboard immediately.
+
+    .faq-card
+      h3 How does scoring work?
+      p
+        | You earn one point for each percent of each activity ring you close. For example: 50% Move + 125% Exercise + 75% Stand = 250 points for that day. The maximum is
+        strong  600 points per day
+        |  (100% on all three rings counts as 300; going beyond 100% on any ring earns bonus points up to the cap).
+      p Since points are based on your personal ring goals set in Apple Health, make sure your goals are set to a realistic level so competitions stay fair.
+
+    .faq-card
+      h3 How many competitions can I be in at once?
+      p
+        | Free accounts can be in up to
+        strong  1 active private competition
+        |  at a time. Upgrading to
+        strong  Fit with Friends Pro
+        |  raises this limit to 10, and also unlocks access to public community competitions.
+
+    h2 Activity Data Troubleshooting
+
+    .faq-card
+      h3 My activity data isn't being counted
+      p First, check that Fit with Friends has permission to read all required Apple Health categories:
+      p
+        code Settings &rsaquo; Privacy &amp; Security &rsaquo; Health &rsaquo; Fit with Friends
+      p Make sure all categories are enabled. Then close and re-launch the app.
+
+    .faq-card
+      h3 Data updates while the app is open but not in the background
+      p Enable Background App Refresh for the app:
+      p
+        code Settings &rsaquo; Fit with Friends &rsaquo; Background App Refresh
+      p With this enabled, your rings will sync automatically throughout the day without needing to open the app.
+
+    h2 Contact
+
+    p
+      | Can't find what you're looking for? Send us an email and we'll get back to you.
+
+    .contact-block
+      p Fit With Friends
+      p
+        a(href='mailto:fitwithfriendsapp@gmail.com') fitwithfriendsapp@gmail.com

@@ -57,6 +57,13 @@ jobs:
           AUTH_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           AUTH_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          FWF_KEYCHAIN_PREFIX: ${{ secrets.FWF_KEYCHAIN_PREFIX }}
+          FWF_SUPPORT_EMAIL: ${{ secrets.FWF_SUPPORT_EMAIL }}
+          FWF_APP_PROTOCOL: ${{ secrets.FWF_APP_PROTOCOL }}
+          FWF_DEVELOPER_NAME: ${{ secrets.FWF_DEVELOPER_NAME }}
+          FWF_PROD_SERVER_URL: ${{ secrets.FWF_PROD_SERVER_URL }}
+          FWF_PROD_CLIENT_SECRET: ${{ secrets.FWF_PROD_CLIENT_SECRET }}
+          FWF_PROD_CLIENT_ID: ${{ secrets.FWF_PROD_CLIENT_ID }}
         run: |
           xcodebuild archive \
             -workspace "$WORKSPACE_NAME" \

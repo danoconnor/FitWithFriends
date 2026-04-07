@@ -304,26 +304,5 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
     return `Created weekly competition starting ${upcomingMonday.toISOString()}`;
 }
 
-router.post('/setUserProStatus', function (req, res) {
-    const userId: string = req.body['userId'];
-    const isPro: boolean = req.body['isPro'];
-
-    if (!userId || isPro === undefined || isPro === null) {
-        handleError(null, 400, 'Missing required parameter', res);
-        return;
-    }
-
-    UserQueries.updateUserProStatus({
-        userId: UserHelpers.convertUserIdToBuffer(userId),
-        isPro,
-        maxActiveCompetitions: isPro ? 10 : 1
-    })
-        .then(() => {
-            res.sendStatus(200);
-        })
-        .catch(error => {
-            handleError(error, 500, 'Error updating user pro status', res);
-        });
-});
 
 export default router;

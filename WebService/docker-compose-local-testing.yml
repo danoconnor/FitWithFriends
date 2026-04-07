@@ -20,6 +20,7 @@ services:
       - FWF_IOS_RECOMMENDED_BUILD=20260401.1200
       - FWF_IOS_REQUIRED_BUILD=20260301.0900
       - NODE_ENV=test
+      - FWF_ENABLE_TEST_HELPERS=true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 60s
