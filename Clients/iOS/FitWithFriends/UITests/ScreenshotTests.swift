@@ -23,7 +23,7 @@ final class ScreenshotTests: FWFUITestBase {
 
     /// 02 — Home screen with an active competition and a full leaderboard
     func test02_HomeScreen() throws {
-        let competitionId = try createCompetitionForScreenshots(name: "Summer Challenge")
+        let competitionId = try createCompetitionForScreenshots(name: "Move More, Win More")
         try seedCompetitionWithUsers(competitionId: competitionId)
         try seedSelfActivityData(daysAgo: 5, caloriesBurned: 340, caloriesGoal: 400,
                                   exerciseTime: 27, exerciseTimeGoal: 30,
@@ -32,14 +32,14 @@ final class ScreenshotTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["Summer Challenge"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Move More, Win More"].waitForExistence(timeout: 10))
 
         takeScreenshot(name: "02_HomeScreen")
     }
 
     /// 03 — Competition detail view with a full leaderboard
     func test03_CompetitionDetail() throws {
-        let competitionId = try createCompetitionForScreenshots(name: "Summer Challenge")
+        let competitionId = try createCompetitionForScreenshots(name: "Move More, Win More")
         try seedCompetitionWithUsers(competitionId: competitionId)
         try seedSelfActivityData(daysAgo: 5, caloriesBurned: 340, caloriesGoal: 400,
                                   exerciseTime: 27, exerciseTimeGoal: 30,
@@ -48,7 +48,7 @@ final class ScreenshotTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-        let competitionText = app.staticTexts["Summer Challenge"]
+        let competitionText = app.staticTexts["Move More, Win More"]
         XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
         competitionText.tap()
 
@@ -72,7 +72,7 @@ final class ScreenshotTests: FWFUITestBase {
         let nameField = app.textFields["e.g., January Challenge"]
         XCTAssertTrue(nameField.waitForExistence(timeout: 3))
         nameField.tap()
-        nameField.typeText("Summer Fitness Challenge")
+        nameField.typeText("Move More, Win More")
 
         takeScreenshot(name: "04_CreateCompetition")
     }
