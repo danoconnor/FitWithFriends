@@ -35,6 +35,8 @@
 		0B1CBECC27C3F51C0008C72A /* CompetitionAdminDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */; };
 		0B1CBECE27C3F7B40008C72A /* JoinCompetitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */; };
 		0B1CBED027C3F7C50008C72A /* JoinCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */; };
+		0B2A5A7E2F849A0A00361436 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0B2A5A7D2F849A0A00361436 /* PrivacyInfo.xcprivacy */; };
+		0B2A5A802F849A1900361436 /*  Friends.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0B2A5A7F2F849A1900361436 /*  Friends.storekit */; };
 		0B329F092E4C2C890082D211 /* IEmailUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F072E4C2C890082D211 /* IEmailUtility.swift */; };
 		0B329F0A2E4C2C890082D211 /* IShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F082E4C2C890082D211 /* IShakeGestureHandler.swift */; };
 		0B329F0E2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F0C2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift */; };
@@ -49,7 +51,6 @@
 		0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B35977325714E7D006D956A /* HealthKit.framework */; };
 		0B3597782571502A006D956A /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3597772571502A006D956A /* HealthKitManager.swift */; };
 		0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35977A25715567006D956A /* LoggedInContentView.swift */; };
-		0B4693AF2F79A72600AAD94C /*  Friends.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0B4693AE2F79A72600AAD94C /*  Friends.storekit */; };
 		0B4693B12F79A73300AAD94C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4693B02F79A73300AAD94C /* StoreKit.framework */; };
 		0B47A220279C893100C2970E /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0B47A21F279C893100C2970E /* CocoaLumberjackSwift */; };
 		0B47A222279C90EC00C2970E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A221279C90EB00C2970E /* User.swift */; };
@@ -73,17 +74,6 @@
 		0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */; };
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
 		0B47A252279E424300C2970E /* CompetitionOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A251279E424300C2970E /* CompetitionOverviewView.swift */; };
-		FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E4 /* PublicCompetitionCard.swift */; };
-		FWF0000200000000000000F0 /* IosBuildVersionsDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */; };
-		FWF0000200000000000000F2 /* SemanticVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F3 /* SemanticVersion.swift */; };
-		FWF0000200000000000000F4 /* IAppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F5 /* IAppMetadataService.swift */; };
-		FWF0000200000000000000F6 /* AppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F7 /* AppMetadataService.swift */; };
-		FWF0000200000000000000F8 /* IAppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F9 /* IAppVersionManager.swift */; };
-		FWF0000200000000000000FA /* AppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FB /* AppVersionManager.swift */; };
-		FWF0000200000000000000FC /* MockAppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FD /* MockAppMetadataService.swift */; };
-		FWF0000200000000000000FE /* MockAppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FF /* MockAppVersionManager.swift */; };
-		FWF00002000000000000010A /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010B /* AppVersionViewModel.swift */; };
-		FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010D /* AppVersionManagerTests.swift */; };
 		0B47A254279E47B600C2970E /* UserCompetitionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */; };
 		0B50BA3F27EFE7D40066134D /* AppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */; };
 		0B50BA4127EFEB410066134D /* AppleAuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */; };
@@ -201,6 +191,18 @@
 		FWF0000200000000000000DF /* ProUpgradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000DE /* ProUpgradeView.swift */; };
 		FWF0000200000000000000E1 /* MockSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E0 /* MockSubscriptionManager.swift */; };
 		FWF0000200000000000000E3 /* MockSubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E2 /* MockSubscriptionService.swift */; };
+		FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E4 /* PublicCompetitionCard.swift */; };
+		FWF0000200000000000000E7 /* ScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E6 /* ScreenshotTests.swift */; };
+		FWF0000200000000000000F0 /* IosBuildVersionsDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */; };
+		FWF0000200000000000000F2 /* SemanticVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F3 /* SemanticVersion.swift */; };
+		FWF0000200000000000000F4 /* IAppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F5 /* IAppMetadataService.swift */; };
+		FWF0000200000000000000F6 /* AppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F7 /* AppMetadataService.swift */; };
+		FWF0000200000000000000F8 /* IAppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F9 /* IAppVersionManager.swift */; };
+		FWF0000200000000000000FA /* AppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FB /* AppVersionManager.swift */; };
+		FWF0000200000000000000FC /* MockAppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FD /* MockAppMetadataService.swift */; };
+		FWF0000200000000000000FE /* MockAppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FF /* MockAppVersionManager.swift */; };
+		FWF00002000000000000010A /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010B /* AppVersionViewModel.swift */; };
+		FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010D /* AppVersionManagerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -250,6 +252,8 @@
 		0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionAdminDetails.swift; sourceTree = "<group>"; };
 		0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionView.swift; sourceTree = "<group>"; };
 		0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCompetitionViewModel.swift; sourceTree = "<group>"; };
+		0B2A5A7D2F849A0A00361436 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		0B2A5A7F2F849A1900361436 /*  Friends.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = " Friends.storekit"; sourceTree = "<group>"; };
 		0B329F072E4C2C890082D211 /* IEmailUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEmailUtility.swift; sourceTree = "<group>"; };
 		0B329F082E4C2C890082D211 /* IShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IShakeGestureHandler.swift; sourceTree = "<group>"; };
 		0B329F0C2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppleAuthenticationManager.swift; sourceTree = "<group>"; };
@@ -265,7 +269,6 @@
 		0B35977325714E7D006D956A /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		0B3597772571502A006D956A /* HealthKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		0B35977A25715567006D956A /* LoggedInContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedInContentView.swift; sourceTree = "<group>"; };
-		0B4693AE2F79A72600AAD94C /*  Friends.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; name = " Friends.storekit"; path = "FitWithFriends/ Friends.storekit"; sourceTree = "<group>"; };
 		0B4693B02F79A73300AAD94C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		0B47A221279C90EB00C2970E /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0B47A226279CA8EF00C2970E /* MockAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAuthenticationManager.swift; sourceTree = "<group>"; };
@@ -288,17 +291,6 @@
 		0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKActivitySummary+Extensions.swift"; sourceTree = "<group>"; };
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
 		0B47A251279E424300C2970E /* CompetitionOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionOverviewView.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000E4 /* PublicCompetitionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionCard.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosBuildVersionsDTO.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000F3 /* SemanticVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticVersion.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000F5 /* IAppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppMetadataService.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000F7 /* AppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetadataService.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000F9 /* IAppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppVersionManager.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000FB /* AppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManager.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000FD /* MockAppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppMetadataService.swift; sourceTree = "<group>"; };
-		FWF0000200000000000000FF /* MockAppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppVersionManager.swift; sourceTree = "<group>"; };
-		FWF00002000000000000010B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
-		FWF00002000000000000010D /* AppVersionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManagerTests.swift; sourceTree = "<group>"; };
 		0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionResultView.swift; sourceTree = "<group>"; };
 		0B50BA3E27EFE7D40066134D /* AppleAuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationManager.swift; sourceTree = "<group>"; };
 		0B50BA4027EFEB410066134D /* AppleAuthenticationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAuthenticationError.swift; sourceTree = "<group>"; };
@@ -321,7 +313,8 @@
 		0B99FBCD256A016900673133 /* FitWithFriendsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitWithFriendsApp.swift; sourceTree = "<group>"; };
 		0B99FBD1256A016900673133 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0B99FBD4256A016900673133 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		0B99FBD6256A016900673133 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0B99FBD6256A016900673133 /* Info-Debug.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Debug.plist"; sourceTree = "<group>"; };
+		67A0E0255290448AB9D8BAA4 /* Info-Release.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Release.plist"; sourceTree = "<group>"; };
 		0B99FBE4256A04A200673133 /* HttpConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpConnector.swift; sourceTree = "<group>"; };
 		0B99FBE7256A068700673133 /* HttpError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpError.swift; sourceTree = "<group>"; };
 		0B99FBEA256A070F00673133 /* HttpMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpMethod.swift; sourceTree = "<group>"; };
@@ -419,6 +412,18 @@
 		FWF0000200000000000000DE /* ProUpgradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUpgradeView.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000E0 /* MockSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubscriptionManager.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000E2 /* MockSubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubscriptionService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E4 /* PublicCompetitionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionCard.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E6 /* ScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosBuildVersionsDTO.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F3 /* SemanticVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticVersion.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F5 /* IAppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppMetadataService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F7 /* AppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetadataService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000F9 /* IAppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppVersionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000FB /* AppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManager.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000FD /* MockAppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppMetadataService.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000FF /* MockAppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppVersionManager.swift; sourceTree = "<group>"; };
+		FWF00002000000000000010B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
+		FWF00002000000000000010D /* AppVersionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManagerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -552,24 +557,6 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
-		FWF0000200000000000000D0 /* Subscriptions */ = {
-			isa = PBXGroup;
-			children = (
-				FWF0000200000000000000D1 /* ISubscriptionManager.swift */,
-				FWF0000200000000000000D3 /* SubscriptionManager.swift */,
-			);
-			path = Subscriptions;
-			sourceTree = "<group>";
-		};
-		FWF00002000000000000010E /* AppVersion */ = {
-			isa = PBXGroup;
-			children = (
-				FWF0000200000000000000F9 /* IAppVersionManager.swift */,
-				FWF0000200000000000000FB /* AppVersionManager.swift */,
-			);
-			path = AppVersion;
-			sourceTree = "<group>";
-		};
 		0B47A223279CA88800C2970E /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
@@ -607,7 +594,6 @@
 		0B99FBC1256A016900673133 = {
 			isa = PBXGroup;
 			children = (
-				0B4693AE2F79A72600AAD94C /*  Friends.storekit */,
 				0B99FBCC256A016900673133 /* FitWithFriends */,
 				0B08797E2BB3A8E80073AB09 /* UnitTests */,
 				FE00000100000000000001AA /* UITests */,
@@ -629,6 +615,8 @@
 		0B99FBCC256A016900673133 /* FitWithFriends */ = {
 			isa = PBXGroup;
 			children = (
+				0B2A5A7F2F849A1900361436 /*  Friends.storekit */,
+				0B2A5A7D2F849A0A00361436 /* PrivacyInfo.xcprivacy */,
 				0BCF64942BCC3F0B004E98C7 /* RootSettings */,
 				0B47A223279CA88800C2970E /* Mocks */,
 				0B35977D25715675006D956A /* Data */,
@@ -643,7 +631,8 @@
 				0B47A234279CB2ED00C2970E /* IObjectGraph.swift */,
 				0B99FBD1256A016900673133 /* Assets.xcassets */,
 				0B35971E256B4506006D956A /* FitWithFriends.entitlements */,
-				0B99FBD6256A016900673133 /* Info.plist */,
+				0B99FBD6256A016900673133 /* Info-Debug.plist */,
+				67A0E0255290448AB9D8BAA4 /* Info-Release.plist */,
 				0B99FBD3256A016900673133 /* Preview Content */,
 			);
 			path = FitWithFriends;
@@ -811,14 +800,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		FWF0000200000000000000DD /* Subscriptions */ = {
-			isa = PBXGroup;
-			children = (
-				FWF0000200000000000000DE /* ProUpgradeView.swift */,
-			);
-			path = Subscriptions;
-			sourceTree = "<group>";
-		};
 		0BBD789F259A536000E08EB2 /* Competitions */ = {
 			isa = PBXGroup;
 			children = (
@@ -960,6 +941,7 @@
 				FE00000100000000000001BA /* AuthenticationTests.swift */,
 				FE00000100000000000001BC /* FirstLaunchScreenTests.swift */,
 				FWF0000200000000000000CD /* PublicCompetitionTests.swift */,
+				FWF0000200000000000000E6 /* ScreenshotTests.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -971,6 +953,32 @@
 				FWF00002000000000000004B /* PushNotificationManager.swift */,
 			);
 			path = PushNotifications;
+			sourceTree = "<group>";
+		};
+		FWF0000200000000000000D0 /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000D1 /* ISubscriptionManager.swift */,
+				FWF0000200000000000000D3 /* SubscriptionManager.swift */,
+			);
+			path = Subscriptions;
+			sourceTree = "<group>";
+		};
+		FWF0000200000000000000DD /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000DE /* ProUpgradeView.swift */,
+			);
+			path = Subscriptions;
+			sourceTree = "<group>";
+		};
+		FWF00002000000000000010E /* AppVersion */ = {
+			isa = PBXGroup;
+			children = (
+				FWF0000200000000000000F9 /* IAppVersionManager.swift */,
+				FWF0000200000000000000FB /* AppVersionManager.swift */,
+			);
+			path = AppVersion;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1089,11 +1097,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B2A5A7E2F849A0A00361436 /* PrivacyInfo.xcprivacy in Resources */,
 				0BF759C525B67CD00098AE13 /* Colors.xcassets in Resources */,
 				0B99FBD5256A016900673133 /* Preview Assets.xcassets in Resources */,
+				0B2A5A802F849A1900361436 /*  Friends.storekit in Resources */,
 				0B99FBD2256A016900673133 /* Assets.xcassets in Resources */,
 				0BCF64972BCC3F55004E98C7 /* Settings.bundle in Resources */,
-				0B4693AF2F79A72600AAD94C /*  Friends.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1107,6 +1116,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0B2ACCFF2EC04000004966FF /* Set Bundle Version */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Set Bundle Version";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nfi\n";
+		};
 		0BCF64992BCCB4F4004E98C7 /* Remove Settings bundle from Release builds */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -1146,20 +1169,6 @@
 			shellPath = /bin/sh;
 			shellScript = "# Set the below environment variables to insert the secrets into SecretsConstants.swift \n# FWF_KEYCHAIN_PREFIX\n# FWF_SUPPORT_EMAIL\n# FWF_APP_PROTOCOL\n# FWF_DEVELOPER_NAME\n# FWF_LOCAL_SERVER_URL\n# FWF_LOCAL_CLIENT_SECRET\n# FWF_LOCAL_CLIENT_ID\n# FWF_PROD_SERVER_URL\n# FWF_PROD_CLIENT_SECRET\n# FWF_PROD_CLIENT_ID\n\nif [ -z \"$FWF_KEYCHAIN_PREFIX\" ]; then\n  if [ ! -f \"$PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\" ]; then\n    cp \"$PROJECT_DIR/FitWithFriends/Utilities/SecretConstantsTemplate.swift\" \"$PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\"\n  fi\n  exit 0\nfi\n\n# Copy the template into the real file, then replace all the empty vars with our actual values\ncp $PROJECT_DIR/FitWithFriends/Utilities/SecretConstantsTemplate.swift $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let keychainPrefix = \"\"/static let keychainPrefix = \"'\"$FWF_KEYCHAIN_PREFIX\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let supportEmail = \"\"/static let supportEmail = \"'\"$FWF_SUPPORT_EMAIL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let baseAppProtocol = \"\"/static let baseAppProtocol = \"'\"$FWF_APP_PROTOCOL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let developerName = \"\"/static let developerName = \"'\"$FWF_DEVELOPER_NAME\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localServiceBaseUrl = \"\"/static let localServiceBaseUrl = \"'\"$FWF_LOCAL_SERVER_URL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localClientSecret = \"\"/static let localClientSecret = \"'\"$FWF_LOCAL_CLIENT_SECRET\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let localClientId = \"\"/static let localClientId = \"'\"$FWF_LOCAL_CLIENT_ID\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodServiceBaseUrl = \"\"/static let prodServiceBaseUrl = \"'\"$FWF_PROD_SERVER_URL\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodClientSecret = \"\"/static let prodClientSecret = \"'\"$FWF_PROD_CLIENT_SECRET\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n\nsed -i '' 's/static let prodClientId = \"\"/static let prodClientId = \"'\"$FWF_PROD_CLIENT_ID\"'\"/g' $PROJECT_DIR/FitWithFriends/Utilities/SecretConstants.swift\n";
 			showEnvVarsInLog = 0;
-		};
-		0B2ACCFF2EC04000004966FF /* Set Bundle Version */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Set Bundle Version";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1368,6 +1377,7 @@
 				FE00000100000000000001BB /* AuthenticationTests.swift in Sources */,
 				FE00000100000000000001BD /* FirstLaunchScreenTests.swift in Sources */,
 				FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */,
+				FWF0000200000000000000E7 /* ScreenshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1566,7 +1576,7 @@
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				INFOPLIST_FILE = FitWithFriends/Info.plist;
+				INFOPLIST_FILE = "FitWithFriends/Info-Debug.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1591,7 +1601,7 @@
 				DEVELOPMENT_TEAM = U7MJ9CBUMD;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				INFOPLIST_FILE = FitWithFriends/Info.plist;
+				INFOPLIST_FILE = "FitWithFriends/Info-Release.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

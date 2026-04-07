@@ -192,6 +192,7 @@ struct LoggedInContentView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             guard ProcessInfo.processInfo.environment["FWF_UI_TESTING"] != "1" else { return }
             Task.detached {

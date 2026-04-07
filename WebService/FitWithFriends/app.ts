@@ -13,6 +13,7 @@ import oauth from './routes/auth';
 import competitions from './routes/competitions';
 import activityData from './routes/activityData';
 import admin from './routes/admin';
+import testHelpers from './routes/testHelpers';
 import pushNotifications from './routes/pushNotifications';
 import subscriptions from './routes/subscriptions';
 import appStoreNotifications from './routes/appStoreNotifications';
@@ -55,6 +56,7 @@ app.use('/pushNotifications', oauthServer.authenticate(), pushNotifications);
 app.use('/subscriptions', oauthServer.authenticate(), subscriptions);
 app.use('/appstore', appStoreNotifications);
 app.use('/admin', authenticateAdmin, admin);
+app.use('/testHelpers', testHelpers);
 app.use('/.well-known', wellKnown);
 app.use('/appMetadata', appMetadata);
 

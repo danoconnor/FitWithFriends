@@ -144,31 +144,130 @@ class FWFUITestBase: XCTestCase {
     /// Create a test competition via the backend API and return the competition ID
     @discardableResult
     func createTestCompetition(name: String = "UI Test Competition") throws -> String {
+        return try createCompetition(name: name, startDate: Date())
+    }
+
+    /// Create a competition starting `daysInPast` days ago, for screenshot tests that need
+    /// accumulated historical activity data.
+    @discardableResult
+    func createCompetitionForScreenshots(name: String, daysInPast: Int = 5) throws -> String {
+        let start = Date(timeIntervalSinceNow: -Double(daysInPast) * 24 * 60 * 60)
+        return try createCompetition(name: name, startDate: start)
+    }
+
+    /// Seed a competition with realistic fake users for App Store screenshots.
+    /// Each user gets the same activity values inserted for every day from the
+    /// competition's start date through today, giving nonzero total points and points today.
+    func seedCompetitionWithUsers(competitionId: String) throws {
+        let users: [[String: Any]] = [
+            ["firstName": "Alice",  "lastName": "Chen",
+             "caloriesBurned": 420, "caloriesGoal": 400,
+             "exerciseTime": 38,    "exerciseTimeGoal": 30,
+             "standTime": 12,       "standTimeGoal": 12],
+            ["firstName": "Marcus", "lastName": "Johnson",
+             "caloriesBurned": 370, "caloriesGoal": 400,
+             "exerciseTime": 32,    "exerciseTimeGoal": 30,
+             "standTime": 11,       "standTimeGoal": 12],
+            ["firstName": "Sarah",  "lastName": "Kim",
+             "caloriesBurned": 240, "caloriesGoal": 400,
+             "exerciseTime": 18,    "exerciseTimeGoal": 30,
+             "standTime": 10,       "standTimeGoal": 12],
+            ["firstName": "James",  "lastName": "Park",
+             "caloriesBurned": 180, "caloriesGoal": 400,
+             "exerciseTime": 14,    "exerciseTimeGoal": 30,
+             "standTime": 8,        "standTimeGoal": 12],
+        ]
+
+        let url = URL(string: "http://localhost:3000/testHelpers/seedCompetitionUsers")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: [
+            "competitionId": competitionId,
+            "users": users
+        ])
+
+        var httpResponse: HTTPURLResponse?
+        let semaphore = DispatchSemaphore(value: 0)
+        URLSession.shared.dataTask(with: request) { _, response, _ in
+            httpResponse = response as? HTTPURLResponse
+            semaphore.signal()
+        }.resume()
+        semaphore.wait()
+
+        XCTAssertEqual(httpResponse?.statusCode, 200, "Failed to seed competition users")
+    }
+
+    /// Post activity data for the authenticated test user for every day from `daysAgo` days ago
+    /// through today (inclusive).
+    func seedSelfActivityData(daysAgo: Int,
+                              caloriesBurned: Int, caloriesGoal: Int,
+                              exerciseTime: Int, exerciseTimeGoal: Int,
+                              standTime: Int, standTimeGoal: Int) throws {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate]
+
+        var summaries: [[String: Any]] = []
+        for i in stride(from: daysAgo, through: 0, by: -1) {
+            let date = Date(timeIntervalSinceNow: -Double(i) * 24 * 60 * 60)
+            summaries.append([
+                "date": formatter.string(from: date),
+                "activeCaloriesBurned": caloriesBurned,
+                "activeCaloriesGoal": caloriesGoal,
+                "exerciseTime": exerciseTime,
+                "exerciseTimeGoal": exerciseTimeGoal,
+                "standTime": standTime,
+                "standTimeGoal": standTimeGoal
+            ])
+        }
+
+        try makeAuthenticatedRequest(method: "POST", path: "activityData/dailySummary",
+                                     body: ["values": summaries])
+    }
+
+    /// Create a public competition via the admin endpoint and return the competition ID.
+    @discardableResult
+    func createPublicCompetition(name: String = "UI Test Public Competition") throws -> String {
         let startDate = ISO8601DateFormatter().string(from: Date())
         let endDate = ISO8601DateFormatter().string(from: Date(timeIntervalSinceNow: 7 * 24 * 60 * 60))
+
+        let url = URL(string: "http://localhost:3000/admin/createPublicCompetition")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("some_admin_secret", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: Any] = [
             "displayName": name,
             "startDate": startDate,
             "endDate": endDate,
-            "ianaTimezone": TimeZone.current.identifier
+            "ianaTimezone": TimeZone.current.identifier,
+            "adminUserId": userId!
         ]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        let (data, response) = try makeAuthenticatedRequest(method: "POST", path: "competitions", body: body)
-        XCTAssertEqual(response.statusCode, 200, "Failed to create test competition")
+        var responseData: Data?
+        var httpResponse: HTTPURLResponse?
+        let semaphore = DispatchSemaphore(value: 0)
+        URLSession.shared.dataTask(with: request) { data, response, _ in
+            responseData = data
+            httpResponse = response as? HTTPURLResponse
+            semaphore.signal()
+        }.resume()
+        semaphore.wait()
 
-        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        XCTAssertEqual(httpResponse?.statusCode, 200, "Failed to create public competition")
+        let json = try JSONSerialization.jsonObject(with: responseData!) as! [String: Any]
         return json["competition_id"] as! String
     }
 
-    /// Make the test user a Pro subscriber via the admin endpoint
+    /// Make the test user a Pro subscriber via the test helpers endpoint
     func makeUserPro() throws {
         guard let userId else { return }
 
-        let url = URL(string: "http://localhost:3000/admin/setUserProStatus")!
+        let url = URL(string: "http://localhost:3000/testHelpers/setUserProStatus")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("some_admin_secret", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: Any] = ["userId": userId, "isPro": true]
@@ -186,6 +285,22 @@ class FWFUITestBase: XCTestCase {
     }
 
     // MARK: - Private
+
+    @discardableResult
+    private func createCompetition(name: String, startDate: Date) throws -> String {
+        let body: [String: Any] = [
+            "displayName": name,
+            "startDate": ISO8601DateFormatter().string(from: startDate),
+            "endDate": ISO8601DateFormatter().string(from: Date(timeIntervalSinceNow: 7 * 24 * 60 * 60)),
+            "ianaTimezone": TimeZone.current.identifier
+        ]
+
+        let (data, response) = try makeAuthenticatedRequest(method: "POST", path: "competitions", body: body)
+        XCTAssertEqual(response.statusCode, 200, "Failed to create competition")
+
+        let json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        return json["competition_id"] as! String
+    }
 
     private func deleteAllCompetitions() {
         guard accessToken != nil else { return }

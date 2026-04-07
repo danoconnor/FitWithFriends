@@ -14,6 +14,10 @@ router.get('/privacyPolicy', function (req, res) {
     res.render('privacyPolicy', { title: 'Fit With Friends Privacy Policy' });
 });
 
+router.get('/support', function (req, res) {
+    res.render('support', { title: 'Fit With Friends Support' });
+});
+
 router.get('/joinCompetition', function (req, res) {
     // All incoming query params are lowercased
     const competitionID = req.query['competitionid'];
