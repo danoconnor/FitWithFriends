@@ -5,8 +5,8 @@
 # destinations, then extracts and organises the images for App Store upload.
 #
 # Prerequisites:
-#   - Docker backend must be running before executing this script.
-#     Start it with: Clients/iOS/FitWithFriends/Scripts/start-ui-test-backend.sh
+#   - Docker must be installed and running (the script handles compose up/down itself).
+#   - The WebService/.env file must exist with the required env vars (PGUSER, PGPASSWORD, etc.).
 #
 # Usage (run from repo root):
 #   bash Clients/iOS/scripts/capture_screenshots.sh
@@ -29,6 +29,8 @@ set -e
 # Resolve the project directory regardless of where the script is called from
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$SCRIPT_DIR/../FitWithFriends"
+REPO_ROOT="$SCRIPT_DIR/../../.."
+DOCKER_COMPOSE_FILE="$REPO_ROOT/WebService/docker-compose-local-testing.yml"
 
 SCHEME="FitWithFriends"
 PROJECT="FitWithFriends.xcodeproj"
@@ -41,6 +43,26 @@ rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 echo "=== Capturing App Store Screenshots ==="
+echo ""
+
+# Restart the backend with a clean database so screenshots start from a known state.
+# -v removes the postgres volume so the DB is fully re-initialised from the SQL seed scripts.
+echo "--- Restarting backend with clean database ---"
+docker compose -f "$DOCKER_COMPOSE_FILE" down -v --remove-orphans
+docker compose -f "$DOCKER_COMPOSE_FILE" up -d
+
+echo "  Waiting for backend to be ready..."
+for i in $(seq 1 60); do
+    if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+        echo "  Backend is ready."
+        break
+    fi
+    if [ "$i" -eq 60 ]; then
+        echo "  ERROR: Backend did not become ready after 60s. Aborting."
+        exit 1
+    fi
+    sleep 1
+done
 echo ""
 
 # Device configurations for App Store submission.

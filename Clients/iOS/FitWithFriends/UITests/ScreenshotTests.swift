@@ -79,7 +79,8 @@ final class ScreenshotTests: FWFUITestBase {
 
     /// 05 — Pro upgrade sheet
     func test05_ProUpgradeSheet() throws {
-        try createPublicCompetition(name: "Community Run")
+        let competitionId = try createPublicCompetition(name: "Community Run")
+        try seedCompetitionWithUsers(competitionId: competitionId)
 
         launchApp(loggedIn: true)
 
