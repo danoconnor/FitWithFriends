@@ -1,7 +1,7 @@
 import * as https from 'https';
+import jwt from 'jsonwebtoken';
 import { DefaultAzureCredential } from '@azure/identity';
-import { KeyClient } from '@azure/keyvault-keys';
-import { CertificateClient } from '@azure/keyvault-certificates';
+import { SecretClient } from '@azure/keyvault-secrets';
 import * as PushNotificationQueries from '../sql/pushNotifications.queries';
 import { convertUserIdToBuffer } from './userHelpers';
 
@@ -10,6 +10,11 @@ export interface Notification {
     title: string;
     body: string;
 }
+
+// Cache the token and its expiry to avoid re-signing on every request.
+// APNs tokens are valid for 1 hour; we refresh 5 minutes early.
+let cachedToken: string | null = null;
+let cachedTokenExpiresAt: number = 0;
 
 export async function sendPushNotifications(notifications: Notification[]) {
     if (notifications.length === 0) {
@@ -23,14 +28,14 @@ export async function sendPushNotifications(notifications: Notification[]) {
         console.log('No distinct user IDs found in notifications');
         return;
     }
-    
-    const apnsCredentialPromise = getAPNSCertAndKey();
-    const pushTokenResults = await Promise.all(userIds.map(userId => getPushTokenForUser(userId)));
+
+    const [pushTokenResults, apnsToken] = await Promise.all([
+        Promise.all(userIds.map(userId => getPushTokenForUser(userId))),
+        getAPNSToken()
+    ]);
     const usersToPushTokens = Object.fromEntries(
         pushTokenResults.map(result => [result.userId, result.tokens])
     );
-
-    const { cert, key } = await apnsCredentialPromise;
 
     // Create an HTTPS agent to reuse the TLS connection for multiple requests
     const httpsAgent = new https.Agent({ keepAlive: true });
@@ -66,8 +71,7 @@ export async function sendPushNotifications(notifications: Notification[]) {
                     pushToken,
                     title,
                     body,
-                    cert,
-                    key
+                    apnsToken
                 )
             )
         );
@@ -84,54 +88,54 @@ async function getPushTokenForUser(userId: string): Promise<{ userId: string, to
     return { userId, tokens: pushTokens.map(token => token.push_token) };
 }
 
-/**
- * Get the APNS certificate and key from the keyvault
- * @returns The APNS certificate and key in PEM format
- */
-async function getAPNSCertAndKey(): Promise<{ cert: string, key: string }> {
+// Returns a valid APNs bearer token, using the cached one if still fresh.
+async function getAPNSToken(): Promise<string> {
     if (isTestEnvironment()) {
-        // In test environment, use a mock certificate and key
-        return {
-            cert: '-----BEGIN CERTIFICATE-----\nYOUR_TEST_CERTIFICATE_HERE\n-----END CERTIFICATE-----',
-            key: '-----BEGIN PRIVATE KEY-----\nYOUR_TEST_KEY_HERE\n-----END PRIVATE KEY-----'
-        };
+        return 'test-apns-token';
     }
 
-    // Get the APNS key from the keyvault
-    const vaultUrl = process.env.AZURE_KEYVAULT_URL;
-    const apnsKeyId = process.env.APNS_KEY_ID;
-    const apnsCertificateId = process.env.APNS_CERTIFICATE_ID;
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    if (cachedToken && nowSeconds < cachedTokenExpiresAt) {
+        return cachedToken;
+    }
 
-    if (!vaultUrl || !apnsKeyId || !apnsCertificateId) {
+    const vaultUrl = process.env.AZURE_KEYVAULT_URL;
+    const secretId = process.env.APNS_KEY_SECRET_ID;
+    const apnsKeyId = process.env.APNS_KEY_ID;
+    const teamId = process.env.APNS_TEAM_ID;
+
+    if (!vaultUrl || !secretId || !apnsKeyId || !teamId) {
         throw new Error('Missing required APNS environment variables');
     }
 
-    const credential = new DefaultAzureCredential();
-    const keyClient = new KeyClient(vaultUrl, credential);
-    const key = await keyClient.getKey(apnsKeyId);
-    const keyPem = key.key.toString();
+    const secretClient = new SecretClient(vaultUrl, new DefaultAzureCredential());
+    const secret = await secretClient.getSecret(secretId);
+    if (!secret.value) {
+        throw new Error('APNS secret value is empty in Key Vault');
+    }
 
-    const certificateClient = new CertificateClient(vaultUrl, credential);
-    const certificate = await certificateClient.getCertificate(apnsCertificateId);
-    const certificatePem = certificate.cer.toString();
+    const token = jwt.sign({ iss: teamId, iat: nowSeconds }, secret.value, {
+        algorithm: 'ES256',
+        keyid: apnsKeyId,
+        noTimestamp: true,
+    });
 
-    return { cert: certificatePem, key: keyPem };
+    // Cache for 55 minutes (token is valid for 60)
+    cachedToken = token;
+    cachedTokenExpiresAt = nowSeconds + 55 * 60;
+
+    return token;
 }
 
-/**
- * Send a push notification to a device
- * @param httpsAgent The agent to use for the HTTPS request. This resuses the TLS connection for multiple requests
- * @param userId The user ID to whom the notification is being sent
- * @param pushToken The push token of the device
- * @param notificationTitle The title of the notification
- * @param notificationBody The body of the notification
- * @param cert The APNS certificate in PEM format
- * @param key The APNS key in PEM format
- */
-async function sendPushNotification(httpsAgent: https.Agent, userId: string, pushToken: string, notificationTitle: string, notificationBody: string, cert: string, key: string) {
+async function sendPushNotification(httpsAgent: https.Agent, userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string) {
     if (isTestEnvironment()) {
         console.log(`Mock push notification to userId ${userId} with token ${pushToken}: ${notificationTitle} - ${notificationBody}`);
         return;
+    }
+
+    const bundleId = process.env.APNS_BUNDLE_ID;
+    if (!bundleId) {
+        throw new Error('Missing required APNS_BUNDLE_ID environment variable');
     }
 
     const options: https.RequestOptions = {
@@ -142,10 +146,10 @@ async function sendPushNotification(httpsAgent: https.Agent, userId: string, pus
         headers: {
             'Content-Type': 'application/json',
             'apns-push-type': 'alert',
+            'apns-topic': bundleId,
+            'authorization': `bearer ${apnsToken}`,
         },
-        key: key,
-        cert: cert,
-        agent: httpsAgent // Reuse the agent to send multiple POST requests over the same TLS connection
+        agent: httpsAgent
     };
 
     // See https://developer.apple.com/documentation/usernotifications/generating-a-remote-notification#Create-the-JSON-payload
@@ -193,7 +197,7 @@ async function sendPushNotification(httpsAgent: https.Agent, userId: string, pus
                 } else {
                     // Do not reject here so we can continue processing other notifications
                     console.error(`Request failed with status code ${statusCode}. Details: ${data}`);
-                    resolve(); 
+                    resolve();
                 }
             });
         });
