@@ -2,8 +2,8 @@
 //  ScreenshotTests.swift
 //  FitWithFriends UITests
 //
-//  Captures App Store screenshots. Run via scripts/capture_screenshots.sh.
-//  Requires the Docker backend to be running (Scripts/start-ui-test-backend.sh).
+//  Captures App Store screenshots. Run via: bundle exec fastlane screenshots
+//  Requires Docker to be installed (the lane manages compose up/down).
 //
 
 import XCTest
@@ -18,7 +18,7 @@ final class ScreenshotTests: FWFUITestBase {
         XCTAssertTrue(app.staticTexts["Compete. Move. Win."].exists)
         XCTAssertTrue(app.buttons["signInButton"].waitForExistence(timeout: 3))
 
-        takeScreenshot(name: "01_WelcomeScreen")
+        snapshot("01_WelcomeScreen")
     }
 
     /// 02 — Home screen with an active competition and a full leaderboard
@@ -34,7 +34,7 @@ final class ScreenshotTests: FWFUITestBase {
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Move More, Win More"].waitForExistence(timeout: 10))
 
-        takeScreenshot(name: "02_HomeScreen")
+        snapshot("02_HomeScreen")
     }
 
     /// 03 — Competition detail view with a full leaderboard
@@ -54,7 +54,7 @@ final class ScreenshotTests: FWFUITestBase {
 
         XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
 
-        takeScreenshot(name: "03_CompetitionDetail")
+        snapshot("03_CompetitionDetail")
     }
 
     /// 04 — Create competition sheet with name filled in
@@ -74,7 +74,7 @@ final class ScreenshotTests: FWFUITestBase {
         nameField.tap()
         nameField.typeText("Move More, Win More")
 
-        takeScreenshot(name: "04_CreateCompetition")
+        snapshot("04_CreateCompetition")
     }
 
     /// 05 — Pro upgrade sheet
@@ -94,6 +94,6 @@ final class ScreenshotTests: FWFUITestBase {
         XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Upgrade to Pro"].waitForExistence(timeout: 3))
 
-        takeScreenshot(name: "05_ProUpgradeSheet")
+        snapshot("05_ProUpgradeSheet")
     }
 }
