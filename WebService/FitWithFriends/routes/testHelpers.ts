@@ -117,4 +117,30 @@ router.post('/seedCompetitionUsers', async function (req, res) {
     }
 });
 
+// POST /testHelpers/setCompetitionArchived
+// Body: { competitionId: string, userFinalPoints: [{ userId: string, points: number }] }
+router.post('/setCompetitionArchived', async function (req, res) {
+    const competitionId: string = req.body['competitionId'];
+    const userFinalPoints: Array<{ userId: string; points: number }> = req.body['userFinalPoints'] ?? [];
+
+    if (!competitionId) {
+        handleError(null, 400, 'Missing required parameter', res);
+        return;
+    }
+
+    try {
+        for (const entry of userFinalPoints) {
+            await CompetitionQueries.updateCompetitionFinalPoints({
+                userId: UserHelpers.convertUserIdToBuffer(entry.userId),
+                competitionId,
+                finalPoints: entry.points
+            });
+        }
+        await CompetitionQueries.updateCompetitionState({ competitionId, newState: 3 });
+        res.sendStatus(200);
+    } catch (error) {
+        handleError(error, 500, 'Error archiving competition', res);
+    }
+});
+
 export default router;

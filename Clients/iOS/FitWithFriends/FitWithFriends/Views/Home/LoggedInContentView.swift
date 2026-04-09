@@ -13,6 +13,7 @@ struct LoggedInContentView: View {
 
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
     @ObservedObject private var homepageViewModel: HomepageViewModel
+    @ObservedObject private var competitionEndAlertViewModel: CompetitionEndAlertViewModel
 
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
@@ -22,9 +23,14 @@ struct LoggedInContentView: View {
                                               competitionManager: objectGraph.competitionManager,
                                               healthKitManager: objectGraph.healthKitManager,
                                               subscriptionManager: objectGraph.subscriptionManager)
+        competitionEndAlertViewModel = CompetitionEndAlertViewModel(
+            competitionManager: objectGraph.competitionManager,
+            authenticationManager: objectGraph.authenticationManager
+        )
     }
 
     var body: some View {
+        ZStack {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
@@ -199,6 +205,22 @@ struct LoggedInContentView: View {
             Task.detached {
                 await self.homepageViewModel.refreshData()
             }
+        }
+
+        if competitionEndAlertViewModel.shouldShowConfetti {
+            ConfettiOverlayView()
+        }
+        }
+        .alert(
+            competitionEndAlertViewModel.alertTitle,
+            isPresented: Binding(
+                get: { competitionEndAlertViewModel.currentAlertCompetition != nil },
+                set: { if !$0 { competitionEndAlertViewModel.alertDismissed() } }
+            )
+        ) {
+            Button("OK") { competitionEndAlertViewModel.alertDismissed() }
+        } message: {
+            Text(competitionEndAlertViewModel.alertMessage)
         }
     }
 }

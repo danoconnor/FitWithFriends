@@ -37,6 +37,7 @@
 		0B1CBED027C3F7C50008C72A /* JoinCompetitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */; };
 		0B2A5A7E2F849A0A00361436 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0B2A5A7D2F849A0A00361436 /* PrivacyInfo.xcprivacy */; };
 		0B2A5A802F849A1900361436 /*  Friends.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 0B2A5A7F2F849A1900361436 /*  Friends.storekit */; };
+		0B2A5AFB2F8804C100361436 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0B2A5AFA2F8804C100361436 /* ConfettiSwiftUI */; };
 		0B329F092E4C2C890082D211 /* IEmailUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F072E4C2C890082D211 /* IEmailUtility.swift */; };
 		0B329F0A2E4C2C890082D211 /* IShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F082E4C2C890082D211 /* IShakeGestureHandler.swift */; };
 		0B329F0E2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B329F0C2E4C2CAA0082D211 /* IAppleAuthenticationManager.swift */; };
@@ -204,6 +205,10 @@
 		FWF0000200000000000000FE /* MockAppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000FF /* MockAppVersionManager.swift */; };
 		FWF00002000000000000010A /* AppVersionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010B /* AppVersionViewModel.swift */; };
 		FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010D /* AppVersionManagerTests.swift */; };
+		FWF000020000000000000111 /* ConfettiOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000110 /* ConfettiOverlayView.swift */; };
+		FWF000020000000000000116 /* CompetitionEndAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000117 /* CompetitionEndAlertViewModel.swift */; };
+		FWF000020000000000000113 /* CompetitionEndAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */; };
+		FWF000020000000000000115 /* CompetitionEndedAlertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000114 /* CompetitionEndedAlertTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -315,7 +320,6 @@
 		0B99FBD1256A016900673133 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0B99FBD4256A016900673133 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0B99FBD6256A016900673133 /* Info-Debug.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Debug.plist"; sourceTree = "<group>"; };
-		67A0E0255290448AB9D8BAA4 /* Info-Release.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Release.plist"; sourceTree = "<group>"; };
 		0B99FBE4256A04A200673133 /* HttpConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpConnector.swift; sourceTree = "<group>"; };
 		0B99FBE7256A068700673133 /* HttpError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpError.swift; sourceTree = "<group>"; };
 		0B99FBEA256A070F00673133 /* HttpMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpMethod.swift; sourceTree = "<group>"; };
@@ -384,6 +388,7 @@
 		0BF759C425B67CD00098AE13 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		0BF759C725B67D5C0098AE13 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageSheetViewModel.swift; sourceTree = "<group>"; };
+		67A0E0255290448AB9D8BAA4 /* Info-Release.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Release.plist"; sourceTree = "<group>"; };
 		FE00000100000000000001A1 /* FitWithFriends_UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitWithFriends_UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE00000100000000000001B0 /* FWFUITestBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FWFUITestBase.swift; sourceTree = "<group>"; };
 		FE00000100000000000001B2 /* WelcomeScreenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeScreenTests.swift; sourceTree = "<group>"; };
@@ -426,6 +431,10 @@
 		FWF0000200000000000000FF /* MockAppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAppVersionManager.swift; sourceTree = "<group>"; };
 		FWF00002000000000000010B /* AppVersionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionViewModel.swift; sourceTree = "<group>"; };
 		FWF00002000000000000010D /* AppVersionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManagerTests.swift; sourceTree = "<group>"; };
+		FWF000020000000000000110 /* ConfettiOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiOverlayView.swift; sourceTree = "<group>"; };
+		FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndAlertViewModelTests.swift; sourceTree = "<group>"; };
+		FWF000020000000000000117 /* CompetitionEndAlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndAlertViewModel.swift; sourceTree = "<group>"; };
+		FWF000020000000000000114 /* CompetitionEndedAlertTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndedAlertTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -442,6 +451,7 @@
 			files = (
 				0B4693B12F79A73300AAD94C /* StoreKit.framework in Frameworks */,
 				0B47A220279C893100C2970E /* CocoaLumberjackSwift in Frameworks */,
+				0B2A5AFB2F8804C100361436 /* ConfettiSwiftUI in Frameworks */,
 				0B35977425714E7D006D956A /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -470,6 +480,7 @@
 				FWF00002000000000000008B /* PushNotificationManagerTests.swift */,
 				FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */,
 				FWF00002000000000000010D /* AppVersionManagerTests.swift */,
+				FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -826,6 +837,7 @@
 				0B35977A25715567006D956A /* LoggedInContentView.swift */,
 				0B6752D925715ED80032835D /* PermissionPromptView.swift */,
 				0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */,
+				FWF000020000000000000110 /* ConfettiOverlayView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -852,6 +864,7 @@
 				0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */,
 				0B592C2925715CAC004F68AB /* PermissionPromptViewModel.swift */,
 				0BFBCA2625F48C710004658C /* HomepageSheetViewModel.swift */,
+				FWF000020000000000000117 /* CompetitionEndAlertViewModel.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -945,6 +958,7 @@
 				FWF0000200000000000000CD /* PublicCompetitionTests.swift */,
 				FWF0000200000000000000E6 /* ScreenshotTests.swift */,
 				FWF0000200000000000000E8 /* SnapshotHelper.swift */,
+				FWF000020000000000000114 /* CompetitionEndedAlertTests.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -1023,6 +1037,7 @@
 			name = FitWithFriends;
 			packageProductDependencies = (
 				0B47A21F279C893100C2970E /* CocoaLumberjackSwift */,
+				0B2A5AFA2F8804C100361436 /* ConfettiSwiftUI */,
 			);
 			productName = FitWithFriends;
 			productReference = 0B99FBCA256A016900673133 /* Fit with Friends.app */;
@@ -1076,6 +1091,7 @@
 			mainGroup = 0B99FBC1256A016900673133;
 			packageReferences = (
 				0B47A21E279C893100C2970E /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
+				0B2A5AF92F8804C100361436 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 			);
 			productRefGroup = 0B99FBCB256A016900673133 /* Products */;
 			projectDirPath = "";
@@ -1191,6 +1207,7 @@
 				FWF00002000000000000008A /* PushNotificationManagerTests.swift in Sources */,
 				FWF0000200000000000000CA /* SubscriptionAndPublicCompetitionTests.swift in Sources */,
 				FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */,
+				FWF000020000000000000113 /* CompetitionEndAlertViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1365,6 +1382,8 @@
 				FWF0000200000000000000FC /* MockAppMetadataService.swift in Sources */,
 				FWF0000200000000000000FE /* MockAppVersionManager.swift in Sources */,
 				FWF00002000000000000010A /* AppVersionViewModel.swift in Sources */,
+				FWF000020000000000000111 /* ConfettiOverlayView.swift in Sources */,
+				FWF000020000000000000116 /* CompetitionEndAlertViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1382,6 +1401,7 @@
 				FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */,
 				FWF0000200000000000000E7 /* ScreenshotTests.swift in Sources */,
 				FWF0000200000000000000E9 /* SnapshotHelper.swift in Sources */,
+				FWF000020000000000000115 /* CompetitionEndedAlertTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1705,6 +1725,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0B2A5AF92F8804C100361436 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		0B47A21E279C893100C2970E /* XCRemoteSwiftPackageReference "CocoaLumberjack" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/CocoaLumberjack/CocoaLumberjack.git";
@@ -1716,6 +1744,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0B2A5AFA2F8804C100361436 /* ConfettiSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0B2A5AF92F8804C100361436 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
+			productName = ConfettiSwiftUI;
+		};
 		0B47A21F279C893100C2970E /* CocoaLumberjackSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0B47A21E279C893100C2970E /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
