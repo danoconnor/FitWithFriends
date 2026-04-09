@@ -193,6 +193,7 @@
 		FWF0000200000000000000E3 /* MockSubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E2 /* MockSubscriptionService.swift */; };
 		FWF0000200000000000000E5 /* PublicCompetitionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E4 /* PublicCompetitionCard.swift */; };
 		FWF0000200000000000000E7 /* ScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E6 /* ScreenshotTests.swift */; };
+		FWF0000200000000000000E9 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000E8 /* SnapshotHelper.swift */; };
 		FWF0000200000000000000F0 /* IosBuildVersionsDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */; };
 		FWF0000200000000000000F2 /* SemanticVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F3 /* SemanticVersion.swift */; };
 		FWF0000200000000000000F4 /* IAppMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000200000000000000F5 /* IAppMetadataService.swift */; };
@@ -414,6 +415,7 @@
 		FWF0000200000000000000E2 /* MockSubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSubscriptionService.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000E4 /* PublicCompetitionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicCompetitionCard.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000E6 /* ScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTests.swift; sourceTree = "<group>"; };
+		FWF0000200000000000000E8 /* SnapshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000F1 /* IosBuildVersionsDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosBuildVersionsDTO.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000F3 /* SemanticVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticVersion.swift; sourceTree = "<group>"; };
 		FWF0000200000000000000F5 /* IAppMetadataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAppMetadataService.swift; sourceTree = "<group>"; };
@@ -942,6 +944,7 @@
 				FE00000100000000000001BC /* FirstLaunchScreenTests.swift */,
 				FWF0000200000000000000CD /* PublicCompetitionTests.swift */,
 				FWF0000200000000000000E6 /* ScreenshotTests.swift */,
+				FWF0000200000000000000E8 /* SnapshotHelper.swift */,
 			);
 			path = UITests;
 			sourceTree = "<group>";
@@ -1378,6 +1381,7 @@
 				FE00000100000000000001BD /* FirstLaunchScreenTests.swift in Sources */,
 				FWF0000200000000000000CC /* PublicCompetitionTests.swift in Sources */,
 				FWF0000200000000000000E7 /* ScreenshotTests.swift in Sources */,
+				FWF0000200000000000000E9 /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

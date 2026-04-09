@@ -1,0 +1,92 @@
+# --------------------------------------------------------------------------
+# screenshots
+# Captures App Store screenshots on all configured devices and frames them.
+# Requires Docker to be installed. Run from Clients/iOS/FitWithFriends/.
+# --------------------------------------------------------------------------
+lane :screenshots do
+  # Restart the backend with a clean database so every run starts from a
+  # known state.
+  sh("docker compose -f '../../../../WebService/docker-compose-local-testing.yml' down -v --remove-orphans")
+  sh("docker compose -f '../../../../WebService/docker-compose-local-testing.yml' up -d")
+  sh("until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 1; done && echo 'Backend ready'")
+
+  # Capture raw screenshots via XCUITest (config in fastlane/Snapfile).
+  snapshot
+
+  # The iPad Pro 11-inch (M4) simulator on iOS 26 captures screenshots at
+  # 1668x2420, but frameit only recognises 1668x2388 (the App Store required
+  # size for the 11-inch iPad Pro).  Crop the bottom 32 px from every iPad
+  # screenshot so frameit can match the device frame correctly.
+  # Note: sh() runs from the fastlane/ subdirectory, so screenshots are at ../screenshots/.
+  sh(<<~BASH)
+    for f in ../screenshots/en-US/iPad\\ Pro\\ 11-inch*.png; do
+      [ -f "$f" ] || continue
+      h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/{print $2}')
+      if [ "$h" = "2420" ]; then
+        sips --cropOffset 0 0 --cropToHeightWidth 2388 1668 "$f"
+        echo "Cropped $f to 1668x2388"
+      fi
+    done
+  BASH
+
+  # Copy Framefile.json and background.png into the screenshots directory so
+  # frameit can find them (it searches up from each screenshot file, not from
+  # the fastlane/ folder where they live).
+  sh("cp Framefile.json background.png '/System/Library/Fonts/Supplemental/Arial Bold.ttf' ../screenshots/")
+
+  # Wrap each screenshot in a device frame with a branded background and
+  # tagline (config in fastlane/Framefile.json).
+  frameit
+end
+
+# --------------------------------------------------------------------------
+# screenshots_ci
+# Captures and frames screenshots in CI where the backend is already running.
+# --------------------------------------------------------------------------
+lane :screenshots_ci do
+  snapshot
+
+  # Same iPad crop as in the :screenshots lane — see comment there.
+  sh(<<~BASH)
+    for f in ../screenshots/en-US/iPad\\ Pro\\ 11-inch*.png; do
+      [ -f "$f" ] || continue
+      h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/{print $2}')
+      if [ "$h" = "2420" ]; then
+        sips --cropOffset 0 0 --cropToHeightWidth 2388 1668 "$f"
+        echo "Cropped $f to 1668x2388"
+      fi
+    done
+  BASH
+
+  # Same Framefile.json copy as in the :screenshots lane — see comment there.
+  sh("cp Framefile.json background.png '/System/Library/Fonts/Supplemental/Arial Bold.ttf' ../screenshots/")
+
+  frameit
+end
+
+# --------------------------------------------------------------------------
+# release
+# Uploads App Store metadata and screenshots to App Store Connect.
+# The binary must already have been uploaded by the ios-deploy CI workflow.
+# Run from Clients/iOS/FitWithFriends/ with the three env vars set:
+#   APP_STORE_CONNECT_KEY_ID
+#   APP_STORE_CONNECT_ISSUER_ID
+#   APP_STORE_CONNECT_KEY_CONTENT  (base64-encoded .p8)
+# --------------------------------------------------------------------------
+lane :release do
+  api_key = app_store_connect_api_key(
+    key_id:                ENV["APP_STORE_CONNECT_KEY_ID"],
+    issuer_id:             ENV["APP_STORE_CONNECT_ISSUER_ID"],
+    key_content:           ENV["APP_STORE_CONNECT_KEY_CONTENT"],
+    is_key_content_base64: true
+  )
+
+  upload_to_app_store(
+    api_key:            api_key,
+    skip_binary_upload: true,   # binary uploaded separately by ios-deploy.yml
+    skip_metadata:      false,
+    skip_screenshots:   false,
+    submit_for_review:  false,
+    precheck_include_in_app_purchases: false
+  )
+end

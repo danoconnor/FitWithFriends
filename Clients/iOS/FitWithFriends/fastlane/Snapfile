@@ -1,0 +1,23 @@
+scheme("FitWithFriends")
+
+# App Store required device sizes.
+# frameit 2.232.2 supports device dimensions up to iPhone 14 Pro Max (1290x2796)
+# and iPad Pro 11-inch (1668x2388). Both of the devices below share those exact
+# dimensions and run on iOS 26, matching the app's minimum deployment target.
+devices([
+  "iPhone 16 Plus",        # 1290x2796 — satisfies 6.7" App Store category
+  "iPad Pro 11-inch (M4)"  # 1668x2420, cropped to 1668x2388 — satisfies 11" App Store category
+])
+
+languages(["en-US"])
+
+output_directory("./screenshots")
+
+# Only run the dedicated screenshot test class
+only_testing("FitWithFriends_UITests/ScreenshotTests")
+
+clear_previous_screenshots(true)
+
+# Keep the simulator running between tests for faster iteration
+reinstall_app(false)
+erase_simulator(false)

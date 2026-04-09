@@ -84,6 +84,7 @@ class FWFUITestBase: XCTestCase {
             // to be nil so the app starts on the WelcomeView (not already logged in).
         }
 
+        setupSnapshot(app)
         app.launch()
     }
 

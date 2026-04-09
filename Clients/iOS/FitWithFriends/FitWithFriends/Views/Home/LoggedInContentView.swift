@@ -190,6 +190,7 @@ struct LoggedInContentView: View {
                         .font(.body)
                         .foregroundStyle(.white)
                 }
+                .accessibilityIdentifier("SettingsMenu")
             }
         }
         .navigationViewStyle(.stack)
