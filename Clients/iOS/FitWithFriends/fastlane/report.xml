@@ -5,22 +5,22 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; down -v --remove-orphans" time="1.983636">
+      <testcase classname="fastlane.lanes" name="0: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; down -v --remove-orphans" time="2.12396">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; up -d" time="10.996099">
+      <testcase classname="fastlane.lanes" name="1: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; up -d" time="11.010236">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: until curl -sf http://localhost:3000 &gt; /dev/null 2&gt;&amp;1; do sleep 1; done &amp;&amp; echo &apos;Backend ready&apos;" time="1.233598">
+      <testcase classname="fastlane.lanes" name="2: until curl -sf http://localhost:3000 &gt; /dev/null 2&gt;&amp;1; do sleep 1; done &amp;&amp; echo &apos;Backend ready&apos;" time="1.233563">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="3: snapshot" time="296.44927">
+      <testcase classname="fastlane.lanes" name="3: snapshot" time="371.653814">
         
       </testcase>
     
@@ -33,17 +33,17 @@
     echo &quot;Cropped $f to 1668x2388&quot;
   fi
 done
-" time="1.154085">
+" time="1.991013">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="5: cp Framefile.json background.png &apos;/System/Library/Fonts/Supplemental/Arial Bold.ttf&apos; ../screenshots/" time="0.0359">
+      <testcase classname="fastlane.lanes" name="5: cp Framefile.json background.png &apos;/System/Library/Fonts/Supplemental/Arial Bold.ttf&apos; ../screenshots/" time="0.047726">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="6: frameit" time="110.178324">
+      <testcase classname="fastlane.lanes" name="6: frameit" time="140.803405">
         
       </testcase>
     

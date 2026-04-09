@@ -14,17 +14,13 @@ final class AuthenticationTests: FWFUITestBase {
         // Wait for the home screen to load
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
 
-        // Open the toolbar menu and tap Logout
-        let menuButton = app.buttons["More"]
-        if menuButton.waitForExistence(timeout: 3) {
-            menuButton.tap()
-        } else {
-            let gearButton = app.navigationBars.buttons.element(boundBy: 0)
-            gearButton.tap()
-        }
+        // Open the toolbar settings menu and tap Logout
+        let menuButton = app.buttons["SettingsMenu"]
+        XCTAssertTrue(menuButton.waitForExistence(timeout: 5))
+        menuButton.tap()
 
         let logoutButton = app.buttons["Logout"]
-        XCTAssertTrue(logoutButton.waitForExistence(timeout: 3))
+        XCTAssertTrue(logoutButton.waitForExistence(timeout: 5))
         logoutButton.tap()
 
         // Verify we're back at the welcome screen
