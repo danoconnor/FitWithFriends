@@ -5,6 +5,8 @@
 //  Created by Dan O'Connor on 3/27/26.
 //
 
+#if DEBUG
+
 import Foundation
 
 /// Object graph used for UI testing.
@@ -126,7 +128,7 @@ class UITestingObjectGraph: IObjectGraph {
             case "success":
                 mockAppleAuth.return_loginOutcome = .success
                 // Re-use the same injected token so the app lands on the home screen
-                mockAppleAuth.return_loginToken = (mockTokenManager as? MockTokenManager)?.return_token
+                mockAppleAuth.return_loginToken = mockTokenManager.return_token
             case "failure":
                 mockAppleAuth.return_loginOutcome = .failure
             default:
@@ -145,3 +147,5 @@ class UITestingObjectGraph: IObjectGraph {
         competitionManager = compManager
     }
 }
+
+#endif

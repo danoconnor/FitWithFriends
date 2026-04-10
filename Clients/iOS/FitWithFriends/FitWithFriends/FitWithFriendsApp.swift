@@ -12,13 +12,17 @@ struct FitWithFriendsApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
     static let objectGraph: IObjectGraph = {
-        if ProcessInfo.processInfo.environment["FWF_UNIT_TESTING"] == "1" {
-            return MockObjectGraph()
-        } else if ProcessInfo.processInfo.environment["FWF_UI_TESTING"] == "1" {
-            return UITestingObjectGraph()
-        } else {
-            return ObjectGraph()
-        }
+        #if DEBUG
+            if ProcessInfo.processInfo.environment["FWF_UNIT_TESTING"] == "1" {
+                return MockObjectGraph()
+            } else if ProcessInfo.processInfo.environment["FWF_UI_TESTING"] == "1" {
+                return UITestingObjectGraph()
+            } else {
+                return ObjectGraph()
+            }
+        #else // release
+            ObjectGraph()
+        #endif
     }()
 
     init() {
