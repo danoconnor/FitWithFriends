@@ -21,6 +21,10 @@
       "title": { "text": "Live leaderboard" }
     },
     {
+      "filter": "03b_UserDailyDetails",
+      "title": { "text": "Day-by-day breakdown" }
+    },
+    {
       "filter": "04_CreateCompetition",
       "title": { "text": "Start a challenge in seconds" }
     },

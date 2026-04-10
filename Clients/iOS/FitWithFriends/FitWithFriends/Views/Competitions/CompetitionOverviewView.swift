@@ -183,6 +183,8 @@ struct CompetitionOverviewView: View {
                     }
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier(showAllDetails ? "competitionLeaderboard" : "")
         }
         .sheet(isPresented: $viewModel.shouldShowSheet, content: {
             if let shareUrl = viewModel.shareUrl {

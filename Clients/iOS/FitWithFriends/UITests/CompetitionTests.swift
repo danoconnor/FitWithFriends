@@ -83,12 +83,12 @@ final class CompetitionTests: FWFUITestBase {
         XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
 
         // Tap on Alice Chen (first seeded user) to view their daily details
-        // The home screen leaderboard also has Alice Chen (behind the sheet), so tap the hittable one
-        let aliceChenElements = app.staticTexts.matching(identifier: "Alice Chen")
-        XCTAssertTrue(aliceChenElements.firstMatch.waitForExistence(timeout: 5))
-        let aliceChenElement = (0..<aliceChenElements.count).map { aliceChenElements.element(boundBy: $0) }.first(where: { $0.isHittable })
-        XCTAssertNotNil(aliceChenElement)
-        aliceChenElement?.tap()
+        // Scope to the leaderboard in the detail sheet to avoid matching the home screen leaderboard
+        let leaderboard = app.otherElements["competitionLeaderboard"].firstMatch
+        XCTAssertTrue(leaderboard.waitForExistence(timeout: 5))
+        let userRow = leaderboard.staticTexts["Alice Chen"]
+        XCTAssertTrue(userRow.waitForExistence(timeout: 5))
+        userRow.tap()
 
         // Verify user details view appears with total points
         XCTAssertTrue(app.staticTexts["total points"].waitForExistence(timeout: 10))

@@ -60,7 +60,23 @@ final class ScreenshotTests: FWFUITestBase {
     /// 03b — User daily details view showing activity rings for each day of competition
     func test03b_UserDailyDetails() throws {
         let competitionId = try createCompetitionForScreenshots(name: "Move More, Win More", daysInPast: 5)
-        try seedCompetitionWithUsers(competitionId: competitionId)
+        // Give Alice Chen varied activity per day so the rings look different each day
+        try seedCompetitionWithUsers(competitionId: competitionId, dailyDataOverrides: [
+            "Alice Chen": [
+                // day -5 (oldest): moderate
+                ["caloriesBurned": 310, "caloriesGoal": 400, "exerciseTime": 22, "exerciseTimeGoal": 30, "standTime":  9, "standTimeGoal": 12],
+                // day -4: strong
+                ["caloriesBurned": 420, "caloriesGoal": 400, "exerciseTime": 38, "exerciseTimeGoal": 30, "standTime": 12, "standTimeGoal": 12],
+                // day -3: low (rest day)
+                ["caloriesBurned": 180, "caloriesGoal": 400, "exerciseTime": 12, "exerciseTimeGoal": 30, "standTime":  7, "standTimeGoal": 12],
+                // day -2: strong
+                ["caloriesBurned": 390, "caloriesGoal": 400, "exerciseTime": 35, "exerciseTimeGoal": 30, "standTime": 11, "standTimeGoal": 12],
+                // day -1: moderate
+                ["caloriesBurned": 290, "caloriesGoal": 400, "exerciseTime": 26, "exerciseTimeGoal": 30, "standTime": 10, "standTimeGoal": 12],
+                // today: on track
+                ["caloriesBurned": 340, "caloriesGoal": 400, "exerciseTime": 27, "exerciseTimeGoal": 30, "standTime": 11, "standTimeGoal": 12],
+            ]
+        ])
         try seedSelfActivityData(daysAgo: 5, caloriesBurned: 340, caloriesGoal: 400,
                                   exerciseTime: 27, exerciseTimeGoal: 30,
                                   standTime: 11, standTimeGoal: 12)
@@ -74,13 +90,13 @@ final class ScreenshotTests: FWFUITestBase {
 
         XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
 
-        // Tap on Alice Chen to view their daily details
-        // The home screen leaderboard also has Alice Chen (behind the sheet), so tap the hittable one
-        let aliceChenElements = app.staticTexts.matching(identifier: "Alice Chen")
-        XCTAssertTrue(aliceChenElements.firstMatch.waitForExistence(timeout: 5))
-        let aliceChenElement = (0..<aliceChenElements.count).map { aliceChenElements.element(boundBy: $0) }.first(where: { $0.isHittable })
-        XCTAssertNotNil(aliceChenElement)
-        aliceChenElement?.tap()
+        // Tap on Alice Chen — scope to the leaderboard in the detail sheet to avoid
+        // matching the home screen leaderboard visible behind the modal
+        let leaderboard = app.otherElements["competitionLeaderboard"].firstMatch
+        XCTAssertTrue(leaderboard.waitForExistence(timeout: 5))
+        let userRow = leaderboard.staticTexts["Alice Chen"]
+        XCTAssertTrue(userRow.waitForExistence(timeout: 5))
+        userRow.tap()
 
         // Wait for the daily details to load
         XCTAssertTrue(app.staticTexts["total points"].waitForExistence(timeout: 10))

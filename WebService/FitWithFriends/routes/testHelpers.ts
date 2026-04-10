@@ -42,17 +42,23 @@ router.post('/setUserProStatus', function (req, res) {
 
 // Creates fake users, adds them to a competition, and inserts activity summaries
 // for every day from the competition's start date through today (inclusive).
+interface DayValues {
+    caloriesBurned: number;
+    caloriesGoal: number;
+    exerciseTime: number;
+    exerciseTimeGoal: number;
+    standTime: number;
+    standTimeGoal: number;
+}
+
 router.post('/seedCompetitionUsers', async function (req, res) {
     const competitionId: string = req.body['competitionId'];
-    const users: Array<{
+    const users: Array<DayValues & {
         firstName: string;
         lastName: string;
-        caloriesBurned: number;
-        caloriesGoal: number;
-        exerciseTime: number;
-        exerciseTimeGoal: number;
-        standTime: number;
-        standTimeGoal: number;
+        // Optional per-day overrides. If provided, values cycle through the array
+        // for each competition day instead of repeating the flat values above.
+        dailyData?: DayValues[];
     }> = req.body['users'];
 
     if (!competitionId || !users || !Array.isArray(users) || users.length === 0) {
@@ -97,16 +103,21 @@ router.post('/seedCompetitionUsers', async function (req, res) {
 
             if (dates.length > 0) {
                 await ActivityDataQueries.insertActivitySummaries({
-                    summaries: dates.map(date => ({
-                        userId: userIdBuffer,
-                        date,
-                        caloriesBurned: user.caloriesBurned,
-                        caloriesGoal: user.caloriesGoal,
-                        exerciseTime: user.exerciseTime,
-                        exerciseTimeGoal: user.exerciseTimeGoal,
-                        standTime: user.standTime,
-                        standTimeGoal: user.standTimeGoal
-                    }))
+                    summaries: dates.map((date, index) => {
+                        const day: DayValues = user.dailyData && user.dailyData.length > 0
+                            ? user.dailyData[index % user.dailyData.length]
+                            : user;
+                        return {
+                            userId: userIdBuffer,
+                            date,
+                            caloriesBurned: day.caloriesBurned,
+                            caloriesGoal: day.caloriesGoal,
+                            exerciseTime: day.exerciseTime,
+                            exerciseTimeGoal: day.exerciseTimeGoal,
+                            standTime: day.standTime,
+                            standTimeGoal: day.standTimeGoal
+                        };
+                    })
                 });
             }
         }
