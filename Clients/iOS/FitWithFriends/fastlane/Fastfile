@@ -13,7 +13,7 @@ lane :screenshots do
   # Capture raw screenshots via XCUITest (config in fastlane/Snapfile).
   snapshot
 
-  # The iPad Pro 11-inch (M4) simulator on iOS 26 captures screenshots at
+  # The iPad Pro 11-inch (M5) simulator on iOS 26 captures screenshots at
   # 1668x2420, but frameit only recognises 1668x2388 (the App Store required
   # size for the 11-inch iPad Pro).  Crop the bottom 32 px from every iPad
   # screenshot so frameit can match the device frame correctly.
