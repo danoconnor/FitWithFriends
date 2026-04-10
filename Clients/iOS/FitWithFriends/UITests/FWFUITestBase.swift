@@ -262,6 +262,20 @@ class FWFUITestBase: XCTestCase {
         return json["competition_id"] as! String
     }
 
+    /// Archive a competition with final points for the test user, enabling the competition-ended alert
+    @discardableResult
+    func setCompetitionArchived(competitionId: String, userPoints: Int = 500) throws {
+        guard let userId else { return }
+        let body: [String: Any] = [
+            "competitionId": competitionId,
+            "userFinalPoints": [["userId": userId, "points": userPoints]]
+        ]
+        let (_, response) = try makeAuthenticatedRequest(
+            method: "POST", path: "testHelpers/setCompetitionArchived", body: body
+        )
+        XCTAssertEqual(response.statusCode, 200, "Failed to archive competition")
+    }
+
     /// Make the test user a Pro subscriber via the test helpers endpoint
     func makeUserPro() throws {
         guard let userId else { return }
