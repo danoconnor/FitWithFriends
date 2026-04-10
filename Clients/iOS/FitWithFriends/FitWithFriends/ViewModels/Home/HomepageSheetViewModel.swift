@@ -8,6 +8,12 @@
 import Combine
 import Foundation
 
+struct UserDetailsSheetContext {
+    let competitionId: UUID
+    let userId: String
+    let userName: String
+}
+
 public class HomepageSheetViewModel: ObservableObject {
     typealias HomepageSheetState = (shouldShow: Bool, contextData: Any?)
 
@@ -17,6 +23,7 @@ public class HomepageSheetViewModel: ObservableObject {
         case joinCompetition
         case createCompetition
         case competitionDetails
+        case userDetails
         case proUpgrade
         case about
 
@@ -36,6 +43,7 @@ public class HomepageSheetViewModel: ObservableObject {
         .joinCompetition: (shouldShow: false, contextData: nil),
         .createCompetition: (shouldShow: false, contextData: nil),
         .competitionDetails: (shouldShow: false, contextData: nil),
+        .userDetails: (shouldShow: false, contextData: nil),
         .proUpgrade: (shouldShow: false, contextData: nil),
     ]
 

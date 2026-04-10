@@ -57,6 +57,37 @@ final class ScreenshotTests: FWFUITestBase {
         snapshot("03_CompetitionDetail")
     }
 
+    /// 03b — User daily details view showing activity rings for each day of competition
+    func test03b_UserDailyDetails() throws {
+        let competitionId = try createCompetitionForScreenshots(name: "Move More, Win More", daysInPast: 5)
+        try seedCompetitionWithUsers(competitionId: competitionId)
+        try seedSelfActivityData(daysAgo: 5, caloriesBurned: 340, caloriesGoal: 400,
+                                  exerciseTime: 27, exerciseTimeGoal: 30,
+                                  standTime: 11, standTimeGoal: 12)
+
+        launchApp(loggedIn: true)
+
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        let competitionText = app.staticTexts["Move More, Win More"]
+        XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
+        competitionText.tap()
+
+        XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
+
+        // Tap on Alice Chen to view their daily details
+        // The home screen leaderboard also has Alice Chen (behind the sheet), so tap the hittable one
+        let aliceChenElements = app.staticTexts.matching(identifier: "Alice Chen")
+        XCTAssertTrue(aliceChenElements.firstMatch.waitForExistence(timeout: 5))
+        let aliceChenElement = (0..<aliceChenElements.count).map { aliceChenElements.element(boundBy: $0) }.first(where: { $0.isHittable })
+        XCTAssertNotNil(aliceChenElement)
+        aliceChenElement?.tap()
+
+        // Wait for the daily details to load
+        XCTAssertTrue(app.staticTexts["total points"].waitForExistence(timeout: 10))
+
+        snapshot("03b_UserDailyDetails")
+    }
+
     /// 04 — Create competition sheet with name filled in
     func test04_CreateCompetition() {
         launchApp(loggedIn: true)

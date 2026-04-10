@@ -13,6 +13,29 @@ export interface UserPoints {
 };
 
 /**
+ * Calculate the points scored for a single day of activity data.
+ * Points are capped at 600 per day (matching Apple's activity ring competition rules).
+ */
+export function calculateDailyPoints(row: { calories_burned: number; calories_goal: number; exercise_time: number; exercise_time_goal: number; stand_time: number; stand_time_goal: number }): number {
+    const maxPointsPerDay = 600;
+    let points = 0;
+
+    if (row.calories_goal > 0) {
+        points += row.calories_burned / row.calories_goal * 100;
+    }
+
+    if (row.exercise_time_goal > 0) {
+        points += row.exercise_time / row.exercise_time_goal * 100;
+    }
+
+    if (row.stand_time_goal > 0) {
+        points += row.stand_time / row.stand_time_goal * 100;
+    }
+
+    return Math.min(points, maxPointsPerDay);
+}
+
+/**
  * Get the current standings for a competition
  * @param competitionInfo The competition to get the standings for
  * @param users The users in the competition. It is optional to include the first and last name of the user. If included, the names will be included in the result
@@ -62,26 +85,8 @@ export async function getCompetitionStandings(
     const userIdList = users.map(row => convertUserIdToBuffer(row.userId));
     const activitySummaries = await ActivityDataQueries.getActivitySummariesForUsers({ userIds: userIdList, startDate: competitionInfo.start_date, endDate: competitionInfo.end_date })
     
-    // We allow users to score up to 600 total points per day (matching Apple's activity ring competition rules)
-    // This will eventually change when we allow users to define custom scoring rules, but for now we will stick with Apple's rules
-    const maxPointsPerDay = 600;
     activitySummaries.forEach(row => {
-        let points = 0;
-
-        // Avoid divide-by-zero errors
-        if (row.calories_goal > 0) {
-            points += row.calories_burned / row.calories_goal * 100;
-        }
-
-        if (row.exercise_time_goal > 0) {
-            points += row.exercise_time / row.exercise_time_goal * 100;
-        }
-
-        if (row.stand_time_goal > 0) {
-            points += row.stand_time / row.stand_time_goal * 100;
-        }
-        
-        const pointsScoredThisDay = Math.min(points, maxPointsPerDay);
+        const pointsScoredThisDay = calculateDailyPoints(row);
         userPoints[row.userId].activityPoints += pointsScoredThisDay;
 
         if (row.date.getDay() === currentDate.getDay() && row.date.getMonth() === currentDate.getMonth() && row.date.getFullYear() === currentDate.getFullYear()) {

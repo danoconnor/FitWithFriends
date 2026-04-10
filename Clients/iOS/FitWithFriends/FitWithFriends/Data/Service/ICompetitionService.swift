@@ -64,4 +64,13 @@ public protocol ICompetitionService {
     /// Join a public competition (requires Pro subscription)
     /// - Parameter competitionId: The competition to join
     func joinPublicCompetition(competitionId: UUID) async throws
+
+    /// Get daily activity details for a specific user within a competition.
+    /// Both the logged-in user and the target user must be members of the competition.
+    /// Only returns data within the competition's date range.
+    /// - Parameters:
+    ///   - competitionId: The competition id
+    ///   - userId: The target user id
+    /// - Returns: The user's daily competition details, or a relevant error
+    func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails
 }

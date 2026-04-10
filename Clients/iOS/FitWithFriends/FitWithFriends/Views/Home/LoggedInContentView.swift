@@ -164,6 +164,19 @@ struct LoggedInContentView: View {
                         } else {
                             Text("Error showing competition details")
                         }
+                    case .userDetails:
+                        if let context = homepageSheetViewModel.sheetContextData as? UserDetailsSheetContext {
+                            NavigationView {
+                                UserCompetitionDailyDetailsView(
+                                    competitionId: context.competitionId,
+                                    userId: context.userId,
+                                    userName: context.userName,
+                                    objectGraph: objectGraph)
+                            }
+                            .presentationDragIndicator(.visible)
+                        } else {
+                            Text("Error showing user details")
+                        }
                     case .about:
                         AboutView(emailUtility: objectGraph.emailUtility,
                                   serverEnvironmentManager: objectGraph.serverEnvironmentManager)

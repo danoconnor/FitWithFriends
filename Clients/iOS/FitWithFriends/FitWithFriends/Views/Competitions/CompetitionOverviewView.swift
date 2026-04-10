@@ -10,6 +10,7 @@ import SwiftUI
 
 struct CompetitionOverviewView: View {
     private let showAllDetails: Bool
+    private let objectGraph: IObjectGraph
 
     private let competitionOverview: CompetitionOverview
     private let homepageSheetViewModel: HomepageSheetViewModel
@@ -18,6 +19,7 @@ struct CompetitionOverviewView: View {
     @State private var actionInProgress = false
 
     init(objectGraph: IObjectGraph, competitionOverview: CompetitionOverview, homepageSheetViewModel: HomepageSheetViewModel, showAllDetails: Bool) {
+        self.objectGraph = objectGraph
         self.competitionOverview = competitionOverview
         self.homepageSheetViewModel = homepageSheetViewModel
         self.showAllDetails = showAllDetails
@@ -127,8 +129,20 @@ struct CompetitionOverviewView: View {
             VStack(spacing: 2) {
                 ForEach(0 ..< viewModel.results.count, id: \.self) { position in
                     let result = viewModel.results[position]
-                    UserCompetitionResultView(result: result,
-                                              isCompetitionActive: viewModel.isCompetitionActive)
+
+                    if showAllDetails {
+                        // Inside the detail sheet: use NavigationLink to push within the existing NavigationView
+                        NavigationLink {
+                            UserCompetitionDailyDetailsView(
+                                competitionId: competitionOverview.competitionId,
+                                userId: result.userCompetitionPoints.userId,
+                                userName: result.userCompetitionPoints.displayName,
+                                objectGraph: objectGraph)
+                        } label: {
+                            UserCompetitionResultView(result: result,
+                                                      isCompetitionActive: viewModel.isCompetitionActive)
+                        }
+                        .buttonStyle(.plain)
                         .contextMenu {
                             let availableActions = self.viewModel.getUserContextMenuActions(for: result.userCompetitionPoints.userId)
 
@@ -140,6 +154,33 @@ struct CompetitionOverviewView: View {
                                 }
                             }
                         }
+                    } else {
+                        // On the homepage: open user details as a sheet
+                        Button {
+                            homepageSheetViewModel.updateState(
+                                sheet: .userDetails,
+                                state: true,
+                                contextData: UserDetailsSheetContext(
+                                    competitionId: competitionOverview.competitionId,
+                                    userId: result.userCompetitionPoints.userId,
+                                    userName: result.userCompetitionPoints.displayName))
+                        } label: {
+                            UserCompetitionResultView(result: result,
+                                                      isCompetitionActive: viewModel.isCompetitionActive)
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            let availableActions = self.viewModel.getUserContextMenuActions(for: result.userCompetitionPoints.userId)
+
+                            ForEach(availableActions, id: \.self) { action in
+                                Button(action.description) {
+                                    Task.detached {
+                                        await self.viewModel.performAction(action)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
