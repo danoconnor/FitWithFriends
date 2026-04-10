@@ -43,7 +43,6 @@ public class KeychainUtilities: IKeychainUtilities {
             let decodedObject = try JSONDecoder.fwfDefaultDecoder.decode(T.self, from: returnedData)
             return decodedObject
         } catch {
-            print(error.localizedDescription)
             Logger.traceError(message: "Failed to unarchive data returned from keychain", error: error)
             throw KeychainError.encodingError(innerError: error)
         }

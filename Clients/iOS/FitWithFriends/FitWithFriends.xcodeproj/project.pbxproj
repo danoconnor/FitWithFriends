@@ -1027,7 +1027,7 @@
 				0B99FBC6256A016900673133 /* Sources */,
 				0B99FBC7256A016900673133 /* Frameworks */,
 				0B99FBC8256A016900673133 /* Resources */,
-				0BCF64992BCCB4F4004E98C7 /* Remove Settings bundle from Release builds */,
+				0BCF64992BCCB4F4004E98C7 /* Configure Settings bundle for build type */,
 				0B2ACCFF2EC04000004966FF /* Set Bundle Version */,
 			);
 			buildRules = (
@@ -1149,7 +1149,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nfi\n";
 		};
-		0BCF64992BCCB4F4004E98C7 /* Remove Settings bundle from Release builds */ = {
+		0BCF64992BCCB4F4004E98C7 /* Configure Settings bundle for build type */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -1159,14 +1159,14 @@
 			);
 			inputPaths = (
 			);
-			name = "Remove Settings bundle from Release builds";
+			name = "Configure Settings bundle for build type";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Our Settings.bundle (which displays FwF settings in the iOS Settings app) only contains settings related to debug builds\n# so remove it from Release builds\nBUILD_APP_DIR=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app\"\n\nif [ $CONFIGURATION == \"Release\" ]; then\n    rm -rf \"$BUILD_APP_DIR/Settings.bundle\"\nfi\n";
+			shellScript = "# For non-Debug builds, replace Root.plist with the release version which omits debug-only toggles\nBUILD_APP_DIR=\"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app\"\n\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    cp \"$PROJECT_DIR/FitWithFriends/RootSettings/Settings.bundle/Root-Release.plist\" \"$BUILD_APP_DIR/Settings.bundle/Root.plist\"\nfi\n";
 		};
 		0BCF64B22BD57D39004E98C7 /* Setup SecretConstants.swift */ = {
 			isa = PBXShellScriptBuildPhase;
