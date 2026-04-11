@@ -209,6 +209,11 @@
 		FWF000020000000000000116 /* CompetitionEndAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000117 /* CompetitionEndAlertViewModel.swift */; };
 		FWF000020000000000000113 /* CompetitionEndAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */; };
 		FWF000020000000000000115 /* CompetitionEndedAlertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000114 /* CompetitionEndedAlertTests.swift */; };
+		A1B2C3D4E5F6000000000002 /* DailySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000001 /* DailySummary.swift */; };
+		A1B2C3D4E5F6000000000004 /* UserCompetitionDailyDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000003 /* UserCompetitionDailyDetails.swift */; };
+		A1B2C3D4E5F6000000000006 /* UserCompetitionDailyDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000005 /* UserCompetitionDailyDetailsViewModel.swift */; };
+		A1B2C3D4E5F6000000000008 /* UserCompetitionDailyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000007 /* UserCompetitionDailyDetailsView.swift */; };
+		A1B2C3D4E5F600000000000A /* UserCompetitionDailyDetailsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000009 /* UserCompetitionDailyDetailsViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -435,6 +440,11 @@
 		FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndAlertViewModelTests.swift; sourceTree = "<group>"; };
 		FWF000020000000000000117 /* CompetitionEndAlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndAlertViewModel.swift; sourceTree = "<group>"; };
 		FWF000020000000000000114 /* CompetitionEndedAlertTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndedAlertTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000001 /* DailySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySummary.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000003 /* UserCompetitionDailyDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionDailyDetails.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000005 /* UserCompetitionDailyDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionDailyDetailsViewModel.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000007 /* UserCompetitionDailyDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionDailyDetailsView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000009 /* UserCompetitionDailyDetailsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionDailyDetailsViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -481,6 +491,7 @@
 				FWF0000200000000000000CB /* SubscriptionAndPublicCompetitionTests.swift */,
 				FWF00002000000000000010D /* AppVersionManagerTests.swift */,
 				FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */,
+				A1B2C3D4E5F6000000000009 /* UserCompetitionDailyDetailsViewModelTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -524,6 +535,8 @@
 				0B1CBECB27C3F51C0008C72A /* CompetitionAdminDetails.swift */,
 				0B329F142E4D789F0082D211 /* CompetitionState.swift */,
 				FWF0000200000000000000D5 /* PublicCompetition.swift */,
+				A1B2C3D4E5F6000000000001 /* DailySummary.swift */,
+				A1B2C3D4E5F6000000000003 /* UserCompetitionDailyDetails.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -854,6 +867,7 @@
 				0B1CBECD27C3F7B40008C72A /* JoinCompetitionView.swift */,
 				0BD8B5BE27D42C92009BA5F2 /* CompetitionDetailView.swift */,
 				FWF0000200000000000000E4 /* PublicCompetitionCard.swift */,
+				A1B2C3D4E5F6000000000007 /* UserCompetitionDailyDetailsView.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -887,6 +901,7 @@
 				0B1CBECF27C3F7C50008C72A /* JoinCompetitionViewModel.swift */,
 				0BD8B5BA27D41F2E009BA5F2 /* UserPosition.swift */,
 				0BD8B5BC27D42C79009BA5F2 /* CompetitionDetailViewModel.swift */,
+				A1B2C3D4E5F6000000000005 /* UserCompetitionDailyDetailsViewModel.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -1208,6 +1223,7 @@
 				FWF0000200000000000000CA /* SubscriptionAndPublicCompetitionTests.swift in Sources */,
 				FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */,
 				FWF000020000000000000113 /* CompetitionEndAlertViewModelTests.swift in Sources */,
+				A1B2C3D4E5F600000000000A /* UserCompetitionDailyDetailsViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1384,6 +1400,10 @@
 				FWF00002000000000000010A /* AppVersionViewModel.swift in Sources */,
 				FWF000020000000000000111 /* ConfettiOverlayView.swift in Sources */,
 				FWF000020000000000000116 /* CompetitionEndAlertViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000002 /* DailySummary.swift in Sources */,
+				A1B2C3D4E5F6000000000004 /* UserCompetitionDailyDetails.swift in Sources */,
+				A1B2C3D4E5F6000000000006 /* UserCompetitionDailyDetailsViewModel.swift in Sources */,
+				A1B2C3D4E5F6000000000008 /* UserCompetitionDailyDetailsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

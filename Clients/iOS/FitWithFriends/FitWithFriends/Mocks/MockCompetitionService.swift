@@ -145,4 +145,20 @@ public class MockCompetitionService: ICompetitionService {
             throw error
         }
     }
+
+    public var param_getUserCompetitionDetails_competitionId: UUID?
+    public var param_getUserCompetitionDetails_userId: String?
+    public var return_getUserCompetitionDetails: UserCompetitionDailyDetails?
+    public var getUserCompetitionDetailsCallCount = 0
+    public func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails {
+        getUserCompetitionDetailsCallCount += 1
+        param_getUserCompetitionDetails_competitionId = competitionId
+        param_getUserCompetitionDetails_userId = userId
+
+        if let retVal = return_getUserCompetitionDetails {
+            return retVal
+        } else {
+            throw HttpError.generic
+        }
+    }
 }

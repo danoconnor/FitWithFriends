@@ -102,4 +102,11 @@ public class CompetitionService: ServiceBase, ICompetitionService {
                                                                            method: .post,
                                                                            body: requestBody)
     }
+
+    public func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails {
+        let ianaTimezone = TimeZone.current.identifier
+
+        return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/\(competitionId.uuidString)/userDetails/\(userId)?timezone=\(ianaTimezone)",
+                                                           method: .get)
+    }
 }

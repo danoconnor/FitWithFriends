@@ -62,6 +62,41 @@ final class CompetitionTests: FWFUITestBase {
         takeScreenshot(name: "05_CompetitionDetail")
     }
 
+    func testUserDetailsView() throws {
+        // Create a competition with activity data
+        let competitionId = try createCompetitionForScreenshots(name: "User Detail Test", daysInPast: 3)
+        try seedCompetitionWithUsers(competitionId: competitionId)
+        try seedSelfActivityData(daysAgo: 3,
+                                  caloriesBurned: 300, caloriesGoal: 400,
+                                  exerciseTime: 25, exerciseTimeGoal: 30,
+                                  standTime: 10, standTimeGoal: 12)
+
+        launchApp(loggedIn: true)
+
+        // Wait for the home screen and competition to load
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        let competitionText = app.staticTexts["User Detail Test"]
+        XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
+
+        // Open competition detail
+        competitionText.tap()
+        XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
+
+        // Tap on Alice Chen (first seeded user) to view their daily details
+        // Scope to the leaderboard in the detail sheet to avoid matching the home screen leaderboard
+        let leaderboard = app.otherElements["competitionLeaderboard"].firstMatch
+        XCTAssertTrue(leaderboard.waitForExistence(timeout: 5))
+        let userRow = leaderboard.staticTexts["Alice Chen"]
+        XCTAssertTrue(userRow.waitForExistence(timeout: 5))
+        userRow.tap()
+
+        // Verify user details view appears with total points
+        XCTAssertTrue(app.staticTexts["total points"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.navigationBars["Alice Chen"].waitForExistence(timeout: 5))
+
+        takeScreenshot(name: "06_UserDailyDetails")
+    }
+
     func testPrivateBadgeShown() throws {
         try createTestCompetition(name: "Private Badge Test")
 
