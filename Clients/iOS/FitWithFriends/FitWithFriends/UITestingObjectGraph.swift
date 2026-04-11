@@ -112,7 +112,9 @@ class UITestingObjectGraph: IObjectGraph {
 
         // Use real subscription service but mock manager in UI tests - StoreKit is not available in test environment
         subscriptionService = SubscriptionService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager, tokenManager: tokenManager)
-        subscriptionManager = MockSubscriptionManager()
+        let mockSubscriptionManager = MockSubscriptionManager()
+        mockSubscriptionManager.return_isUserPro = env["FWF_UI_TEST_IS_PRO"] == "1"
+        subscriptionManager = mockSubscriptionManager
 
         // Use real app metadata service but mock version manager in UI tests
         appMetadataService = AppMetadataService(httpConnector: httpConnector, serverEnvironmentManager: serverEnvironmentManager)

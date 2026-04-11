@@ -53,8 +53,17 @@ class CompetitionEndAlertViewModel: ObservableObject {
     private func showNextIfNeeded() {
         guard currentAlertCompetition == nil, let next = pendingCompetitions.first else { return }
         pendingCompetitions.removeFirst()
-        currentAlertCompetition = next
-        shouldShowConfetti = (userPosition(in: next) ?? Int.max) <= 3
+        let willShowConfetti = (userPosition(in: next) ?? Int.max) <= 3
+        if willShowConfetti {
+            // Start confetti first so particles are already in motion when the
+            // alert's dim overlay appears, keeping them visible to the user.
+            shouldShowConfetti = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+                self?.currentAlertCompetition = next
+            }
+        } else {
+            currentAlertCompetition = next
+        }
     }
 
     var alertTitle: String {

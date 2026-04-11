@@ -12,7 +12,8 @@ struct ConfettiOverlayView: View {
     var body: some View {
         Color.clear
             .confettiCannon(trigger: $counter, num: 80, openingAngle: .degrees(60),
-                            closingAngle: .degrees(120), radius: 400)
+                            closingAngle: .degrees(120), radius: 400,
+                            repetitions: 2, repetitionInterval: 1.0)
             .ignoresSafeArea()
             .allowsHitTesting(false)
             .onAppear { counter += 1 }

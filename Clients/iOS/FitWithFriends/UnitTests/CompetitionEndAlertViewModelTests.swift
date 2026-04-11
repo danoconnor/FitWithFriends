@@ -79,9 +79,15 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         )
     }
 
-    private func waitForPublisher() async {
-        // Allow the Combine pipeline (.receive(on: DispatchQueue.main)) to deliver
-        try? await Task.sleep(nanoseconds: 100_000_000)
+    /// Polls `condition` every 50 ms until it returns `true` or `timeout` seconds elapse.
+    /// Always waits at least one poll interval before checking, so async work (Combine pipeline
+    /// delivery, the 0.8 s confetti delay, etc.) has time to execute.
+    private func waitUntil(_ condition: @autoclosure () -> Bool, timeout: TimeInterval = 2.0) async {
+        let pollIntervalNs: UInt64 = 50_000_000 // 50 ms
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            try? await Task.sleep(nanoseconds: pollIntervalNs)
+        } while !condition() && Date() < deadline
     }
 
     // MARK: - Alert Trigger Tests
@@ -91,7 +97,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 1)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertNotNil(vm.currentAlertCompetition)
     }
@@ -101,7 +107,9 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeCompetition(state: .notStartedOrActive)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        // Poll until the Combine pipeline has had a chance to deliver; no async delay applies for
+        // non-archived state, so we wait for shouldShowConfetti to remain false (confirming delivery).
+        await waitUntil(vm.shouldShowConfetti == false)
 
         XCTAssertNil(vm.currentAlertCompetition)
     }
@@ -111,7 +119,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeCompetition(state: .processingResults)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.shouldShowConfetti == false)
 
         XCTAssertNil(vm.currentAlertCompetition)
     }
@@ -122,7 +130,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         testUserDefaults.set(true, forKey: "hasSeenCompetitionEndAlert_\(competition.competitionId.uuidString)")
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.shouldShowConfetti == false)
 
         XCTAssertNil(vm.currentAlertCompetition)
     }
@@ -134,7 +142,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 1)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.shouldShowConfetti)
 
         XCTAssertTrue(vm.shouldShowConfetti)
     }
@@ -144,7 +152,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 3)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.shouldShowConfetti)
 
         XCTAssertTrue(vm.shouldShowConfetti)
     }
@@ -154,7 +162,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 4)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertFalse(vm.shouldShowConfetti)
     }
@@ -169,7 +177,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 1) // "test_user" is in results, but VM uses "unknown_user"
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertFalse(vm.shouldShowConfetti)
         XCTAssertEqual(vm.alertMessage, "The competition has ended.")
@@ -182,7 +190,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 1)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertTrue(vm.alertMessage.contains("1st"), "Expected '1st' in '\(vm.alertMessage)'")
     }
@@ -192,7 +200,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 2)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertTrue(vm.alertMessage.contains("2nd"), "Expected '2nd' in '\(vm.alertMessage)'")
     }
@@ -202,7 +210,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 3)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertTrue(vm.alertMessage.contains("3rd"), "Expected '3rd' in '\(vm.alertMessage)'")
     }
@@ -212,7 +220,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 4)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertTrue(vm.alertMessage.contains("4th"), "Expected '4th' in '\(vm.alertMessage)'")
     }
@@ -223,7 +231,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         // The makeArchivedCompetition helper uses name: "Test Competition" by default
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         XCTAssertTrue(vm.alertTitle.contains("Test Competition"))
         XCTAssertTrue(vm.alertTitle.contains("ended"))
@@ -236,7 +244,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 1)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         let competitionId = competition.competitionId
         vm.alertDismissed()
@@ -249,8 +257,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 1)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
-        XCTAssertNotNil(vm.currentAlertCompetition)
+        await waitUntil(vm.currentAlertCompetition != nil)
 
         vm.alertDismissed()
         XCTAssertNil(vm.currentAlertCompetition)
@@ -261,7 +268,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let competition = makeArchivedCompetition(userPosition: 1)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitForPublisher()
+        await waitUntil(vm.shouldShowConfetti)
         XCTAssertTrue(vm.shouldShowConfetti)
 
         vm.alertDismissed()
@@ -281,16 +288,21 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
             comp2.competitionId: comp2,
             comp3.competitionId: comp3
         ]
-        await waitForPublisher()
 
         // One alert is shown (which one depends on endDate sorting — all have same endDate here,
         // so we just verify one is shown and subsequent dismissals drain the queue)
+        await waitUntil(vm.currentAlertCompetition != nil)
         XCTAssertNotNil(vm.currentAlertCompetition)
         vm.alertDismissed()
+
+        await waitUntil(vm.currentAlertCompetition != nil)
         XCTAssertNotNil(vm.currentAlertCompetition)
         vm.alertDismissed()
+
+        await waitUntil(vm.currentAlertCompetition != nil)
         XCTAssertNotNil(vm.currentAlertCompetition)
         vm.alertDismissed()
+
         XCTAssertNil(vm.currentAlertCompetition)
     }
 
@@ -299,7 +311,7 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         let comp1 = makeArchivedCompetition(id: UUID(), name: "First", userPosition: 1)
 
         mockCompetitionManager.return_competitionOverviews = [comp1.competitionId: comp1]
-        await waitForPublisher()
+        await waitUntil(vm.currentAlertCompetition != nil)
         XCTAssertNotNil(vm.currentAlertCompetition)
         let firstCompetitionId = vm.currentAlertCompetition?.competitionId
 
@@ -309,7 +321,9 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
             comp1.competitionId: comp1,
             comp2.competitionId: comp2
         ]
-        await waitForPublisher()
+        // Poll until the pipeline has delivered the second update (at which point the VM will
+        // have returned early, leaving comp1 as the active alert).
+        await waitUntil(vm.currentAlertCompetition?.competitionId == firstCompetitionId)
 
         // Current alert should not have changed
         XCTAssertEqual(vm.currentAlertCompetition?.competitionId, firstCompetitionId)

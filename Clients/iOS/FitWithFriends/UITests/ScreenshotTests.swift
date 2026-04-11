@@ -29,7 +29,7 @@ final class ScreenshotTests: FWFUITestBase {
                                   exerciseTime: 27, exerciseTimeGoal: 30,
                                   standTime: 11, standTimeGoal: 12)
 
-        launchApp(loggedIn: true)
+        launchApp(loggedIn: true, isPro: true)
 
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Move More, Win More"].waitForExistence(timeout: 10))
@@ -45,7 +45,7 @@ final class ScreenshotTests: FWFUITestBase {
                                   exerciseTime: 27, exerciseTimeGoal: 30,
                                   standTime: 11, standTimeGoal: 12)
 
-        launchApp(loggedIn: true)
+        launchApp(loggedIn: true, isPro: true)
 
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Move More, Win More"]
@@ -105,8 +105,8 @@ final class ScreenshotTests: FWFUITestBase {
     }
 
     /// 04 — Create competition sheet with name filled in
-    func test04_CreateCompetition() {
-        launchApp(loggedIn: true)
+    func test04_CreateCompetition() throws {
+        launchApp(loggedIn: true, isPro: true)
 
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
 
@@ -124,7 +124,7 @@ final class ScreenshotTests: FWFUITestBase {
         snapshot("04_CreateCompetition")
     }
 
-    /// 05 — Pro upgrade sheet
+    /// 05 — Pro upgrade sheet (user must NOT be Pro so the upgrade prompt appears)
     func test05_ProUpgradeSheet() throws {
         let competitionId = try createPublicCompetition(name: "Community Run")
         try seedCompetitionWithUsers(competitionId: competitionId)
@@ -142,5 +142,33 @@ final class ScreenshotTests: FWFUITestBase {
         XCTAssertTrue(app.staticTexts["Upgrade to Pro"].waitForExistence(timeout: 3))
 
         snapshot("05_ProUpgradeSheet")
+    }
+
+    /// 06 — Competition end alert with confetti (1st place finish)
+    func test06_CompetitionEndAlert() throws {
+        let competitionId = try createCompetitionForScreenshots(name: "Move More, Win More")
+        let seededUserIds = try seedCompetitionWithUsers(competitionId: competitionId)
+        try seedSelfActivityData(daysAgo: 5, caloriesBurned: 340, caloriesGoal: 400,
+                                  exerciseTime: 27, exerciseTimeGoal: 30,
+                                  standTime: 11, standTimeGoal: 12)
+
+        // Archive with points for all users so the leaderboard is fully populated.
+        // Test user is 1st (480 pts) to trigger confetti; seeded users are 2nd–5th.
+        let seededPoints = [420, 370, 240, 180]
+        let additionalPoints = zip(seededUserIds, seededPoints).map { userId, points in
+            (userId: userId, points: points)
+        }
+        try setCompetitionArchived(competitionId: competitionId,
+                                   userPoints: 480,
+                                   additionalUserPoints: additionalPoints)
+
+        launchApp(loggedIn: true, isPro: true)
+
+        // The view model starts confetti 0.8 s before showing the alert, so particles
+        // are already in motion when the dim overlay appears. Snapshot while the alert
+        // is visible — this is exactly what a user sees on their device.
+        XCTAssertTrue(app.staticTexts["Move More, Win More has ended!"].waitForExistence(timeout: 10))
+
+        snapshot("06_CompetitionEndAlert")
     }
 }
