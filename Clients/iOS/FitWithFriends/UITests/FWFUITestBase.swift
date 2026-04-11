@@ -161,12 +161,14 @@ class FWFUITestBase: XCTestCase {
     }
 
     /// Seed a competition with realistic fake users for App Store screenshots.
-    /// Each user gets the same activity values inserted for every day from the
-    /// competition's start date through today, giving nonzero total points and points today.
+    /// Each user gets activity values inserted for every day from the competition's start
+    /// date through today.  Pass `dailyDataOverrides` keyed by `"FirstName LastName"` to
+    /// supply per-day values for a specific user; other users repeat their flat values.
     /// Returns the user IDs of the created users in the same order as the input list.
     @discardableResult
-    func seedCompetitionWithUsers(competitionId: String) throws -> [String] {
-        let users: [[String: Any]] = [
+    func seedCompetitionWithUsers(competitionId: String,
+                                  dailyDataOverrides: [String: [[String: Any]]] = [:]) throws -> [String] {
+        var users: [[String: Any]] = [
             ["firstName": "Alice",  "lastName": "Chen",
              "caloriesBurned": 420, "caloriesGoal": 400,
              "exerciseTime": 38,    "exerciseTimeGoal": 30,
@@ -184,6 +186,15 @@ class FWFUITestBase: XCTestCase {
              "exerciseTime": 14,    "exerciseTimeGoal": 30,
              "standTime": 8,        "standTimeGoal": 12],
         ]
+
+        // Attach per-day data for any user that has an override
+        users = users.map { user in
+            let key = "\(user["firstName"]!) \(user["lastName"]!)"
+            guard let daily = dailyDataOverrides[key] else { return user }
+            var updated = user
+            updated["dailyData"] = daily
+            return updated
+        }
 
         let url = URL(string: "http://localhost:3000/testHelpers/seedCompetitionUsers")!
         var request = URLRequest(url: url)

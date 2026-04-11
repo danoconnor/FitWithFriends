@@ -10,7 +10,7 @@ import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
-import { getCompetitionStandings } from '../utilities/competitionStandingsHelper';
+import { getCompetitionStandings, calculateDailyPoints } from '../utilities/competitionStandingsHelper';
 import { CompetitionState } from '../utilities/enums/CompetitionState';
 
 const msPerDay = 1000 * 60 * 60 * 24;
@@ -349,6 +349,83 @@ router.get('/:competitionId/overview', function (req, res) {
                 })
                 .catch(error => {
                     handleError(error, 500, 'Error calculating results', res);
+                });
+        })
+        .catch(error => {
+            handleError(error, 500, 'Error getting competition info', res);
+        });
+});
+
+// Returns the daily activity summaries and points for a specific user within a competition
+// Both the requesting user and the target user must be members of the competition
+// Only returns data within the competition's date range
+//
+// Expects a query param with the user's current timezone
+router.get('/:competitionId/userDetails/:userId', function (req, res) {
+    const timezoneParam = req.query['timezone']?.toString();
+    const competitionId: string = req.params.competitionId;
+    const targetUserId: string = req.params.userId;
+
+    if (!timezoneParam || !allIANATimezones.includes(timezoneParam)) {
+        handleError(null, 400, 'Invalid timezone query param: ' + timezoneParam, res);
+        return;
+    }
+
+    const requestingUserId = res.locals.oauth.token.user.id;
+
+    Promise.all([
+        UserQueries.getUsersInCompetition({ competitionId }),
+        CompetitionQueries.getCompetition({ competitionId })
+    ])
+        .then(([usersInCompetition, competitionsResult]) => {
+            if (!usersInCompetition.length || !competitionsResult.length) {
+                handleError(null, 404, 'Could not find competition info', res);
+                return;
+            }
+
+            // Verify the requesting user is a member of the competition
+            if (!usersInCompetition.filter((row) => { return row.userId === requestingUserId }).length) {
+                handleError(null, 401, 'User is not a member of the competition', res);
+                return;
+            }
+
+            // Verify the target user is a member of the competition
+            const targetUser = usersInCompetition.find((row) => row.userId === targetUserId);
+            if (!targetUser) {
+                handleError(null, 404, 'Target user is not a member of the competition', res);
+                return;
+            }
+
+            const competitionInfo = competitionsResult[0];
+
+            // Fetch activity summaries for only the target user within the competition date range
+            ActivityDataQueries.getActivitySummariesForUsers({
+                userIds: [convertUserIdToBuffer(targetUserId)],
+                startDate: competitionInfo.start_date,
+                endDate: competitionInfo.end_date
+            })
+                .then(activitySummaries => {
+                    const dailySummaries = activitySummaries.map(row => ({
+                        date: row.date,
+                        caloriesBurned: row.calories_burned,
+                        caloriesGoal: row.calories_goal,
+                        exerciseTime: row.exercise_time,
+                        exerciseTimeGoal: row.exercise_time_goal,
+                        standTime: row.stand_time,
+                        standTimeGoal: row.stand_time_goal,
+                        points: calculateDailyPoints(row)
+                    }));
+
+                    res.json({
+                        userId: targetUserId,
+                        firstName: targetUser.first_name,
+                        lastName: targetUser.last_name,
+                        competitionId: competitionInfo.competition_id,
+                        dailySummaries
+                    });
+                })
+                .catch(error => {
+                    handleError(error, 500, 'Error fetching activity data', res);
                 });
         })
         .catch(error => {

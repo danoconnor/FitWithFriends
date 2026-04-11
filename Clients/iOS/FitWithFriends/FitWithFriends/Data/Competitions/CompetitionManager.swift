@@ -159,6 +159,10 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
             await self.refreshPublicCompetitions()
         }
     }
+
+    func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails {
+        return try await competitionService.getUserCompetitionDetails(competitionId: competitionId, userId: userId)
+    }
 }
 
 extension CompetitionManager: ActivityUpdateDelegate {

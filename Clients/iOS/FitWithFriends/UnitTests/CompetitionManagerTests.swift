@@ -108,6 +108,30 @@ final class CompetitionManagerTests: XCTestCase {
         }
     }
 
+    func test_getUserCompetitionDetails_shouldCallService() async throws {
+        // Arrange
+        let competitionId = UUID()
+        let userId = "testUser"
+        let expectedDetails = UserCompetitionDailyDetails(
+            userId: userId,
+            firstName: "Test",
+            lastName: "User",
+            competitionId: competitionId,
+            dailySummaries: [DailySummary(date: Date(), caloriesBurned: 300, caloriesGoal: 400, points: 75)])
+        mockCompetitionService.return_getUserCompetitionDetails = expectedDetails
+
+        // Act
+        let result = try await competitionManager.getUserCompetitionDetails(
+            competitionId: competitionId, userId: userId)
+
+        // Assert
+        XCTAssertEqual(mockCompetitionService.getUserCompetitionDetailsCallCount, 1)
+        XCTAssertEqual(mockCompetitionService.param_getUserCompetitionDetails_competitionId, competitionId)
+        XCTAssertEqual(mockCompetitionService.param_getUserCompetitionDetails_userId, userId)
+        XCTAssertEqual(result.userId, userId)
+        XCTAssertEqual(result.dailySummaries.count, 1)
+    }
+
     func XCTAssertThrowsErrorAsync<T>(_ expression: @autoclosure () async throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line, _ errorHandler: (Error) -> Void) async {
         do {
             _ = try await expression()

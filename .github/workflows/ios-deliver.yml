@@ -28,6 +28,11 @@ jobs:
       - name: Install Fastlane
         run: brew install fastlane
 
+      - name: Create iPhone 16 Plus simulator
+        run: |
+          runtime=$(xcrun simctl list runtimes | grep -E '^iOS' | sort -V | tail -1 | awk '{print $NF}')
+          xcrun simctl create "iPhone 16 Plus" "iPhone 16 Plus" "$runtime"
+
       - name: Capture and frame screenshots
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: fastlane screenshots_ci

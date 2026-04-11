@@ -70,4 +70,11 @@ protocol ICompetitionManager: AnyObject {
 
     /// Join a public competition
     func joinPublicCompetition(competitionId: UUID) async throws
+
+    /// Get daily activity details for a specific user in a competition
+    /// - Parameters:
+    ///   - competitionId: The competition id
+    ///   - userId: The target user id
+    /// - Returns: The user's daily competition details
+    func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails
 }
