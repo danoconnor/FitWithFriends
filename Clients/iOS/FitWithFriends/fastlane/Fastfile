@@ -87,6 +87,7 @@ lane :release do
     skip_metadata:      false,
     skip_screenshots:   false,
     submit_for_review:  false,
-    precheck_include_in_app_purchases: false
+    precheck_include_in_app_purchases: false,
+    force:              true    # skip HTML preview confirmation (required in CI)
   )
 end
