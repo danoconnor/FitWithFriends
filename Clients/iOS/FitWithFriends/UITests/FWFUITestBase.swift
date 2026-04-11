@@ -54,9 +54,13 @@ class FWFUITestBase: XCTestCase {
     ///     `"failure"` to have the mock Apple auth immediately resolve instead of staying in progress.
     ///   - showFirstLaunchScreen: If true, do NOT suppress the first-launch welcome sheet.
     ///     Defaults to false so the sheet never blocks unrelated tests.
-    func launchApp(loggedIn: Bool = true, loginOutcome: String? = nil, showFirstLaunchScreen: Bool = false) {
+    func launchApp(loggedIn: Bool = true, loginOutcome: String? = nil, showFirstLaunchScreen: Bool = false, isPro: Bool = false) {
         app = XCUIApplication()
         app.launchEnvironment["FWF_UI_TESTING"] = "1"
+
+        if isPro {
+            app.launchEnvironment["FWF_UI_TEST_IS_PRO"] = "1"
+        }
 
         if showFirstLaunchScreen {
             // Signal the app to reset the first-launch UserDefault before the view model
@@ -159,7 +163,9 @@ class FWFUITestBase: XCTestCase {
     /// Seed a competition with realistic fake users for App Store screenshots.
     /// Each user gets the same activity values inserted for every day from the
     /// competition's start date through today, giving nonzero total points and points today.
-    func seedCompetitionWithUsers(competitionId: String) throws {
+    /// Returns the user IDs of the created users in the same order as the input list.
+    @discardableResult
+    func seedCompetitionWithUsers(competitionId: String) throws -> [String] {
         let users: [[String: Any]] = [
             ["firstName": "Alice",  "lastName": "Chen",
              "caloriesBurned": 420, "caloriesGoal": 400,
@@ -188,15 +194,24 @@ class FWFUITestBase: XCTestCase {
             "users": users
         ])
 
+        var responseData: Data?
         var httpResponse: HTTPURLResponse?
         let semaphore = DispatchSemaphore(value: 0)
-        URLSession.shared.dataTask(with: request) { _, response, _ in
+        URLSession.shared.dataTask(with: request) { data, response, _ in
+            responseData = data
             httpResponse = response as? HTTPURLResponse
             semaphore.signal()
         }.resume()
         semaphore.wait()
 
         XCTAssertEqual(httpResponse?.statusCode, 200, "Failed to seed competition users")
+
+        if let data = responseData,
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let userIds = json["userIds"] as? [String] {
+            return userIds
+        }
+        return []
     }
 
     /// Post activity data for the authenticated test user for every day from `daysAgo` days ago
@@ -262,13 +277,23 @@ class FWFUITestBase: XCTestCase {
         return json["competition_id"] as! String
     }
 
-    /// Archive a competition with final points for the test user, enabling the competition-ended alert
+    /// Archive a competition with final points, enabling the competition-ended alert.
+    /// - Parameters:
+    ///   - userPoints: Final points for the authenticated test user.
+    ///   - additionalUserPoints: Optional `[(userId, points)]` for other competition members
+    ///     (e.g. users returned by `seedCompetitionWithUsers`).
     @discardableResult
-    func setCompetitionArchived(competitionId: String, userPoints: Int = 500) throws {
+    func setCompetitionArchived(competitionId: String,
+                                userPoints: Int = 500,
+                                additionalUserPoints: [(userId: String, points: Int)] = []) throws {
         guard let userId else { return }
+        var userFinalPoints: [[String: Any]] = [["userId": userId, "points": userPoints]]
+        for entry in additionalUserPoints {
+            userFinalPoints.append(["userId": entry.userId, "points": entry.points])
+        }
         let body: [String: Any] = [
             "competitionId": competitionId,
-            "userFinalPoints": [["userId": userId, "points": userPoints]]
+            "userFinalPoints": userFinalPoints
         ]
         let (_, response) = try makeAuthenticatedRequest(
             method: "POST", path: "testHelpers/setCompetitionArchived", body: body

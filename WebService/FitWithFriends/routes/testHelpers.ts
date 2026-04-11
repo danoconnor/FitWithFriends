@@ -80,6 +80,8 @@ router.post('/seedCompetitionUsers', async function (req, res) {
             cursor.setDate(cursor.getDate() + 1);
         }
 
+        const createdUserIds: string[] = [];
+
         for (const user of users) {
             const userId = uuid().replace(/-/g, '');
             const userIdBuffer = UserHelpers.convertUserIdToBuffer(userId);
@@ -109,9 +111,11 @@ router.post('/seedCompetitionUsers', async function (req, res) {
                     }))
                 });
             }
+
+            createdUserIds.push(userId);
         }
 
-        res.sendStatus(200);
+        res.status(200).json({ userIds: createdUserIds });
     } catch (error) {
         handleError(error, 500, 'Error seeding competition users', res);
     }
