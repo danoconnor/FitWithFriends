@@ -41,13 +41,13 @@
   },
   "devDependencies": {
     "@pgtyped/cli": "file:./pgtyped_cli",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^30.0.0",
     "@types/pg": "^8.20.0",
     "@types/ua-parser-js": "^0.7.39",
     "@types/uuid": "^9.0.8",
     "axios": "^1.15.0",
     "brace-expansion": "^5.0.5",
-    "jest": "^29.7.0",
+    "jest": "^30.3.0",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
