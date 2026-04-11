@@ -150,7 +150,8 @@ CREATE TABLE public.workouts (
     duration integer NOT NULL,
     distance integer,
     unit smallint,
-    calories_burned integer NOT NULL
+    calories_burned integer NOT NULL,
+    CONSTRAINT workouts_distance_unit_check CHECK ((distance IS NULL) = (unit IS NULL))
 );
 
 
@@ -338,6 +339,28 @@ ALTER TABLE ONLY public.users_competitions
 
 ALTER TABLE ONLY public.activity_summaries
     ADD CONSTRAINT user_id_foreignkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
+-- Performance indexes
+--
+
+-- activity_summaries: queries filter by user_id first then date range, but the PK is (date, user_id).
+-- This index matches the actual query pattern used in competition standings calculations.
+CREATE INDEX idx_activity_summaries_user_date ON public.activity_summaries USING btree (user_id, date);
+
+-- users: GetUserByOriginalTransactionId does a full table scan without this index.
+-- Called on every App Store subscription notification.
+CREATE INDEX idx_users_apple_transaction_id ON public.users USING btree (apple_original_transaction_id);
+
+-- competitions: GetCompetitionsInState filters on both columns (used by the daily archiving task).
+CREATE INDEX idx_competitions_state_end_date ON public.competitions USING btree (state, end_date);
+
+-- competitions: GetPublicCompetitions filters on both columns (hit on every public competitions list view).
+CREATE INDEX idx_competitions_public_state ON public.competitions USING btree (is_public, state);
+
+-- oauth_tokens: DeleteExpiredRefreshTokens filters on this column (runs daily).
+CREATE INDEX idx_oauth_tokens_expires_on ON public.oauth_tokens USING btree (refresh_token_expires_on);
 
 
 -- Completed on 2025-07-14 14:38:47 EDT

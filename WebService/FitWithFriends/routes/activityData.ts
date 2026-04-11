@@ -109,6 +109,11 @@ router.post('/workouts', function (req, res) {
             return;
         }
 
+        if ((distance === null) !== (unit === null)) {
+            handleError(null, 400, 'distance and unit must both be provided or both be omitted', res);
+            return;
+        }
+
         const startDate = new Date(startDateStr);
         if (isNaN(startDate.getTime())) {
             handleError(null, 400, 'Could not parse date', res);
