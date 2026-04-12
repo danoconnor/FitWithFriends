@@ -59,7 +59,26 @@ router.post('/dailySummary', function (req, res) {
         });
     }
 
-    ActivityDataQueries.insertActivitySummaries({ summaries: summariesToInsert })
+    // Deduplicate by date: if the client sends multiple entries for the same date,
+    // merge them by taking the max values (consistent with the ON CONFLICT DO UPDATE logic).
+    // PostgreSQL cannot update the same target row twice in one statement.
+    const summaryByDate = new Map<string, typeof summariesToInsert[0]>();
+    for (const summary of summariesToInsert) {
+        const key = summary.date.toISOString();
+        const existing = summaryByDate.get(key);
+        if (existing) {
+            existing.caloriesBurned = Math.max(existing.caloriesBurned, summary.caloriesBurned);
+            existing.caloriesGoal = Math.max(existing.caloriesGoal, summary.caloriesGoal);
+            existing.exerciseTime = Math.max(existing.exerciseTime, summary.exerciseTime);
+            existing.exerciseTimeGoal = Math.max(existing.exerciseTimeGoal, summary.exerciseTimeGoal);
+            existing.standTime = Math.max(existing.standTime, summary.standTime);
+            existing.standTimeGoal = Math.max(existing.standTimeGoal, summary.standTimeGoal);
+        } else {
+            summaryByDate.set(key, summary);
+        }
+    }
+
+    ActivityDataQueries.insertActivitySummaries({ summaries: Array.from(summaryByDate.values()) })
         .then(_result => {
             res.sendStatus(200);
         })

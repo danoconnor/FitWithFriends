@@ -447,6 +447,123 @@ test('Add workout missing distance', async () => {
     compareWorkoutResultToExpected(workouts[0], expectedData);
 });
 
+test('Add activityData duplicate dates in same batch - takes max values', async () => {
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+
+    // Two entries for the same date; each has some higher and some lower values
+    const firstEntry = {
+        date: '2021-01-01',
+        activeCaloriesBurned: 200,
+        activeCaloriesGoal: 500,
+        exerciseTime: 15,
+        exerciseTimeGoal: 60,
+        standTime: 20,
+        standTimeGoal: 12
+    };
+    const secondEntry = {
+        date: '2021-01-01',
+        activeCaloriesBurned: 100,
+        activeCaloriesGoal: 600,
+        exerciseTime: 30,
+        exerciseTimeGoal: 30,
+        standTime: 10,
+        standTimeGoal: 24
+    };
+
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [firstEntry, secondEntry] }, token);
+    expect(response.status).toBe(200);
+
+    // Should result in a single row with the max value of each field
+    const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
+    expect(activityDatas.length).toBe(1);
+
+    const result = activityDatas[0];
+    expect(result.calories_burned).toBe(200);
+    expect(result.calories_goal).toBe(600);
+    expect(result.exercise_time).toBe(30);
+    expect(result.exercise_time_goal).toBe(60);
+    expect(result.stand_time).toBe(20);
+    expect(result.stand_time_goal).toBe(24);
+});
+
+test('Add activityData duplicate dates in same batch with other days - only deduplicates matching dates', async () => {
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+
+    const dupEntry1 = {
+        date: '2021-01-01',
+        activeCaloriesBurned: 100,
+        activeCaloriesGoal: 500,
+        exerciseTime: 15,
+        exerciseTimeGoal: 30,
+        standTime: 10,
+        standTimeGoal: 12
+    };
+    const dupEntry2 = {
+        date: '2021-01-01',
+        activeCaloriesBurned: 200,
+        activeCaloriesGoal: 400,
+        exerciseTime: 25,
+        exerciseTimeGoal: 60,
+        standTime: 20,
+        standTimeGoal: 8
+    };
+    const otherDayEntry = {
+        date: '2021-01-02',
+        activeCaloriesBurned: 50,
+        activeCaloriesGoal: 300,
+        exerciseTime: 5,
+        exerciseTimeGoal: 20,
+        standTime: 3,
+        standTimeGoal: 10
+    };
+
+    const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [dupEntry1, dupEntry2, otherDayEntry] }, token);
+    expect(response.status).toBe(200);
+
+    const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
+    expect(activityDatas.length).toBe(2);
+
+    // Duplicate date should be merged with max values
+    const jan1Result = activityDatas.find(x => x.date.getUTCDate() === 1);
+    expect(jan1Result).not.toBeUndefined();
+    expect(jan1Result.calories_burned).toBe(200);
+    expect(jan1Result.calories_goal).toBe(500);
+    expect(jan1Result.exercise_time).toBe(25);
+    expect(jan1Result.exercise_time_goal).toBe(60);
+    expect(jan1Result.stand_time).toBe(20);
+    expect(jan1Result.stand_time_goal).toBe(12);
+
+    // Other day should be inserted as-is
+    const jan2Result = activityDatas.find(x => x.date.getUTCDate() === 2);
+    expect(jan2Result).not.toBeUndefined();
+    compareActivityDataResultToExpected(jan2Result, otherDayEntry);
+});
+
+test('Add duplicate workout - second submission is ignored', async () => {
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+
+    const workout = {
+        startDate: '2021-01-01',
+        duration: 60 * 60,
+        appleActivityTypeRawValue: 1,
+        caloriesBurned: 123,
+        distance: 5,
+        unit: 1
+    };
+
+    // Submit the same workout twice
+    const firstResponse = await RequestUtilities.makePostRequest('activityData/workouts', { values: [workout] }, token);
+    expect(firstResponse.status).toBe(200);
+
+    const secondResponse = await RequestUtilities.makePostRequest('activityData/workouts', { values: [workout] }, token);
+    expect(secondResponse.status).toBe(200);
+
+    // Only one row should exist in the database
+    const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
+    expect(workouts.length).toBe(1);
+    compareWorkoutResultToExpected(workouts[0], workout);
+});
+
 test('Add workout missing unit', async () => {
 
     const expectedData = {
