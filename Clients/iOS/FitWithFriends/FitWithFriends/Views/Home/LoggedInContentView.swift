@@ -204,6 +204,7 @@ struct LoggedInContentView: View {
                         self.homepageSheetViewModel.updateState(sheet: .about,
                                                                 state: true)
                     }
+                    .accessibilityIdentifier("AboutMenuButton")
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.body)

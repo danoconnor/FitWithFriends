@@ -19,7 +19,7 @@ final class AboutScreenTests: FWFUITestBase {
         XCTAssertTrue(menuButton.waitForExistence(timeout: 5))
         menuButton.tap()
 
-        let aboutButton = app.buttons["About"]
+        let aboutButton = app.buttons["AboutMenuButton"]
         XCTAssertTrue(aboutButton.waitForExistence(timeout: 5))
         aboutButton.tap()
 
