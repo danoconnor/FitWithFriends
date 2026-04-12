@@ -26,4 +26,5 @@ ON CONFLICT (user_id, date) DO UPDATE SET
     @param workouts -> ((userId!, startDate!, caloriesBurned!, workoutType!, duration!, distance, unit)...)
 */
 INSERT INTO workouts(user_id, start_date, calories_burned, workout_type, duration, distance, unit)
-VALUES :workouts!;
+VALUES :workouts!
+ON CONFLICT (user_id, start_date, workout_type) DO NOTHING;

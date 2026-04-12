@@ -116,13 +116,14 @@ export interface IInsertWorkoutsQuery {
   result: IInsertWorkoutsResult;
 }
 
-const insertWorkoutsIR: any = {"usedParamSet":{"workouts":true},"params":[{"name":"workouts","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"startDate","required":true},{"name":"caloriesBurned","required":true},{"name":"workoutType","required":true},{"name":"duration","required":true},{"name":"distance","required":false},{"name":"unit","required":false}]},"locs":[{"a":106,"b":115}]}],"statement":"INSERT INTO workouts(user_id, start_date, calories_burned, workout_type, duration, distance, unit)\nVALUES :workouts!"};
+const insertWorkoutsIR: any = {"usedParamSet":{"workouts":true},"params":[{"name":"workouts","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"startDate","required":true},{"name":"caloriesBurned","required":true},{"name":"workoutType","required":true},{"name":"duration","required":true},{"name":"distance","required":false},{"name":"unit","required":false}]},"locs":[{"a":106,"b":115}]}],"statement":"INSERT INTO workouts(user_id, start_date, calories_burned, workout_type, duration, distance, unit)\nVALUES :workouts!\nON CONFLICT (user_id, start_date, workout_type) DO NOTHING"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO workouts(user_id, start_date, calories_burned, workout_type, duration, distance, unit)
  * VALUES :workouts!
+ * ON CONFLICT (user_id, start_date, workout_type) DO NOTHING
  * ```
  */
 export function insertWorkouts(params: IInsertWorkoutsParams): Promise<Array<IInsertWorkoutsResult>> {
