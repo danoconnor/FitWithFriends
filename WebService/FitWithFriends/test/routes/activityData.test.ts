@@ -426,25 +426,20 @@ test('Add workout missing caloriesBurned', async () => {
 });
 
 test('Add workout missing distance', async () => {
-    const expectedData = {
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [{
         startDate: '2021-01-01',
         duration: 60 * 60,
         appleActivityTypeRawValue: 1,
         caloriesBurned: 123,
         unit: 1
-    };
-
-    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [expectedData] },
+        // distance omitted: unit without distance is not valid
+    }] },
     token);
 
-    // Should succeed because distance is optional
-    expect(response.status).toBe(200);
-
-    // Validate that the data was inserted into the database
-    const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
-    expect(workouts.length).toBe(1);
-    compareWorkoutResultToExpected(workouts[0], expectedData);
+    // distance and unit must both be provided or both be omitted
+    expect(response.status).toBe(400);
+    expect(response.data.context).toContain('distance and unit must both be provided or both be omitted');
 });
 
 test('Add activityData duplicate dates in same batch - takes max values', async () => {
@@ -565,26 +560,20 @@ test('Add duplicate workout - second submission is ignored', async () => {
 });
 
 test('Add workout missing unit', async () => {
-
-    const expectedData = {
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [{
         startDate: '2021-01-01',
         duration: 60 * 60,
         appleActivityTypeRawValue: 1,
         caloriesBurned: 123,
         distance: 5
-    };
-
-    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [expectedData] },
+        // unit omitted: distance without unit is not valid
+    }] },
     token);
 
-    // Should succeed because unit is optional
-    expect(response.status).toBe(200);
-
-    // Validate that the data was inserted into the database
-    const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
-    expect(workouts.length).toBe(1);
-    compareWorkoutResultToExpected(workouts[0], expectedData);
+    // distance and unit must both be provided or both be omitted
+    expect(response.status).toBe(400);
+    expect(response.data.context).toContain('distance and unit must both be provided or both be omitted');
 });
 
 // Helpers

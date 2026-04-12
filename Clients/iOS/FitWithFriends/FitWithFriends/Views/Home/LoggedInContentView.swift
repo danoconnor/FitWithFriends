@@ -205,6 +205,10 @@ struct LoggedInContentView: View {
                                                                 state: true)
                     }
                     .accessibilityIdentifier("AboutMenuButton")
+
+                    Button("Send logs") {
+                        self.objectGraph.emailUtility.sendLogEmail()
+                    }
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.body)
