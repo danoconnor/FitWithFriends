@@ -204,6 +204,10 @@ struct LoggedInContentView: View {
                         self.homepageSheetViewModel.updateState(sheet: .about,
                                                                 state: true)
                     }
+
+                    Button("Send logs") {
+                        self.objectGraph.emailUtility.sendLogEmail()
+                    }
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.body)
