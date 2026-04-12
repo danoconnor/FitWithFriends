@@ -84,7 +84,7 @@ lane :release do
   upload_to_app_store(
     api_key:            api_key,
     skip_binary_upload: true,   # binary uploaded separately by ios-deploy.yml
-    skip_metadata:      false,
+    skip_metadata:      true,    # metadata not managed in repo; upload screenshots only
     skip_screenshots:   false,
     submit_for_review:  false,
     precheck_include_in_app_purchases: false,
