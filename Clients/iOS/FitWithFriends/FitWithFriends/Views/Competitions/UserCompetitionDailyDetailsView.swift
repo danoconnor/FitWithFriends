@@ -9,18 +9,18 @@ import HealthKit
 import SwiftUI
 
 struct UserCompetitionDailyDetailsView: View {
-    @ObservedObject private var viewModel: UserCompetitionDailyDetailsViewModel
+    @StateObject private var viewModel: UserCompetitionDailyDetailsViewModel
 
     init(competitionId: UUID, userId: String, userName: String, objectGraph: IObjectGraph) {
-        viewModel = UserCompetitionDailyDetailsViewModel(
+        _viewModel = StateObject(wrappedValue: UserCompetitionDailyDetailsViewModel(
             competitionManager: objectGraph.competitionManager,
             competitionId: competitionId,
             userId: userId,
-            userName: userName)
+            userName: userName))
     }
 
     init(viewModel: UserCompetitionDailyDetailsViewModel) {
-        self.viewModel = viewModel
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
@@ -89,6 +89,7 @@ struct DailySummaryCard: View {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
+        formatter.timeZone = TimeZone(identifier: "UTC")
         return formatter.string(from: summary.date)
     }
 
