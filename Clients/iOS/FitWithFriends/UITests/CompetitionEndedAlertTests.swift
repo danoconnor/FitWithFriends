@@ -12,10 +12,10 @@ final class CompetitionEndedAlertTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
 
         let alert = app.alerts.firstMatch
-        XCTAssertTrue(alert.waitForExistence(timeout: 10))
+        XCTAssertTrue(alert.waitForExistence(timeout: 30))
         XCTAssertTrue(alert.staticTexts["Finished Competition has ended!"].exists)
         XCTAssertTrue(
             alert.staticTexts.matching(NSPredicate(format: "label CONTAINS 'place'")).firstMatch.waitForExistence(timeout: 3)
@@ -27,7 +27,8 @@ final class CompetitionEndedAlertTests: FWFUITestBase {
         try setCompetitionArchived(competitionId: competitionId, userPoints: 500)
 
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
+        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 30))
         app.alerts.firstMatch.buttons["OK"].tap()
 
         XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 3))

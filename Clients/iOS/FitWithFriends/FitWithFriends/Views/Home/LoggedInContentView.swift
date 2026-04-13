@@ -199,11 +199,13 @@ struct LoggedInContentView: View {
                     Button("Logout") {
                         self.homepageViewModel.logout()
                     }
+                    .accessibilityIdentifier("LogoutMenuButton")
 
                     Button("About") {
                         self.homepageSheetViewModel.updateState(sheet: .about,
                                                                 state: true)
                     }
+                    .accessibilityIdentifier("AboutMenuButton")
 
                     Button("Send logs") {
                         self.objectGraph.emailUtility.sendLogEmail()

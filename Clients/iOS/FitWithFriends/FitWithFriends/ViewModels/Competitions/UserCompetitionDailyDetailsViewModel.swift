@@ -41,6 +41,8 @@ public class UserCompetitionDailyDetailsViewModel: ObservableObject {
             dailySummaries = details.dailySummaries.sorted { $0.date > $1.date }
             totalPoints = details.dailySummaries.reduce(0) { $0 + $1.points }
             isLoading = false
+        } catch is CancellationError {
+            isLoading = false
         } catch {
             Logger.traceError(message: "Failed to load user competition details", error: error)
             errorMessage = "Failed to load details"

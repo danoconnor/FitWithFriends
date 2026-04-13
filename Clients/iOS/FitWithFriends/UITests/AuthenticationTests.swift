@@ -19,7 +19,7 @@ final class AuthenticationTests: FWFUITestBase {
         XCTAssertTrue(menuButton.waitForExistence(timeout: 5))
         menuButton.tap()
 
-        let logoutButton = app.buttons["Logout"]
+        let logoutButton = app.buttons["LogoutMenuButton"]
         XCTAssertTrue(logoutButton.waitForExistence(timeout: 5))
         logoutButton.tap()
 
