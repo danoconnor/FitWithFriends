@@ -199,6 +199,7 @@ struct LoggedInContentView: View {
                     Button("Logout") {
                         self.homepageViewModel.logout()
                     }
+                    .accessibilityIdentifier("LogoutMenuButton")
 
                     Button("About") {
                         self.homepageSheetViewModel.updateState(sheet: .about,
