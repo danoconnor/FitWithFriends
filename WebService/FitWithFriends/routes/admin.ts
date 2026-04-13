@@ -3,6 +3,7 @@ import * as express from 'express';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import * as OAuthQueries from '../sql/oauth.queries';
+import * as ActivityDataQueries from '../sql/activityData.queries';
 import { sendPushNotifications } from '../utilities/apnsHelper';
 import { CompetitionState } from '../utilities/enums/CompetitionState';
 import { handleError } from '../utilities/errorHelpers';
@@ -12,6 +13,11 @@ import * as cryptoHelpers from '../utilities/cryptoHelpers';
 import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
+
+const MAX_BOT_USERS = 100;
+
+const BOT_FIRST_NAMES = ['Alex', 'Jordan', 'Casey', 'Morgan', 'Riley', 'Taylor', 'Jamie', 'Drew', 'Avery', 'Quinn'];
+const BOT_LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Moore', 'Anderson'];
 
 router.post('/createPublicCompetition', function (req, res) {
     const startDate = new Date(req.body['startDate']);
@@ -62,12 +68,77 @@ router.post('/createPublicCompetition', function (req, res) {
         ianaTimezone: timezone,
         competitionId
     })
-        .then((_result) => {
+        .then(async (_result) => {
+            const botUsers = await UserQueries.getBotUsers(undefined);
+            await Promise.all(botUsers.map(bot =>
+                CompetitionQueries.addUserToCompetition({
+                    userId: UserHelpers.convertUserIdToBuffer(bot.userId),
+                    competitionId
+                })
+            ));
             res.json({ 'competition_id': competitionId });
         })
         .catch(error => {
             handleError(error, 500, 'Error creating public competition', res);
         });
+});
+
+router.post('/createBotUsers', async function (req, res) {
+    const count: number = parseInt(req.body['count']);
+    if (isNaN(count) || count <= 0) {
+        handleError(null, 400, 'count must be a positive integer', res);
+        return;
+    }
+
+    const countResult = await UserQueries.getBotUserCount(undefined);
+    const currentCount = countResult[0]?.count ?? 0;
+
+    if (currentCount >= MAX_BOT_USERS) {
+        handleError(null, 400, `Bot user limit of ${MAX_BOT_USERS} already reached`, res);
+        return;
+    }
+
+    const canCreate = Math.min(count, MAX_BOT_USERS - currentCount);
+    const now = new Date();
+
+    const botUserIds: string[] = [];
+    await Promise.all(
+        Array.from({ length: canCreate }, async () => {
+            const userId = uuid().replace(/-/g, '');
+            const firstName = BOT_FIRST_NAMES[Math.floor(Math.random() * BOT_FIRST_NAMES.length)];
+            const lastName = BOT_LAST_NAMES[Math.floor(Math.random() * BOT_LAST_NAMES.length)];
+            await UserQueries.createBotUser({
+                userId: UserHelpers.convertUserIdToBuffer(userId),
+                firstName,
+                lastName,
+                maxActiveCompetitions: 1,
+                isPro: false,
+                createdDate: now
+            });
+            botUserIds.push(userId);
+        })
+    );
+
+    // Enroll new bots in all active public competitions
+    const activePublicCompetitions = await CompetitionQueries.getPublicCompetitions({
+        activeState: CompetitionState.NotStartedOrActive
+    });
+    await Promise.all(
+        botUserIds.flatMap(userId =>
+            activePublicCompetitions.map(competition =>
+                CompetitionQueries.addUserToCompetition({
+                    userId: UserHelpers.convertUserIdToBuffer(userId),
+                    competitionId: competition.competition_id
+                })
+            )
+        )
+    );
+
+    res.json({
+        created: canCreate,
+        userIds: botUserIds,
+        total: currentCount + canCreate
+    });
 });
 
 router.post('/performDailyTasks', async function (req, res) {
@@ -79,6 +150,7 @@ router.post('/performDailyTasks', async function (req, res) {
     const now = req.body['currentDate'] ? new Date(req.body['currentDate']) : new Date();
 
     const deleteExpiredTokensPromise = deleteExpiredRefreshTokens(now);
+    const seedBotActivityDataPromise = seedBotActivityData(now);
 
     // Do not parallelize the competition tasks
     // because we do not want to move a competition to processing to archiving in the same run
@@ -105,6 +177,12 @@ router.post('/performDailyTasks', async function (req, res) {
         taskResults.push({ name: 'createWeeklyPublicCompetition', result: await createWeeklyPublicCompetition(now) });
     } catch (err) {
         errors.push(['createWeeklyPublicCompetition', err]);
+    }
+
+    try {
+        taskResults.push({ name: 'seedBotActivityData', result: await seedBotActivityDataPromise });
+    } catch (err) {
+        errors.push(['seedBotActivityData', err]);
     }
 
     const summary = {
@@ -301,8 +379,58 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
         competitionId
     });
 
+    const botUsers = await UserQueries.getBotUsers(undefined);
+    await Promise.all(botUsers.map(bot =>
+        CompetitionQueries.addUserToCompetition({
+            userId: UserHelpers.convertUserIdToBuffer(bot.userId),
+            competitionId
+        })
+    ));
+
     return `Created weekly competition starting ${upcomingMonday.toISOString()}`;
 }
 
+
+async function seedBotActivityData(now: Date): Promise<string> {
+    const botUsers = await UserQueries.getBotUsers(undefined);
+    if (botUsers.length === 0) return 'No bot users found';
+
+    // Get current Eastern time details
+    const easternHour = parseInt(
+        new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/New_York' }).format(now)
+    );
+    const easternDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(now); // "YYYY-MM-DD"
+
+    // Fetch today's existing activity for all bots (single query)
+    const botUserBuffers = botUsers.map(bot => UserHelpers.convertUserIdToBuffer(bot.userId));
+    const existingActivity = await ActivityDataQueries.getActivitySummariesForUsers({
+        userIds: botUserBuffers,
+        startDate: easternDateStr,
+        endDate: easternDateStr,
+    });
+    const existingByUser = new Map(existingActivity.map(a => [a.userId, a]));
+
+    // Build incremented summaries
+    const summaries = botUsers.map(bot => {
+        const existing = existingByUser.get(bot.userId);
+        const currentCalories = existing?.calories_burned ?? 0;
+        const currentExercise = existing?.exercise_time ?? 0;
+        const currentStand = existing?.stand_time ?? 0;
+
+        return {
+            userId: UserHelpers.convertUserIdToBuffer(bot.userId),
+            date: easternDateStr,
+            caloriesBurned: currentCalories + Math.floor(Math.random() * 25) + 5,  // +5–30 per run
+            caloriesGoal: 400,
+            exerciseTime: currentExercise + Math.floor(Math.random() * 3),           // +0–2 min per run
+            exerciseTimeGoal: 30,
+            standTime: Math.min(currentStand + (Math.random() < 0.6 ? 1 : 0), easternHour), // capped at Eastern hour
+            standTimeGoal: 12,
+        };
+    });
+
+    await ActivityDataQueries.insertActivitySummaries({ summaries });
+    return `Seeded activity data for ${botUsers.length} bot users`;
+}
 
 export default router;

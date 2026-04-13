@@ -479,6 +479,208 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
     });
 });
 
+describe('createBotUsers', () => {
+    test('creates N bots and returns userIds in response', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 3 });
+        expect(response.status).toBe(200);
+        expect(response.data.created).toBe(3);
+        expect(response.data.userIds).toHaveLength(3);
+        expect(response.data.total).toBe(3);
+
+        // Track for cleanup
+        for (const userId of response.data.userIds) {
+            usersToCleanup.push(userId);
+        }
+    });
+
+    test('enrolls new bots in existing active public competitions', async () => {
+        // Create an active public competition first
+        const competitionId = uuid();
+        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await TestSQL.createPublicCompetition({
+            competitionId,
+            displayName: 'Bot Enrollment Test',
+            startDate: tomorrow,
+            endDate: nextWeek,
+            adminUserId: convertUserIdToBuffer(testUserId1),
+            accessToken: 'test-token',
+            ianaTimezone: 'UTC'
+        });
+        competitionsToCleanup.push(competitionId);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 2 });
+        expect(response.status).toBe(200);
+        expect(response.data.created).toBe(2);
+
+        const botUserIds: string[] = response.data.userIds;
+        for (const userId of botUserIds) {
+            usersToCleanup.push(userId);
+        }
+
+        // Verify each bot is in the competition
+        const usersInCompetition = await TestSQL.getUsersInCompetition({ competitionId });
+        const competitionUserIds = usersInCompetition.map(u => Buffer.from(u.user_id).toString('hex'));
+        for (const botUserId of botUserIds) {
+            expect(competitionUserIds).toContain(botUserId);
+        }
+    });
+
+    test('returns 400 when bot limit already reached', async () => {
+        // Pre-create 100 bots
+        const now = new Date();
+        const botIds: string[] = [];
+        for (let i = 0; i < 100; i++) {
+            const userId = uuid().replace(/-/g, '');
+            await TestSQL.createBotUser({
+                userId: convertUserIdToBuffer(userId),
+                firstName: 'Bot',
+                lastName: 'User',
+                maxActiveCompetitions: 1,
+                isPro: false,
+                createdDate: now
+            });
+            botIds.push(userId);
+            usersToCleanup.push(userId);
+        }
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 1 });
+        expect(response.status).toBe(400);
+    });
+
+    test('returns 400 for count=0', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 0 });
+        expect(response.status).toBe(400);
+    });
+
+    test('returns 400 for count=-1', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: -1 });
+        expect(response.status).toBe(400);
+    });
+
+    test('caps creation at remaining capacity', async () => {
+        // Pre-create 98 bots
+        const now = new Date();
+        for (let i = 0; i < 98; i++) {
+            const userId = uuid().replace(/-/g, '');
+            await TestSQL.createBotUser({
+                userId: convertUserIdToBuffer(userId),
+                firstName: 'Bot',
+                lastName: 'User',
+                maxActiveCompetitions: 1,
+                isPro: false,
+                createdDate: now
+            });
+            usersToCleanup.push(userId);
+        }
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 5 });
+        expect(response.status).toBe(200);
+        expect(response.data.created).toBe(2);
+        expect(response.data.total).toBe(100);
+
+        for (const userId of response.data.userIds) {
+            usersToCleanup.push(userId);
+        }
+    });
+});
+
+describe('performDailyTasks - seedBotActivityData', () => {
+    test('returns "No bot users found" when none exist', async () => {
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'seedBotActivityData')).toBe('No bot users found');
+    });
+
+    test('creates initial activity data for bots', async () => {
+        const now = new Date();
+        const botId1 = uuid().replace(/-/g, '');
+        const botId2 = uuid().replace(/-/g, '');
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId1),
+            firstName: 'Bot',
+            lastName: 'One',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId2),
+            firstName: 'Bot',
+            lastName: 'Two',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        usersToCleanup.push(botId1, botId2);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'seedBotActivityData')).toContain('Seeded activity data for 2 bot users');
+
+        // Verify activity summaries were created with calories > 0
+        const activity1 = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId1) });
+        const activity2 = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId2) });
+        expect(activity1.length).toBeGreaterThan(0);
+        expect(activity1[0].calories_burned).toBeGreaterThan(0);
+        expect(activity2.length).toBeGreaterThan(0);
+        expect(activity2[0].calories_burned).toBeGreaterThan(0);
+    });
+
+    test('increments existing data on subsequent runs', async () => {
+        const now = new Date();
+        const botId = uuid().replace(/-/g, '');
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId),
+            firstName: 'Bot',
+            lastName: 'Inc',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        usersToCleanup.push(botId);
+
+        // First run
+        const response1 = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response1.status).toBe(200);
+        const activity1 = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId) });
+        const firstCalories = activity1[0].calories_burned;
+
+        // Second run
+        const response2 = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response2.status).toBe(200);
+        const activity2 = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId) });
+        const secondCalories = activity2[0].calories_burned;
+
+        expect(secondCalories).toBeGreaterThanOrEqual(firstCalories);
+    });
+
+    test('stand_time never exceeds current Eastern hour', async () => {
+        const now = new Date();
+        const currentEasternHour = now.getHours(); // TZ=America/New_York is set for the test process
+
+        const botId = uuid().replace(/-/g, '');
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId),
+            firstName: 'Bot',
+            lastName: 'Stand',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        usersToCleanup.push(botId);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response.status).toBe(200);
+
+        const activity = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId) });
+        expect(activity.length).toBeGreaterThan(0);
+        expect(activity[0].stand_time).toBeLessThanOrEqual(currentEasternHour);
+    });
+});
+
 describe('performDailyTasks - comprehensive integration', () => {
     test('handles multiple operations in single run', async () => {
         // Set up test data for all three operations
@@ -566,5 +768,122 @@ describe('performDailyTasks - comprehensive integration', () => {
         // Track any public competition created by createWeeklyPublicCompetition so afterEach can clean it up
         const createdPublicComps = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
         createdPublicComps.forEach(c => competitionsToCleanup.push(c.competition_id));
+    });
+});
+
+describe('performDailyTasks - createWeeklyPublicCompetition - bot enrollment', () => {
+    // Re-derive the same Sunday/Monday reference dates used in the existing weekly competition tests
+    const setupNow = new Date();
+    const setupDayOfWeek = setupNow.getUTCDay();
+    const setupDaysUntilMonday = setupDayOfWeek === 1 ? 0 : (8 - setupDayOfWeek) % 7;
+    const upcomingMondayUTC = new Date(setupNow);
+    upcomingMondayUTC.setUTCDate(setupNow.getUTCDate() + setupDaysUntilMonday);
+    upcomingMondayUTC.setUTCHours(0, 0, 0, 0);
+
+    const sundayNoonUTC = new Date(upcomingMondayUTC.getTime() - 12 * 60 * 60 * 1000);
+
+    const expectedMonday = new Date(
+        upcomingMondayUTC.getUTCFullYear(),
+        upcomingMondayUTC.getUTCMonth(),
+        upcomingMondayUTC.getUTCDate()
+    );
+
+    beforeEach(async () => {
+        // Clean up any competitions scheduled for the upcoming Monday
+        const publicComps = await CompetitionQueries.getPublicCompetitions({ activeState: CompetitionState.NotStartedOrActive });
+        const upcomingWeekComps = publicComps.filter(c =>
+            new Date(c.start_date).getTime() >= expectedMonday.getTime()
+        );
+        await Promise.all(upcomingWeekComps.map(c => TestSQL.clearDataForCompetition({ competitionId: c.competition_id })));
+    });
+
+    test('enrolls existing bots in auto-created weekly competition', async () => {
+        const now = new Date();
+        const botId1 = uuid().replace(/-/g, '');
+        const botId2 = uuid().replace(/-/g, '');
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId1),
+            firstName: 'Weekly',
+            lastName: 'Bot1',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId2),
+            firstName: 'Weekly',
+            lastName: 'Bot2',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        usersToCleanup.push(botId1, botId2);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
+            currentDate: sundayNoonUTC.toISOString()
+        });
+        expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created weekly competition starting /);
+
+        // Find the created competition
+        const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
+            activeState: CompetitionState.NotStartedOrActive
+        });
+        const competition = publicCompetitions.find(c =>
+            new Date(c.start_date).getTime() === expectedMonday.getTime()
+        );
+        expect(competition).toBeDefined();
+        competitionsToCleanup.push(competition.competition_id);
+
+        // Verify both bots are in the competition
+        const usersInCompetition = await TestSQL.getUsersInCompetition({ competitionId: competition.competition_id });
+        const competitionUserIds = usersInCompetition.map(u => Buffer.from(u.user_id).toString('hex'));
+        expect(competitionUserIds).toContain(botId1);
+        expect(competitionUserIds).toContain(botId2);
+    });
+});
+
+describe('createPublicCompetition - bot enrollment', () => {
+    test('enrolls bots in manually created public competition', async () => {
+        const now = new Date();
+        const botId1 = uuid().replace(/-/g, '');
+        const botId2 = uuid().replace(/-/g, '');
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId1),
+            firstName: 'Public',
+            lastName: 'Bot1',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId2),
+            firstName: 'Public',
+            lastName: 'Bot2',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        usersToCleanup.push(botId1, botId2);
+
+        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createPublicCompetition', {
+            startDate: tomorrow.toISOString(),
+            endDate: nextWeek.toISOString(),
+            displayName: 'Bot Enrollment Test Competition',
+            ianaTimezone: 'UTC',
+            adminUserId: testUserId1
+        });
+        expect(response.status).toBe(200);
+        const competitionId = response.data.competition_id;
+        competitionsToCleanup.push(competitionId);
+
+        // Verify both bots are in the competition
+        const usersInCompetition = await TestSQL.getUsersInCompetition({ competitionId });
+        const competitionUserIds = usersInCompetition.map(u => Buffer.from(u.user_id).toString('hex'));
+        expect(competitionUserIds).toContain(botId1);
+        expect(competitionUserIds).toContain(botId2);
     });
 });
