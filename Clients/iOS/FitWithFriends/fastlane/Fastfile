@@ -13,18 +13,18 @@ lane :screenshots do
   # Capture raw screenshots via XCUITest (config in fastlane/Snapfile).
   snapshot
 
-  # The iPad Pro 11-inch (M5) simulator on iOS 26 captures screenshots at
-  # 1668x2420, but frameit only recognises 1668x2388 (the App Store required
-  # size for the 11-inch iPad Pro).  Crop the bottom 32 px from every iPad
-  # screenshot so frameit can match the device frame correctly.
+  # The iPad Pro 13-inch (M4) simulator on iOS 26 captures screenshots at
+  # 2064x2752, but frameit only recognises 2048x2732 (the App Store required
+  # size for the 13-inch iPad Pro).  Crop every iPad screenshot so frameit
+  # can match the device frame correctly.
   # Note: sh() runs from the fastlane/ subdirectory, so screenshots are at ../screenshots/.
   sh(<<~BASH)
-    for f in ../screenshots/en-US/iPad\\ Pro\\ 11-inch*.png; do
+    for f in ../screenshots/en-US/iPad\\ Pro\\ 13-inch*.png; do
       [ -f "$f" ] || continue
       h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/{print $2}')
-      if [ "$h" = "2420" ]; then
-        sips --cropOffset 0 0 --cropToHeightWidth 2388 1668 "$f"
-        echo "Cropped $f to 1668x2388"
+      if [ "$h" = "2752" ]; then
+        sips --cropOffset 0 0 --cropToHeightWidth 2732 2048 "$f"
+        echo "Cropped $f to 2048x2732"
       fi
     done
   BASH
@@ -48,12 +48,12 @@ lane :screenshots_ci do
 
   # Same iPad crop as in the :screenshots lane — see comment there.
   sh(<<~BASH)
-    for f in ../screenshots/en-US/iPad\\ Pro\\ 11-inch*.png; do
+    for f in ../screenshots/en-US/iPad\\ Pro\\ 13-inch*.png; do
       [ -f "$f" ] || continue
       h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/{print $2}')
-      if [ "$h" = "2420" ]; then
-        sips --cropOffset 0 0 --cropToHeightWidth 2388 1668 "$f"
-        echo "Cropped $f to 1668x2388"
+      if [ "$h" = "2752" ]; then
+        sips --cropOffset 0 0 --cropToHeightWidth 2732 2048 "$f"
+        echo "Cropped $f to 2048x2732"
       fi
     done
   BASH

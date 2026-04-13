@@ -5,45 +5,45 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; down -v --remove-orphans" time="1.940267">
+      <testcase classname="fastlane.lanes" name="0: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; down -v --remove-orphans" time="1.966794">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; up -d" time="10.932507">
+      <testcase classname="fastlane.lanes" name="1: docker compose -f &apos;../../../../WebService/docker-compose-local-testing.yml&apos; up -d" time="10.908836">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: until curl -sf http://localhost:3000 &gt; /dev/null 2&gt;&amp;1; do sleep 1; done &amp;&amp; echo &apos;Backend ready&apos;" time="1.216611">
+      <testcase classname="fastlane.lanes" name="2: until curl -sf http://localhost:3000 &gt; /dev/null 2&gt;&amp;1; do sleep 1; done &amp;&amp; echo &apos;Backend ready&apos;" time="1.197366">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="3: snapshot" time="362.013223">
+      <testcase classname="fastlane.lanes" name="3: snapshot" time="382.894507">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="4: for f in ../screenshots/en-US/iPad\ Pro\ 11-inch*.png; do
+      <testcase classname="fastlane.lanes" name="4: for f in ../screenshots/en-US/iPad\ Pro\ 13-inch*.png; do
   [ -f &quot;$f&quot; ] || continue
   h=$(sips -g pixelHeight &quot;$f&quot; | awk &apos;/pixelHeight/{print $2}&apos;)
-  if [ &quot;$h&quot; = &quot;2420&quot; ]; then
-    sips --cropOffset 0 0 --cropToHeightWidth 2388 1668 &quot;$f&quot;
-    echo &quot;Cropped $f to 1668x2388&quot;
+  if [ &quot;$h&quot; = &quot;2752&quot; ]; then
+    sips --cropOffset 0 0 --cropToHeightWidth 2732 2048 &quot;$f&quot;
+    echo &quot;Cropped $f to 2048x2732&quot;
   fi
 done
-" time="1.610486">
+" time="4.253877">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="5: cp Framefile.json background.png &apos;/System/Library/Fonts/Supplemental/Arial Bold.ttf&apos; ../screenshots/" time="0.058117">
+      <testcase classname="fastlane.lanes" name="5: cp Framefile.json background.png &apos;/System/Library/Fonts/Supplemental/Arial Bold.ttf&apos; ../screenshots/" time="0.09555">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="6: frameit" time="113.946875">
+      <testcase classname="fastlane.lanes" name="6: frameit" time="496.849596">
         
       </testcase>
     

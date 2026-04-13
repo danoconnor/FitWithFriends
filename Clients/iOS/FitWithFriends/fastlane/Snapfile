@@ -6,7 +6,7 @@ scheme("FitWithFriends")
 # dimensions and run on iOS 26, matching the app's minimum deployment target.
 devices([
   "iPhone 16 Plus",        # 1290x2796 — satisfies 6.7" App Store category
-  "iPad Pro 11-inch (M5)"  # 1668x2420, cropped to 1668x2388 — satisfies 11" App Store category
+  "iPad Pro 13-inch (M4)"  # 2064x2752, cropped to 2048x2732 — satisfies 13" App Store category
 ])
 
 languages(["en-US"])

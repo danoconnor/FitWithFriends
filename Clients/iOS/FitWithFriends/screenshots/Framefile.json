@@ -31,6 +31,10 @@
     {
       "filter": "05_ProUpgradeSheet",
       "title": { "text": "Unlock public competitions" }
+    },
+    {
+      "filter": "06_CompetitionEndAlert",
+      "title": { "text": "Celebrate every win" }
     }
   ]
 }
