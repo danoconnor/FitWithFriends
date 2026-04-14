@@ -16,8 +16,20 @@ const router = express.Router();
 
 const MAX_BOT_USERS = 100;
 
-const BOT_FIRST_NAMES = ['Alex', 'Jordan', 'Casey', 'Morgan', 'Riley', 'Taylor', 'Jamie', 'Drew', 'Avery', 'Quinn'];
-const BOT_LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Moore', 'Anderson'];
+const BOT_FIRST_NAMES = [
+    'Alex', 'Jordan', 'Casey', 'Morgan', 'Riley', 'Taylor', 'Jamie', 'Drew', 'Avery', 'Quinn',
+    'Sam', 'Blake', 'Cameron', 'Jesse', 'Kyle', 'Dana', 'Robin', 'Pat', 'Terry', 'Lee',
+    'Chris', 'Kim', 'Leslie', 'Frankie', 'Reese', 'Parker', 'Skyler', 'Finley', 'Logan', 'Hayden',
+    'Spencer', 'Kendall', 'Sage', 'Rowan', 'Emery', 'Scout', 'River', 'Remy', 'Elliot', 'Peyton',
+    'Dylan', 'Shawn', 'Devon', 'Corey', 'Harley', 'Bailey', 'Charlie', 'Jody', 'Angel', 'Bobbie',
+];
+const BOT_LAST_NAMES = [
+    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Moore', 'Anderson',
+    'Taylor', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson',
+    'Clark', 'Rodriguez', 'Lewis', 'Lee', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King',
+    'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Baker', 'Gonzalez', 'Nelson', 'Carter',
+    'Mitchell', 'Perez', 'Roberts', 'Turner', 'Phillips', 'Campbell', 'Parker', 'Evans', 'Edwards', 'Collins',
+];
 
 router.post('/createPublicCompetition', function (req, res) {
     const startDate = new Date(req.body['startDate']);
@@ -69,7 +81,7 @@ router.post('/createPublicCompetition', function (req, res) {
         competitionId
     })
         .then(async (_result) => {
-            const botUsers = await UserQueries.getBotUsers(undefined);
+            const botUsers = await UserQueries.getBotUsers();
             await Promise.all(botUsers.map(bot =>
                 CompetitionQueries.addUserToCompetition({
                     userId: UserHelpers.convertUserIdToBuffer(bot.userId),
@@ -90,7 +102,7 @@ router.post('/createBotUsers', async function (req, res) {
         return;
     }
 
-    const countResult = await UserQueries.getBotUserCount(undefined);
+    const countResult = await UserQueries.getBotUserCount();
     const currentCount = countResult[0]?.count ?? 0;
 
     if (currentCount >= MAX_BOT_USERS) {
@@ -379,7 +391,7 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
         competitionId
     });
 
-    const botUsers = await UserQueries.getBotUsers(undefined);
+    const botUsers = await UserQueries.getBotUsers();
     await Promise.all(botUsers.map(bot =>
         CompetitionQueries.addUserToCompetition({
             userId: UserHelpers.convertUserIdToBuffer(bot.userId),
@@ -392,7 +404,7 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
 
 
 async function seedBotActivityData(now: Date): Promise<string> {
-    const botUsers = await UserQueries.getBotUsers(undefined);
+    const botUsers = await UserQueries.getBotUsers();
     if (botUsers.length === 0) return 'No bot users found';
 
     // Get current Eastern time details
