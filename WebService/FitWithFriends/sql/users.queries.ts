@@ -275,3 +275,99 @@ export function getUserByOriginalTransactionId(params: IGetUserByOriginalTransac
 }
 
 
+/** 'CreateBotUser' parameters type */
+export interface ICreateBotUserParams {
+  createdDate: DateOrString;
+  firstName: string;
+  isPro: boolean;
+  lastName?: string | null | void;
+  maxActiveCompetitions: number;
+  userId: Buffer;
+}
+
+/** 'CreateBotUser' return type */
+export type ICreateBotUserResult = void;
+
+/** 'CreateBotUser' query type */
+export interface ICreateBotUserQuery {
+  params: ICreateBotUserParams;
+  result: ICreateBotUserResult;
+}
+
+const createBotUserIR: any = {"usedParamSet":{"userId":true,"firstName":true,"lastName":true,"maxActiveCompetitions":true,"isPro":true,"createdDate":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":113,"b":120}]},{"name":"firstName","required":true,"transform":{"type":"scalar"},"locs":[{"a":123,"b":133}]},{"name":"lastName","required":false,"transform":{"type":"scalar"},"locs":[{"a":136,"b":144}]},{"name":"maxActiveCompetitions","required":true,"transform":{"type":"scalar"},"locs":[{"a":147,"b":169}]},{"name":"isPro","required":true,"transform":{"type":"scalar"},"locs":[{"a":172,"b":178}]},{"name":"createdDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":181,"b":193}]}],"statement":"INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date, is_bot)\nVALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!, true)"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date, is_bot)
+ * VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!, true)
+ * ```
+ */
+export function createBotUser(params: ICreateBotUserParams): Promise<Array<ICreateBotUserResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const createBotUser = new pgtyped.PreparedQuery<ICreateBotUserParams,ICreateBotUserResult>(createBotUserIR);
+    return createBotUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetBotUsers' parameters type */
+export type IGetBotUsersParams = void;
+
+/** 'GetBotUsers' return type */
+export interface IGetBotUsersResult {
+  userId: string;
+}
+
+/** 'GetBotUsers' query type */
+export interface IGetBotUsersQuery {
+  params: IGetBotUsersParams;
+  result: IGetBotUsersResult;
+}
+
+const getBotUsersIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT encode(user_id::bytea, 'hex') AS \"userId!\" FROM users WHERE is_bot = true"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT encode(user_id::bytea, 'hex') AS "userId!" FROM users WHERE is_bot = true
+ * ```
+ */
+export function getBotUsers(params: IGetBotUsersParams): Promise<Array<IGetBotUsersResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getBotUsers = new pgtyped.PreparedQuery<IGetBotUsersParams,IGetBotUsersResult>(getBotUsersIR);
+    return getBotUsers.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetBotUserCount' parameters type */
+export type IGetBotUserCountParams = void;
+
+/** 'GetBotUserCount' return type */
+export interface IGetBotUserCountResult {
+  count: number;
+}
+
+/** 'GetBotUserCount' query type */
+export interface IGetBotUserCountQuery {
+  params: IGetBotUserCountParams;
+  result: IGetBotUserCountResult;
+}
+
+const getBotUserCountIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT COUNT(*)::INTEGER AS \"count!\" FROM users WHERE is_bot = true"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT COUNT(*)::INTEGER AS "count!" FROM users WHERE is_bot = true
+ * ```
+ */
+export function getBotUserCount(params: IGetBotUserCountParams): Promise<Array<IGetBotUserCountResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getBotUserCount = new pgtyped.PreparedQuery<IGetBotUserCountParams,IGetBotUserCountResult>(getBotUserCountIR);
+    return getBotUserCount.run(params, DatabaseConnectionPool);
+  });
+}
+
+
