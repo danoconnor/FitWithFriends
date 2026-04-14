@@ -118,7 +118,8 @@ CREATE TABLE public.users (
     is_pro boolean DEFAULT false NOT NULL,
     created_date date NOT NULL,
     apple_original_transaction_id text,
-    subscription_expires_date timestamp
+    subscription_expires_date timestamp,
+    is_bot boolean DEFAULT false NOT NULL
 );
 
 
