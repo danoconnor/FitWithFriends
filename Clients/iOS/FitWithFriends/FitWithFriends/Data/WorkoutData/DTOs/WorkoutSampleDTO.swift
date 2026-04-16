@@ -33,12 +33,12 @@ public struct WorkoutSampleDTO {
              .swimming,
              .walking,
              .swimBikeRun:
-            distance = round(workout.totalDistance?.doubleValue(for: .mile()) ?? 0)
+            distance = workout.totalDistance?.doubleValue(for: .mile()) ?? 0
             unit = .mile
         case .stairs,
              .stairClimbing:
             // For stair workouts, we measure distance in terms of stairs climbed instead of distance
-            distance = round(workout.statistics(for: HKQuantityType(.flightsClimbed))?.sumQuantity()?.doubleValue(for: .count()) ?? 0)
+            distance = workout.statistics(for: HKQuantityType(.flightsClimbed))?.sumQuantity()?.doubleValue(for: .count()) ?? 0
             unit = .count
         default:
             distance = nil
