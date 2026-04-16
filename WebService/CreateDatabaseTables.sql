@@ -152,7 +152,7 @@ CREATE TABLE public.workouts (
     distance integer,
     unit smallint,
     calories_burned integer NOT NULL,
-    CONSTRAINT workouts_distance_unit_check CHECK ((distance IS NULL) = (unit IS NULL))
+    CONSTRAINT workouts_distance_unit_check CHECK ((distance IS NULL) = (unit IS NULL or unit = 0))
 );
 
 
