@@ -1349,6 +1349,17 @@
 					0B99FBC9256A016900673133 = {
 						CreatedOnToolsVersion = 12.2;
 					};
+					AD6B4CCC4EF66BE675C6E8FC = {
+						CreatedOnToolsVersion = 16.3;
+						DevelopmentTeam = U7MJ9CBUMD;
+						ProvisioningStyle = Automatic;
+						TestTargetID = BCD02D9723624FD8DF535CFB;
+					};
+					BCD02D9723624FD8DF535CFB = {
+						CreatedOnToolsVersion = 16.3;
+						DevelopmentTeam = U7MJ9CBUMD;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 0B99FBC5256A016900673133 /* Build configuration list for PBXProject "FitWithFriends" */;
