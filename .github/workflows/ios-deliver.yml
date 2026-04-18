@@ -15,14 +15,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Generate SecretConstants.swift
-        run: |
-          TEMPLATE="Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstantsTemplate.swift"
-          OUTPUT="Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift"
-          if [ ! -f "$OUTPUT" ]; then
-            cp "$TEMPLATE" "$OUTPUT"
-          fi
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
