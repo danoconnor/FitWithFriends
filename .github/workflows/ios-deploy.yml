@@ -21,6 +21,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Generate SecretConstants.swift
+        run: |
+          TEMPLATE="Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstantsTemplate.swift"
+          OUTPUT="Clients/iOS/FitWithFriends/FitWithFriends/Utilities/SecretConstants.swift"
+          if [ ! -f "$OUTPUT" ]; then
+            cp "$TEMPLATE" "$OUTPUT"
+          fi
+
       - name: Set up App Store Connect API key
         env:
           APP_STORE_CONNECT_API_KEY_CONTENT_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT_BASE64 }}
