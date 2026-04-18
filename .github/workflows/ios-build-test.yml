@@ -10,7 +10,7 @@ env:
   WORKSPACE_NAME: FitWithFriends.xcworkspace
 
 jobs:
-  build:
+  ios-tests:
     name: iOS build and test
     runs-on: macos-26
 
@@ -53,3 +53,20 @@ jobs:
       - name: Stop UI test backend
         if: always()
         run: Scripts/stop-ui-test-backend-native.sh
+
+  watch-tests:
+    name: Watch unit tests
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Test
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
+        run: |
+          xcodebuild test \
+            -scheme "FitWithFriends Watch App" \
+            -workspace $WORKSPACE_NAME \
+            -destination "platform=watchOS Simulator,OS=latest,name=Apple Watch Ultra 2 (49mm)" \
+            CODE_SIGNING_ALLOWED=NO
