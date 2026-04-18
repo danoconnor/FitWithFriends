@@ -23,5 +23,6 @@ struct NoCompetitionsView: View {
         }
         .padding(.horizontal, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityIdentifier("noCompetitionsView")
     }
 }

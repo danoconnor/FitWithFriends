@@ -42,6 +42,7 @@ struct WatchUserResultRow: View {
             Text("\(entry.totalPoints)")
                 .font(.footnote.weight(.semibold).monospacedDigit())
         }
+        .accessibilityIdentifier("userRow_\(entry.displayName)")
     }
 
     @ViewBuilder

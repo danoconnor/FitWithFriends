@@ -37,5 +37,6 @@ struct CompetitionsPagerView: View {
         .refreshable {
             await onRefresh()
         }
+        .accessibilityIdentifier("competitionsPager")
     }
 }

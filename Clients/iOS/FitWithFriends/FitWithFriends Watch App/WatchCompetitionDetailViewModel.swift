@@ -35,7 +35,7 @@ class WatchCompetitionDetailViewModel {
         competition.isCompetitionActive
     }
 
-    /// A compact position-and-time summary like "You · 2nd · 3d left" or "Not started" or "Ended".
+    /// A compact position-and-time summary like "2nd place · 3d left" or "Not started" or "Ended".
     var userPositionDescription: String {
         let positionString = currentUserPositionString
 
@@ -52,7 +52,7 @@ class WatchCompetitionDetailViewModel {
 
         let remaining = WatchCompetitionDetailViewModel.relativeDateString(until: competition.endDate)
         if let pos = positionString {
-            return "You · \(pos) · \(remaining) left"
+            return "\(pos) place · \(remaining) left"
         }
         return "\(remaining) left"
     }

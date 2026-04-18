@@ -7,12 +7,17 @@
 		<key>FitWithFriends Watch App (Notification).xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>3</integer>
+			<integer>4</integer>
+		</dict>
+		<key>FitWithFriends Watch App UITests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
 		</dict>
 		<key>FitWithFriends Watch App.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>3</integer>
 		</dict>
 		<key>FitWithFriends.xcscheme_^#shared#^_</key>
 		<dict>
@@ -28,6 +33,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>0B99FBC9256A016900673133</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>WATCHUI00000000000000A0</key>
 		<dict>
 			<key>primary</key>
 			<true/>

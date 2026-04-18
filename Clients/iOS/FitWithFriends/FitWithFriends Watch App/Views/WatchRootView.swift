@@ -43,6 +43,7 @@ struct WatchRootView: View {
         case .loading:
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .accessibilityIdentifier("loadingView")
         case .signedOut:
             SignedOutView()
         case .noCompetitions:

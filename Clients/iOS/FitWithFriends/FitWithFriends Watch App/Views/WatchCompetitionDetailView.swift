@@ -26,5 +26,6 @@ struct WatchCompetitionDetailView: View {
         .listStyle(.carousel)
         #endif
         .navigationTitle(viewModel.competitionName)
+        .accessibilityIdentifier("competitionDetailView")
     }
 }

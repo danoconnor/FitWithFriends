@@ -48,7 +48,7 @@ jobs:
           # Pick the iPhone simulator with the highest available OS version
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
-          xcodebuild test-without-building -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" CODE_SIGNING_ALLOWED=NO
+          xcodebuild test-without-building -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" -skip-testing:FitWithFriends_UnitTests/WatchScreenshotTests CODE_SIGNING_ALLOWED=NO
 
       - name: Stop UI test backend
         if: always()
@@ -65,8 +65,42 @@ jobs:
       - name: Test
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |
+          device=$(xcrun xctrace list devices 2>&1 | grep -E 'Apple Watch.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
           xcodebuild test \
             -scheme "FitWithFriends Watch App" \
             -workspace $WORKSPACE_NAME \
-            -destination "platform=watchOS Simulator,OS=latest,name=Apple Watch Ultra 2 (49mm)" \
+            -destination "platform=watchOS Simulator,OS=latest,name=$device" \
+            -skip-testing:"FitWithFriends Watch App UITests" \
             CODE_SIGNING_ALLOWED=NO
+
+  watch-ui-tests:
+    name: Watch UI tests
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: WebService/FitWithFriends/package-lock.json
+
+      - name: Start UI test backend
+        run: Scripts/start-ui-test-backend-native.sh
+
+      - name: Test
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
+        run: |
+          device=$(xcrun xctrace list devices 2>&1 | grep -E 'Apple Watch.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
+          xcodebuild test \
+            -scheme "FitWithFriends Watch App UITests" \
+            -workspace $WORKSPACE_NAME \
+            -destination "platform=watchOS Simulator,OS=latest,name=$device" \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Stop UI test backend
+        if: always()
+        run: Scripts/stop-ui-test-backend-native.sh

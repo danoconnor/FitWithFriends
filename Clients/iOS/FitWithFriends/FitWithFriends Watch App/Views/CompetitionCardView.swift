@@ -45,6 +45,7 @@ struct CompetitionCardView: View {
             }
             .padding(.horizontal, 4)
         }
+        .accessibilityIdentifier("competitionCard_\(viewModel.competitionName)")
     }
 
     @ViewBuilder
