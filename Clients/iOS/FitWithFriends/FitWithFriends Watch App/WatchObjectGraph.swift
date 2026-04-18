@@ -20,6 +20,7 @@ class WatchObjectGraph: ObservableObject {
     let authenticationService: IAuthenticationService
     let competitionService: ICompetitionService
     let competitionManager: CompetitionManager
+    let watchSessionReceiver: WatchSessionReceiver?
 
     init() {
         let keychainUtilities = KeychainUtilities()
@@ -46,10 +47,21 @@ class WatchObjectGraph: ObservableObject {
         self.competitionService = competitionService
         self.competitionManager = competitionManager
 
-        // Kick off the initial login-state check. This flows through WatchAuthenticationManager
-        // which will read the token from the shared Keychain and publish .loggedIn if found,
-        // which in turn triggers CompetitionManager.refreshCompetitionOverviews() through its
-        // existing login-state subscription.
+        // Activate WatchConnectivity to receive tokens from the paired iPhone.
+        // This must be set up before evaluateInitialLoginState so incoming tokens
+        // can update the auth state.
+        #if os(watchOS)
+        self.watchSessionReceiver = WatchSessionReceiver(
+            tokenManager: tokenManager,
+            authenticationManager: authenticationManager
+        )
+        #else
+        self.watchSessionReceiver = nil
+        #endif
+
+        // Check the local Keychain for a previously received token. If found, the
+        // user is already logged in. If not, the Watch shows "Sign in on iPhone"
+        // until a token arrives via WatchConnectivity.
         authenticationManager.evaluateInitialLoginState()
     }
 
@@ -71,5 +83,6 @@ class WatchObjectGraph: ObservableObject {
         self.authenticationManager = authenticationManager
         self.competitionService = competitionService
         self.competitionManager = competitionManager
+        self.watchSessionReceiver = nil
     }
 }

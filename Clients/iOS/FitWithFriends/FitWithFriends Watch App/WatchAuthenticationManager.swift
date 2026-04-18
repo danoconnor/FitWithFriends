@@ -76,6 +76,20 @@ class WatchAuthenticationManager: IAuthenticationManager, ObservableObject {
         }
     }
 
+    /// Called by WatchSessionReceiver when a token arrives from the iPhone via WatchConnectivity.
+    /// The token has already been stored in the local Keychain by the caller.
+    func handleReceivedToken(_ token: Token) {
+        loggedInUserId = token.userId
+        if token.isAccessTokenExpired {
+            loginState = .inProgress
+            Task.detached { [weak self] in
+                await self?.refreshToken(token: token)
+            }
+        } else {
+            loginState = .loggedIn
+        }
+    }
+
     // MARK: IAuthenticationManager — no-op login surface
 
     #if !os(watchOS)
