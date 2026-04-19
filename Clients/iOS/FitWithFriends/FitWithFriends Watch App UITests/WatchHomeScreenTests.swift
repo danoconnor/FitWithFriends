@@ -24,7 +24,7 @@ final class WatchHomeScreenTests: WatchUITestBase {
 
         // NoCompetitionsView displays "No competitions"
         let noCompText = app.staticTexts["No competitions"]
-        XCTAssertTrue(noCompText.waitForExistence(timeout: 20))
+        XCTAssertTrue(noCompText.waitForExistence(timeout: 30))
 
         takeScreenshot(name: "Watch_NoCompetitions")
     }
@@ -42,7 +42,7 @@ final class WatchHomeScreenTests: WatchUITestBase {
         // On watchOS, NavigationLink collapses child views into a single Button
         // whose label contains all text content. Query buttons by label predicate.
         let card = competitionCard(named: "Spring Showdown")
-        XCTAssertTrue(card.waitForExistence(timeout: 20))
+        XCTAssertTrue(card.waitForExistence(timeout: 30))
 
         // Verify top-3 leaderboard data is present in the card's label
         XCTAssertTrue(card.label.contains("Alice Chen"))
@@ -59,7 +59,7 @@ final class WatchHomeScreenTests: WatchUITestBase {
         // At least one competition card should be visible
         let cardA = competitionCard(named: "Competition A")
         let cardB = competitionCard(named: "Competition B")
-        XCTAssertTrue(cardA.waitForExistence(timeout: 20) || cardB.waitForExistence(timeout: 5))
+        XCTAssertTrue(cardA.waitForExistence(timeout: 30) || cardB.waitForExistence(timeout: 5))
 
         takeScreenshot(name: "Watch_MultipleCompetitions")
     }

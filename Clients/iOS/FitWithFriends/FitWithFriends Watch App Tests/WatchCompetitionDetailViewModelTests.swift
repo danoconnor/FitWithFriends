@@ -80,8 +80,8 @@ final class WatchCompetitionDetailViewModelTests: XCTestCase {
         )
         let viewModel = WatchCompetitionDetailViewModel(competition: competition, currentUserId: "me")
         let description = viewModel.userPositionDescription
-        XCTAssertTrue(description.contains("You"), "Expected '\(description)' to contain 'You'")
         XCTAssertTrue(description.contains("2nd"), "Expected '\(description)' to contain '2nd'")
+        XCTAssertTrue(description.contains("place"), "Expected '\(description)' to contain 'place'")
         XCTAssertTrue(description.contains("left"), "Expected '\(description)' to contain 'left'")
     }
 

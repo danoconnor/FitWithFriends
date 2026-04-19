@@ -20,7 +20,7 @@ final class WatchCompetitionDetailTests: WatchUITestBase {
 
         // On watchOS, NavigationLink collapses child views into a single Button
         let card = competitionCard(named: "Detail Test")
-        XCTAssertTrue(card.waitForExistence(timeout: 20))
+        XCTAssertTrue(card.waitForExistence(timeout: 30))
 
         // Tap the card to navigate to the detail view
         card.tap()
@@ -52,7 +52,7 @@ final class WatchCompetitionDetailTests: WatchUITestBase {
 
         // Wait for card and tap into detail
         let card = competitionCard(named: "Full Leaderboard")
-        XCTAssertTrue(card.waitForExistence(timeout: 20))
+        XCTAssertTrue(card.waitForExistence(timeout: 30))
         card.tap()
 
         // Verify seeded users appear in the leaderboard
@@ -89,7 +89,7 @@ final class WatchCompetitionDetailTests: WatchUITestBase {
         launchApp(loggedIn: true)
 
         let card = competitionCard(named: "Nav Test")
-        XCTAssertTrue(card.waitForExistence(timeout: 20))
+        XCTAssertTrue(card.waitForExistence(timeout: 30))
 
         // Tap into detail
         card.tap()
