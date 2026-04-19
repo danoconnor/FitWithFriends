@@ -95,17 +95,11 @@ final class WatchCompetitionDetailTests: WatchUITestBase {
         let detailContent = app.descendants(matching: .any).matching(alicePredicate).firstMatch
         XCTAssertTrue(detailContent.waitForExistence(timeout: 10), "Detail view did not appear")
 
-        // Navigate back — on watchOS the back button may not be in navigationBars.
-        // Try navigationBars first, then fall back to tapping the top-left corner
-        // where the back chevron renders.
-        let navBackButton = app.navigationBars.buttons.firstMatch
-        if navBackButton.waitForExistence(timeout: 3) {
-            navBackButton.tap()
-        } else {
-            // Tap the top-left corner where watchOS renders the back chevron
-            let topLeft = app.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0.05))
-            topLeft.tap()
-        }
+        // On watchOS, the back button is a standalone Button (not inside navigationBars)
+        // with identifier "BackButton" and label "Back".
+        let backButton = app.buttons["BackButton"]
+        XCTAssertTrue(backButton.waitForExistence(timeout: 5), "Back button not found")
+        backButton.tap()
 
         // Should be back on the card view with competition card visible
         XCTAssertTrue(card.waitForExistence(timeout: 10))

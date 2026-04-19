@@ -70,7 +70,6 @@ jobs:
             -scheme "FitWithFriends Watch App" \
             -workspace $WORKSPACE_NAME \
             -destination "platform=watchOS Simulator,OS=latest,name=$device" \
-            -skip-testing:"FitWithFriends Watch App UITests" \
             CODE_SIGNING_ALLOWED=NO
 
   watch-ui-tests:
