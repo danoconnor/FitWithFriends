@@ -95,11 +95,12 @@ final class WatchCompetitionDetailTests: WatchUITestBase {
         let detailContent = app.descendants(matching: .any).matching(alicePredicate).firstMatch
         XCTAssertTrue(detailContent.waitForExistence(timeout: 10), "Detail view did not appear")
 
-        // On watchOS, the back button is a standalone Button (not inside navigationBars)
-        // with identifier "BackButton" and label "Back".
+        // On watchOS, the back button is a standalone Button (identifier "BackButton")
+        // but with .carousel list style it may not be hittable (behind carousel content).
+        // Use coordinate-based tap to bypass the hittability wait.
         let backButton = app.buttons["BackButton"]
         XCTAssertTrue(backButton.waitForExistence(timeout: 5), "Back button not found")
-        backButton.tap()
+        backButton.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
 
         // Should be back on the card view with competition card visible
         XCTAssertTrue(card.waitForExistence(timeout: 10))
