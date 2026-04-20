@@ -90,6 +90,17 @@ jobs:
       - name: Start UI test backend
         run: Scripts/start-ui-test-backend-native.sh
 
+      - name: Wait for backend
+        run: |
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null -w '%{http_code}' http://localhost:3000 | grep -qE '^[2-4]'; then
+              echo "Backend ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend not ready after 30s" && exit 1
+
       - name: Test
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |
@@ -98,7 +109,24 @@ jobs:
             -scheme "FitWithFriends Watch App UITests" \
             -workspace $WORKSPACE_NAME \
             -destination "platform=watchOS Simulator,OS=latest,name=$device" \
+            -parallel-testing-enabled NO \
+            -retry-tests-on-failure \
+            -resultBundlePath "$RUNNER_TEMP/WatchUITests.xcresult" \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Print test failures
+        if: failure()
+        run: |
+          xcrun xcresulttool get test-results summary \
+            --path "$RUNNER_TEMP/WatchUITests.xcresult" 2>/dev/null \
+            | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          for f in data.get('testFailures', []):
+              print(f'FAILED: {f[\"testName\"]}')
+              print(f'  {f[\"failureText\"]}')
+              print()
+          " || echo "Could not extract test failure details"
 
       - name: Stop UI test backend
         if: always()

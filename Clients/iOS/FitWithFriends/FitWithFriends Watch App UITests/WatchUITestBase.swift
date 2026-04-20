@@ -236,23 +236,30 @@ class WatchUITestBase: XCTestCase {
     }
 
     private func checkBackendIsRunning() throws {
-        let url = URL(string: Self.backendBaseURL)!
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 5
+        // Retry a few times — on CI the backend may still be starting up
+        for attempt in 1...5 {
+            let url = URL(string: Self.backendBaseURL)!
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 5
 
-        var isRunning = false
-        let semaphore = DispatchSemaphore(value: 0)
-        URLSession.shared.dataTask(with: request) { _, response, _ in
-            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode < 500 {
-                isRunning = true
+            var isRunning = false
+            let semaphore = DispatchSemaphore(value: 0)
+            URLSession.shared.dataTask(with: request) { _, response, _ in
+                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode < 500 {
+                    isRunning = true
+                }
+                semaphore.signal()
+            }.resume()
+            semaphore.wait()
+
+            if isRunning { return }
+
+            if attempt < 5 {
+                Thread.sleep(forTimeInterval: 2)
             }
-            semaphore.signal()
-        }.resume()
-        semaphore.wait()
-
-        if !isRunning {
-            throw XCTSkip("Docker backend is not running at \(Self.backendBaseURL). Run Scripts/start-ui-test-backend.sh first.")
         }
+
+        throw XCTSkip("Docker backend is not running at \(Self.backendBaseURL). Run Scripts/start-ui-test-backend.sh first.")
     }
 
     private func obtainAccessToken() throws {
