@@ -29,6 +29,9 @@ WHERE user_id = :userId!;
 /* @name GetUserByOriginalTransactionId */
 SELECT user_id FROM users WHERE apple_original_transaction_id = :originalTransactionId!;
 
+/* @name DeleteUser */
+DELETE FROM users WHERE user_id = :userId!;
+
 /* @name CreateBotUser */
 INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date, is_bot)
 VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!, true);

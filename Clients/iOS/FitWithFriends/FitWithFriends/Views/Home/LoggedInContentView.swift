@@ -15,6 +15,8 @@ struct LoggedInContentView: View {
     @ObservedObject private var homepageViewModel: HomepageViewModel
     @ObservedObject private var competitionEndAlertViewModel: CompetitionEndAlertViewModel
 
+    @State private var showDeleteAccountAlert = false
+
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
         homepageSheetViewModel = HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
@@ -22,7 +24,8 @@ struct LoggedInContentView: View {
         homepageViewModel = HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
                                               competitionManager: objectGraph.competitionManager,
                                               healthKitManager: objectGraph.healthKitManager,
-                                              subscriptionManager: objectGraph.subscriptionManager)
+                                              subscriptionManager: objectGraph.subscriptionManager,
+                                              userService: objectGraph.userService)
         competitionEndAlertViewModel = CompetitionEndAlertViewModel(
             competitionManager: objectGraph.competitionManager,
             authenticationManager: objectGraph.authenticationManager
@@ -201,6 +204,10 @@ struct LoggedInContentView: View {
                     }
                     .accessibilityIdentifier("LogoutMenuButton")
 
+                    Button("Delete Account", role: .destructive) {
+                        showDeleteAccountAlert = true
+                    }
+
                     Button("About") {
                         self.homepageSheetViewModel.updateState(sheet: .about,
                                                                 state: true)
@@ -240,6 +247,14 @@ struct LoggedInContentView: View {
             Button("OK") { competitionEndAlertViewModel.alertDismissed() }
         } message: {
             Text(competitionEndAlertViewModel.alertMessage)
+        }
+        .alert("Delete Account", isPresented: $showDeleteAccountAlert) {
+            Button("Delete", role: .destructive) {
+                Task { await homepageViewModel.deleteAccount() }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will permanently delete your account and all your data. This cannot be undone.")
         }
     }
 }

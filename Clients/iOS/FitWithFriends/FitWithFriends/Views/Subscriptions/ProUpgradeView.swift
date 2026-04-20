@@ -13,6 +13,7 @@ struct ProUpgradeView: View {
     @State private var isPurchasing = false
     @State private var isRestoring = false
     @State private var errorMessage: String?
+    @State private var product: Product?
 
     init(homepageSheetViewModel: HomepageSheetViewModel,
          subscriptionManager: ISubscriptionManager) {
@@ -53,6 +54,22 @@ struct ProUpgradeView: View {
                     .fwfCard()
                     .padding(.horizontal, 16)
 
+                    // Pricing
+                    VStack(spacing: 4) {
+                        if let product = product {
+                            Text("\(product.displayPrice) / month")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                        } else {
+                            ProgressView()
+                                .frame(height: 32)
+                        }
+                        Text("Auto-renews monthly. Cancel anytime.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 16)
+
                     if let errorMessage = errorMessage {
                         FWFErrorBanner(message: errorMessage)
                     }
@@ -84,6 +101,10 @@ struct ProUpgradeView: View {
             }
             .navigationTitle("Pro")
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                let products = try? await Product.products(for: ["com.danoconnor.FitWithFriends.pro.monthly"])
+                product = products?.first
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {

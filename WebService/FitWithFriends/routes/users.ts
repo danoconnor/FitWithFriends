@@ -2,8 +2,9 @@
 import { validateAppleIdToken } from '../utilities/appleIdAuthenticationHelpers';
 import { handleError } from '../utilities/errorHelpers';
 import express from 'express';
-import { ICreateUserParams, createUser } from '../sql/users.queries';
+import { ICreateUserParams, createUser, deleteUser } from '../sql/users.queries';
 import { convertUserIdToBuffer } from '../utilities/userHelpers';
+import oauthServer from '../oauth/server';
 
 const router = express.Router();
 
@@ -73,6 +74,16 @@ router.post('/userFromAppleID', function (req, res) {
         .catch(error => {
             handleError(error, 401, 'Token failed validation', res);
         });
+});
+
+// Deletes the currently authenticated user's account and all associated data
+router.delete('/me', oauthServer.authenticate(), function (req, res) {
+    const userId: string = res.locals.oauth.token.user.id;
+    const userIdBuffer = convertUserIdToBuffer(userId);
+
+    deleteUser({ userId: userIdBuffer })
+        .then(() => res.sendStatus(200))
+        .catch((error: Error) => handleError(error, 500, 'Unexpected error while deleting user', res));
 });
 
 export default router;

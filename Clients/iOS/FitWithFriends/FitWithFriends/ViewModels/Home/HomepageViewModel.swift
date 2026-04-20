@@ -15,6 +15,7 @@ public class HomepageViewModel: ObservableObject {
     private let competitionManager: ICompetitionManager
     private let healthKitManager: IHealthKitManager
     private let subscriptionManager: ISubscriptionManager
+    private let userService: IUserService
 
     @Published var loadedActivitySummary: Bool
     @Published var todayActivitySummary: ActivitySummary?
@@ -30,11 +31,13 @@ public class HomepageViewModel: ObservableObject {
     init(authenticationManager: IAuthenticationManager,
          competitionManager: ICompetitionManager,
          healthKitManager: IHealthKitManager,
-         subscriptionManager: ISubscriptionManager) {
+         subscriptionManager: ISubscriptionManager,
+         userService: IUserService) {
         self.authenticationManager = authenticationManager
         self.competitionManager = competitionManager
         self.healthKitManager = healthKitManager
         self.subscriptionManager = subscriptionManager
+        self.userService = userService
 
         loadedActivitySummary = false
 
@@ -75,6 +78,15 @@ public class HomepageViewModel: ObservableObject {
     }
 
     func logout() {
+        authenticationManager.logout()
+    }
+
+    func deleteAccount() async {
+        do {
+            try await userService.deleteAccount()
+        } catch {
+            Logger.traceError(message: "Failed to delete account", error: error)
+        }
         authenticationManager.logout()
     }
 

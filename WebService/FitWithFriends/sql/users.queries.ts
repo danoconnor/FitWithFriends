@@ -275,6 +275,36 @@ export function getUserByOriginalTransactionId(params: IGetUserByOriginalTransac
 }
 
 
+/** 'DeleteUser' parameters type */
+export interface IDeleteUserParams {
+  userId: Buffer;
+}
+
+/** 'DeleteUser' return type */
+export type IDeleteUserResult = void;
+
+/** 'DeleteUser' query type */
+export interface IDeleteUserQuery {
+  params: IDeleteUserParams;
+  result: IDeleteUserResult;
+}
+
+const deleteUserIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":34,"b":42}]}],"statement":"DELETE FROM users WHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * DELETE FROM users WHERE user_id = :userId!
+ * ```
+ */
+export function deleteUser(params: IDeleteUserParams): Promise<Array<IDeleteUserResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const deleteUser = new pgtyped.PreparedQuery<IDeleteUserParams,IDeleteUserResult>(deleteUserIR);
+    return deleteUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+
 /** 'CreateBotUser' parameters type */
 export interface ICreateBotUserParams {
   createdDate: DateOrString;
