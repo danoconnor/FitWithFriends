@@ -41,6 +41,10 @@ jobs:
         if: always()
         run: Scripts/stop-ui-test-backend-native.sh
 
+      - name: Capture watch screenshots
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
+        run: fastlane watch_screenshots
+
       - name: Upload metadata and screenshots
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
         env:

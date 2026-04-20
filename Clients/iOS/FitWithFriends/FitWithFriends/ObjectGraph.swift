@@ -62,9 +62,11 @@ class ObjectGraph: IObjectGraph {
                                                                 keychainUtilities: keychainUtilities,
                                                                 serverEnvironmentManager: serverEnvironmentManager,
                                                                 userService: userService)
+        let phoneWatchSessionManager = PhoneWatchSessionManager(tokenManager: tokenManager)
         let authenticationManager = AuthenticationManager(appleAuthenticationManager: appleAuthenticationManager,
                                                       authenticationService: authenticationService,
-                                                      tokenManager: tokenManager)
+                                                      tokenManager: tokenManager,
+                                                      phoneWatchSessionManager: phoneWatchSessionManager)
         self.authenticationManager = authenticationManager
         appleAuthenticationManager.authenticationDelegate = authenticationManager
 

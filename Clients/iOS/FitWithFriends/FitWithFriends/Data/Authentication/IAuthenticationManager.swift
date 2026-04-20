@@ -1,5 +1,7 @@
 import Combine
+#if !os(watchOS)
 import AuthenticationServices
+#endif
 
 /**
  A protocol defining the interface for managing user authentication.
@@ -14,6 +16,7 @@ public protocol IAuthenticationManager: AnyObject {
     /// The ID of the currently logged-in user, if any.
     var loggedInUserId: String? { get }
 
+    #if !os(watchOS)
     /// Begins the login process.
     /// - Parameters:
     ///   - delegate: The delegate responsible for presenting the login UI.
@@ -22,6 +25,7 @@ public protocol IAuthenticationManager: AnyObject {
         with delegate: ASAuthorizationControllerPresentationContextProviding,
         userProvidedName: PersonNameComponents?
     )
+    #endif
 
     /// Cancels any ongoing user input during the login process.
     func cancelUserInput()
