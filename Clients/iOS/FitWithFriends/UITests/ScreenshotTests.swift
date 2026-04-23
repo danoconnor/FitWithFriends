@@ -138,8 +138,8 @@ final class ScreenshotTests: FWFUITestBase {
         XCTAssertTrue(upgradeButton.waitForExistence(timeout: 5))
         upgradeButton.tap()
 
-        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Upgrade to Pro"].waitForExistence(timeout: 3))
+        // SubscriptionStoreView provides its own Close button — verify the sheet appeared
+        XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 5))
 
         snapshot("05_ProUpgradeSheet")
     }
