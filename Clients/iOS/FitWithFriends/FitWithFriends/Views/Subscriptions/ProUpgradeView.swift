@@ -13,6 +13,7 @@ struct ProUpgradeView: View {
     @State private var isPurchasing = false
     @State private var isRestoring = false
     @State private var errorMessage: String?
+    @State private var product: Product?
 
     init(homepageSheetViewModel: HomepageSheetViewModel,
          subscriptionManager: ISubscriptionManager) {
@@ -22,7 +23,8 @@ struct ProUpgradeView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
+                SubscriptionStoreView(productIDs: ["com.danoconnor.FitWithFriends.pro.monthly"])
+            {
                 VStack(spacing: 24) {
                     // Header
                     VStack(spacing: 12) {
@@ -52,78 +54,10 @@ struct ProUpgradeView: View {
                     }
                     .fwfCard()
                     .padding(.horizontal, 16)
-
-                    if let errorMessage = errorMessage {
-                        FWFErrorBanner(message: errorMessage)
-                    }
-
-                    // Purchase button
-                    FWFPrimaryButton("Subscribe", icon: "star.fill") {
-                        Task {
-                            await purchase()
-                        }
-                    }
-                    .disabled(isPurchasing || isRestoring)
-                    .padding(.horizontal, 16)
-
-                    // Restore purchases
-                    Button("Restore Purchases") {
-                        Task {
-                            await restore()
-                        }
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .disabled(isPurchasing || isRestoring)
-
-                    if isPurchasing || isRestoring {
-                        ProgressView()
-                    }
                 }
-                .padding(.bottom, 24)
             }
-            .navigationTitle("Pro")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        homepageSheetViewModel.dismissCurrentSheet()
-                    }
-                }
-            }
         }
-    }
-
-    private func purchase() async {
-        isPurchasing = true
-        errorMessage = nil
-
-        do {
-            try await subscriptionManager.purchaseProSubscription()
-            homepageSheetViewModel.dismissCurrentSheet()
-        } catch {
-            errorMessage = "Purchase failed. Please try again."
-        }
-
-        isPurchasing = false
-    }
-
-    private func restore() async {
-        isRestoring = true
-        errorMessage = nil
-
-        do {
-            try await subscriptionManager.restorePurchases()
-            if subscriptionManager.isUserPro {
-                homepageSheetViewModel.dismissCurrentSheet()
-            } else {
-                errorMessage = "No active subscription found."
-            }
-        } catch {
-            errorMessage = "Restore failed. Please try again."
-        }
-
-        isRestoring = false
     }
 }
 

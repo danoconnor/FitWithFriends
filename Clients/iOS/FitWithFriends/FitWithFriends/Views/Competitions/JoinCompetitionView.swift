@@ -11,17 +11,16 @@ struct JoinCompetitionView: View {
     private let homepageSheetViewModel: HomepageSheetViewModel
     private let objectGraph: IObjectGraph
 
-    @ObservedObject
-    private var viewModel: JoinCompetitionViewModel
+    @StateObject private var viewModel: JoinCompetitionViewModel
 
     @State var joinLoading = false
 
     init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
         self.homepageSheetViewModel = homepageSheetViewModel
         self.objectGraph = objectGraph
-        viewModel = JoinCompetitionViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
-                                             competitionManager: objectGraph.competitionManager,
-                                             homepageSheetViewModel: homepageSheetViewModel)
+        _viewModel = StateObject(wrappedValue: JoinCompetitionViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
+                                                                        competitionManager: objectGraph.competitionManager,
+                                                                        homepageSheetViewModel: homepageSheetViewModel))
     }
 
     var body: some View {
