@@ -278,16 +278,16 @@ final class HomepageViewModelTests: XCTestCase {
         XCTAssertTrue(mockAuthenticationManager.return_logout_called)
     }
 
-    func test_deleteAccount_serviceError_shouldStillLogout() async {
+    func test_deleteAccount_serviceError_shouldNotLogout() async {
         // Arrange
         mockUserService.return_deleteAccount_error = HttpError.generic
 
         // Act
-        await homepageViewModel.deleteAccount()
+        let deleteSuccess = await homepageViewModel.deleteAccount()
 
         // Assert
+        XCTAssertFalse(deleteSuccess, "Delete account should fail if the service throws")
         XCTAssertEqual(mockUserService.deleteAccountCallCount, 1, "deleteAccount should be called once on the service")
-        XCTAssertEqual(mockAuthenticationManager.logoutCallCount, 1, "logout should still be called even when service throws")
-        XCTAssertTrue(mockAuthenticationManager.return_logout_called)
+        XCTAssertEqual(mockAuthenticationManager.logoutCallCount, 0, "logout should not be called when the service throws")
     }
 }
