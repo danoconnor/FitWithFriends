@@ -11,23 +11,23 @@ import SwiftUI
 struct LoggedInContentView: View {
     private let objectGraph: IObjectGraph
 
-    @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
-    @ObservedObject private var homepageViewModel: HomepageViewModel
-    @ObservedObject private var competitionEndAlertViewModel: CompetitionEndAlertViewModel
+    @StateObject private var homepageSheetViewModel: HomepageSheetViewModel
+    @StateObject private var homepageViewModel: HomepageViewModel
+    @StateObject private var competitionEndAlertViewModel: CompetitionEndAlertViewModel
 
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
-        homepageSheetViewModel = HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
-                                                        healthKitManager: objectGraph.healthKitManager)
-        homepageViewModel = HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
-                                              competitionManager: objectGraph.competitionManager,
-                                              healthKitManager: objectGraph.healthKitManager,
-                                              subscriptionManager: objectGraph.subscriptionManager,
-                                              userService: objectGraph.userService)
-        competitionEndAlertViewModel = CompetitionEndAlertViewModel(
+        _homepageSheetViewModel = StateObject(wrappedValue: HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
+                                                                                   healthKitManager: objectGraph.healthKitManager))
+        _homepageViewModel = StateObject(wrappedValue: HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
+                                                                         competitionManager: objectGraph.competitionManager,
+                                                                         healthKitManager: objectGraph.healthKitManager,
+                                                                         subscriptionManager: objectGraph.subscriptionManager,
+                                                                         userService: objectGraph.userService))
+        _competitionEndAlertViewModel = StateObject(wrappedValue: CompetitionEndAlertViewModel(
             competitionManager: objectGraph.competitionManager,
             authenticationManager: objectGraph.authenticationManager
-        )
+        ))
     }
 
     var body: some View {

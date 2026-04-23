@@ -9,11 +9,11 @@ import SwiftUI
 
 struct WelcomeView: View {
     private let objectGraph: IObjectGraph
-    @ObservedObject private var viewModel: WelcomeViewModel
+    @StateObject private var viewModel: WelcomeViewModel
 
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
-        viewModel = WelcomeViewModel(authenticationManager: objectGraph.authenticationManager)
+        _viewModel = StateObject(wrappedValue: WelcomeViewModel(authenticationManager: objectGraph.authenticationManager))
     }
 
     var body: some View {
