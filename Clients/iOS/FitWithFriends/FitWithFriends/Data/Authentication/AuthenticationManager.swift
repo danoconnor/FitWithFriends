@@ -23,15 +23,18 @@ public class AuthenticationManager: IAuthenticationManager, ObservableObject {
     private let appleAuthenticationManager: IAppleAuthenticationManager
     private let authenticationService: IAuthenticationService
     private let tokenManager: ITokenManager
+    private let phoneWatchSessionManager: PhoneWatchSessionManager?
 
     public var loggedInUserId: String?
 
     init(appleAuthenticationManager: IAppleAuthenticationManager,
          authenticationService: IAuthenticationService,
-         tokenManager: ITokenManager) {
+         tokenManager: ITokenManager,
+         phoneWatchSessionManager: PhoneWatchSessionManager? = nil) {
         self.appleAuthenticationManager = appleAuthenticationManager
         self.authenticationService = authenticationService
         self.tokenManager = tokenManager
+        self.phoneWatchSessionManager = phoneWatchSessionManager
 
         setInitialLoginState()
     }
@@ -55,6 +58,7 @@ public class AuthenticationManager: IAuthenticationManager, ObservableObject {
         tokenManager.deleteAllTokens()
         loggedInUserId = nil
         loginState = .notLoggedIn(nil)
+        phoneWatchSessionManager?.sendLogout()
     }
 
     private func refreshToken(token: Token) async {
@@ -65,6 +69,7 @@ public class AuthenticationManager: IAuthenticationManager, ObservableObject {
             loggedInUserId = token.userId
             tokenManager.storeToken(token)
             loginState = .loggedIn
+            phoneWatchSessionManager?.sendToken(token)
         } catch {
             Logger.traceError(message: "Could not refresh token", error: error)
             loggedInUserId = nil
@@ -108,6 +113,7 @@ extension AuthenticationManager: AppleAuthenticationDelegate {
             tokenManager.storeToken(token)
             loggedInUserId = token.userId
             loginState = .loggedIn
+            phoneWatchSessionManager?.sendToken(token)
         case let .failure(error):
             Logger.traceError(message: "Could not fetch token for user", error: error)
             loggedInUserId = nil

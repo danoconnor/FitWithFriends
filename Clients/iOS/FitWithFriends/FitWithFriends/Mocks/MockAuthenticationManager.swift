@@ -5,7 +5,9 @@
 //  Created by Dan O'Connor on 1/22/22.
 //
 
+#if !os(watchOS)
 import AuthenticationServices
+#endif
 import Combine
 import Foundation
 
@@ -16,6 +18,7 @@ public class MockAuthenticationManager: IAuthenticationManager {
 
     public init() {}
 
+    #if !os(watchOS)
     public var param_beginLogin_delegate: ASAuthorizationControllerPresentationContextProviding?
     public var param_beginLogin_userProvidedName: PersonNameComponents?
 
@@ -30,6 +33,7 @@ public class MockAuthenticationManager: IAuthenticationManager {
 
         loginState = .inProgress
     }
+    #endif
 
     public var return_cancelUserInput_called: Bool = false
 
