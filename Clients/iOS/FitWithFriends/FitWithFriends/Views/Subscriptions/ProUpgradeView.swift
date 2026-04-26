@@ -10,11 +10,6 @@ struct ProUpgradeView: View {
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
     private let subscriptionManager: ISubscriptionManager
 
-    @State private var isPurchasing = false
-    @State private var isRestoring = false
-    @State private var errorMessage: String?
-    @State private var product: Product?
-
     init(homepageSheetViewModel: HomepageSheetViewModel,
          subscriptionManager: ISubscriptionManager) {
         self.homepageSheetViewModel = homepageSheetViewModel
@@ -22,41 +17,43 @@ struct ProUpgradeView: View {
     }
 
     var body: some View {
-        NavigationView {
-                SubscriptionStoreView(productIDs: ["com.danoconnor.FitWithFriends.pro.monthly"])
-            {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 12) {
-                        Image(systemName: "star.circle.fill")
-                            .font(.system(size: 64))
-                            .foregroundStyle(Color("FwFBrandingColor"))
+        SubscriptionStoreView(productIDs: ["com.danoconnor.FitWithFriends.pro.monthly"]) {
+            VStack(spacing: 24) {
+                // Header
+                VStack(spacing: 12) {
+                    Image(systemName: "star.circle.fill")
+                        .font(.system(size: 64))
+                        .foregroundStyle(Color("FwFBrandingColor"))
 
-                        Text("Upgrade to Pro")
-                            .font(.title)
-                            .fontWeight(.bold)
+                    Text("Upgrade to Pro")
+                        .font(.title)
+                        .fontWeight(.bold)
 
-                        Text("Get the most out of Fit with Friends")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.top, 20)
-
-                    // Benefits
-                    VStack(alignment: .leading, spacing: 16) {
-                        BenefitRow(icon: "globe",
-                                   title: "Public Competitions",
-                                   description: "Join weekly public competitions and compete with the community")
-
-                        BenefitRow(icon: "person.3.fill",
-                                   title: "More Competitions",
-                                   description: "Join up to 10 private competitions at the same time")
-                    }
-                    .fwfCard()
-                    .padding(.horizontal, 16)
+                    Text("Get the most out of Fit with Friends")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
+                .padding(.top, 20)
+
+                // Benefits
+                VStack(alignment: .leading, spacing: 16) {
+                    BenefitRow(icon: "globe",
+                               title: "Public Competitions",
+                               description: "Join weekly public competitions and compete with the community")
+
+                    BenefitRow(icon: "person.3.fill",
+                               title: "More Competitions",
+                               description: "Join up to 10 private competitions at the same time")
+                }
+                .fwfCard()
+                .padding(.horizontal, 16)
             }
-            .navigationBarTitleDisplayMode(.inline)
+        }
+        .onInAppPurchaseCompletion { _, result in
+            guard case .success(let purchaseResult) = result,
+                  case .success = purchaseResult else { return }
+            await subscriptionManager.checkSubscriptionStatus()
+            homepageSheetViewModel.dismissCurrentSheet()
         }
     }
 }
