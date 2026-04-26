@@ -432,9 +432,9 @@ async function seedBotActivityData(now: Date): Promise<string> {
         return {
             userId: UserHelpers.convertUserIdToBuffer(bot.userId),
             date: easternDateStr,
-            caloriesBurned: currentCalories + Math.floor(Math.random() * 25) + 5,  // +5–30 per run
-            caloriesGoal: 400,
-            exerciseTime: currentExercise + Math.floor(Math.random() * 3),           // +0–2 min per run
+            caloriesBurned: currentCalories + Math.floor(Math.random() * 61) + 5,  // +5–65 per run
+            caloriesGoal: 500,
+            exerciseTime: currentExercise + Math.floor(Math.random() * 8),           // +0–7 min per run
             exerciseTimeGoal: 30,
             standTime: Math.min(currentStand + (Math.random() < 0.6 ? 1 : 0), easternHour), // capped at Eastern hour
             standTimeGoal: 12,
