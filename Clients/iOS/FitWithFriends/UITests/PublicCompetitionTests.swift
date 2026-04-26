@@ -71,7 +71,8 @@ final class PublicCompetitionTests: FWFUITestBase {
 
         app.buttons["Close"].tap()
 
-        // Verify we returned to the home screen after dismissing the sheet
+        // The Close button must disappear — if it's still present the sheet never dismissed
+        XCTAssertTrue(app.buttons["Close"].waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 5))
     }
 
