@@ -130,6 +130,7 @@ struct LoggedInContentView: View {
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
                         }
+                        .frame(maxWidth: .infinity)
                         .fwfCard()
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
