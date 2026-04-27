@@ -19,7 +19,7 @@
 		0B0879872BB3A9B90073AB09 /* HealthKitManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0879862BB3A9B90073AB09 /* HealthKitManagerTests.swift */; };
 		0B087A002BB3B4D10073AB09 /* MockActivityUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0879FF2BB3B4D10073AB09 /* MockActivityUpdateDelegate.swift */; };
 		0B0B413428143D4A0053541A /* FirstLaunchWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */; };
-		0B0B4138281446890053541A /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4137281446890053541A /* AboutView.swift */; };
+		0B0B4138281446890053541A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B4137281446890053541A /* SettingsView.swift */; };
 		0B0B413D281453E30053541A /* AboutCompetitionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413C281453E30053541A /* AboutCompetitionsView.swift */; };
 		0B0B414028145CE80053541A /* AboutHealthDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B0B413F28145CE80053541A /* AboutHealthDataView.swift */; };
 		0B109F2C2E51733B00F5C534 /* ServiceBaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B109F2B2E51733B00F5C534 /* ServiceBaseTests.swift */; };
@@ -251,7 +251,7 @@
 		0B0879862BB3A9B90073AB09 /* HealthKitManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitManagerTests.swift; sourceTree = "<group>"; };
 		0B0879FF2BB3B4D10073AB09 /* MockActivityUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockActivityUpdateDelegate.swift; sourceTree = "<group>"; };
 		0B0B413328143D4A0053541A /* FirstLaunchWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchWelcomeView.swift; sourceTree = "<group>"; };
-		0B0B4137281446890053541A /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		0B0B4137281446890053541A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		0B0B413C281453E30053541A /* AboutCompetitionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutCompetitionsView.swift; sourceTree = "<group>"; };
 		0B0B413F28145CE80053541A /* AboutHealthDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutHealthDataView.swift; sourceTree = "<group>"; };
 		0B109F2B2E51733B00F5C534 /* ServiceBaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceBaseTests.swift; sourceTree = "<group>"; };
@@ -508,7 +508,7 @@
 		0B0B413E28145CD60053541A /* About */ = {
 			isa = PBXGroup;
 			children = (
-				0B0B4137281446890053541A /* AboutView.swift */,
+				0B0B4137281446890053541A /* SettingsView.swift */,
 				0B0B413C281453E30053541A /* AboutCompetitionsView.swift */,
 				0B0B413F28145CE80053541A /* AboutHealthDataView.swift */,
 			);
@@ -1343,7 +1343,7 @@
 				0B329F112E4C2CB20082D211 /* ICompetitionManager.swift in Sources */,
 				0B47A222279C90EC00C2970E /* User.swift in Sources */,
 				0B35977B25715567006D956A /* LoggedInContentView.swift in Sources */,
-				0B0B4138281446890053541A /* AboutView.swift in Sources */,
+				0B0B4138281446890053541A /* SettingsView.swift in Sources */,
 				0B1CBED027C3F7C50008C72A /* JoinCompetitionViewModel.swift in Sources */,
 				0BCF647A2BC17D0B004E98C7 /* StatisticDTO.swift in Sources */,
 				0BBD78852593F51100E08EB2 /* Encodable+Extension.swift in Sources */,

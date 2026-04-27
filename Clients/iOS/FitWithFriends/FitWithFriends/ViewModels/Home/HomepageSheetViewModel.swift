@@ -25,7 +25,7 @@ public class HomepageSheetViewModel: ObservableObject {
         case competitionDetails
         case userDetails
         case proUpgrade
-        case about
+        case settings
 
         case none
     }
@@ -45,7 +45,7 @@ public class HomepageSheetViewModel: ObservableObject {
         .competitionDetails: (shouldShow: false, contextData: nil),
         .userDetails: (shouldShow: false, contextData: nil),
         .proUpgrade: (shouldShow: false, contextData: nil),
-        .about: (shouldShow: false, contextData: nil),
+        .settings: (shouldShow: false, contextData: nil),
     ]
 
     init(appProtocolHandler: IAppProtocolHandler, healthKitManager: IHealthKitManager) {

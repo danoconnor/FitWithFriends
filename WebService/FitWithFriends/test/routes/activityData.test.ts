@@ -576,6 +576,46 @@ test('Add workout missing unit', async () => {
     expect(response.data.context).toContain('distance and unit must both be provided or both be omitted');
 });
 
+test('Add workout with unit=none (unit=0) and no distance - should succeed', async () => {
+    // Regression test: iOS client sends unit=0 (HKUnit.none) for workout types that don't
+    // track distance (e.g. strength training). The backend must treat unit=0 as equivalent
+    // to no unit being provided and accept the workout.
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const expectedData = {
+        startDate: '2021-01-01',
+        duration: 60 * 30,
+        appleActivityTypeRawValue: 42,
+        caloriesBurned: 200,
+        unit: 0
+        // distance intentionally omitted
+    };
+
+    const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [expectedData] }, token);
+    console.log(response.data);
+    expect(response.status).toBe(200);
+
+    const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
+    expect(workouts.length).toBe(1);
+    compareWorkoutResultToExpected(workouts[0], expectedData);
+});
+
+test('Add workout with unit=none (unit=0) and distance provided - should fail', async () => {
+    // unit=none paired with an actual distance value is still an invalid combination.
+    const token = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [{
+        startDate: '2021-01-01',
+        duration: 60 * 60,
+        appleActivityTypeRawValue: 1,
+        caloriesBurned: 123,
+        distance: 5,
+        unit: 0  // none + distance is invalid
+    }] },
+    token);
+
+    expect(response.status).toBe(400);
+    expect(response.data.context).toContain('distance and unit must both be provided or both be omitted');
+});
+
 // Helpers
 
 function compareActivityDataResultToExpected(result: TestSQL.IGetActivitySummariesForUserResult, expected: any) {

@@ -147,7 +147,7 @@ router.post('/workouts', function (req, res) {
             return;
         }
 
-        if ((distance === null) !== (unit === null)) {
+        if ((distance === null) !== (unit === null || unit === 0)) {
             handleError(null, 400, 'distance and unit must both be provided or both be omitted', res);
             return;
         }

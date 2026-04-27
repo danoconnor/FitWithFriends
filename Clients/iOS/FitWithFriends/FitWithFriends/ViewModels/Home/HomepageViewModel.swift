@@ -81,13 +81,15 @@ public class HomepageViewModel: ObservableObject {
         authenticationManager.logout()
     }
 
-    func deleteAccount() async {
+    func deleteAccount() async -> Bool {
         do {
             try await userService.deleteAccount()
+            authenticationManager.logout()
+            return true
         } catch {
             Logger.traceError(message: "Failed to delete account", error: error)
+            return false
         }
-        authenticationManager.logout()
     }
 
     private func refreshTodayActivitySummary() async {

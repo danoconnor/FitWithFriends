@@ -10,11 +10,6 @@ struct ProUpgradeView: View {
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
     private let subscriptionManager: ISubscriptionManager
 
-    @State private var isPurchasing = false
-    @State private var isRestoring = false
-    @State private var errorMessage: String?
-    @State private var product: Product?
-
     init(homepageSheetViewModel: HomepageSheetViewModel,
          subscriptionManager: ISubscriptionManager) {
         self.homepageSheetViewModel = homepageSheetViewModel
@@ -22,129 +17,44 @@ struct ProUpgradeView: View {
     }
 
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(spacing: 12) {
-                        Image(systemName: "star.circle.fill")
-                            .font(.system(size: 64))
-                            .foregroundStyle(Color("FwFBrandingColor"))
+        SubscriptionStoreView(productIDs: ["com.danoconnor.FitWithFriends.pro.monthly"]) {
+            VStack(spacing: 24) {
+                // Header
+                VStack(spacing: 12) {
+                    Image(systemName: "star.circle.fill")
+                        .font(.system(size: 64))
+                        .foregroundStyle(Color("FwFBrandingColor"))
 
-                        Text("Upgrade to Pro")
-                            .font(.title)
-                            .fontWeight(.bold)
+                    Text("Upgrade to Pro")
+                        .font(.title)
+                        .fontWeight(.bold)
 
-                        Text("Get the most out of Fit with Friends")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.top, 20)
-
-                    // Benefits
-                    VStack(alignment: .leading, spacing: 16) {
-                        BenefitRow(icon: "globe",
-                                   title: "Public Competitions",
-                                   description: "Join weekly public competitions and compete with the community")
-
-                        BenefitRow(icon: "person.3.fill",
-                                   title: "More Competitions",
-                                   description: "Join up to 10 private competitions at the same time")
-                    }
-                    .fwfCard()
-                    .padding(.horizontal, 16)
-
-                    // Pricing
-                    VStack(spacing: 4) {
-                        if let product = product {
-                            Text("\(product.displayPrice) / month")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                        } else {
-                            ProgressView()
-                                .frame(height: 32)
-                        }
-                        Text("Auto-renews monthly. Cancel anytime.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, 16)
-
-                    if let errorMessage = errorMessage {
-                        FWFErrorBanner(message: errorMessage)
-                    }
-
-                    // Purchase button
-                    FWFPrimaryButton("Subscribe", icon: "star.fill") {
-                        Task {
-                            await purchase()
-                        }
-                    }
-                    .disabled(isPurchasing || isRestoring)
-                    .padding(.horizontal, 16)
-
-                    // Restore purchases
-                    Button("Restore Purchases") {
-                        Task {
-                            await restore()
-                        }
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .disabled(isPurchasing || isRestoring)
-
-                    if isPurchasing || isRestoring {
-                        ProgressView()
-                    }
+                    Text("Get the most out of Fit with Friends")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                .padding(.bottom, 24)
-            }
-            .navigationTitle("Pro")
-            .navigationBarTitleDisplayMode(.inline)
-            .task {
-                let products = try? await Product.products(for: ["com.danoconnor.FitWithFriends.pro.monthly"])
-                product = products?.first
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        homepageSheetViewModel.dismissCurrentSheet()
-                    }
+                .padding(.top, 20)
+
+                // Benefits
+                VStack(alignment: .leading, spacing: 16) {
+                    BenefitRow(icon: "globe",
+                               title: "Public Competitions",
+                               description: "Join weekly public competitions and compete with the community")
+
+                    BenefitRow(icon: "person.3.fill",
+                               title: "More Competitions",
+                               description: "Join up to 10 private competitions at the same time")
                 }
+                .fwfCard()
+                .padding(.horizontal, 16)
             }
         }
-    }
-
-    private func purchase() async {
-        isPurchasing = true
-        errorMessage = nil
-
-        do {
-            try await subscriptionManager.purchaseProSubscription()
+        .onInAppPurchaseCompletion { _, result in
+            guard case .success(let purchaseResult) = result,
+                  case .success = purchaseResult else { return }
+            await subscriptionManager.checkSubscriptionStatus()
             homepageSheetViewModel.dismissCurrentSheet()
-        } catch {
-            errorMessage = "Purchase failed. Please try again."
         }
-
-        isPurchasing = false
-    }
-
-    private func restore() async {
-        isRestoring = true
-        errorMessage = nil
-
-        do {
-            try await subscriptionManager.restorePurchases()
-            if subscriptionManager.isUserPro {
-                homepageSheetViewModel.dismissCurrentSheet()
-            } else {
-                errorMessage = "No active subscription found."
-            }
-        } catch {
-            errorMessage = "Restore failed. Please try again."
-        }
-
-        isRestoring = false
     }
 }
 

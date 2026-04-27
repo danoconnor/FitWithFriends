@@ -11,25 +11,23 @@ import SwiftUI
 struct LoggedInContentView: View {
     private let objectGraph: IObjectGraph
 
-    @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
-    @ObservedObject private var homepageViewModel: HomepageViewModel
-    @ObservedObject private var competitionEndAlertViewModel: CompetitionEndAlertViewModel
-
-    @State private var showDeleteAccountAlert = false
+    @StateObject private var homepageSheetViewModel: HomepageSheetViewModel
+    @StateObject private var homepageViewModel: HomepageViewModel
+    @StateObject private var competitionEndAlertViewModel: CompetitionEndAlertViewModel
 
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
-        homepageSheetViewModel = HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
-                                                        healthKitManager: objectGraph.healthKitManager)
-        homepageViewModel = HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
-                                              competitionManager: objectGraph.competitionManager,
-                                              healthKitManager: objectGraph.healthKitManager,
-                                              subscriptionManager: objectGraph.subscriptionManager,
-                                              userService: objectGraph.userService)
-        competitionEndAlertViewModel = CompetitionEndAlertViewModel(
+        _homepageSheetViewModel = StateObject(wrappedValue: HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
+                                                                                   healthKitManager: objectGraph.healthKitManager))
+        _homepageViewModel = StateObject(wrappedValue: HomepageViewModel(authenticationManager: objectGraph.authenticationManager,
+                                                                         competitionManager: objectGraph.competitionManager,
+                                                                         healthKitManager: objectGraph.healthKitManager,
+                                                                         subscriptionManager: objectGraph.subscriptionManager,
+                                                                         userService: objectGraph.userService))
+        _competitionEndAlertViewModel = StateObject(wrappedValue: CompetitionEndAlertViewModel(
             competitionManager: objectGraph.competitionManager,
             authenticationManager: objectGraph.authenticationManager
-        )
+        ))
     }
 
     var body: some View {
@@ -132,6 +130,7 @@ struct LoggedInContentView: View {
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
                         }
+                        .frame(maxWidth: .infinity)
                         .fwfCard()
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
@@ -180,9 +179,10 @@ struct LoggedInContentView: View {
                         } else {
                             Text("Error showing user details")
                         }
-                    case .about:
-                        AboutView(emailUtility: objectGraph.emailUtility,
-                                  serverEnvironmentManager: objectGraph.serverEnvironmentManager)
+                    case .settings:
+                        SettingsView(emailUtility: objectGraph.emailUtility,
+                                     serverEnvironmentManager: objectGraph.serverEnvironmentManager,
+                                     onDeleteAccount: { return await homepageViewModel.deleteAccount() })
                     case .proUpgrade:
                         ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
                                        subscriptionManager: objectGraph.subscriptionManager)
@@ -204,19 +204,11 @@ struct LoggedInContentView: View {
                     }
                     .accessibilityIdentifier("LogoutMenuButton")
 
-                    Button("Delete Account", role: .destructive) {
-                        showDeleteAccountAlert = true
-                    }
-
-                    Button("About") {
-                        self.homepageSheetViewModel.updateState(sheet: .about,
+                    Button("Settings") {
+                        self.homepageSheetViewModel.updateState(sheet: .settings,
                                                                 state: true)
                     }
-                    .accessibilityIdentifier("AboutMenuButton")
-
-                    Button("Send logs") {
-                        self.objectGraph.emailUtility.sendLogEmail()
-                    }
+                    .accessibilityIdentifier("SettingsMenuButton")
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.body)
@@ -247,14 +239,6 @@ struct LoggedInContentView: View {
             Button("OK") { competitionEndAlertViewModel.alertDismissed() }
         } message: {
             Text(competitionEndAlertViewModel.alertMessage)
-        }
-        .alert("Delete Account", isPresented: $showDeleteAccountAlert) {
-            Button("Delete", role: .destructive) {
-                Task { await homepageViewModel.deleteAccount() }
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("This will permanently delete your account and all your data. This cannot be undone.")
         }
     }
 }

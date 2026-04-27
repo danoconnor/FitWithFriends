@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CreateCompetitionView: View {
-    @ObservedObject private var viewModel: CreateCompetitionViewModel
+    @StateObject private var viewModel: CreateCompetitionViewModel
 
     @State var startDate = Date().addingTimeInterval(TimeInterval.xtDays(1))
     @State var endDate = Date().addingTimeInterval(TimeInterval.xtDays(8))
@@ -39,10 +39,10 @@ struct CreateCompetitionView: View {
     private let maxCompetitionLengthInDays: Double = 30
 
     init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
-        viewModel = CreateCompetitionViewModel(authenticationManager: objectGraph.authenticationManager,
-                                               competitionManager: objectGraph.competitionManager,
-                                               subscriptionManager: objectGraph.subscriptionManager,
-                                               homepageSheetViewModel: homepageSheetViewModel)
+        _viewModel = StateObject(wrappedValue: CreateCompetitionViewModel(authenticationManager: objectGraph.authenticationManager,
+                                                                          competitionManager: objectGraph.competitionManager,
+                                                                          subscriptionManager: objectGraph.subscriptionManager,
+                                                                          homepageSheetViewModel: homepageSheetViewModel))
     }
 
     var body: some View {

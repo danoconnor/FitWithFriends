@@ -14,7 +14,7 @@ struct CompetitionOverviewView: View {
 
     private let competitionOverview: CompetitionOverview
     private let homepageSheetViewModel: HomepageSheetViewModel
-    @ObservedObject private var viewModel: CompetitionOverviewViewModel
+    @StateObject private var viewModel: CompetitionOverviewViewModel
 
     @State private var actionInProgress = false
 
@@ -23,10 +23,11 @@ struct CompetitionOverviewView: View {
         self.competitionOverview = competitionOverview
         self.homepageSheetViewModel = homepageSheetViewModel
         self.showAllDetails = showAllDetails
-        viewModel = CompetitionOverviewViewModel(authenticationManager: objectGraph.authenticationManager,
-                                                 competitionManager: objectGraph.competitionManager,
-                                                 competitionOverview: competitionOverview, serverEnrivonmentManager: objectGraph.serverEnvironmentManager,
-                                                 showAllDetails: showAllDetails)
+        _viewModel = StateObject(wrappedValue: CompetitionOverviewViewModel(authenticationManager: objectGraph.authenticationManager,
+                                                                            competitionManager: objectGraph.competitionManager,
+                                                                            competitionOverview: competitionOverview,
+                                                                            serverEnrivonmentManager: objectGraph.serverEnvironmentManager,
+                                                                            showAllDetails: showAllDetails))
     }
 
     var body: some View {
