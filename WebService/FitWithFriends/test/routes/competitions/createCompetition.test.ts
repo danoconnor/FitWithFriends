@@ -376,7 +376,7 @@ test('Create competition: invalid scoringRules shape rejected with 400', async (
     expect(response.data.context).toContain('Invalid scoringRules');
 });
 
-test('Create competition: dailyCap exceeds 100 × included rings is rejected', async () => {
+test('Create competition: dailyCap exceeds 200 × included rings is rejected', async () => {
     const proUserId = Math.random().toString().slice(2, 8);
     usersToCleanup.push(proUserId);
     await TestSQL.createUser({
@@ -394,6 +394,49 @@ test('Create competition: dailyCap exceeds 100 × included rings is rejected', a
         displayName: 'Crazy cap',
         ianaTimezone: 'America/New_York',
         scoringRules: { kind: 'rings', includedRings: ['calories'], dailyCap: 500 },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(proUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(400);
+    expect(response.data.context).toContain('dailyCap');
+});
+
+test('Create competition: explicit full-set includedRings is NOT treated as custom (free user allowed)', async () => {
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Explicit Full Rings',
+        ianaTimezone: 'America/New_York',
+        // Same shape as default — Pro gate must not fire.
+        scoringRules: { kind: 'rings', includedRings: ['calories', 'exercise', 'stand'] },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(200);
+    competitionsToCleanup.push(response.data.competition_id);
+});
+
+test('Create competition: non-integer dailyCap is rejected', async () => {
+    const proUserId = Math.random().toString().slice(2, 8);
+    usersToCleanup.push(proUserId);
+    await TestSQL.createUser({
+        userId: convertUserIdToBuffer(proUserId),
+        firstName: 'Pro',
+        maxActiveCompetitions: 10,
+        isPro: true,
+        createdDate: new Date(),
+    });
+
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Fractional Cap',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'rings', dailyCap: 599.5 },
     };
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(proUserId);

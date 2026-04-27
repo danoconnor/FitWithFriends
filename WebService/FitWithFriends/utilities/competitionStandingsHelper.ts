@@ -129,7 +129,9 @@ export function validateScoringRulesInput(input: unknown): string | null {
                 }
             }
             if (r.dailyCap !== undefined) {
-                if (typeof r.dailyCap !== 'number' || r.dailyCap <= 0) return 'dailyCap must be a positive number';
+                if (typeof r.dailyCap !== 'number' || !Number.isInteger(r.dailyCap) || r.dailyCap <= 0) {
+                    return 'dailyCap must be a positive integer';
+                }
                 const ringsCount = Array.isArray(r.includedRings) ? r.includedRings.length : 3;
                 // Natural max is 200 per included ring (legacy cap for 3 rings = 600).
                 if (r.dailyCap > ringsCount * 200) return `dailyCap cannot exceed ${ringsCount * 200}`;
@@ -164,22 +166,32 @@ export function validateScoringRulesInput(input: unknown): string | null {
 /** True for rules other than the legacy rings rule — used to gate custom rules behind Pro. */
 export function isCustomRule(rules: ScoringRules): boolean {
     if (rules.kind !== 'rings') return true;
-    return !!rules.includedRings || !!rules.minGoals || !!rules.dailyCap;
+    if (rules.minGoals || rules.dailyCap) return true;
+    // An explicit full set of rings is semantically the default — only treat as custom when
+    // a strict subset is selected.
+    if (rules.includedRings && !isFullRingSet(rules.includedRings)) return true;
+    return false;
+}
+
+function isFullRingSet(rings: RingKey[]): boolean {
+    if (rings.length !== allRings.length) return false;
+    const seen = new Set(rings);
+    return allRings.every(r => seen.has(r));
+}
+
+function workoutScoringUnit(metric: WorkoutMetric): ScoringUnit {
+    switch (metric) {
+        case 'calories': return 'kcal';
+        case 'duration': return 'minutes';
+        case 'distance': return 'meters';
+    }
 }
 
 export function getScoringUnit(rules: ScoringRules): ScoringUnit {
     switch (rules.kind) {
-        case 'rings':
-            return 'points';
-        case 'workouts':
-            switch (rules.metric) {
-                case 'calories': return 'kcal';
-                case 'duration': return 'minutes';
-                case 'distance': return 'meters';
-            }
-        // eslint-disable-next-line no-fallthrough
-        case 'daily':
-            return rules.metric === 'steps' ? 'steps' : 'meters';
+        case 'rings': return 'points';
+        case 'workouts': return workoutScoringUnit(rules.metric);
+        case 'daily': return rules.metric === 'steps' ? 'steps' : 'meters';
     }
 }
 

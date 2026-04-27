@@ -1,6 +1,7 @@
 'use strict';
 import * as express from 'express';
 import * as CompetitionQueries from '../sql/competitions.queries';
+import { Json } from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import * as OAuthQueries from '../sql/oauth.queries';
 import * as ActivityDataQueries from '../sql/activityData.queries';
@@ -80,6 +81,8 @@ router.post('/createPublicCompetition', function (req, res) {
     const accessToken = cryptoHelpers.getRandomToken();
     const competitionId = uuid();
 
+    const scoringRulesForDb: Json | null = (rawScoringRules !== undefined && rawScoringRules !== null) ? (rawScoringRules as Json) : null;
+
     CompetitionQueries.createPublicCompetition({
         startDate: startDateUTC,
         endDate: endDateUTC,
@@ -88,7 +91,7 @@ router.post('/createPublicCompetition', function (req, res) {
         accessToken,
         ianaTimezone: timezone,
         competitionId,
-        scoringRules: (rawScoringRules !== undefined && rawScoringRules !== null ? rawScoringRules : null) as never
+        scoringRules: scoringRulesForDb
     })
         .then(async (_result) => {
             const botUsers = await UserQueries.getBotUsers();
@@ -399,7 +402,7 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
         accessToken: cryptoHelpers.getRandomToken(),
         ianaTimezone: 'UTC',
         competitionId,
-        scoringRules: null as never
+        scoringRules: null
     });
 
     const botUsers = await UserQueries.getBotUsers();

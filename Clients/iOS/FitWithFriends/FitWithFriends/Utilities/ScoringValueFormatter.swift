@@ -21,7 +21,7 @@ public enum ScoringValueFormatter {
         case .points:
             return compact ? "\(formatInt(value))" : "\(formatInt(value)) pts"
         case .steps:
-            return "\(formatThousands(value))\(compact ? "" : " steps")"
+            return "\(formatInt(value))\(compact ? "" : " steps")"
         case .kcal:
             return "\(formatInt(value))\(compact ? "" : " kcal")"
         case .minutes:
@@ -32,14 +32,6 @@ public enum ScoringValueFormatter {
     }
 
     private static func formatInt(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.maximumFractionDigits = 0
-        formatter.groupingSeparator = ","
-        formatter.usesGroupingSeparator = true
-        return formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))"
-    }
-
-    private static func formatThousands(_ value: Double) -> String {
         let formatter = NumberFormatter()
         formatter.maximumFractionDigits = 0
         formatter.groupingSeparator = ","

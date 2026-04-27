@@ -886,4 +886,38 @@ describe('createPublicCompetition - bot enrollment', () => {
         expect(competitionUserIds).toContain(botId1);
         expect(competitionUserIds).toContain(botId2);
     });
+
+    test('persists scoringRules when provided', async () => {
+        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createPublicCompetition', {
+            startDate: tomorrow.toISOString(),
+            endDate: nextWeek.toISOString(),
+            displayName: 'Public Distance Comp',
+            ianaTimezone: 'UTC',
+            adminUserId: testUserId1,
+            scoringRules: { kind: 'workouts', metric: 'distance' },
+        });
+        expect(response.status).toBe(200);
+        const competitionId = response.data.competition_id;
+        competitionsToCleanup.push(competitionId);
+
+        const rows = await TestSQL.getCompetition({ competitionId });
+        expect(rows[0].scoring_rules).toEqual({ kind: 'workouts', metric: 'distance' });
+    });
+
+    test('rejects invalid scoringRules with 400', async () => {
+        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const response = await RequestUtilities.makeAdminPostRequest('admin/createPublicCompetition', {
+            startDate: tomorrow.toISOString(),
+            endDate: nextWeek.toISOString(),
+            displayName: 'Bad Rules',
+            ianaTimezone: 'UTC',
+            adminUserId: testUserId1,
+            scoringRules: { kind: 'daily', metric: 'potato' },
+        });
+        expect(response.status).toBe(400);
+        expect(response.data.context).toContain('Invalid scoringRules');
+    });
 });

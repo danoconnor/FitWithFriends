@@ -123,10 +123,12 @@ struct CreateCompetitionView: View {
             }
             .pickerStyle(.segmented)
 
-            if !viewModel.isUserPro && ruleKind != .rings {
+            if requiresProUserMissing {
                 HStack(spacing: 6) {
                     Image(systemName: "lock.fill")
-                    Text("Pro required for non-ring scoring")
+                    Text(ruleKind == .rings
+                         ? "Pro required for custom ring scoring"
+                         : "Pro required for non-ring scoring")
                 }
                 .font(.footnote.weight(.medium))
                 .foregroundStyle(.secondary)
@@ -166,6 +168,12 @@ struct CreateCompetitionView: View {
                 }
                 if includeStand {
                     labelledNumberField(label: "Min stand goal", text: $minStandText, placeholder: "8", suffix: "hr")
+                }
+
+                if hasIncompleteMinGoals {
+                    Text("Enter a minimum for each included ring")
+                        .font(.caption)
+                        .foregroundStyle(.red)
                 }
             }
 
@@ -235,8 +243,32 @@ struct CreateCompetitionView: View {
         [includeCalories, includeExercise, includeStand].filter { $0 }.count
     }
 
+    /// True when `enforceMinGoals` is on but a value is missing for a ring the user included —
+    /// silently treating empty fields as "no minimum" surprised early testers, so block submit
+    /// and surface the gap inline.
+    private var hasIncompleteMinGoals: Bool {
+        guard ruleKind == .rings && enforceMinGoals else { return false }
+        if includeCalories && Int(minCaloriesText) == nil { return true }
+        if includeExercise && Int(minExerciseText) == nil { return true }
+        if includeStand && Int(minStandText) == nil { return true }
+        return false
+    }
+
+    /// Custom rules require Pro — block submit for free users on anything but the default.
+    private var requiresProUserMissing: Bool {
+        guard !viewModel.isUserPro else { return false }
+        if ruleKind != .rings { return true }
+        // Even a rings rule counts as custom when something is changed away from default.
+        let hasCustomRingsConfig = includedRingCount < ScoringRing.allCases.count
+            || enforceMinGoals
+            || (Int(dailyCapText) ?? 0) > 0
+        return hasCustomRingsConfig
+    }
+
     private var canSubmit: Bool {
         if ruleKind == .rings && includedRingCount == 0 { return false }
+        if hasIncompleteMinGoals { return false }
+        if requiresProUserMissing { return false }
         return true
     }
 

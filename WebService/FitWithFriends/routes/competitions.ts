@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../utilities/enums/FWFErrorCodes';
 import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
+import { Json } from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
 import {
@@ -184,20 +185,26 @@ router.post('/', async function (req, res) {
     const userId: string = res.locals.oauth.token.user.id;
     const userIdBuffer = convertUserIdToBuffer(userId);
 
-    try {
-        // Gate custom rules behind Pro: free users can only create default-rings competitions
-        if (rawScoringRules) {
-            const parsedRule = parseScoringRules(rawScoringRules);
-            if (isCustomRule(parsedRule)) {
+    // Gate custom rules behind Pro: free users can only create default-rings competitions.
+    // Kept in its own try so DB failures here don't get reported as a competition-limit error.
+    if (rawScoringRules) {
+        const parsedRule = parseScoringRules(rawScoringRules);
+        if (isCustomRule(parsedRule)) {
+            try {
                 const proStatus = await UserQueries.getUserProStatus({ userId: userIdBuffer });
                 if (!proStatus.length || !proStatus[0].is_pro) {
                     handleError(null, 403, 'Pro subscription required to create a competition with custom scoring rules',
                         res, true, FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
                     return;
                 }
+            } catch (error) {
+                handleError(error, 500, 'Error checking subscription status', res);
+                return;
             }
         }
+    }
 
+    try {
         await validateCompetitionCountLimit(userId);
     } catch (error) {
         handleError(error, 400, 'User is not eligible to join a new competition', res, true, FWFErrorCodes.CompetitionErrorCodes.TooManyActiveCompetitions);
@@ -209,7 +216,8 @@ router.post('/', async function (req, res) {
     const competitionId = uuid();
 
     // Store the validated JSON as-is; `parseScoringRules` will normalise when reading.
-    const scoringRulesForDb = (rawScoringRules !== undefined && rawScoringRules !== null) ? rawScoringRules : null;
+    // Cast through Json — validateScoringRulesInput already enforced the shape upstream.
+    const scoringRulesForDb: Json | null = (rawScoringRules !== undefined && rawScoringRules !== null) ? (rawScoringRules as Json) : null;
 
     try {
         await CompetitionQueries.createCompetition({
@@ -220,7 +228,7 @@ router.post('/', async function (req, res) {
             accessToken,
             ianaTimezone: timezone,
             competitionId,
-            scoringRules: scoringRulesForDb as never, // pgtyped types this as Json | null | undefined
+            scoringRules: scoringRulesForDb,
         });
         await CompetitionQueries.addUserToCompetition({ userId: userIdBuffer, competitionId });
         res.json({

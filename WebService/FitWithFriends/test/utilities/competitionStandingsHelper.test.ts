@@ -97,6 +97,10 @@ describe('validateScoringRulesInput', () => {
         expect(result).toMatch(/dailyCap/);
     });
 
+    it('rejects non-integer dailyCap', () => {
+        expect(validateScoringRulesInput({ kind: 'rings', dailyCap: 599.5 })).toMatch(/dailyCap/);
+    });
+
     it('accepts dailyCap equal to 200 × ring count (matches legacy)', () => {
         expect(validateScoringRulesInput({ kind: 'rings', includedRings: ['calories', 'exercise'], dailyCap: 400 })).toBeNull();
     });
@@ -159,6 +163,14 @@ describe('getScoringUnit', () => {
 describe('isCustomRule', () => {
     it('is false for default rings', () => {
         expect(isCustomRule({ kind: 'rings' })).toBe(false);
+    });
+
+    it('is false when includedRings explicitly lists the full set (semantically default)', () => {
+        expect(isCustomRule({ kind: 'rings', includedRings: ['calories', 'exercise', 'stand'] })).toBe(false);
+    });
+
+    it('is false regardless of full-set ordering', () => {
+        expect(isCustomRule({ kind: 'rings', includedRings: ['stand', 'calories', 'exercise'] })).toBe(false);
     });
 
     it('is true for rings with minGoals', () => {
