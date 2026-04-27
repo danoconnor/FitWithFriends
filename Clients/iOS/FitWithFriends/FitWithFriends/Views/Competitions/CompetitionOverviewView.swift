@@ -125,6 +125,22 @@ struct CompetitionOverviewView: View {
 
             Divider()
 
+            // Scoring rule summary — only show in the detail sheet to keep the homepage card compact.
+            if showAllDetails {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Scoring")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Text(competitionOverview.scoringRules.humanReadableDescription)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.vertical, 4)
+
+                Divider()
+            }
+
             // Leaderboard
             VStack(spacing: 2) {
                 ForEach(0 ..< viewModel.results.count, id: \.self) { position in
@@ -140,7 +156,8 @@ struct CompetitionOverviewView: View {
                                 objectGraph: objectGraph)
                         } label: {
                             UserCompetitionResultView(result: result,
-                                                      isCompetitionActive: viewModel.isCompetitionActive)
+                                                      isCompetitionActive: viewModel.isCompetitionActive,
+                                                      scoringUnit: competitionOverview.scoringUnit)
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
@@ -166,7 +183,8 @@ struct CompetitionOverviewView: View {
                                     userName: result.userCompetitionPoints.displayName))
                         } label: {
                             UserCompetitionResultView(result: result,
-                                                      isCompetitionActive: viewModel.isCompetitionActive)
+                                                      isCompetitionActive: viewModel.isCompetitionActive,
+                                                      scoringUnit: competitionOverview.scoringUnit)
                         }
                         .buttonStyle(.plain)
                         .contextMenu {

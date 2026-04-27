@@ -35,14 +35,16 @@ public class MockCompetitionManager: ICompetitionManager {
     public var param_createCompetition_startDate: Date?
     public var param_createCompetition_endDate: Date?
     public var param_createCompetition_competitionName: String?
+    public var param_createCompetition_scoringRules: ScoringRules?
     public var return_createCompetition_error: Error?
 
     public var createCompetitionCallCount = 0
-    public func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws {
+    public func createCompetition(startDate: Date, endDate: Date, competitionName: String, scoringRules: ScoringRules) async throws {
         createCompetitionCallCount += 1
         param_createCompetition_startDate = startDate
         param_createCompetition_endDate = endDate
         param_createCompetition_competitionName = competitionName
+        param_createCompetition_scoringRules = scoringRules
 
         await MockUtilities.delayOneSecond()
 

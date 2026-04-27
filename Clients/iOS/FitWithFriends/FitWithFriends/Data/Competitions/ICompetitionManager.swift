@@ -15,8 +15,10 @@ protocol ICompetitionManager: AnyObject {
     ///   - startDate: The start date of the competition.
     ///   - endDate: The end date of the competition.
     ///   - competitionName: The name of the competition.
+    ///   - scoringRules: The rule for computing scores. Pass `.default` for activity rings scoring.
+    ///                   Non-default rules require the user to have a Pro subscription (server enforces).
     /// - Throws: An error if the competition could not be created.
-    func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws
+    func createCompetition(startDate: Date, endDate: Date, competitionName: String, scoringRules: ScoringRules) async throws
 
     /// Refreshes the competition overviews by fetching the latest data.
     func refreshCompetitionOverviews() async

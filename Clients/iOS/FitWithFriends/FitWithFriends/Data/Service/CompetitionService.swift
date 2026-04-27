@@ -21,21 +21,24 @@ public class CompetitionService: ServiceBase, ICompetitionService {
                                                            method: .get)
     }
 
-    public func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws {
+    public func createCompetition(startDate: Date, endDate: Date, competitionName: String, scoringRules: ScoringRules) async throws {
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.timeZone = Calendar.current.timeZone
         dateFormatter.formatOptions = .withFullDate
 
-        let requestBody: [String: String] = [
-            "startDate": dateFormatter.string(from: startDate),
-            "endDate": dateFormatter.string(from: endDate),
-            "displayName": competitionName,
-            "ianaTimezone": TimeZone.current.identifier
-        ]
+        // Only send scoringRules when non-default. Free users creating the default rule shouldn't
+        // trigger the server-side Pro gate.
+        let body = CreateCompetitionRequestBody(
+            startDate: dateFormatter.string(from: startDate),
+            endDate: dateFormatter.string(from: endDate),
+            displayName: competitionName,
+            ianaTimezone: TimeZone.current.identifier,
+            scoringRules: scoringRules.isDefault ? nil : scoringRules
+        )
 
         let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions",
                                                                            method: .post,
-                                                                           body: requestBody)
+                                                                           body: body)
     }
 
     public func joinCompetition(competitionId: UUID, competitionToken: String) async throws {
@@ -109,4 +112,12 @@ public class CompetitionService: ServiceBase, ICompetitionService {
         return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/\(competitionId.uuidString)/userDetails/\(userId)?timezone=\(ianaTimezone)",
                                                            method: .get)
     }
+}
+
+private struct CreateCompetitionRequestBody: Encodable {
+    let startDate: String
+    let endDate: String
+    let displayName: String
+    let ianaTimezone: String
+    let scoringRules: ScoringRules?
 }

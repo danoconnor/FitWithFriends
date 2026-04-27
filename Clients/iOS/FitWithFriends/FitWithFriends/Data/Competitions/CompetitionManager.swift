@@ -42,11 +42,12 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
         }
     }
 
-    func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws {
+    func createCompetition(startDate: Date, endDate: Date, competitionName: String, scoringRules: ScoringRules) async throws {
         do {
             try await competitionService.createCompetition(startDate: startDate,
                                                            endDate: endDate,
-                                                           competitionName: competitionName)
+                                                           competitionName: competitionName,
+                                                           scoringRules: scoringRules)
 
             Logger.traceInfo(message: "Successfully created competition")
 

@@ -35,13 +35,14 @@ final class CompetitionManagerTests: XCTestCase {
         let competitionName = "Test Competition"
 
         // Act
-        try await competitionManager.createCompetition(startDate: startDate, endDate: endDate, competitionName: competitionName)
+        try await competitionManager.createCompetition(startDate: startDate, endDate: endDate, competitionName: competitionName, scoringRules: .default)
 
         // Assert
         XCTAssertEqual(mockCompetitionService.createCompetitionCallCount, 1, "createCompetition should be called once")
         XCTAssertEqual(mockCompetitionService.param_createCompetition_startDate, startDate, "Start date should match")
         XCTAssertEqual(mockCompetitionService.param_createCompetition_endDate, endDate, "End date should match")
         XCTAssertEqual(mockCompetitionService.param_createCompetition_competitionName, competitionName, "Competition name should match")
+        XCTAssertEqual(mockCompetitionService.param_createCompetition_scoringRules, .default, "Default scoring rule should be passed through")
     }
 
     func test_refreshCompetitionOverviews_withLoggedInUser_shouldFetchAndUpdateOverviews() async {

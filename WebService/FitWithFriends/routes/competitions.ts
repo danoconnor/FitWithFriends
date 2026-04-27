@@ -10,7 +10,16 @@ import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../utilities/userHelpers';
-import { getCompetitionStandings, calculateDailyPoints } from '../utilities/competitionStandingsHelper';
+import {
+    getCompetitionStandings,
+    calculateRingsDailyPoints,
+    calculateDailyMetricValue,
+    calculateWorkoutMetricValue,
+    parseScoringRules,
+    validateScoringRulesInput,
+    getScoringUnit,
+    isCustomRule,
+} from '../utilities/competitionStandingsHelper';
 import { CompetitionState } from '../utilities/enums/CompetitionState';
 
 const msPerDay = 1000 * 60 * 60 * 24;
@@ -117,12 +126,14 @@ router.get('/', function (req, res) {
 });
 
 // Create new competition. The currently authenticated user will become the admin for the competition.
-// The request should have startDate, endDate, displayName, and timezone values
-router.post('/', function (req, res) {
+// The request should have startDate, endDate, displayName, and timezone values.
+// Optionally accepts scoringRules (a custom scoring config) - Pro required for any non-default rule.
+router.post('/', async function (req, res) {
     const startDate = new Date(req.body['startDate']);
     const endDate = new Date(req.body['endDate']);
     const displayName: string = req.body['displayName'];
     const timezone: string = req.body['ianaTimezone'];
+    const rawScoringRules: unknown = req.body['scoringRules'];
 
     if (!startDate || !endDate || !displayName || !timezone) {
         handleError(null, 400, 'Missing required parameter', res);
@@ -159,38 +170,66 @@ router.post('/', function (req, res) {
         return;
     }
 
+    // Validate scoring rules if provided
+    if (rawScoringRules !== undefined && rawScoringRules !== null) {
+        const validationError = validateScoringRulesInput(rawScoringRules);
+        if (validationError) {
+            handleError(null, 400, `Invalid scoringRules: ${validationError}`, res, true);
+            return;
+        }
+    }
+
     const startDateUTC = new Date(startDate.toUTCString());
     const endDateUTC = new Date(endDate.toUTCString());
-
-    // Check that the user is allowed to join a new competition
     const userId: string = res.locals.oauth.token.user.id;
-    validateCompetitionCountLimit(userId)
-        .then(function () {
-            // Generate an access code for this competition so users can be added
-            const accessToken = cryptoHelpers.getRandomToken();
+    const userIdBuffer = convertUserIdToBuffer(userId);
 
-            const competitionId = uuid();
-            CompetitionQueries.createCompetition({ startDate: startDateUTC, endDate: endDateUTC, displayName, adminUserId: convertUserIdToBuffer(userId), accessToken, ianaTimezone: timezone, competitionId })
-                .then((_result) => {
-                    // Add the admin user to the competition
-                    CompetitionQueries.addUserToCompetition({ userId: convertUserIdToBuffer(userId), competitionId })
-                        .then(function (_result) {
-                            res.json({
-                                'competition_id': competitionId,
-                                'accessCode': accessToken
-                            });
-                        })
-                        .catch(error => {
-                            handleError(error, 500, 'Error adding user to new competition', res);
-                        });
-                })
-                .catch(error => {
-                    handleError(error, 500, 'Error creating competition', res);
-                });
-        })
-        .catch(error => {
-            handleError(error, 400, 'User is not eligible to join a new competition', res, true, FWFErrorCodes.CompetitionErrorCodes.TooManyActiveCompetitions);
+    try {
+        // Gate custom rules behind Pro: free users can only create default-rings competitions
+        if (rawScoringRules) {
+            const parsedRule = parseScoringRules(rawScoringRules);
+            if (isCustomRule(parsedRule)) {
+                const proStatus = await UserQueries.getUserProStatus({ userId: userIdBuffer });
+                if (!proStatus.length || !proStatus[0].is_pro) {
+                    handleError(null, 403, 'Pro subscription required to create a competition with custom scoring rules',
+                        res, true, FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
+                    return;
+                }
+            }
+        }
+
+        await validateCompetitionCountLimit(userId);
+    } catch (error) {
+        handleError(error, 400, 'User is not eligible to join a new competition', res, true, FWFErrorCodes.CompetitionErrorCodes.TooManyActiveCompetitions);
+        return;
+    }
+
+    // Generate an access code for this competition so users can be added
+    const accessToken = cryptoHelpers.getRandomToken();
+    const competitionId = uuid();
+
+    // Store the validated JSON as-is; `parseScoringRules` will normalise when reading.
+    const scoringRulesForDb = (rawScoringRules !== undefined && rawScoringRules !== null) ? rawScoringRules : null;
+
+    try {
+        await CompetitionQueries.createCompetition({
+            startDate: startDateUTC,
+            endDate: endDateUTC,
+            displayName,
+            adminUserId: userIdBuffer,
+            accessToken,
+            ianaTimezone: timezone,
+            competitionId,
+            scoringRules: scoringRulesForDb as never, // pgtyped types this as Json | null | undefined
         });
+        await CompetitionQueries.addUserToCompetition({ userId: userIdBuffer, competitionId });
+        res.json({
+            'competition_id': competitionId,
+            'accessCode': accessToken,
+        });
+    } catch (error) {
+        handleError(error, 500, 'Error creating competition', res);
+    }
 });
 
 // Join existing competition endpoint - adds the currently authenticated user to the competition that matches the given token
@@ -335,6 +374,7 @@ router.get('/:competitionId/overview', function (req, res) {
 
             getCompetitionStandings(competitionInfo, usersCompetitionsResult, timezoneParam)
                 .then(userPoints => {
+                    const parsedRules = parseScoringRules(competitionInfo.scoring_rules);
                     res.json({
                         'competitionId': competitionInfo.competition_id,
                         'competitionName': competitionInfo.display_name,
@@ -344,6 +384,8 @@ router.get('/:competitionId/overview', function (req, res) {
                         'isCompetitionProcessingResults': competitionInfo.state === CompetitionState.ProcessingResults,
                         'isUserAdmin': isUserAdmin,
                         'isPublic': competitionInfo.is_public,
+                        'scoringRules': competitionInfo.scoring_rules ?? { kind: 'rings' },
+                        'scoringUnit': getScoringUnit(parsedRules),
                         'currentResults': Object.values(userPoints)
                     });
                 })
@@ -397,36 +439,78 @@ router.get('/:competitionId/userDetails/:userId', function (req, res) {
             }
 
             const competitionInfo = competitionsResult[0];
+            const rules = parseScoringRules(competitionInfo.scoring_rules);
+            const scoringUnit = getScoringUnit(rules);
+            const targetUserIdBuffer = convertUserIdToBuffer(targetUserId);
 
-            // Fetch activity summaries for only the target user within the competition date range
-            ActivityDataQueries.getActivitySummariesForUsers({
-                userIds: [convertUserIdToBuffer(targetUserId)],
-                startDate: competitionInfo.start_date,
-                endDate: competitionInfo.end_date
-            })
-                .then(activitySummaries => {
-                    const dailySummaries = activitySummaries.map(row => ({
-                        date: row.date,
-                        caloriesBurned: row.calories_burned,
-                        caloriesGoal: row.calories_goal,
-                        exerciseTime: row.exercise_time,
-                        exerciseTimeGoal: row.exercise_time_goal,
-                        standTime: row.stand_time,
-                        standTimeGoal: row.stand_time_goal,
-                        points: calculateDailyPoints(row)
-                    }));
+            (async () => {
+                try {
+                    if (rules.kind === 'workouts') {
+                        // Workouts-based rule: group this user's workouts by day and sum the metric
+                        const workouts = await ActivityDataQueries.getWorkoutsForUsersInDateRange({
+                            userIds: [targetUserIdBuffer],
+                            startDate: competitionInfo.start_date,
+                            endDate: competitionInfo.end_date,
+                        });
+                        const typeFilter = rules.activityTypes && rules.activityTypes.length > 0
+                            ? new Set(rules.activityTypes)
+                            : null;
+                        const perDay = new Map<string, number>();
+                        for (const w of workouts) {
+                            if (typeFilter && !typeFilter.has(w.workout_type)) continue;
+                            const key = w.start_date.toISOString().slice(0, 10);
+                            perDay.set(key, (perDay.get(key) ?? 0) + calculateWorkoutMetricValue(w, rules));
+                        }
+                        const dailySummaries = Array.from(perDay.entries())
+                            .sort(([a], [b]) => a.localeCompare(b))
+                            .map(([dateStr, value]) => ({ date: new Date(dateStr), value, points: value }));
+                        res.json({
+                            userId: targetUserId,
+                            firstName: targetUser.first_name,
+                            lastName: targetUser.last_name,
+                            competitionId: competitionInfo.competition_id,
+                            scoringUnit,
+                            dailySummaries,
+                        });
+                        return;
+                    }
 
+                    // Rings / daily rules: per-day values come from activity_summaries
+                    const activitySummaries = await ActivityDataQueries.getActivitySummariesForUsers({
+                        userIds: [targetUserIdBuffer],
+                        startDate: competitionInfo.start_date,
+                        endDate: competitionInfo.end_date,
+                    });
+                    const dailySummaries = activitySummaries.map(row => {
+                        const value = rules.kind === 'rings'
+                            ? calculateRingsDailyPoints(row, rules)
+                            : calculateDailyMetricValue(row, rules);
+                        return {
+                            date: row.date,
+                            caloriesBurned: row.calories_burned,
+                            caloriesGoal: row.calories_goal,
+                            exerciseTime: row.exercise_time,
+                            exerciseTimeGoal: row.exercise_time_goal,
+                            standTime: row.stand_time,
+                            standTimeGoal: row.stand_time_goal,
+                            stepCount: row.step_count,
+                            distanceWalkingRunningMeters: row.distance_walking_running_meters,
+                            value,
+                            points: value,
+                        };
+                    });
                     res.json({
                         userId: targetUserId,
                         firstName: targetUser.first_name,
                         lastName: targetUser.last_name,
                         competitionId: competitionInfo.competition_id,
-                        dailySummaries
+                        scoringUnit,
+                        dailySummaries,
                     });
-                })
-                .catch(error => {
+                } catch (error) {
                     handleError(error, 500, 'Error fetching activity data', res);
-                });
+                }
+            })();
         })
         .catch(error => {
             handleError(error, 500, 'Error getting competition info', res);

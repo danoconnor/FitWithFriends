@@ -18,6 +18,18 @@ public class UserCompetitionDailyDetailsViewModel: ObservableObject {
     @Published var isLoading = true
     @Published var errorMessage: String?
     @Published var totalPoints: Double = 0
+    @Published var scoringUnit: ScoringUnit = .points
+
+    /// Label shown under the big total number. Unit-aware so non-ring competitions make sense.
+    var totalLabel: String {
+        switch scoringUnit {
+        case .points: return "total points"
+        case .kcal: return "total calories"
+        case .minutes: return "total minutes"
+        case .meters: return "total distance"
+        case .steps: return "total steps"
+        }
+    }
 
     init(competitionManager: ICompetitionManager,
          competitionId: UUID,
@@ -40,6 +52,7 @@ public class UserCompetitionDailyDetailsViewModel: ObservableObject {
 
             dailySummaries = details.dailySummaries.sorted { $0.date > $1.date }
             totalPoints = details.dailySummaries.reduce(0) { $0 + $1.points }
+            scoringUnit = details.scoringUnit
             isLoading = false
         } catch is CancellationError {
             isLoading = false

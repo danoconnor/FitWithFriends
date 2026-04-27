@@ -35,7 +35,10 @@ CREATE TABLE public.activity_summaries (
     exercise_time_goal smallint NOT NULL,
     stand_time smallint NOT NULL,
     stand_time_goal smallint NOT NULL,
-    user_id bytea NOT NULL
+    user_id bytea NOT NULL,
+    step_count integer DEFAULT 0 NOT NULL,
+    distance_walking_running_meters integer DEFAULT 0 NOT NULL,
+    flights_climbed integer DEFAULT 0 NOT NULL
 );
 
 
@@ -55,7 +58,8 @@ CREATE TABLE public.competitions (
     competition_id uuid NOT NULL,
     admin_user_id bytea NOT NULL,
     state smallint DEFAULT 1 NOT NULL,
-    is_public boolean DEFAULT false NOT NULL
+    is_public boolean DEFAULT false NOT NULL,
+    scoring_rules jsonb
 );
 
 

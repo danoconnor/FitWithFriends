@@ -277,3 +277,127 @@ test('Create competition: display name is too long', async () => {
     expect(response.status).toBe(400);
     expect(response.data.context).toContain('Display name is too long');
 });
+
+/* ───────────────────────── Scoring rules ───────────────────────── */
+
+test('Create competition: stores default rings rule as null when scoringRules omitted', async () => {
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Default Rules Competition',
+        ianaTimezone: 'America/New_York',
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(200);
+    const createdCompetitionId: string = response.data.competition_id;
+    competitionsToCleanup.push(createdCompetitionId);
+
+    const rows = await TestSQL.getCompetition({ competitionId: createdCompetitionId });
+    expect(rows[0].scoring_rules).toBeNull();
+});
+
+test('Create competition: free user blocked from custom rule (workouts)', async () => {
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Miles Competition',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'workouts', metric: 'distance', activityTypes: [37] },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(403);
+    expect(response.data.custom_error_code).toEqual(FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
+});
+
+test('Create competition: free user blocked from rings with minGoals', async () => {
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Rings with min goals',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'rings', minGoals: { calories: 500 } },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(403);
+});
+
+test('Create competition: Pro user can create a workouts-distance competition', async () => {
+    const proUserId = Math.random().toString().slice(2, 8);
+    usersToCleanup.push(proUserId);
+    await TestSQL.createUser({
+        userId: convertUserIdToBuffer(proUserId),
+        firstName: 'Pro',
+        maxActiveCompetitions: 10,
+        isPro: true,
+        createdDate: new Date(),
+    });
+
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Running Miles',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'workouts', metric: 'distance', activityTypes: [37] },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(proUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(200);
+    const createdCompetitionId: string = response.data.competition_id;
+    competitionsToCleanup.push(createdCompetitionId);
+
+    const rows = await TestSQL.getCompetition({ competitionId: createdCompetitionId });
+    expect(rows[0].scoring_rules).toEqual({ kind: 'workouts', metric: 'distance', activityTypes: [37] });
+});
+
+test('Create competition: invalid scoringRules shape rejected with 400', async () => {
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Bad Rules',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'daily', metric: 'potato' },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(400);
+    expect(response.data.context).toContain('Invalid scoringRules');
+});
+
+test('Create competition: dailyCap exceeds 100 × included rings is rejected', async () => {
+    const proUserId = Math.random().toString().slice(2, 8);
+    usersToCleanup.push(proUserId);
+    await TestSQL.createUser({
+        userId: convertUserIdToBuffer(proUserId),
+        firstName: 'Pro',
+        maxActiveCompetitions: 10,
+        isPro: true,
+        createdDate: new Date(),
+    });
+
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Crazy cap',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'rings', includedRings: ['calories'], dailyCap: 500 },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(proUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(400);
+    expect(response.data.context).toContain('dailyCap');
+});

@@ -50,22 +50,29 @@ struct UserCompetitionDailyDetailsView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 16) {
-                        // Header: total points
+                        // Header: total in the rule's unit
                         VStack(spacing: 4) {
-                            Text("\(Int(viewModel.totalPoints))")
+                            Text(ScoringValueFormatter.formatCompact(viewModel.totalPoints, unit: viewModel.scoringUnit))
                                 .font(.system(size: 36, weight: .bold, design: .rounded))
 
-                            Text("total points")
+                            Text(viewModel.totalLabel)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
                         .padding(.top, 8)
 
-                        // Daily cards
+                        // Daily cards — rings rule keeps the detailed ring breakdown, other rules
+                        // fall back to a simple date → value row.
                         ForEach(viewModel.dailySummaries) { summary in
-                            DailySummaryCard(summary: summary)
-                                .fwfCard()
-                                .padding(.horizontal, 16)
+                            if viewModel.scoringUnit == .points {
+                                DailySummaryCard(summary: summary)
+                                    .fwfCard()
+                                    .padding(.horizontal, 16)
+                            } else {
+                                DailyValueRow(summary: summary, unit: viewModel.scoringUnit)
+                                    .fwfCard()
+                                    .padding(.horizontal, 16)
+                            }
                         }
                     }
                     .padding(.bottom, 24)
@@ -141,6 +148,31 @@ struct DailySummaryCard: View {
                     }
                 }
             }
+        }
+    }
+}
+
+// MARK: - Non-rings per-day row
+
+struct DailyValueRow: View {
+    let summary: DailySummary
+    let unit: ScoringUnit
+
+    private var dateString: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter.string(from: summary.date)
+    }
+
+    var body: some View {
+        HStack {
+            Text(dateString)
+                .font(.headline)
+            Spacer()
+            Text(ScoringValueFormatter.format(summary.points, unit: unit))
+                .font(.headline.weight(.semibold).monospacedDigit())
         }
     }
 }

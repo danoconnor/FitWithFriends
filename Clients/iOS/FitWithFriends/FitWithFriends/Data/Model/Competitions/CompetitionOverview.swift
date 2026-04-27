@@ -17,6 +17,8 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
         case isUserAdmin
         case competitionState
         case isPublic
+        case scoringRules
+        case scoringUnit
     }
 
     let competitionId: UUID
@@ -26,6 +28,14 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
     let competitionEnd: Date
     let competitionState: CompetitionState
     let isPublic: Bool
+
+    /// Scoring rule configuration for the competition. Legacy competitions (pre-feature) send
+    /// no value; treat as the default rings rule so UI keeps rendering.
+    let scoringRules: ScoringRules
+
+    /// Unit string the leaderboard should use ("points", "meters", "steps", etc.). Always
+    /// present on responses from a current server; falls back to the rule-derived unit otherwise.
+    let scoringUnit: ScoringUnit
 
     /// If the current user is the admin of the competition
     let isUserAdmin: Bool
@@ -55,7 +65,7 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
     }
 
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
-    init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false, competitionState: CompetitionState = .notStartedOrActive, isPublic: Bool = false) {
+    init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false, competitionState: CompetitionState = .notStartedOrActive, isPublic: Bool = false, scoringRules: ScoringRules = .default, scoringUnit: ScoringUnit? = nil) {
         competitionId = id
         competitionName = name
         competitionStart = start
@@ -64,6 +74,39 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
         self.isUserAdmin = isUserAdmin
         self.competitionState = competitionState
         self.isPublic = isPublic
+        self.scoringRules = scoringRules
+        self.scoringUnit = scoringUnit ?? ScoringUnit.derive(from: scoringRules)
+    }
+
+    public required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        competitionId = try container.decode(UUID.self, forKey: .competitionId)
+        competitionName = try container.decode(String.self, forKey: .competitionName)
+        currentResults = try container.decode([UserCompetitionPoints].self, forKey: .currentResults)
+        competitionStart = try container.decode(Date.self, forKey: .competitionStart)
+        competitionEnd = try container.decode(Date.self, forKey: .competitionEnd)
+        competitionState = try container.decode(CompetitionState.self, forKey: .competitionState)
+        isPublic = try container.decode(Bool.self, forKey: .isPublic)
+        isUserAdmin = try container.decode(Bool.self, forKey: .isUserAdmin)
+
+        let rules = (try? container.decodeIfPresent(ScoringRules.self, forKey: .scoringRules)) ?? .default
+        scoringRules = rules
+        scoringUnit = (try? container.decodeIfPresent(ScoringUnit.self, forKey: .scoringUnit)) ?? ScoringUnit.derive(from: rules)
+        super.init()
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(competitionId, forKey: .competitionId)
+        try container.encode(competitionName, forKey: .competitionName)
+        try container.encode(currentResults, forKey: .currentResults)
+        try container.encode(competitionStart, forKey: .competitionStart)
+        try container.encode(competitionEnd, forKey: .competitionEnd)
+        try container.encode(competitionState, forKey: .competitionState)
+        try container.encode(isPublic, forKey: .isPublic)
+        try container.encode(isUserAdmin, forKey: .isUserAdmin)
+        try container.encode(scoringRules, forKey: .scoringRules)
+        try container.encode(scoringUnit, forKey: .scoringUnit)
     }
 
     // MARK: Comparable
