@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 import { ICreateCompetitionParams } from '../../../sql/competitions.queries';
 import { CompetitionState } from '../../../utilities/enums/CompetitionState';
 import { ICreateCompetitionWithStateParams } from '../../testUtilities/sql/testQueries.queries';
@@ -16,7 +15,7 @@ const testUserName = 'Test User';
 
 const now = new Date();
 const testCompetitionInfo: ICreateCompetitionParams = {
-    competitionId: uuid(),
+    competitionId: crypto.randomUUID(),
     adminUserId: convertUserIdToBuffer(testUserId),
     displayName: 'Test Competition',
     startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
@@ -267,7 +266,7 @@ test('Get user details: target user is not a competition member', async () => {
 test('Get user details: competition does not exist', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(
-        `competitions/${uuid()}/userDetails/${testUserId}?timezone=America/New_York`,
+        `competitions/${crypto.randomUUID()}/userDetails/${testUserId}?timezone=America/New_York`,
         accessToken
     );
 
@@ -289,7 +288,7 @@ test('Get user details: invalid timezone', async () => {
 test('Get user details: archived competition still returns daily activity data', async () => {
     const now = new Date();
     const archivedCompetitionInfo: ICreateCompetitionWithStateParams = {
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Archived Competition',
         startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 14).toUTCString(), // 14 days ago

@@ -4,7 +4,6 @@ import express = require('express');
 const router = express.Router();
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
 import { handleError } from '../utilities/errorHelpers';
-import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../utilities/enums/FWFErrorCodes';
 import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
@@ -169,7 +168,7 @@ router.post('/', function (req, res) {
             // Generate an access code for this competition so users can be added
             const accessToken = cryptoHelpers.getRandomToken();
 
-            const competitionId = uuid();
+            const competitionId = crypto.randomUUID();
             CompetitionQueries.createCompetition({ startDate: startDateUTC, endDate: endDateUTC, displayName, adminUserId: convertUserIdToBuffer(userId), accessToken, ianaTimezone: timezone, competitionId })
                 .then((_result) => {
                     // Add the admin user to the competition

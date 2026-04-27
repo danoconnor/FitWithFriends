@@ -10,7 +10,6 @@ import { handleError } from '../utilities/errorHelpers';
 import * as UserHelpers from '../utilities/userHelpers';
 import { getCompetitionStandings } from '../utilities/competitionStandingsHelper';
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
-import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
 
@@ -69,7 +68,7 @@ router.post('/createPublicCompetition', function (req, res) {
     const startDateUTC = new Date(startDate.toUTCString());
     const endDateUTC = new Date(endDate.toUTCString());
     const accessToken = cryptoHelpers.getRandomToken();
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
 
     CompetitionQueries.createPublicCompetition({
         startDate: startDateUTC,
@@ -116,7 +115,7 @@ router.post('/createBotUsers', async function (req, res) {
     const botUserIds: string[] = [];
     await Promise.all(
         Array.from({ length: canCreate }, async () => {
-            const userId = uuid().replace(/-/g, '');
+            const userId = crypto.randomUUID().replace(/-/g, '');
             const firstName = BOT_FIRST_NAMES[Math.floor(Math.random() * BOT_FIRST_NAMES.length)];
             const lastName = BOT_LAST_NAMES[Math.floor(Math.random() * BOT_LAST_NAMES.length)];
             await UserQueries.createBotUser({
@@ -379,7 +378,7 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
 
     const endDate = new Date(upcomingMonday);
     endDate.setUTCDate(upcomingMonday.getUTCDate() + 7);
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
 
     await CompetitionQueries.createPublicCompetition({
         startDate: upcomingMonday,

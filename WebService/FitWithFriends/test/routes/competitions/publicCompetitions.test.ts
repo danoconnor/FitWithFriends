@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../../../utilities/enums/FWFErrorCodes';
 import { CompetitionState } from '../../../utilities/enums/CompetitionState';
 
@@ -67,7 +66,7 @@ describe('GET /competitions/public', () => {
     });
 
     test('returns public competitions with member count', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const now = new Date();
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -101,7 +100,7 @@ describe('GET /competitions/public', () => {
     });
 
     test('shows isUserMember when user is in the competition', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const now = new Date();
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -156,7 +155,7 @@ describe('POST /competitions/joinPublic', () => {
             maxActiveCompetitions: 10
         });
 
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const now = new Date();
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -180,7 +179,7 @@ describe('POST /competitions/joinPublic', () => {
     });
 
     test('non-pro user cannot join a public competition', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const now = new Date();
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -213,7 +212,7 @@ describe('POST /competitions/joinPublic', () => {
 
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makePostRequest('competitions/joinPublic', {
-            competitionId: uuid()
+            competitionId: crypto.randomUUID()
         }, accessToken);
 
         expect(response.status).toBe(404);
@@ -233,7 +232,7 @@ describe('POST /competitions/joinPublic', () => {
             maxActiveCompetitions: 10
         });
 
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const now = new Date();
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -395,7 +394,7 @@ describe('Public competitions and private competition limits', () => {
         usersToCleanup.push(limitedUserId);
 
         // Add user to a public competition
-        const publicCompId = uuid();
+        const publicCompId = crypto.randomUUID();
         const now = new Date();
         const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -416,7 +415,7 @@ describe('Public competitions and private competition limits', () => {
         });
 
         // Create a private competition for the user to join
-        const privateCompId = uuid();
+        const privateCompId = crypto.randomUUID();
         await TestSQL.createCompetition({
             competitionId: privateCompId,
             displayName: 'Private Competition',
