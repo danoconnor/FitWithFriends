@@ -5,7 +5,6 @@ import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { handleError } from '../utilities/errorHelpers';
 import * as UserHelpers from '../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
 
@@ -89,7 +88,7 @@ router.post('/seedCompetitionUsers', async function (req, res) {
         const createdUserIds: string[] = [];
 
         for (const user of users) {
-            const userId = uuid().replace(/-/g, '');
+            const userId = crypto.randomUUID().replace(/-/g, '');
             const userIdBuffer = UserHelpers.convertUserIdToBuffer(userId);
 
             await UserQueries.createUser({

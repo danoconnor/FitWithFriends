@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../../../utilities/enums/FWFErrorCodes';
 import { CompetitionState } from '../../../utilities/enums/CompetitionState';
 
@@ -14,7 +13,7 @@ import { CompetitionState } from '../../../utilities/enums/CompetitionState';
 const testUserId = Math.random().toString().slice(2, 8);
 
 // The competitionId that will be created in the database during the test setup
-const testCompetitionId = uuid();
+const testCompetitionId = crypto.randomUUID();
 const testCompetitionAccessCode = '1234';
 
 // Data created during the tests that needs to be cleaned up after
@@ -113,7 +112,7 @@ test('Join competition with missing access code', async () => {
 test('Join competition with invalid competitionId', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions/join', {
-        competitionId: uuid(), // A competition that doesn't exist
+        competitionId: crypto.randomUUID(), // A competition that doesn't exist
         accessToken: testCompetitionAccessCode
     }, accessToken);
 
@@ -164,7 +163,7 @@ test('Join competition with user already at competition limit', async () => {
     usersToCleanup.push(testUserId2);
 
     // Create a second test competition that is currently active
-    const testCompetitionId2 = uuid();
+    const testCompetitionId2 = crypto.randomUUID();
     const now = new Date();
     await TestSQL.createCompetition({
         competitionId: testCompetitionId2,
@@ -209,7 +208,7 @@ test('Join competition with user who has joined past competitions', async () => 
     usersToCleanup.push(testUserId2);
 
     // Create a second test competition that has already completed
-    const testCompetitionId2 = uuid();
+    const testCompetitionId2 = crypto.randomUUID();
     const now = new Date();
     await TestSQL.createCompetitionWithState({
         competitionId: testCompetitionId2,

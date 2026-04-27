@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 import { ICreateCompetitionParams } from '../../../sql/competitions.queries';
 import { CompetitionState } from '../../../utilities/enums/CompetitionState';
 import { ICreateCompetitionWithStateParams } from '../../testUtilities/sql/testQueries.queries';
@@ -19,7 +18,7 @@ const testUserName = 'Test User';
 // The competitionId that will be created in the database during the test setup
 const now = new Date();
 const testCompetitionInfo: ICreateCompetitionParams = {
-    competitionId: uuid(),
+    competitionId: crypto.randomUUID(),
     adminUserId: convertUserIdToBuffer(testUserId),
     displayName: 'Test Competition',
     startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
@@ -391,7 +390,7 @@ test('Get competition overview: user is not part of competition', async () => {
 
 test('Get competition overview: competition does not exist', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makeGetRequest(`competitions/${uuid()}/overview?timezone=America/New_York`, accessToken);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${crypto.randomUUID()}/overview?timezone=America/New_York`, accessToken);
 
     expect(response.status).toBe(404);
     expect(response.data.context).toContain('Could not find competition info');
@@ -408,7 +407,7 @@ test('Get competition overview: invalid timezone', async () => {
 
 test('Get competition overview: returns isPublic true for public competition', async () => {
     // Create a public competition and add the test user to it
-    const publicCompetitionId = uuid();
+    const publicCompetitionId = crypto.randomUUID();
     const now = new Date();
     await TestSQL.createPublicCompetition({
         competitionId: publicCompetitionId,
@@ -446,7 +445,7 @@ test('Get competition overview: competition is processing results', async () => 
     // Competition processing is based off UTC dates
     const now = new Date();
     const testCompetitionInfoProcessing: ICreateCompetitionWithStateParams = {
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition Processing Results',
         startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7).toUTCString(), // 7 days ago
@@ -479,7 +478,7 @@ test('Get competition overview: competition is archived', async () => {
     // Create a competition that has been archived with final points stored
     const now = new Date();
     const testCompetitionInfoArchived: ICreateCompetitionWithStateParams = {
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition Archived',
         startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 14).toUTCString(), // 14 days ago

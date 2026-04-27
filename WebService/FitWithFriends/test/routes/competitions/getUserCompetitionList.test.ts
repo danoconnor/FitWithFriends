@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 
 /*
     Tests the /competitions route for getting the user's competitions
@@ -56,7 +55,7 @@ test('Get user competitions: One competition', async () => {
         displayName: 'Test Competition',
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         accessToken: 'CompetitionsTestToken',
         ianaTimezone: 'America/New_York',
     };
@@ -78,7 +77,7 @@ test('Get user competitions: Multiple competitions', async () => {
         displayName: 'Test Competition 1',
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         accessToken: 'CompetitionsTestToken1',
         ianaTimezone: 'America/New_York',
     };
@@ -88,7 +87,7 @@ test('Get user competitions: Multiple competitions', async () => {
         displayName: 'Test Competition 2',
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         accessToken: 'CompetitionsTestToken2',
         ianaTimezone: 'America/New_York',
     };
@@ -98,7 +97,7 @@ test('Get user competitions: Multiple competitions', async () => {
         displayName: 'Test Competition 3',
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         accessToken: 'CompetitionsTestToken3',
         ianaTimezone: 'America/New_York',
     };
@@ -137,7 +136,7 @@ test('Get users competitions: only authenticated users competitions returned', a
         displayName: 'Test Competition - only user 1',
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         accessToken: 'CompetitionsTestToken1',
         ianaTimezone: 'America/New_York',
     };
@@ -147,7 +146,7 @@ test('Get users competitions: only authenticated users competitions returned', a
         displayName: 'Test Competition - only user 2',
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         accessToken: 'CompetitionsTestToken2',
         ianaTimezone: 'America/New_York',
     };
@@ -157,7 +156,7 @@ test('Get users competitions: only authenticated users competitions returned', a
         displayName: 'Test Competition - both users',
         startDate: new Date(),
         endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         accessToken: 'CompetitionsTestToken2',
         ianaTimezone: 'America/New_York',
     };
