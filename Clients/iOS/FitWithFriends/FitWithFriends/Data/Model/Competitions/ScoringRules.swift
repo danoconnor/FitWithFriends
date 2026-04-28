@@ -209,6 +209,27 @@ public extension ScoringRules {
     }
 }
 
+public extension ScoringRules.Kind {
+    var displayName: String {
+        switch self {
+        case .rings: return "Activity Rings"
+        case .workouts: return "Tracked Workouts"
+        case .daily: return "Daily Totals"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .rings:
+            return "Points per % of each Activity Ring closed."
+        case .workouts:
+            return "Only recorded workouts earn points."
+        case .daily:
+            return "Points from daily steps or walking distance."
+        }
+    }
+}
+
 public extension ScoringRing {
     var displayName: String {
         switch self {

@@ -71,6 +71,7 @@
 		0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */; };
 		0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A243279DDF1300C2970E /* ActivityRingView.swift */; };
 		0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A245279DE17B00C2970E /* TodaySummaryView.swift */; };
+		0B47A249279DE17B00C2970A /* MotivationalMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24A279DE17B00C2970A /* MotivationalMessageProvider.swift */; };
 		0B47A248279DE1FA00C2970E /* HomepageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */; };
 		0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */; };
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
@@ -304,6 +305,7 @@
 		0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockShakeGestureHandler.swift; sourceTree = "<group>"; };
 		0B47A243279DDF1300C2970E /* ActivityRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRingView.swift; sourceTree = "<group>"; };
 		0B47A245279DE17B00C2970E /* TodaySummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryView.swift; sourceTree = "<group>"; };
+		0B47A24A279DE17B00C2970A /* MotivationalMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotivationalMessageProvider.swift; sourceTree = "<group>"; };
 		0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageViewModel.swift; sourceTree = "<group>"; };
 		0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKActivitySummary+Extensions.swift"; sourceTree = "<group>"; };
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
@@ -879,6 +881,7 @@
 				0B62E66E25EB356100189702 /* CreateCompetitionView.swift */,
 				0B47A243279DDF1300C2970E /* ActivityRingView.swift */,
 				0B47A245279DE17B00C2970E /* TodaySummaryView.swift */,
+				0B47A24A279DE17B00C2970A /* MotivationalMessageProvider.swift */,
 				0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */,
 				0B47A251279E424300C2970E /* CompetitionOverviewView.swift */,
 				0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */,
@@ -1360,6 +1363,7 @@
 				0B47A22B279CAC1E00C2970E /* MockTokenManager.swift in Sources */,
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
 				0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */,
+				0B47A249279DE17B00C2970A /* MotivationalMessageProvider.swift in Sources */,
 				0B329F132E4C2CBE0082D211 /* IAppProtocolHandler.swift in Sources */,
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0B674531297B5F3700F20018 /* Date+Extensions.swift in Sources */,

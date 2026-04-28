@@ -184,8 +184,7 @@ struct LoggedInContentView: View {
                                      serverEnvironmentManager: objectGraph.serverEnvironmentManager,
                                      onDeleteAccount: { return await homepageViewModel.deleteAccount() })
                     case .proUpgrade:
-                        ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
-                                       subscriptionManager: objectGraph.subscriptionManager)
+                        ProUpgradeView(subscriptionManager: objectGraph.subscriptionManager)
                     default:
                         Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
                     }

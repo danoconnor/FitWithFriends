@@ -7,12 +7,10 @@ import StoreKit
 import SwiftUI
 
 struct ProUpgradeView: View {
-    @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
+    @Environment(\.dismiss) private var dismiss
     private let subscriptionManager: ISubscriptionManager
 
-    init(homepageSheetViewModel: HomepageSheetViewModel,
-         subscriptionManager: ISubscriptionManager) {
-        self.homepageSheetViewModel = homepageSheetViewModel
+    init(subscriptionManager: ISubscriptionManager) {
         self.subscriptionManager = subscriptionManager
     }
 
@@ -53,7 +51,7 @@ struct ProUpgradeView: View {
             guard case .success(let purchaseResult) = result,
                   case .success = purchaseResult else { return }
             await subscriptionManager.checkSubscriptionStatus()
-            homepageSheetViewModel.dismissCurrentSheet()
+            dismiss()
         }
     }
 }

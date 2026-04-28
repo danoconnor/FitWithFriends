@@ -5,6 +5,7 @@
 //  Created by Dan O'Connor on 2/27/21.
 //
 
+import Combine
 import Foundation
 import SwiftUI
 
@@ -13,13 +14,14 @@ public class CreateCompetitionViewModel: ObservableObject {
     private let competitionManager: ICompetitionManager
     private let subscriptionManager: ISubscriptionManager
     private let homepageSheetViewModel: HomepageSheetViewModel
+    private var cancellables = Set<AnyCancellable>()
 
     @Published var state: ViewOperationState = .notStarted
 
     /// Scoring rule the user is currently configuring. Defaults to legacy activity rings.
     @Published var scoringRules: ScoringRules = .default
 
-    var isUserPro: Bool { subscriptionManager.isUserPro }
+    @Published var isUserPro: Bool
 
     init(authenticationManager: IAuthenticationManager,
          competitionManager: ICompetitionManager,
@@ -29,6 +31,11 @@ public class CreateCompetitionViewModel: ObservableObject {
         self.competitionManager = competitionManager
         self.subscriptionManager = subscriptionManager
         self.homepageSheetViewModel = homepageSheetViewModel
+        self.isUserPro = subscriptionManager.isUserPro
+
+        subscriptionManager.isUserProPublisher
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$isUserPro)
     }
 
     func createCompetition(competitionName: String, startDate: Date, endDate: Date) {

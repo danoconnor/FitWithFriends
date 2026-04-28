@@ -35,10 +35,15 @@ struct CreateCompetitionView: View {
     @State private var dailyMetric: DailyMetric = .steps
 
     @State private var showingActivityTypePicker = false
+    @State private var showingTypeInfo = false
+    @State private var showingProUpgrade = false
+    @FocusState private var nameFieldFocused: Bool
 
+    private let subscriptionManager: ISubscriptionManager
     private let maxCompetitionLengthInDays: Double = 30
 
     init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
+        self.subscriptionManager = objectGraph.subscriptionManager
         _viewModel = StateObject(wrappedValue: CreateCompetitionViewModel(authenticationManager: objectGraph.authenticationManager,
                                                                           competitionManager: objectGraph.competitionManager,
                                                                           subscriptionManager: objectGraph.subscriptionManager,
@@ -47,63 +52,86 @@ struct CreateCompetitionView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 0) {
-                    if viewModel.state.isFailed {
-                        FWFErrorBanner(message: viewModel.state.errorMessage)
-                            .padding(.top, 8)
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 0) {
+                        if viewModel.state.isFailed {
+                            FWFErrorBanner(message: viewModel.state.errorMessage)
+                                .padding(.top, 8)
+                        }
+
+                        VStack(alignment: .leading, spacing: 24) {
+                            // Competition name field
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Competition Name")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(.secondary)
+
+                                TextField("e.g., January Challenge", text: $competitionName)
+                                    .textFieldStyle(.roundedBorder)
+                                    .submitLabel(.done)
+                                    .focused($nameFieldFocused)
+                                    .onSubmit { nameFieldFocused = false }
+                            }
+
+                            // Date pickers
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Duration")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(.secondary)
+
+                                DatePicker("Start date",
+                                           selection: $startDate,
+                                           displayedComponents: .date)
+
+                                DatePicker("End date",
+                                           selection: $endDate,
+                                           in: ClosedRange(uncheckedBounds: (startDate + .xtDays(1), startDate + .xtDays(maxCompetitionLengthInDays))),
+                                           displayedComponents: .date)
+                            }
+
+                            // Scoring rule configuration
+                            scoringSection
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 24)
                     }
+                }
 
-                    VStack(alignment: .leading, spacing: 24) {
-                        // Competition name field
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Competition Name")
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(.secondary)
+                if requiresProUserMissing {
+                    Text("Custom scoring rules require a Pro subscription")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
 
-                            TextField("e.g., January Challenge", text: $competitionName)
-                                .textFieldStyle(.roundedBorder)
-                        }
-
-                        // Date pickers
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Duration")
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(.secondary)
-
-                            DatePicker("Start date",
-                                       selection: $startDate,
-                                       displayedComponents: .date)
-
-                            DatePicker("End date",
-                                       selection: $endDate,
-                                       in: ClosedRange(uncheckedBounds: (startDate + .xtDays(1), startDate + .xtDays(maxCompetitionLengthInDays))),
-                                       displayedComponents: .date)
-                        }
-
-                        // Scoring rule configuration
-                        scoringSection
+                    FWFPrimaryButton("Upgrade to Pro") {
+                        showingProUpgrade = true
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 24)
+                    .padding(.bottom, 24)
+                } else {
+                    FWFPrimaryButton("Create") {
+                        viewModel.scoringRules = buildRule()
+                        viewModel.createCompetition(competitionName: competitionName,
+                                                    startDate: startDate,
+                                                    endDate: endDate)
+                    }
+                    .disabled(viewModel.state == .inProgress || competitionName.isEmpty)
+                    .opacity(competitionName.isEmpty ? 0.5 : 1.0)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
             }
-
-            FWFPrimaryButton("Create") {
-                viewModel.scoringRules = buildRule()
-                viewModel.createCompetition(competitionName: competitionName,
-                                            startDate: startDate,
-                                            endDate: endDate)
-            }
-            .disabled(viewModel.state == .inProgress || competitionName.isEmpty || !canSubmit)
-            .opacity((competitionName.isEmpty || !canSubmit) ? 0.5 : 1.0)
-            .padding(.horizontal, 16)
-            .padding(.bottom, 24)
             .navigationTitle("Create competition")
         }
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showingActivityTypePicker) {
             ActivityTypePickerView(selected: $selectedActivityTypes)
+        }
+        .sheet(isPresented: $showingProUpgrade) {
+            ProUpgradeView(subscriptionManager: subscriptionManager)
         }
     }
 
@@ -112,26 +140,39 @@ struct CreateCompetitionView: View {
     @ViewBuilder
     private var scoringSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Scoring")
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
-
-            Picker("Scoring rule", selection: $ruleKind) {
-                Text("Activity Rings").tag(ScoringRules.Kind.rings)
-                Text("Tracked Workouts").tag(ScoringRules.Kind.workouts)
-                Text("Daily Totals").tag(ScoringRules.Kind.daily)
-            }
-            .pickerStyle(.segmented)
-
-            if requiresProUserMissing {
-                HStack(spacing: 6) {
-                    Image(systemName: "lock.fill")
-                    Text(ruleKind == .rings
-                         ? "Pro required for custom ring scoring"
-                         : "Pro required for non-ring scoring")
+            HStack(spacing: 6) {
+                Text("Scoring")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Button {
+                    showingTypeInfo = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                        .foregroundStyle(.secondary)
                 }
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.secondary)
+                .buttonStyle(.plain)
+                .popover(isPresented: $showingTypeInfo) {
+                    Text(ruleKind.description)
+                        .font(.subheadline)
+                        .padding()
+                        .presentationCompactAdaptation(.popover)
+                }
+            }
+
+            Menu {
+                Picker("Scoring rule", selection: $ruleKind) {
+                    Text("Activity Rings").tag(ScoringRules.Kind.rings)
+                    Text("Tracked Workouts").tag(ScoringRules.Kind.workouts)
+                    Text("Daily Totals").tag(ScoringRules.Kind.daily)
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text(ruleKind.displayName)
+                        .font(.body)
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption2)
+                }
+                .foregroundStyle(.primary)
             }
 
             switch ruleKind {
@@ -318,6 +359,22 @@ struct ActivityTypePickerView: View {
     var body: some View {
         NavigationView {
             List {
+                Button {
+                    selected.removeAll()
+                } label: {
+                    HStack {
+                        Text("Any workout type")
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if selected.isEmpty {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(.tint)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
                 ForEach(WorkoutActivityTypeCatalog.commonEntries) { entry in
                     Button {
                         if selected.contains(entry.rawValue) {
@@ -344,9 +401,6 @@ struct ActivityTypePickerView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
-                }
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Clear") { selected.removeAll() }
                 }
             }
         }
