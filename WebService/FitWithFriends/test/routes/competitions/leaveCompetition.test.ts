@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertBufferToUserId, convertUserIdToBuffer } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 import { ICreateCompetitionParams } from '../../../sql/competitions.queries';
 
 /*
@@ -20,7 +19,7 @@ const secondUserId = Math.random().toString().slice(2, 8);
 // The competitionId that will be created in the database during the test setup
 const now = new Date();
 const testCompetitionInfo: ICreateCompetitionParams = {
-    competitionId: uuid(),
+    competitionId: crypto.randomUUID(),
     adminUserId: convertUserIdToBuffer(adminTestUserId),
     displayName: 'Test Competition',
     startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
@@ -254,7 +253,7 @@ test('Leave competition: invalid competitionId', async () => {
     // It should fail because the competitionId is invalid
     const accessToken = await AuthUtilities.getAccessTokenForUser(secondUserId);
     const response = await RequestUtilities.makePostRequest('competitions/leave', {
-            competitionId: uuid(),
+            competitionId: crypto.randomUUID(),
             userId: secondUserId
         }, accessToken);
 
@@ -264,7 +263,7 @@ test('Leave competition: invalid competitionId', async () => {
 test('Leave competition: missing access token', async () => {
     // Make the leave request without an access token
     const response = await RequestUtilities.makePostRequest('competitions/leave', {
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         userId: secondUserId
     });
 

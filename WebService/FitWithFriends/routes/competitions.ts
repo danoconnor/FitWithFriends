@@ -4,7 +4,6 @@ import express = require('express');
 const router = express.Router();
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
 import { handleError } from '../utilities/errorHelpers';
-import { v4 as uuid } from 'uuid';
 import FWFErrorCodes from '../utilities/enums/FWFErrorCodes';
 import * as ActivityDataQueries from '../sql/activityData.queries';
 import * as CompetitionQueries from '../sql/competitions.queries';
@@ -213,7 +212,7 @@ router.post('/', async function (req, res) {
 
     // Generate an access code for this competition so users can be added
     const accessToken = cryptoHelpers.getRandomToken();
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
 
     // Store the validated JSON as-is; `parseScoringRules` will normalise when reading.
     // Cast through Json — validateScoringRulesInput already enforced the shape upstream.

@@ -2,7 +2,6 @@ import * as TestSQL from '../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../testUtilities/testRequestUtilities';
 import * as CompetitionQueries from '../../sql/competitions.queries';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 import { CompetitionState } from '../../utilities/enums/CompetitionState';
 
 /*
@@ -70,7 +69,7 @@ describe('Admin authentication', () => {
 
 describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
     test('processes competitions that recently ended', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const oneDayInFuture = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
         const twoDaysInFuture = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         
@@ -102,13 +101,13 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
             userId: convertUserIdToBuffer(testUserId1),
             pushToken: 'test-token-1',
             platform: 1,
-            appInstallId: uuid()
+            appInstallId: crypto.randomUUID()
         });
         await TestSQL.createPushToken({
             userId: convertUserIdToBuffer(testUserId2),
             pushToken: 'test-token-2',
             platform: 1,
-            appInstallId: uuid()
+            appInstallId: crypto.randomUUID()
         });
 
         // Run the admin task
@@ -127,7 +126,7 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
     });
 
     test('does not process competitions that have not ended', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
         
         // Create a competition that ends tomorrow
@@ -157,7 +156,7 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
 
 describe('performDailyTasks - archiveCompetitions', () => {
     test('archives competitions in ProcessingResults state for over 24 hours', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         
         // Create a competition that has been in ProcessingResults state for over 24 hours
@@ -210,13 +209,13 @@ describe('performDailyTasks - archiveCompetitions', () => {
             userId: convertUserIdToBuffer(testUserId1),
             pushToken: 'test-token-1',
             platform: 1,
-            appInstallId: uuid()
+            appInstallId: crypto.randomUUID()
         });
         await TestSQL.createPushToken({
             userId: convertUserIdToBuffer(testUserId2),
             pushToken: 'test-token-2',
             platform: 1,
-            appInstallId: uuid()
+            appInstallId: crypto.randomUUID()
         });
 
         // Run the admin task
@@ -231,7 +230,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
     });
 
     test('does not archive competitions in ProcessingResults state for less than 24 hours', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
         
         // Create a competition that has been in ProcessingResults state for only 12 hours
@@ -259,7 +258,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
     });
 
     test('handles competitions with no users gracefully', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         
         // Create a competition with no users
@@ -445,7 +444,7 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
     });
 
     test('does not create a duplicate when a competition for the upcoming week already exists', async () => {
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         // Use expectedMonday (local midnight) as startDate so pg serializes the correct calendar
         // date regardless of the test worker's timezone offset.
         const endDate = new Date(expectedMonday);
@@ -495,7 +494,7 @@ describe('createBotUsers', () => {
 
     test('enrolls new bots in existing active public competitions', async () => {
         // Create an active public competition first
-        const competitionId = uuid();
+        const competitionId = crypto.randomUUID();
         const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
         const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         await TestSQL.createPublicCompetition({
@@ -531,7 +530,7 @@ describe('createBotUsers', () => {
         const now = new Date();
         const botIds: string[] = [];
         for (let i = 0; i < 100; i++) {
-            const userId = uuid().replace(/-/g, '');
+            const userId = crypto.randomUUID().replace(/-/g, '');
             await TestSQL.createBotUser({
                 userId: convertUserIdToBuffer(userId),
                 firstName: 'Bot',
@@ -562,7 +561,7 @@ describe('createBotUsers', () => {
         // Pre-create 98 bots
         const now = new Date();
         for (let i = 0; i < 98; i++) {
-            const userId = uuid().replace(/-/g, '');
+            const userId = crypto.randomUUID().replace(/-/g, '');
             await TestSQL.createBotUser({
                 userId: convertUserIdToBuffer(userId),
                 firstName: 'Bot',
@@ -595,8 +594,8 @@ describe('performDailyTasks - seedBotActivityData', () => {
 
     test('creates initial activity data for bots', async () => {
         const now = new Date();
-        const botId1 = uuid().replace(/-/g, '');
-        const botId2 = uuid().replace(/-/g, '');
+        const botId1 = crypto.randomUUID().replace(/-/g, '');
+        const botId2 = crypto.randomUUID().replace(/-/g, '');
         await TestSQL.createBotUser({
             userId: convertUserIdToBuffer(botId1),
             firstName: 'Bot',
@@ -631,7 +630,7 @@ describe('performDailyTasks - seedBotActivityData', () => {
 
     test('increments existing data on subsequent runs', async () => {
         const now = new Date();
-        const botId = uuid().replace(/-/g, '');
+        const botId = crypto.randomUUID().replace(/-/g, '');
         await TestSQL.createBotUser({
             userId: convertUserIdToBuffer(botId),
             firstName: 'Bot',
@@ -661,7 +660,7 @@ describe('performDailyTasks - seedBotActivityData', () => {
         const now = new Date();
         const currentEasternHour = now.getHours(); // TZ=America/New_York is set for the test process
 
-        const botId = uuid().replace(/-/g, '');
+        const botId = crypto.randomUUID().replace(/-/g, '');
         await TestSQL.createBotUser({
             userId: convertUserIdToBuffer(botId),
             firstName: 'Bot',
@@ -686,7 +685,7 @@ describe('performDailyTasks - comprehensive integration', () => {
         // Set up test data for all three operations
         
         // 1. Competition to process (recently ended)
-        const processingCompetitionId = uuid();
+        const processingCompetitionId = crypto.randomUUID();
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
         await TestSQL.createCompetitionWithState({
             competitionId: processingCompetitionId,
@@ -701,7 +700,7 @@ describe('performDailyTasks - comprehensive integration', () => {
         competitionsToCleanup.push(processingCompetitionId);
 
         // 2. Competition to archive (in processing for over 24 hours)
-        const archiveCompetitionId = uuid();
+        const archiveCompetitionId = crypto.randomUUID();
         const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
         await TestSQL.createCompetitionWithState({
             competitionId: archiveCompetitionId,
@@ -799,8 +798,8 @@ describe('performDailyTasks - createWeeklyPublicCompetition - bot enrollment', (
 
     test('enrolls existing bots in auto-created weekly competition', async () => {
         const now = new Date();
-        const botId1 = uuid().replace(/-/g, '');
-        const botId2 = uuid().replace(/-/g, '');
+        const botId1 = crypto.randomUUID().replace(/-/g, '');
+        const botId2 = crypto.randomUUID().replace(/-/g, '');
         await TestSQL.createBotUser({
             userId: convertUserIdToBuffer(botId1),
             firstName: 'Weekly',
@@ -847,8 +846,8 @@ describe('performDailyTasks - createWeeklyPublicCompetition - bot enrollment', (
 describe('createPublicCompetition - bot enrollment', () => {
     test('enrolls bots in manually created public competition', async () => {
         const now = new Date();
-        const botId1 = uuid().replace(/-/g, '');
-        const botId2 = uuid().replace(/-/g, '');
+        const botId1 = crypto.randomUUID().replace(/-/g, '');
+        const botId2 = crypto.randomUUID().replace(/-/g, '');
         await TestSQL.createBotUser({
             userId: convertUserIdToBuffer(botId1),
             firstName: 'Public',
