@@ -221,6 +221,8 @@
 		A1B2C3D4E5F6000000000012 /* ScoringRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000011 /* ScoringRulesTests.swift */; };
 		A1B2C3D4E5F6000000000014 /* CompetitionWireFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000013 /* CompetitionWireFormatTests.swift */; };
 		A1B2C3D4E5F6000000000016 /* CompetitionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000015 /* CompetitionServiceTests.swift */; };
+		CC000001000000000000AA02 /* MotivationalMessageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC000001000000000000AA01 /* MotivationalMessageProviderTests.swift */; };
+		CC000001000000000000AA04 /* CreateCompetitionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC000001000000000000AA03 /* CreateCompetitionViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -459,6 +461,8 @@
 		A1B2C3D4E5F6000000000011 /* ScoringRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringRulesTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000000000013 /* CompetitionWireFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionWireFormatTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000000000015 /* CompetitionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionServiceTests.swift; sourceTree = "<group>"; };
+		CC000001000000000000AA01 /* MotivationalMessageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotivationalMessageProviderTests.swift; sourceTree = "<group>"; };
+		CC000001000000000000AA03 /* CreateCompetitionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -509,6 +513,8 @@
 				A1B2C3D4E5F6000000000011 /* ScoringRulesTests.swift */,
 				A1B2C3D4E5F6000000000013 /* CompetitionWireFormatTests.swift */,
 				A1B2C3D4E5F6000000000015 /* CompetitionServiceTests.swift */,
+				CC000001000000000000AA01 /* MotivationalMessageProviderTests.swift */,
+				CC000001000000000000AA03 /* CreateCompetitionViewModelTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -1248,6 +1254,8 @@
 				A1B2C3D4E5F6000000000012 /* ScoringRulesTests.swift in Sources */,
 				A1B2C3D4E5F6000000000014 /* CompetitionWireFormatTests.swift in Sources */,
 				A1B2C3D4E5F6000000000016 /* CompetitionServiceTests.swift in Sources */,
+				CC000001000000000000AA02 /* MotivationalMessageProviderTests.swift in Sources */,
+				CC000001000000000000AA04 /* CreateCompetitionViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

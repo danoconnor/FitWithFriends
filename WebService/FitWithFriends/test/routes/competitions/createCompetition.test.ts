@@ -315,6 +315,22 @@ test('Create competition: free user blocked from custom rule (workouts)', async 
     expect(response.data.custom_error_code).toEqual(FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
 });
 
+test('Create competition: free user blocked from custom rule (daily)', async () => {
+    const now = new Date();
+    const competitionInfo = {
+        startDate: now,
+        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7),
+        displayName: 'Step Challenge',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'daily', metric: 'steps' },
+    };
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
+    expect(response.status).toBe(403);
+    expect(response.data.custom_error_code).toEqual(FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
+});
+
 test('Create competition: free user blocked from rings with minGoals', async () => {
     const now = new Date();
     const competitionInfo = {

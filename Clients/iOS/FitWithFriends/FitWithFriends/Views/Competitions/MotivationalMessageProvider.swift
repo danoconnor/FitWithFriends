@@ -7,14 +7,14 @@ import Foundation
 
 enum MotivationalMessageProvider {
 
-    private enum TimeOfDay: Int {
+    internal enum TimeOfDay: Int {
         case morning   // 5–11
         case afternoon // 12–16
         case evening   // 17–20
         case night     // 21–4
 
-        static func current() -> TimeOfDay {
-            let hour = Calendar.current.component(.hour, from: Date())
+        static func current(for date: Date = Date()) -> TimeOfDay {
+            let hour = Calendar.current.component(.hour, from: date)
             switch hour {
             case 5..<12:  return .morning
             case 12..<17: return .afternoon
@@ -24,7 +24,7 @@ enum MotivationalMessageProvider {
         }
     }
 
-    private enum ActivityLevel {
+    internal enum ActivityLevel {
         case low    // < 200 pts  (~0–33 % of daily max)
         case medium // 200–400 pts
         case high   // > 400 pts
@@ -41,16 +41,21 @@ enum MotivationalMessageProvider {
     /// Returns a message that is stable for the current calendar day and activity bucket,
     /// rotating through the pool day-over-day so it doesn't feel stale.
     static func message(activityPoints: Double) -> String {
-        let time = TimeOfDay.current()
+        return message(activityPoints: activityPoints, date: Date())
+    }
+
+    /// Testable overload — accepts an explicit date so tests can control time-of-day and day index.
+    static func message(activityPoints: Double, date: Date) -> String {
+        let time = TimeOfDay.current(for: date)
         let level = ActivityLevel.from(points: activityPoints)
         let pool = messages(time: time, level: level)
-        let dayIndex = Int(Calendar.current.startOfDay(for: Date()).timeIntervalSince1970 / 86400)
+        let dayIndex = Int(Calendar.current.startOfDay(for: date).timeIntervalSince1970 / 86400)
         return pool[dayIndex % pool.count]
     }
 
     // MARK: - Message pools
 
-    private static func messages(time: TimeOfDay, level: ActivityLevel) -> [String] {
+    internal static func messages(time: TimeOfDay, level: ActivityLevel) -> [String] {
         switch (time, level) {
 
         // MARK: Morning · Low

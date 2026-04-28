@@ -108,4 +108,42 @@ final class ScoringRulesTests: XCTestCase {
     func testFormatterMinutes() {
         XCTAssertEqual(ScoringValueFormatter.format(45, unit: .minutes), "45 min")
     }
+
+    // MARK: - Kind display properties
+
+    func testKindDisplayName_rings() {
+        XCTAssertEqual(ScoringRules.Kind.rings.displayName, "Activity Rings")
+    }
+
+    func testKindDisplayName_workouts() {
+        XCTAssertEqual(ScoringRules.Kind.workouts.displayName, "Tracked Workouts")
+    }
+
+    func testKindDisplayName_daily() {
+        XCTAssertEqual(ScoringRules.Kind.daily.displayName, "Daily Totals")
+    }
+
+    func testKindDescription_allCasesNonEmpty() {
+        for kind in [ScoringRules.Kind.rings, .workouts, .daily] {
+            XCTAssertFalse(kind.description.isEmpty, "description for \(kind) should not be empty")
+        }
+    }
+
+    func testKindDescription_allCasesDistinct() {
+        let descriptions = [
+            ScoringRules.Kind.rings.description,
+            ScoringRules.Kind.workouts.description,
+            ScoringRules.Kind.daily.description
+        ]
+        XCTAssertEqual(Set(descriptions).count, descriptions.count, "All Kind descriptions should be distinct")
+    }
+
+    func testKindDisplayName_allCasesDistinct() {
+        let names = [
+            ScoringRules.Kind.rings.displayName,
+            ScoringRules.Kind.workouts.displayName,
+            ScoringRules.Kind.daily.displayName
+        ]
+        XCTAssertEqual(Set(names).count, names.count, "All Kind displayNames should be distinct")
+    }
 }

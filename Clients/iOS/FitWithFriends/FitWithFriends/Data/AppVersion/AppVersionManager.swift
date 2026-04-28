@@ -35,8 +35,6 @@ class AppVersionManager: IAppVersionManager, ObservableObject {
     }
 
     func determineAlertState(currentBuild: String, versions: IosBuildVersionsDTO) -> AppVersionAlertState {
-        return .none
-
         if compareSemanticVersions(currentBuild, versions.requiredBuild) == .orderedAscending {
             Logger.traceWarning(message: "Required update: currentBuild: \(currentBuild), requiredBuild: \(versions.requiredBuild)")
             return .requiredUpdate
