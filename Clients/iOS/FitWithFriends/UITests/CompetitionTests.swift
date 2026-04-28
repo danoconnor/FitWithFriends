@@ -235,7 +235,7 @@ final class CompetitionTests: FWFUITestBase {
         trackedWorkoutsOption.tap()
 
         // Tap the workout types row to open the picker sheet
-        let workoutTypesRow = app.staticTexts["Workout types"]
+        let workoutTypesRow = app.buttons["Workout types"]
         XCTAssertTrue(workoutTypesRow.waitForExistence(timeout: 3))
         workoutTypesRow.tap()
 

@@ -242,13 +242,16 @@ struct CreateCompetitionView: View {
                 showingActivityTypePicker = true
             } label: {
                 HStack {
-                    Text(selectedActivityTypes.isEmpty ? "Workout types: Any" : "Workout types: \(selectedActivityTypes.count) selected")
+                    Text("Workout types")
                     Spacer()
+                    Text(selectedActivityTypes.isEmpty ? "Any" : "\(selectedActivityTypes.count) selected")
+                        .foregroundStyle(.secondary)
                     Image(systemName: "chevron.right").foregroundStyle(.tertiary)
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Workout types")
         }
     }
 
