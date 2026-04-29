@@ -9,11 +9,14 @@ import SwiftUI
 struct ProUpgradeView: View {
     @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
     private let subscriptionManager: ISubscriptionManager
+    private let serverEnvironmentManager: IServerEnvironmentManager
 
     init(homepageSheetViewModel: HomepageSheetViewModel,
-         subscriptionManager: ISubscriptionManager) {
+         subscriptionManager: ISubscriptionManager,
+         serverEnvironmentManager: IServerEnvironmentManager) {
         self.homepageSheetViewModel = homepageSheetViewModel
         self.subscriptionManager = subscriptionManager
+        self.serverEnvironmentManager = serverEnvironmentManager
     }
 
     var body: some View {
@@ -49,6 +52,14 @@ struct ProUpgradeView: View {
                 .padding(.horizontal, 16)
             }
         }
+        .subscriptionStorePolicyDestination(
+            url: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!,
+            for: .termsOfService
+        )
+        .subscriptionStorePolicyDestination(
+            url: URL(string: "\(serverEnvironmentManager.baseUrl)/privacyPolicy")!,
+            for: .privacyPolicy
+        )
         .onInAppPurchaseCompletion { _, result in
             guard case .success(let purchaseResult) = result,
                   case .success = purchaseResult else { return }
