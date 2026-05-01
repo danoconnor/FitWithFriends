@@ -30,6 +30,18 @@ class FWFUITestBase: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
 
+        // Dismiss "Sign in to your Apple Account" alerts that appear in CI simulators.
+        // The default XCTest handler looks for "Cancel"/"Don't" labels; this alert only
+        // has "Close" and "Settings", so we need an explicit monitor.
+        addUIInterruptionMonitor(withDescription: "Sign in to your Apple Account") { alert in
+            let closeButton = alert.buttons["Close"]
+            if closeButton.exists {
+                closeButton.tap()
+                return true
+            }
+            return false
+        }
+
         // Health check: verify Docker backend is running
         try checkBackendIsRunning()
 
