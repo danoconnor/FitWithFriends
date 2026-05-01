@@ -160,12 +160,9 @@ router.post('/performDailyTasks', async function (req, res) {
     // "now" means for this run without restarting the server.
     const now = req.body['currentDate'] ? new Date(req.body['currentDate']) : new Date();
 
-    const deleteExpiredTokensPromise = deleteExpiredRefreshTokens(now);
-    const seedBotActivityDataPromise = seedBotActivityData(now);
-
-    // Do not parallelize the competition tasks
-    // because we do not want to move a competition to processing to archiving in the same run
-    // This should not happen but could happen if the cron job has not been run recently
+    // Run tasks sequentially to avoid unhandled rejections from pre-started promises failing
+    // while awaiting other tasks. Competition tasks are serialized to prevent a competition
+    // from advancing two states in one run.
     try {
         taskResults.push({ name: 'archiveCompetitions', result: await archiveCompetitions(now) });
     } catch (err) {
@@ -179,7 +176,7 @@ router.post('/performDailyTasks', async function (req, res) {
     }
 
     try {
-        taskResults.push({ name: 'deleteExpiredRefreshTokens', result: await deleteExpiredTokensPromise });
+        taskResults.push({ name: 'deleteExpiredRefreshTokens', result: await deleteExpiredRefreshTokens(now) });
     } catch (err) {
         errors.push(['deleteExpiredRefreshTokens', err]);
     }
@@ -191,14 +188,18 @@ router.post('/performDailyTasks', async function (req, res) {
     }
 
     try {
-        taskResults.push({ name: 'seedBotActivityData', result: await seedBotActivityDataPromise });
+        taskResults.push({ name: 'seedBotActivityData', result: await seedBotActivityData(now) });
     } catch (err) {
         errors.push(['seedBotActivityData', err]);
     }
 
     const summary = {
         tasks: taskResults,
-        errors: errors.map(([name, error]) => ({ name, error: error.message }))
+        errors: errors.map(([name, error]) => ({
+            name,
+            error: error.message,
+            errorType: error.constructor?.name ?? 'Error'
+        }))
     };
 
     if (errors.length > 0) {
