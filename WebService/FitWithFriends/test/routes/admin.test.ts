@@ -21,6 +21,10 @@ function getTaskResult(response: any, taskName: string): string | undefined {
     return response.data?.tasks?.find((t: any) => t.name === taskName)?.result;
 }
 
+function getTaskError(response: any, taskName: string): { name: string; error: string; errorType: string } | undefined {
+    return response.data?.errors?.find((e: any) => e.name === taskName);
+}
+
 beforeEach(async () => {
     try {
         // Create test users
@@ -840,6 +844,61 @@ describe('performDailyTasks - createWeeklyPublicCompetition - bot enrollment', (
         const competitionUserIds = usersInCompetition.map(u => Buffer.from(u.user_id).toString('hex'));
         expect(competitionUserIds).toContain(botId1);
         expect(competitionUserIds).toContain(botId2);
+    });
+});
+
+describe('performDailyTasks - error response structure', () => {
+    test('error entries include name, error message, and errorType fields', async () => {
+        // An invalid currentDate causes pg to send an unparseable value to PostgreSQL,
+        // which rejects it with a DatabaseError for any task that passes a date to the DB.
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
+            currentDate: 'not-a-valid-date'
+        });
+
+        expect(response.status).toBe(500);
+        expect(Array.isArray(response.data.errors)).toBe(true);
+        expect(response.data.errors.length).toBeGreaterThan(0);
+        expect(Array.isArray(response.data.tasks)).toBe(true);
+
+        for (const err of response.data.errors) {
+            expect(err).toMatchObject({
+                name: expect.any(String),
+                error: expect.any(String),
+                errorType: expect.any(String),
+            });
+        }
+
+        const archiveError = getTaskError(response, 'archiveCompetitions');
+        expect(archiveError).toBeDefined();
+        expect(archiveError.errorType).toBe('DatabaseError');
+    });
+
+    test('seedBotActivityData error includes errorType when bot users exist', async () => {
+        const botId = crypto.randomUUID().replace(/-/g, '');
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId),
+            firstName: 'Error',
+            lastName: 'Bot',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: new Date()
+        });
+        usersToCleanup.push(botId);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
+            currentDate: 'not-a-valid-date'
+        });
+
+        expect(response.status).toBe(500);
+
+        // With bot users present, Intl.DateTimeFormat throws RangeError on an invalid date
+        const seedError = getTaskError(response, 'seedBotActivityData');
+        expect(seedError).toBeDefined();
+        expect(seedError).toMatchObject({
+            name: 'seedBotActivityData',
+            error: expect.any(String),
+            errorType: 'RangeError',
+        });
     });
 });
 
