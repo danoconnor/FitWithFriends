@@ -39,11 +39,15 @@ struct CreateCompetitionView: View {
     @State private var showingProUpgrade = false
     @FocusState private var nameFieldFocused: Bool
 
+    private let homepageSheetViewModel: HomepageSheetViewModel
     private let subscriptionManager: ISubscriptionManager
+    private let serverEnvironmentManager: IServerEnvironmentManager
     private let maxCompetitionLengthInDays: Double = 30
 
     init(homepageSheetViewModel: HomepageSheetViewModel, objectGraph: IObjectGraph) {
+        self.homepageSheetViewModel = homepageSheetViewModel
         self.subscriptionManager = objectGraph.subscriptionManager
+        self.serverEnvironmentManager = objectGraph.serverEnvironmentManager
         _viewModel = StateObject(wrappedValue: CreateCompetitionViewModel(authenticationManager: objectGraph.authenticationManager,
                                                                           competitionManager: objectGraph.competitionManager,
                                                                           subscriptionManager: objectGraph.subscriptionManager,
@@ -131,7 +135,9 @@ struct CreateCompetitionView: View {
             ActivityTypePickerView(selected: $selectedActivityTypes)
         }
         .sheet(isPresented: $showingProUpgrade) {
-            ProUpgradeView(subscriptionManager: subscriptionManager)
+            ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
+                           subscriptionManager: subscriptionManager,
+                           serverEnvironmentManager: serverEnvironmentManager)
         }
     }
 
