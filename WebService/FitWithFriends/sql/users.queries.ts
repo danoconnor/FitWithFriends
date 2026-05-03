@@ -289,7 +289,7 @@ export interface IDeleteUserQuery {
   result: IDeleteUserResult;
 }
 
-const deleteUserIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":34,"b":42}]}],"statement":"DELETE FROM users WHERE user_id = :userId!"};
+const deleteUserIR: any = {"usedParamSet":{"userId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":34,"b":41}]}],"statement":"DELETE FROM users WHERE user_id = :userId!"};
 
 /**
  * Query generated from SQL:

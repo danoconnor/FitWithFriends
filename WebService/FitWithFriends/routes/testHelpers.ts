@@ -48,6 +48,9 @@ interface DayValues {
     exerciseTimeGoal: number;
     standTime: number;
     standTimeGoal: number;
+    stepCount?: number;
+    distanceWalkingRunningMeters?: number;
+    flightsClimbed?: number;
 }
 
 router.post('/seedCompetitionUsers', async function (req, res) {
@@ -116,7 +119,10 @@ router.post('/seedCompetitionUsers', async function (req, res) {
                             exerciseTime: day.exerciseTime,
                             exerciseTimeGoal: day.exerciseTimeGoal,
                             standTime: day.standTime,
-                            standTimeGoal: day.standTimeGoal
+                            standTimeGoal: day.standTimeGoal,
+                            stepCount: day.stepCount ?? 0,
+                            distanceWalkingRunningMeters: day.distanceWalkingRunningMeters ?? 0,
+                            flightsClimbed: day.flightsClimbed ?? 0
                         };
                     })
                 });

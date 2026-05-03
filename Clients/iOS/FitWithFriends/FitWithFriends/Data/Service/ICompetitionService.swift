@@ -25,7 +25,9 @@ public protocol ICompetitionService {
     ///   - startDate: The start date
     ///   - endDate: The end date
     ///   - competitionName: The competition name
-    func createCompetition(startDate: Date, endDate: Date, competitionName: String) async throws
+    ///   - scoringRules: How points are calculated. Default-rings rules are allowed for any user; any
+    ///                   other rule requires a Pro subscription (server enforces this).
+    func createCompetition(startDate: Date, endDate: Date, competitionName: String, scoringRules: ScoringRules) async throws
 
     /// Join the given competition
     /// - Parameters:

@@ -1,6 +1,7 @@
 'use strict';
 import * as express from 'express';
 import * as CompetitionQueries from '../sql/competitions.queries';
+import { Json } from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import * as OAuthQueries from '../sql/oauth.queries';
 import * as ActivityDataQueries from '../sql/activityData.queries';
@@ -8,7 +9,7 @@ import { sendPushNotifications } from '../utilities/apnsHelper';
 import { CompetitionState } from '../utilities/enums/CompetitionState';
 import { handleError } from '../utilities/errorHelpers';
 import * as UserHelpers from '../utilities/userHelpers';
-import { getCompetitionStandings } from '../utilities/competitionStandingsHelper';
+import { getCompetitionStandings, validateScoringRulesInput } from '../utilities/competitionStandingsHelper';
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
 
 const router = express.Router();
@@ -36,6 +37,7 @@ router.post('/createPublicCompetition', function (req, res) {
     const displayName: string = req.body['displayName'];
     const timezone: string = req.body['ianaTimezone'];
     const adminUserId: string = req.body['adminUserId'];
+    const rawScoringRules: unknown = req.body['scoringRules'];
 
     if (!startDate || !endDate || !displayName || !timezone || !adminUserId) {
         handleError(null, 400, 'Missing required parameter', res);
@@ -65,10 +67,20 @@ router.post('/createPublicCompetition', function (req, res) {
         return;
     }
 
+    if (rawScoringRules !== undefined && rawScoringRules !== null) {
+        const validationError = validateScoringRulesInput(rawScoringRules);
+        if (validationError) {
+            handleError(null, 400, `Invalid scoringRules: ${validationError}`, res, true);
+            return;
+        }
+    }
+
     const startDateUTC = new Date(startDate.toUTCString());
     const endDateUTC = new Date(endDate.toUTCString());
     const accessToken = cryptoHelpers.getRandomToken();
     const competitionId = crypto.randomUUID();
+
+    const scoringRulesForDb: Json | null = (rawScoringRules !== undefined && rawScoringRules !== null) ? (rawScoringRules as Json) : null;
 
     CompetitionQueries.createPublicCompetition({
         startDate: startDateUTC,
@@ -77,7 +89,8 @@ router.post('/createPublicCompetition', function (req, res) {
         adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
         accessToken,
         ianaTimezone: timezone,
-        competitionId
+        competitionId,
+        scoringRules: scoringRulesForDb
     })
         .then(async (_result) => {
             const botUsers = await UserQueries.getBotUsers();
@@ -388,7 +401,8 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
         adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
         accessToken: cryptoHelpers.getRandomToken(),
         ianaTimezone: 'UTC',
-        competitionId
+        competitionId,
+        scoringRules: null
     });
 
     const botUsers = await UserQueries.getBotUsers();
@@ -428,6 +442,9 @@ async function seedBotActivityData(now: Date): Promise<string> {
         const currentCalories = existing?.calories_burned ?? 0;
         const currentExercise = existing?.exercise_time ?? 0;
         const currentStand = existing?.stand_time ?? 0;
+        const currentSteps = existing?.step_count ?? 0;
+        const currentDistance = existing?.distance_walking_running_meters ?? 0;
+        const currentFlights = existing?.flights_climbed ?? 0;
 
         return {
             userId: UserHelpers.convertUserIdToBuffer(bot.userId),
@@ -438,6 +455,9 @@ async function seedBotActivityData(now: Date): Promise<string> {
             exerciseTimeGoal: 30,
             standTime: Math.min(currentStand + (Math.random() < 0.6 ? 1 : 0), easternHour), // capped at Eastern hour
             standTimeGoal: 12,
+            stepCount: currentSteps + Math.floor(Math.random() * 600) + 100,         // +100–700 per run
+            distanceWalkingRunningMeters: currentDistance + Math.floor(Math.random() * 500) + 50, // +50–550 m per run
+            flightsClimbed: currentFlights + (Math.random() < 0.3 ? 1 : 0),          // occasional flight
         };
     });
 

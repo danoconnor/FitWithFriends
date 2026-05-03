@@ -17,21 +17,17 @@ struct TodaySummaryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Points header with activity ring
-            HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(Int(activitySummary.competitionPoints))")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
+            // Motivational header with activity ring
+            HStack(alignment: .center, spacing: 12) {
+                Text(MotivationalMessageProvider.message(activityPoints: activitySummary.competitionPoints))
+                    .font(.system(.title3, design: .rounded, weight: .semibold))
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                    Text("points today")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
+                Spacer(minLength: 0)
 
                 ActivityRingView(activitySummary: activitySummary.hkActivitySummary)
-                    .frame(width: 100, height: 100)
+                    .frame(width: 90, height: 90)
             }
 
             Divider()

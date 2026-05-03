@@ -17,15 +17,19 @@ router.post('/dailySummary', function (req, res) {
     const userId: string = res.locals.oauth.token.user.id;
     const userIdBuffer = convertUserIdToBuffer(userId);
 
-    var summariesToInsert: { 
-        userId: Buffer; 
-        date: Date; 
-        caloriesBurned: number; 
-        caloriesGoal: number; 
-        exerciseTime: number; 
+    var summariesToInsert: {
+        userId: Buffer;
+        date: Date;
+        caloriesBurned: number;
+        caloriesGoal: number;
+        exerciseTime: number;
         exerciseTimeGoal: number;
-        standTime: number; 
-        standTimeGoal: number; }[] = [];
+        standTime: number;
+        standTimeGoal: number;
+        stepCount: number;
+        distanceWalkingRunningMeters: number;
+        flightsClimbed: number;
+    }[] = [];
 
     for (const summary of summaries) {
         const dateStr: string = summary['date'];
@@ -35,12 +39,21 @@ router.post('/dailySummary', function (req, res) {
         const exerciseTimeGoal: number = Math.round(summary['exerciseTimeGoal']);
         const standTime: number = Math.round(summary['standTime']);
         const standTimeGoal: number = Math.round(summary['standTimeGoal']);
+        // Optional fields (older iOS builds omit them); default to 0 when absent.
+        const stepCount: number = summary['stepCount'] != null ? Math.round(summary['stepCount']) : 0;
+        const distanceWalkingRunningMeters: number = summary['distanceWalkingRunning'] != null ? Math.round(summary['distanceWalkingRunning']) : 0;
+        const flightsClimbed: number = summary['flightsClimbed'] != null ? Math.round(summary['flightsClimbed']) : 0;
 
         if (!dateStr || Number.isNaN(caloriesBurned) || Number.isNaN(caloriesGoal) || Number.isNaN(exerciseTime) || Number.isNaN(exerciseTimeGoal) || Number.isNaN(standTime) || Number.isNaN(standTimeGoal)) {
             handleError(null, 400, 'Missing required parameter', res);
             return;
         }
-    
+
+        if (Number.isNaN(stepCount) || Number.isNaN(distanceWalkingRunningMeters) || Number.isNaN(flightsClimbed)) {
+            handleError(null, 400, 'Invalid daily stats value', res);
+            return;
+        }
+
         const date = new Date(dateStr);
         if (isNaN(date.getTime())) {
             handleError(null, 400, 'Could not parse date', res);
@@ -55,7 +68,10 @@ router.post('/dailySummary', function (req, res) {
             exerciseTime,
             exerciseTimeGoal,
             standTime,
-            standTimeGoal
+            standTimeGoal,
+            stepCount,
+            distanceWalkingRunningMeters,
+            flightsClimbed,
         });
     }
 
@@ -73,6 +89,9 @@ router.post('/dailySummary', function (req, res) {
             existing.exerciseTimeGoal = Math.max(existing.exerciseTimeGoal, summary.exerciseTimeGoal);
             existing.standTime = Math.max(existing.standTime, summary.standTime);
             existing.standTimeGoal = Math.max(existing.standTimeGoal, summary.standTimeGoal);
+            existing.stepCount = Math.max(existing.stepCount, summary.stepCount);
+            existing.distanceWalkingRunningMeters = Math.max(existing.distanceWalkingRunningMeters, summary.distanceWalkingRunningMeters);
+            existing.flightsClimbed = Math.max(existing.flightsClimbed, summary.flightsClimbed);
         } else {
             summaryByDate.set(key, summary);
         }

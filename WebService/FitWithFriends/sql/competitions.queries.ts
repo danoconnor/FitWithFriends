@@ -3,6 +3,8 @@ import { DatabaseConnectionPool } from '../utilities/database';
 
 export type DateOrString = Date | string;
 
+export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
+
 /** 'GetUsersCompetitions' parameters type */
 export interface IGetUsersCompetitionsParams {
   userId: Buffer;
@@ -76,6 +78,7 @@ export interface ICreateCompetitionParams {
   displayName: string;
   endDate: DateOrString;
   ianaTimezone: string;
+  scoringRules?: Json | null | void;
   startDate: DateOrString;
 }
 
@@ -88,12 +91,13 @@ export interface ICreateCompetitionQuery {
   result: ICreateCompetitionResult;
 }
 
-const createCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":130,"b":140}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":143,"b":151}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":154,"b":166}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":181}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":184,"b":196}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":199,"b":212}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":215,"b":229}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!)"};
+const createCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true,"scoringRules":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":145,"b":155}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":158,"b":166}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":181}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":184,"b":196}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":199,"b":211}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":214,"b":227}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":230,"b":244}]},{"name":"scoringRules","required":false,"transform":{"type":"scalar"},"locs":[{"a":247,"b":259}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules)\nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :scoringRules)"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!)
+ * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules)
+ * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :scoringRules)
  * ```
  */
 export function createCompetition(params: ICreateCompetitionParams): Promise<Array<ICreateCompetitionResult>> {
@@ -150,6 +154,7 @@ export interface IGetCompetitionResult {
   end_date: Date;
   iana_timezone: string;
   is_public: boolean;
+  scoring_rules: Json | null;
   start_date: Date;
   state: number;
 }
@@ -160,13 +165,13 @@ export interface IGetCompetitionQuery {
   result: IGetCompetitionResult;
 }
 
-const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":234,"b":248}]}],"statement":"                                                                                      \nSELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public FROM competitions WHERE competition_id = :competitionId!"};
+const getCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":249,"b":263}]}],"statement":"                                                                                      \nSELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules FROM competitions WHERE competition_id = :competitionId!"};
 
 /**
  * Query generated from SQL:
  * ```
  *                                                                                       
- * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public FROM competitions WHERE competition_id = :competitionId!
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules FROM competitions WHERE competition_id = :competitionId!
  * ```
  */
 export function getCompetition(params: IGetCompetitionParams): Promise<Array<IGetCompetitionResult>> {
@@ -191,6 +196,7 @@ export interface IGetCompetitionAdminDetailsResult {
   display_name: string;
   end_date: Date;
   iana_timezone: string;
+  scoring_rules: Json | null;
   start_date: Date;
 }
 
@@ -200,12 +206,12 @@ export interface IGetCompetitionAdminDetailsQuery {
   result: IGetCompetitionAdminDetailsResult;
 }
 
-const getCompetitionAdminDetailsIR: any = {"usedParamSet":{"competitionId":true,"adminUserId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":143,"b":157}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":179,"b":191}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!"};
+const getCompetitionAdminDetailsIR: any = {"usedParamSet":{"competitionId":true,"adminUserId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":158,"b":172}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":194,"b":206}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!
+ * SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!
  * ```
  */
 export function getCompetitionAdminDetails(params: IGetCompetitionAdminDetailsParams): Promise<Array<IGetCompetitionAdminDetailsResult>> {
@@ -430,6 +436,7 @@ export interface IGetCompetitionsInStateResult {
   end_date: Date;
   iana_timezone: string;
   is_public: boolean;
+  scoring_rules: Json | null;
   start_date: Date;
   state: number;
 }
@@ -440,12 +447,12 @@ export interface IGetCompetitionsInStateQuery {
   result: IGetCompetitionsInStateResult;
 }
 
-const getCompetitionsInStateIR: any = {"usedParamSet":{"state":true,"finishedBeforeDate":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":138,"b":144}]},{"name":"finishedBeforeDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":161,"b":180}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public\nFROM competitions\nWHERE state = :state! AND end_date < :finishedBeforeDate!"};
+const getCompetitionsInStateIR: any = {"usedParamSet":{"state":true,"finishedBeforeDate":true},"params":[{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":153,"b":159}]},{"name":"finishedBeforeDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":176,"b":195}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules\nFROM competitions\nWHERE state = :state! AND end_date < :finishedBeforeDate!"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules
  * FROM competitions
  * WHERE state = :state! AND end_date < :finishedBeforeDate!
  * ```
@@ -574,6 +581,7 @@ export interface ICreatePublicCompetitionParams {
   displayName: string;
   endDate: DateOrString;
   ianaTimezone: string;
+  scoringRules?: Json | null | void;
   startDate: DateOrString;
 }
 
@@ -586,13 +594,13 @@ export interface ICreatePublicCompetitionQuery {
   result: ICreatePublicCompetitionResult;
 }
 
-const createPublicCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":141,"b":151}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":154,"b":162}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":165,"b":177}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":180,"b":192}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":195,"b":207}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":210,"b":223}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":226,"b":240}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public)\nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true)"};
+const createPublicCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true,"scoringRules":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":156,"b":166}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":177}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":180,"b":192}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":195,"b":207}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":210,"b":222}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":225,"b":238}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":241,"b":255}]},{"name":"scoringRules","required":false,"transform":{"type":"scalar"},"locs":[{"a":264,"b":276}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public, scoring_rules)\nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true, :scoringRules)"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public)
- * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true)
+ * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public, scoring_rules)
+ * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true, :scoringRules)
  * ```
  */
 export function createPublicCompetition(params: ICreatePublicCompetitionParams): Promise<Array<ICreatePublicCompetitionResult>> {
@@ -616,6 +624,7 @@ export interface IGetPublicCompetitionResult {
   end_date: Date;
   iana_timezone: string;
   is_public: boolean;
+  scoring_rules: Json | null;
   start_date: Date;
   state: number;
 }
@@ -626,12 +635,12 @@ export interface IGetPublicCompetitionQuery {
   result: IGetPublicCompetitionResult;
 }
 
-const getPublicCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":147,"b":161}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public\nFROM competitions\nWHERE competition_id = :competitionId! AND is_public = true"};
+const getPublicCompetitionIR: any = {"usedParamSet":{"competitionId":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":162,"b":176}]}],"statement":"SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules\nFROM competitions\nWHERE competition_id = :competitionId! AND is_public = true"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
+ * SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules
  * FROM competitions
  * WHERE competition_id = :competitionId! AND is_public = true
  * ```

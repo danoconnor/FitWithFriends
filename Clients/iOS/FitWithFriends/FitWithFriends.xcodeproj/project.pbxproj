@@ -71,6 +71,7 @@
 		0B47A241279CB76500C2970E /* MockShakeGestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */; };
 		0B47A244279DDF1300C2970E /* ActivityRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A243279DDF1300C2970E /* ActivityRingView.swift */; };
 		0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A245279DE17B00C2970E /* TodaySummaryView.swift */; };
+		0B47A249279DE17B00C2970A /* MotivationalMessageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24A279DE17B00C2970A /* MotivationalMessageProvider.swift */; };
 		0B47A248279DE1FA00C2970E /* HomepageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */; };
 		0B47A24C279DF37500C2970E /* HKActivitySummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */; };
 		0B47A24E279DFDBC00C2970E /* ActivityValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */; };
@@ -214,6 +215,14 @@
 		A1B2C3D4E5F6000000000006 /* UserCompetitionDailyDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000005 /* UserCompetitionDailyDetailsViewModel.swift */; };
 		A1B2C3D4E5F6000000000008 /* UserCompetitionDailyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000007 /* UserCompetitionDailyDetailsView.swift */; };
 		A1B2C3D4E5F600000000000A /* UserCompetitionDailyDetailsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000009 /* UserCompetitionDailyDetailsViewModelTests.swift */; };
+		A1B2C3D4E5F600000000000C /* ScoringRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000000B /* ScoringRules.swift */; };
+		A1B2C3D4E5F600000000000E /* WorkoutActivityTypeCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000000D /* WorkoutActivityTypeCatalog.swift */; };
+		A1B2C3D4E5F6000000000010 /* ScoringValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000000F /* ScoringValueFormatter.swift */; };
+		A1B2C3D4E5F6000000000012 /* ScoringRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000011 /* ScoringRulesTests.swift */; };
+		A1B2C3D4E5F6000000000014 /* CompetitionWireFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000013 /* CompetitionWireFormatTests.swift */; };
+		A1B2C3D4E5F6000000000016 /* CompetitionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000015 /* CompetitionServiceTests.swift */; };
+		CC000001000000000000AA02 /* MotivationalMessageProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC000001000000000000AA01 /* MotivationalMessageProviderTests.swift */; };
+		CC000001000000000000AA04 /* CreateCompetitionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC000001000000000000AA03 /* CreateCompetitionViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -298,6 +307,7 @@
 		0B47A240279CB76500C2970E /* MockShakeGestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockShakeGestureHandler.swift; sourceTree = "<group>"; };
 		0B47A243279DDF1300C2970E /* ActivityRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRingView.swift; sourceTree = "<group>"; };
 		0B47A245279DE17B00C2970E /* TodaySummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaySummaryView.swift; sourceTree = "<group>"; };
+		0B47A24A279DE17B00C2970A /* MotivationalMessageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotivationalMessageProvider.swift; sourceTree = "<group>"; };
 		0B47A247279DE1FA00C2970E /* HomepageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageViewModel.swift; sourceTree = "<group>"; };
 		0B47A24B279DF37500C2970E /* HKActivitySummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HKActivitySummary+Extensions.swift"; sourceTree = "<group>"; };
 		0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueView.swift; sourceTree = "<group>"; };
@@ -445,6 +455,14 @@
 		A1B2C3D4E5F6000000000005 /* UserCompetitionDailyDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionDailyDetailsViewModel.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000000000007 /* UserCompetitionDailyDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionDailyDetailsView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000000000009 /* UserCompetitionDailyDetailsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCompetitionDailyDetailsViewModelTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000000B /* ScoringRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringRules.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000000D /* WorkoutActivityTypeCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutActivityTypeCatalog.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600000000000F /* ScoringValueFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringValueFormatter.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000011 /* ScoringRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoringRulesTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000013 /* CompetitionWireFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionWireFormatTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000000000015 /* CompetitionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionServiceTests.swift; sourceTree = "<group>"; };
+		CC000001000000000000AA01 /* MotivationalMessageProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotivationalMessageProviderTests.swift; sourceTree = "<group>"; };
+		CC000001000000000000AA03 /* CreateCompetitionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCompetitionViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -492,6 +510,11 @@
 				FWF00002000000000000010D /* AppVersionManagerTests.swift */,
 				FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */,
 				A1B2C3D4E5F6000000000009 /* UserCompetitionDailyDetailsViewModelTests.swift */,
+				A1B2C3D4E5F6000000000011 /* ScoringRulesTests.swift */,
+				A1B2C3D4E5F6000000000013 /* CompetitionWireFormatTests.swift */,
+				A1B2C3D4E5F6000000000015 /* CompetitionServiceTests.swift */,
+				CC000001000000000000AA01 /* MotivationalMessageProviderTests.swift */,
+				CC000001000000000000AA03 /* CreateCompetitionViewModelTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -537,6 +560,8 @@
 				FWF0000200000000000000D5 /* PublicCompetition.swift */,
 				A1B2C3D4E5F6000000000001 /* DailySummary.swift */,
 				A1B2C3D4E5F6000000000003 /* UserCompetitionDailyDetails.swift */,
+				A1B2C3D4E5F600000000000B /* ScoringRules.swift */,
+				A1B2C3D4E5F600000000000D /* WorkoutActivityTypeCatalog.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -677,6 +702,7 @@
 			children = (
 				0BC192AE2B12E6C300C3F4FA /* SecretConstants.swift */,
 				FWF0000200000000000000F3 /* SemanticVersion.swift */,
+				A1B2C3D4E5F600000000000F /* ScoringValueFormatter.swift */,
 				0B99FC36256A3DE100673133 /* Errors */,
 				0B99FC1E256A26D500673133 /* Keychain */,
 				0B99FC0B256A170000673133 /* Extensions */,
@@ -861,6 +887,7 @@
 				0B62E66E25EB356100189702 /* CreateCompetitionView.swift */,
 				0B47A243279DDF1300C2970E /* ActivityRingView.swift */,
 				0B47A245279DE17B00C2970E /* TodaySummaryView.swift */,
+				0B47A24A279DE17B00C2970A /* MotivationalMessageProvider.swift */,
 				0B47A24D279DFDBC00C2970E /* ActivityValueView.swift */,
 				0B47A251279E424300C2970E /* CompetitionOverviewView.swift */,
 				0B47A253279E47B600C2970E /* UserCompetitionResultView.swift */,
@@ -1224,6 +1251,11 @@
 				FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */,
 				FWF000020000000000000113 /* CompetitionEndAlertViewModelTests.swift in Sources */,
 				A1B2C3D4E5F600000000000A /* UserCompetitionDailyDetailsViewModelTests.swift in Sources */,
+				A1B2C3D4E5F6000000000012 /* ScoringRulesTests.swift in Sources */,
+				A1B2C3D4E5F6000000000014 /* CompetitionWireFormatTests.swift in Sources */,
+				A1B2C3D4E5F6000000000016 /* CompetitionServiceTests.swift in Sources */,
+				CC000001000000000000AA02 /* MotivationalMessageProviderTests.swift in Sources */,
+				CC000001000000000000AA04 /* CreateCompetitionViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1339,6 +1371,7 @@
 				0B47A22B279CAC1E00C2970E /* MockTokenManager.swift in Sources */,
 				0B9BADBF256AE2FB00EB1B60 /* ObjectGraph.swift in Sources */,
 				0B47A246279DE17B00C2970E /* TodaySummaryView.swift in Sources */,
+				0B47A249279DE17B00C2970A /* MotivationalMessageProvider.swift in Sources */,
 				0B329F132E4C2CBE0082D211 /* IAppProtocolHandler.swift in Sources */,
 				0B99FC23256A275E00673133 /* KeychainError.swift in Sources */,
 				0B674531297B5F3700F20018 /* Date+Extensions.swift in Sources */,
@@ -1404,6 +1437,9 @@
 				A1B2C3D4E5F6000000000004 /* UserCompetitionDailyDetails.swift in Sources */,
 				A1B2C3D4E5F6000000000006 /* UserCompetitionDailyDetailsViewModel.swift in Sources */,
 				A1B2C3D4E5F6000000000008 /* UserCompetitionDailyDetailsView.swift in Sources */,
+				A1B2C3D4E5F600000000000C /* ScoringRules.swift in Sources */,
+				A1B2C3D4E5F600000000000E /* WorkoutActivityTypeCatalog.swift in Sources */,
+				A1B2C3D4E5F6000000000010 /* ScoringValueFormatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

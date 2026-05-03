@@ -5,7 +5,8 @@ SELECT competition_id from users_competitions WHERE user_id = :userId!;
 SELECT user_id, final_points FROM users_competitions WHERE competition_id = :competitionId!;
 
 /* @name CreateCompetition */
-INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!);
+INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules)
+VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :scoringRules);
 
 /* @name AddUserToCompetition */
 INSERT INTO users_competitions (user_id, competition_id) 
@@ -14,10 +15,10 @@ ON CONFLICT (user_id, competition_id) DO NOTHING;
 
 /* @name GetCompetition */
 /* Does not return the access_token field - we will only return that to admin users */
-SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public FROM competitions WHERE competition_id = :competitionId!;
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules FROM competitions WHERE competition_id = :competitionId!;
 
 /* @name GetCompetitionAdminDetails */
-SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!;
+SELECT start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules FROM competitions WHERE competition_id = :competitionId! AND admin_user_id = :adminUserId!;
 
 /* @name GetNumUsersInCompetition */
 SELECT count(user_id)::INTEGER FROM users_competitions WHERE competition_id = :competitionId!;
@@ -45,7 +46,7 @@ WHERE end_date > :currentDate!;
 DELETE FROM competitions WHERE competition_id = :competitionId!;
 
 /* @name GetCompetitionsInState */
-SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules
 FROM competitions
 WHERE state = :state! AND end_date < :finishedBeforeDate!;
 
@@ -66,11 +67,11 @@ WHERE c.is_public = true AND c.state = :activeState!
 GROUP BY c.competition_id;
 
 /* @name CreatePublicCompetition */
-INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public)
-VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true);
+INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, is_public, scoring_rules)
+VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, true, :scoringRules);
 
 /* @name GetPublicCompetition */
-SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public
+SELECT start_date, end_date, display_name, admin_user_id, iana_timezone, competition_id, state, is_public, scoring_rules
 FROM competitions
 WHERE competition_id = :competitionId! AND is_public = true;
 
