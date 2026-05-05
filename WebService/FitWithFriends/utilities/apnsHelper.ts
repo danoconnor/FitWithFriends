@@ -1,4 +1,3 @@
-import * as https from 'https';
 import jwt from 'jsonwebtoken';
 import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
@@ -37,9 +36,6 @@ export async function sendPushNotifications(notifications: Notification[]) {
         pushTokenResults.map(result => [result.userId, result.tokens])
     );
 
-    // Create an HTTPS agent to reuse the TLS connection for multiple requests
-    const httpsAgent = new https.Agent({ keepAlive: true });
-
     // Create an entry for each notification/push token pair that we are going to send
     const notificationTokenPairs: Array<{
         userId: string;
@@ -65,14 +61,7 @@ export async function sendPushNotifications(notifications: Notification[]) {
         const batch = notificationTokenPairs.slice(i, i + batchSize);
         await Promise.all(
             batch.map(({ userId, pushToken, title, body }) =>
-                sendPushNotification(
-                    httpsAgent,
-                    userId,
-                    pushToken,
-                    title,
-                    body,
-                    apnsToken
-                )
+                sendPushNotification(userId, pushToken, title, body, apnsToken)
             )
         );
     }
@@ -127,7 +116,7 @@ async function getAPNSToken(): Promise<string> {
     return token;
 }
 
-async function sendPushNotification(httpsAgent: https.Agent, userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string) {
+async function sendPushNotification(userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string) {
     if (isTestEnvironment()) {
         console.log(`Mock push notification to userId ${userId} with token ${pushToken}: ${notificationTitle} - ${notificationBody}`);
         return;
@@ -137,20 +126,6 @@ async function sendPushNotification(httpsAgent: https.Agent, userId: string, pus
     if (!bundleId) {
         throw new Error('Missing required APNS_BUNDLE_ID environment variable');
     }
-
-    const options: https.RequestOptions = {
-        hostname: 'api.push.apple.com',
-        port: 443,
-        path: '/3/device/' + pushToken,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'apns-push-type': 'alert',
-            'apns-topic': bundleId,
-            'authorization': `bearer ${apnsToken}`,
-        },
-        agent: httpsAgent
-    };
 
     // See https://developer.apple.com/documentation/usernotifications/generating-a-remote-notification#Create-the-JSON-payload
     const payload = {
@@ -162,55 +137,43 @@ async function sendPushNotification(httpsAgent: https.Agent, userId: string, pus
         }
     };
 
-    // See https://developer.apple.com/documentation/usernotifications/handling-notification-responses-from-apns
-    return new Promise<void>((resolve, reject) => {
-        const req = https.request(options, res => {
-            let data = '';
-
-            res.on('data', chunk => {
-                data += chunk;
-            });
-
-            res.on('end', async () => {
-                const statusCode = res.statusCode;
-                if (!statusCode) {
-                    reject(new Error('No status code in response'));
-                    return;
-                }
-
-                console.log(`statusCode: ${statusCode}`);
-
-                if (statusCode >= 200 && statusCode < 300) {
-                    resolve();
-                } else if (statusCode === 410) {
-                    // 410: The device token is no longer valid, delete it from the database
-                    try {
-                        await PushNotificationQueries.deletePushToken({
-                            userId: convertUserIdToBuffer(userId),
-                            pushToken: pushToken
-                        });
-                        console.warn(`Deleted invalid push token for userId ${userId}`);
-                    } catch (err) {
-                        console.error(`Failed to delete invalid push token for userId ${userId}:`, err);
-                    }
-                    resolve();
-                } else {
-                    // Do not reject here so we can continue processing other notifications
-                    console.error(`Request failed with status code ${statusCode}. Details: ${data}`);
-                    resolve();
-                }
-            });
+    try {
+        // fetch uses undici which negotiates HTTP/2 via ALPN, required by APNs
+        // See https://developer.apple.com/documentation/usernotifications/handling-notification-responses-from-apns
+        const response = await fetch(`https://api.push.apple.com/3/device/${pushToken}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apns-push-type': 'alert',
+                'apns-topic': bundleId,
+                'authorization': `bearer ${apnsToken}`,
+            },
+            body: JSON.stringify(payload)
         });
 
-        req.on('error', error => {
-            // Do not reject here so we can continue processing other notifications
-            console.error('Error sending push notification:', error);
-            resolve();
-        });
+        const statusCode = response.status;
+        console.log(`APNs statusCode: ${statusCode}`);
 
-        req.write(JSON.stringify(payload));
-        req.end();
-    });
+        if (statusCode === 410) {
+            // 410: The device token is no longer valid, delete it from the database
+            try {
+                await PushNotificationQueries.deletePushToken({
+                    userId: convertUserIdToBuffer(userId),
+                    pushToken: pushToken
+                });
+                console.warn(`Deleted invalid push token for userId ${userId}`);
+            } catch (err) {
+                console.error(`Failed to delete invalid push token for userId ${userId}:`, err);
+            }
+        } else if (statusCode < 200 || statusCode >= 300) {
+            // Do not throw so we can continue processing other notifications
+            const data = await response.text();
+            console.error(`APNs request failed with status code ${statusCode}. Details: ${data}`);
+        }
+    } catch (error) {
+        // Do not throw so we can continue processing other notifications
+        console.error('Error sending push notification:', error);
+    }
 }
 
 function isTestEnvironment(): boolean {
