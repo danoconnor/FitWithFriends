@@ -102,6 +102,7 @@ final class HomepageViewModelTests: XCTestCase {
     private var mockCompetitionManager: MockCompetitionManager!
     private var mockHealthKitManager: MockHealthKitManager!
     private var mockSubscriptionManager: MockSubscriptionManager!
+    private var mockUserService: MockUserService!
     private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
@@ -110,13 +111,15 @@ final class HomepageViewModelTests: XCTestCase {
         mockCompetitionManager = MockCompetitionManager()
         mockHealthKitManager = MockHealthKitManager()
         mockSubscriptionManager = MockSubscriptionManager()
+        mockUserService = MockUserService()
         cancellables = []
 
         homepageViewModel = HomepageViewModel(
             authenticationManager: mockAuthenticationManager,
             competitionManager: mockCompetitionManager,
             healthKitManager: mockHealthKitManager,
-            subscriptionManager: mockSubscriptionManager
+            subscriptionManager: mockSubscriptionManager,
+            userService: mockUserService
         )
     }
 
@@ -126,6 +129,7 @@ final class HomepageViewModelTests: XCTestCase {
         mockCompetitionManager = nil
         mockHealthKitManager = nil
         mockSubscriptionManager = nil
+        mockUserService = nil
         cancellables = nil
         super.tearDown()
     }
@@ -262,5 +266,28 @@ final class HomepageViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 2)
         XCTAssertEqual(homepageViewModel.publicCompetitions?.count, 1, "Only the active competition should be shown")
         XCTAssertEqual(homepageViewModel.publicCompetitions?.first?.competitionId, activeCompetitionId)
+    }
+
+    func test_deleteAccount_happyPath_shouldCallServiceThenLogout() async {
+        // Act
+        await homepageViewModel.deleteAccount()
+
+        // Assert
+        XCTAssertEqual(mockUserService.deleteAccountCallCount, 1, "deleteAccount should be called once on the service")
+        XCTAssertEqual(mockAuthenticationManager.logoutCallCount, 1, "logout should be called after successful deletion")
+        XCTAssertTrue(mockAuthenticationManager.return_logout_called)
+    }
+
+    func test_deleteAccount_serviceError_shouldNotLogout() async {
+        // Arrange
+        mockUserService.return_deleteAccount_error = HttpError.generic
+
+        // Act
+        let deleteSuccess = await homepageViewModel.deleteAccount()
+
+        // Assert
+        XCTAssertFalse(deleteSuccess, "Delete account should fail if the service throws")
+        XCTAssertEqual(mockUserService.deleteAccountCallCount, 1, "deleteAccount should be called once on the service")
+        XCTAssertEqual(mockAuthenticationManager.logoutCallCount, 0, "logout should not be called when the service throws")
     }
 }

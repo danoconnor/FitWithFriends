@@ -1,6 +1,7 @@
 import { convertUserIdToBuffer } from "../../utilities/userHelpers";
 import * as TestSQL from "../testUtilities/sql/testQueries.queries";
 import * as RequestUtilities from "../testUtilities/testRequestUtilities";
+import * as AuthUtilities from "../testUtilities/testAuthUtilities";
 
 /*
     Tests the /users routes
@@ -107,4 +108,63 @@ test('userFromAppleID lastName too long', async () => {
 
     expect(response.status).toBe(400);
     expect(response.data.context).toContain('Parameter too long');
+});
+
+// MARK: - DELETE /users/me
+
+describe('DELETE /users/me', () => {
+    const testUserId = Math.random().toString().slice(2, 10);
+    const userIdBuffer = convertUserIdToBuffer(testUserId);
+
+    beforeEach(async () => {
+        await TestSQL.createUser({
+            userId: userIdBuffer,
+            firstName: 'Delete',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: new Date()
+        });
+    });
+
+    afterEach(async () => {
+        await TestSQL.clearDataForUser({ userId: userIdBuffer });
+    });
+
+    test('happy path - deletes user and returns 200', async () => {
+        const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+
+        const response = await RequestUtilities.makeDeleteRequest('users/me', accessToken);
+
+        expect(response.status).toBe(200);
+        const user = await TestSQL.getUser({ userId: userIdBuffer });
+        expect(user.length).toBe(0);
+    });
+
+    test('cascades - removes associated activity summaries', async () => {
+        await TestSQL.insertActivitySummary({
+            userId: userIdBuffer,
+            date: new Date(),
+            caloriesBurned: 300,
+            caloriesGoal: 500,
+            exerciseTime: 30,
+            exerciseTimeGoal: 30,
+            standTime: 10,
+            standTimeGoal: 12
+        });
+
+        const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+        const response = await RequestUtilities.makeDeleteRequest('users/me', accessToken);
+
+        expect(response.status).toBe(200);
+        const summaries = await TestSQL.getActivitySummariesForUser({ userId: userIdBuffer });
+        expect(summaries.length).toBe(0);
+    });
+
+    test('unauthenticated - returns 400 and does not delete user', async () => {
+        const response = await RequestUtilities.makeDeleteRequest('users/me');
+
+        expect(response.status).toBe(400);
+        const user = await TestSQL.getUser({ userId: userIdBuffer });
+        expect(user.length).toBe(1);
+    });
 });

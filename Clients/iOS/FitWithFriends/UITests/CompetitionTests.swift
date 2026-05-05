@@ -108,4 +108,139 @@ final class CompetitionTests: FWFUITestBase {
         // Private competitions should show a "Private" badge
         XCTAssertTrue(app.staticTexts["Private"].waitForExistence(timeout: 5))
     }
+
+    func testCreateCompetitionScoringDropdownExists() {
+        launchApp(loggedIn: true)
+
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+
+        let newCompButton = app.buttons["New Competition"]
+        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
+        newCompButton.tap()
+
+        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+
+        // Verify the scoring type dropdown label button exists
+        let dropdownButton = app.buttons["Activity Rings"]
+        XCTAssertTrue(dropdownButton.waitForExistence(timeout: 3), "Scoring type dropdown should show 'Activity Rings' as the default label")
+
+        // Tap to open the menu
+        dropdownButton.tap()
+
+        // Verify the other options appear in the menu
+        XCTAssertTrue(app.buttons["Tracked Workouts"].waitForExistence(timeout: 3), "Menu should show 'Tracked Workouts' option")
+        XCTAssertTrue(app.buttons["Daily Totals"].waitForExistence(timeout: 3), "Menu should show 'Daily Totals' option")
+    }
+
+    func testCreateCompetitionKeyboardDismiss() {
+        launchApp(loggedIn: true)
+
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+
+        let newCompButton = app.buttons["New Competition"]
+        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
+        newCompButton.tap()
+
+        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+
+        // Tap the name field and type some text
+        let nameField = app.textFields["e.g., January Challenge"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 3))
+        nameField.tap()
+        nameField.typeText("Test")
+
+        // Verify keyboard is visible by checking the Done button exists
+        let doneButton = app.buttons["Done"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 3), "Keyboard Done button should be visible")
+        doneButton.tap()
+
+        // After tapping Done the keyboard should be dismissed
+        // The Done button should no longer be present (keyboard hidden)
+        XCTAssertFalse(app.keyboards.firstMatch.exists)
+    }
+
+    func testCreateCompetitionProUpgradeShownForNonProUser() {
+        launchApp(loggedIn: true, isPro: false)
+
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+
+        let newCompButton = app.buttons["New Competition"]
+        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
+        newCompButton.tap()
+
+        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+
+        // Open the scoring type dropdown and select Tracked Workouts (pro-only)
+        let dropdownButton = app.buttons["Activity Rings"]
+        XCTAssertTrue(dropdownButton.waitForExistence(timeout: 3))
+        dropdownButton.tap()
+
+        let trackedWorkoutsOption = app.buttons["Tracked Workouts"]
+        XCTAssertTrue(trackedWorkoutsOption.waitForExistence(timeout: 3))
+        trackedWorkoutsOption.tap()
+
+        // For a non-pro user selecting a pro-only scoring type, the Upgrade to Pro button should appear
+        XCTAssertTrue(app.buttons["Upgrade to Pro"].waitForExistence(timeout: 3),
+                      "Upgrade to Pro button should appear for non-pro users selecting a pro scoring type")
+
+        // The Create button should NOT be present
+        XCTAssertFalse(app.buttons["Create"].exists,
+                       "Create button should not be shown when Upgrade to Pro is required")
+    }
+
+    func testCreateCompetitionCreateButtonShownForProUser() {
+        launchApp(loggedIn: true, isPro: true)
+
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+
+        let newCompButton = app.buttons["New Competition"]
+        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
+        newCompButton.tap()
+
+        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+
+        // Fill in competition name
+        let nameField = app.textFields["e.g., January Challenge"]
+        XCTAssertTrue(nameField.waitForExistence(timeout: 3))
+        nameField.tap()
+        nameField.typeText("Pro Competition")
+
+        // For a pro user, the Create button should be visible
+        XCTAssertTrue(app.buttons["Create"].waitForExistence(timeout: 3),
+                      "Create button should be visible for pro users")
+
+        // Upgrade to Pro button should NOT be present
+        XCTAssertFalse(app.buttons["Upgrade to Pro"].exists,
+                       "Upgrade to Pro button should not appear for pro users")
+    }
+
+    func testCreateCompetitionWorkoutTypeAnyOption() {
+        launchApp(loggedIn: true, isPro: true)
+
+        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+
+        let newCompButton = app.buttons["New Competition"]
+        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
+        newCompButton.tap()
+
+        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+
+        // Open the scoring type dropdown and select Tracked Workouts
+        let dropdownButton = app.buttons["Activity Rings"]
+        XCTAssertTrue(dropdownButton.waitForExistence(timeout: 3))
+        dropdownButton.tap()
+
+        let trackedWorkoutsOption = app.buttons["Tracked Workouts"]
+        XCTAssertTrue(trackedWorkoutsOption.waitForExistence(timeout: 3))
+        trackedWorkoutsOption.tap()
+
+        // Tap the workout types row to open the picker sheet
+        let workoutTypesRow = app.buttons["Workout types"]
+        XCTAssertTrue(workoutTypesRow.waitForExistence(timeout: 3))
+        workoutTypesRow.tap()
+
+        // Verify "Any workout type" appears at the top of the picker sheet
+        XCTAssertTrue(app.staticTexts["Any workout type"].waitForExistence(timeout: 3),
+                      "The workout type picker should include an 'Any workout type' option")
+    }
 }

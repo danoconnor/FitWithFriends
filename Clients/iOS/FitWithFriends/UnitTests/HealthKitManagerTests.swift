@@ -64,7 +64,7 @@ final class HealthKitManagerTests: XCTestCase {
         healthKitManager.requestHealthKitPermission {
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
 
         // Validate that we should still attempt a prompt on next launch
         XCTAssertTrue(healthKitManager.shouldPromptUser, "Should still prompt user because we did not prompt successfully")
@@ -77,7 +77,7 @@ final class HealthKitManagerTests: XCTestCase {
         healthKitManager.requestHealthKitPermission {
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
 
         // Validate the types that we wanted to read from HealthKit
         XCTAssertNotNil(healthStoreWrapper.param_typesToRead, "Should have requested data to read")

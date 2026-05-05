@@ -19,9 +19,15 @@ jobs:
             -d '{}' \
             "https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/admin/performDailyTasks")
           echo "Response status: $status"
-          echo "Summary:"
-          jq . "$body_file"
+          echo "Full response:"
+          jq . "$body_file" 2>/dev/null || cat "$body_file"
           if [ "$status" -ne 200 ]; then
-            echo "Error: endpoint returned HTTP $status"
+            echo ""
+            echo "::error::performDailyTasks failed with HTTP $status"
+            failed_tasks=$(jq -r '.errors[]? | "  - \(.name) (\(.errorType // "Error")): \(.error)"' "$body_file" 2>/dev/null)
+            if [ -n "$failed_tasks" ]; then
+              echo "Failed tasks:"
+              echo "$failed_tasks"
+            fi
             exit 1
           fi

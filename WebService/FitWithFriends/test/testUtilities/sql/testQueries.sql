@@ -23,17 +23,22 @@ SELECT * FROM users WHERE user_id = :userId!;
 SELECT * FROM activity_summaries WHERE user_id = :userId!;
 
 /* @name InsertActivitySummary */
-INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)
-VALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!)
-ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal;
+INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, step_count, distance_walking_running_meters, flights_climbed)
+VALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!, COALESCE(:stepCount, 0), COALESCE(:distanceWalkingRunningMeters, 0), COALESCE(:flightsClimbed, 0))
+ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal, step_count = EXCLUDED.step_count, distance_walking_running_meters = EXCLUDED.distance_walking_running_meters, flights_climbed = EXCLUDED.flights_climbed;
+
+/* @name InsertWorkout */
+INSERT INTO workouts (user_id, start_date, calories_burned, workout_type, duration, distance, unit)
+VALUES (:userId!, :startDate!, :caloriesBurned!, :workoutType!, :duration!, :distance, :unit)
+ON CONFLICT (user_id, start_date, workout_type) DO NOTHING;
 
 /* @name CreateCompetition */
-INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) 
-VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!);
+INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules)
+VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :scoringRules);
 
 /* @name CreateCompetitionWithState */
-INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state) 
-VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!);
+INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state, scoring_rules)
+VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!, :scoringRules);
 
 /* @name AddUserToCompetition */
 INSERT INTO users_competitions (user_id, competition_id)

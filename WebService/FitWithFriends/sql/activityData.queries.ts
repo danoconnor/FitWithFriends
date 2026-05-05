@@ -15,10 +15,13 @@ export interface IGetActivitySummariesForUsersResult {
   calories_burned: number;
   calories_goal: number;
   date: Date;
+  distance_walking_running_meters: number;
   exercise_time: number;
   exercise_time_goal: number;
+  flights_climbed: number;
   stand_time: number;
   stand_time_goal: number;
+  step_count: number;
   userId: string;
 }
 
@@ -28,13 +31,15 @@ export interface IGetActivitySummariesForUsersQuery {
   result: IGetActivitySummariesForUsersResult;
 }
 
-const getActivitySummariesForUsersIR: any = {"usedParamSet":{"userIds":true,"endDate":true,"startDate":true},"params":[{"name":"userIds","required":true,"transform":{"type":"array_spread"},"locs":[{"a":279,"b":287}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":301,"b":309}]},{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":323,"b":333}]}],"statement":"                                                                                    \nSELECT encode(user_id::bytea, 'hex') AS \"userId!\", date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal \nFROM activity_summaries\nWHERE user_id in :userIds! AND date <= :endDate! AND date >= :startDate!"};
+const getActivitySummariesForUsersIR: any = {"usedParamSet":{"userIds":true,"endDate":true,"startDate":true},"params":[{"name":"userIds","required":true,"transform":{"type":"array_spread"},"locs":[{"a":354,"b":362}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":376,"b":384}]},{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":398,"b":408}]}],"statement":"                                                                                    \nSELECT encode(user_id::bytea, 'hex') AS \"userId!\", date,\n       calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal,\n       step_count, distance_walking_running_meters, flights_climbed\nFROM activity_summaries\nWHERE user_id in :userIds! AND date <= :endDate! AND date >= :startDate!"};
 
 /**
  * Query generated from SQL:
  * ```
  *                                                                                     
- * SELECT encode(user_id::bytea, 'hex') AS "userId!", date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal 
+ * SELECT encode(user_id::bytea, 'hex') AS "userId!", date,
+ *        calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal,
+ *        step_count, distance_walking_running_meters, flights_climbed
  * FROM activity_summaries
  * WHERE user_id in :userIds! AND date <= :endDate! AND date >= :startDate!
  * ```
@@ -57,7 +62,10 @@ export interface IInsertActivitySummariesParams {
     exerciseTime: number,
     exerciseTimeGoal: number,
     standTime: number,
-    standTimeGoal: number
+    standTimeGoal: number,
+    stepCount: number,
+    distanceWalkingRunningMeters: number,
+    flightsClimbed: number
   })[];
 }
 
@@ -70,20 +78,23 @@ export interface IInsertActivitySummariesQuery {
   result: IInsertActivitySummariesResult;
 }
 
-const insertActivitySummariesIR: any = {"usedParamSet":{"summaries":true},"params":[{"name":"summaries","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"date","required":true},{"name":"caloriesBurned","required":true},{"name":"caloriesGoal","required":true},{"name":"exerciseTime","required":true},{"name":"exerciseTimeGoal","required":true},{"name":"standTime","required":true},{"name":"standTimeGoal","required":true}]},"locs":[{"a":149,"b":159}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)\nVALUES :summaries!\nON CONFLICT (user_id, date) DO UPDATE SET \n    calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned), \n    calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal), \n    exercise_time = GREATEST(activity_summaries.exercise_time, EXCLUDED.exercise_time),\n    exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal), \n    stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time), \n    stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal)"};
+const insertActivitySummariesIR: any = {"usedParamSet":{"summaries":true},"params":[{"name":"summaries","required":true,"transform":{"type":"pick_array_spread","keys":[{"name":"userId","required":true},{"name":"date","required":true},{"name":"caloriesBurned","required":true},{"name":"caloriesGoal","required":true},{"name":"exerciseTime","required":true},{"name":"exerciseTimeGoal","required":true},{"name":"standTime","required":true},{"name":"standTimeGoal","required":true},{"name":"stepCount","required":true},{"name":"distanceWalkingRunningMeters","required":true},{"name":"flightsClimbed","required":true}]},"locs":[{"a":211,"b":221}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, step_count, distance_walking_running_meters, flights_climbed)\nVALUES :summaries!\nON CONFLICT (user_id, date) DO UPDATE SET\n    calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned),\n    calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal),\n    exercise_time = GREATEST(activity_summaries.exercise_time, EXCLUDED.exercise_time),\n    exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal),\n    stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time),\n    stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal),\n    step_count = GREATEST(activity_summaries.step_count, EXCLUDED.step_count),\n    distance_walking_running_meters = GREATEST(activity_summaries.distance_walking_running_meters, EXCLUDED.distance_walking_running_meters),\n    flights_climbed = GREATEST(activity_summaries.flights_climbed, EXCLUDED.flights_climbed)"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)
+ * INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, step_count, distance_walking_running_meters, flights_climbed)
  * VALUES :summaries!
- * ON CONFLICT (user_id, date) DO UPDATE SET 
- *     calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned), 
- *     calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal), 
+ * ON CONFLICT (user_id, date) DO UPDATE SET
+ *     calories_burned = GREATEST(activity_summaries.calories_burned, EXCLUDED.calories_burned),
+ *     calories_goal = GREATEST(activity_summaries.calories_goal, EXCLUDED.calories_goal),
  *     exercise_time = GREATEST(activity_summaries.exercise_time, EXCLUDED.exercise_time),
- *     exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal), 
- *     stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time), 
- *     stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal)
+ *     exercise_time_goal = GREATEST(activity_summaries.exercise_time_goal, EXCLUDED.exercise_time_goal),
+ *     stand_time = GREATEST(activity_summaries.stand_time, EXCLUDED.stand_time),
+ *     stand_time_goal = GREATEST(activity_summaries.stand_time_goal, EXCLUDED.stand_time_goal),
+ *     step_count = GREATEST(activity_summaries.step_count, EXCLUDED.step_count),
+ *     distance_walking_running_meters = GREATEST(activity_summaries.distance_walking_running_meters, EXCLUDED.distance_walking_running_meters),
+ *     flights_climbed = GREATEST(activity_summaries.flights_climbed, EXCLUDED.flights_climbed)
  * ```
  */
 export function insertActivitySummaries(params: IInsertActivitySummariesParams): Promise<Array<IInsertActivitySummariesResult>> {
@@ -130,6 +141,49 @@ export function insertWorkouts(params: IInsertWorkoutsParams): Promise<Array<IIn
   return import('@pgtyped/runtime').then(pgtyped => {
     const insertWorkouts = new pgtyped.PreparedQuery<IInsertWorkoutsParams,IInsertWorkoutsResult>(insertWorkoutsIR);
     return insertWorkouts.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'GetWorkoutsForUsersInDateRange' parameters type */
+export interface IGetWorkoutsForUsersInDateRangeParams {
+  endDate: DateOrString;
+  startDate: DateOrString;
+  userIds: readonly (Buffer)[];
+}
+
+/** 'GetWorkoutsForUsersInDateRange' return type */
+export interface IGetWorkoutsForUsersInDateRangeResult {
+  calories_burned: number;
+  distance: number | null;
+  duration: number;
+  start_date: Date;
+  unit: number | null;
+  userId: string;
+  workout_type: number;
+}
+
+/** 'GetWorkoutsForUsersInDateRange' query type */
+export interface IGetWorkoutsForUsersInDateRangeQuery {
+  params: IGetWorkoutsForUsersInDateRangeParams;
+  result: IGetWorkoutsForUsersInDateRangeResult;
+}
+
+const getWorkoutsForUsersInDateRangeIR: any = {"usedParamSet":{"userIds":true,"endDate":true,"startDate":true},"params":[{"name":"userIds","required":true,"transform":{"type":"array_spread"},"locs":[{"a":259,"b":267}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":287,"b":295}]},{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":315,"b":325}]}],"statement":"                                                                                                            \nSELECT encode(user_id::bytea, 'hex') AS \"userId!\", start_date, workout_type, duration, distance, unit, calories_burned\nFROM workouts\nWHERE user_id in :userIds! AND start_date <= :endDate! AND start_date >= :startDate!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ *                                                                                                             
+ * SELECT encode(user_id::bytea, 'hex') AS "userId!", start_date, workout_type, duration, distance, unit, calories_burned
+ * FROM workouts
+ * WHERE user_id in :userIds! AND start_date <= :endDate! AND start_date >= :startDate!
+ * ```
+ */
+export function getWorkoutsForUsersInDateRange(params: IGetWorkoutsForUsersInDateRangeParams): Promise<Array<IGetWorkoutsForUsersInDateRangeResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getWorkoutsForUsersInDateRange = new pgtyped.PreparedQuery<IGetWorkoutsForUsersInDateRangeParams,IGetWorkoutsForUsersInDateRangeResult>(getWorkoutsForUsersInDateRangeIR);
+    return getWorkoutsForUsersInDateRange.run(params, DatabaseConnectionPool);
   });
 }
 

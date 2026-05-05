@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 import { ICreateCompetitionParams } from '../../../sql/competitions.queries';
 import { CompetitionState } from '../../../utilities/enums/CompetitionState';
 import { ICreateCompetitionWithStateParams } from '../../testUtilities/sql/testQueries.queries';
@@ -19,7 +18,7 @@ const testUserName = 'Test User';
 // The competitionId that will be created in the database during the test setup
 const now = new Date();
 const testCompetitionInfo: ICreateCompetitionParams = {
-    competitionId: uuid(),
+    competitionId: crypto.randomUUID(),
     adminUserId: convertUserIdToBuffer(testUserId),
     displayName: 'Test Competition',
     startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
@@ -391,7 +390,7 @@ test('Get competition overview: user is not part of competition', async () => {
 
 test('Get competition overview: competition does not exist', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
-    const response = await RequestUtilities.makeGetRequest(`competitions/${uuid()}/overview?timezone=America/New_York`, accessToken);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${crypto.randomUUID()}/overview?timezone=America/New_York`, accessToken);
 
     expect(response.status).toBe(404);
     expect(response.data.context).toContain('Could not find competition info');
@@ -408,7 +407,7 @@ test('Get competition overview: invalid timezone', async () => {
 
 test('Get competition overview: returns isPublic true for public competition', async () => {
     // Create a public competition and add the test user to it
-    const publicCompetitionId = uuid();
+    const publicCompetitionId = crypto.randomUUID();
     const now = new Date();
     await TestSQL.createPublicCompetition({
         competitionId: publicCompetitionId,
@@ -446,7 +445,7 @@ test('Get competition overview: competition is processing results', async () => 
     // Competition processing is based off UTC dates
     const now = new Date();
     const testCompetitionInfoProcessing: ICreateCompetitionWithStateParams = {
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition Processing Results',
         startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7).toUTCString(), // 7 days ago
@@ -479,7 +478,7 @@ test('Get competition overview: competition is archived', async () => {
     // Create a competition that has been archived with final points stored
     const now = new Date();
     const testCompetitionInfoArchived: ICreateCompetitionWithStateParams = {
-        competitionId: uuid(),
+        competitionId: crypto.randomUUID(),
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition Archived',
         startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 14).toUTCString(), // 14 days ago
@@ -539,4 +538,166 @@ test('Get competition overview: competition is archived', async () => {
     // If it were calculating from activity data, the score would be 600 (max daily score)
     expect(testUserResult.activityPoints).toBe(expectedFinalPoints); // Should use stored final_points
     expect(testUserResult.pointsToday).toBe(0); // No points today for archived competitions
+});
+
+/* ───────────────────────── Scoring rules ───────────────────────── */
+
+test('Get competition overview: default rule returns rings/points and rule object', async () => {
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
+
+    expect(response.status).toBe(200);
+    // Legacy competitions store NULL → response should fall back to the default rings rule.
+    expect(response.data.scoringRules).toEqual({ kind: 'rings' });
+    expect(response.data.scoringUnit).toBe('points');
+});
+
+test('Get competition overview: workouts-distance rule scores from workouts and reports meters', async () => {
+    // Create a separate competition with the workouts-distance rule.
+    const competitionId = crypto.randomUUID();
+    const start = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 3);
+    const end = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 3);
+    await TestSQL.createCompetition({
+        competitionId,
+        adminUserId: convertUserIdToBuffer(testUserId),
+        displayName: 'Distance Comp',
+        startDate: start,
+        endDate: end,
+        accessToken: 'wkt',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'workouts', metric: 'distance', activityTypes: [37] },
+    });
+    competitionsToCleanup.push(competitionId);
+    await TestSQL.addUserToCompetition({ competitionId, userId: convertUserIdToBuffer(testUserId) });
+
+    // Today: 5 mile run (workout_type 37 = walking, used in catalog as a stand-in)
+    await TestSQL.insertWorkout({
+        userId: convertUserIdToBuffer(testUserId),
+        startDate: now,
+        caloriesBurned: 500,
+        workoutType: 37,
+        duration: 1800,
+        distance: 5,
+        unit: 1, // miles
+    });
+    // Yesterday: 2000 m of the same activity type
+    const yesterday = new Date(now.getTime() - 1000 * 60 * 60 * 24);
+    await TestSQL.insertWorkout({
+        userId: convertUserIdToBuffer(testUserId),
+        startDate: yesterday,
+        caloriesBurned: 200,
+        workoutType: 37,
+        duration: 900,
+        distance: 2000,
+        unit: 2, // meters
+    });
+    // Cycling workout (type 13) — should be filtered out by activityTypes.
+    await TestSQL.insertWorkout({
+        userId: convertUserIdToBuffer(testUserId),
+        startDate: now,
+        caloriesBurned: 600,
+        workoutType: 13,
+        duration: 3600,
+        distance: 30000,
+        unit: 2,
+    });
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${competitionId}/overview?timezone=America/New_York`, accessToken);
+
+    expect(response.status).toBe(200);
+    expect(response.data.scoringUnit).toBe('meters');
+    expect(response.data.scoringRules).toMatchObject({ kind: 'workouts', metric: 'distance' });
+
+    const userResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
+    expect(userResult).not.toBeUndefined();
+    // 5 miles + 2000 m = 5*1609.344 + 2000 ≈ 10046.72 m. Cycling excluded.
+    expect(userResult.activityPoints).toBeCloseTo(5 * 1609.344 + 2000, 1);
+    expect(userResult.pointsToday).toBeCloseTo(5 * 1609.344, 1);
+});
+
+test('Get competition overview: daily steps rule reads step_count column', async () => {
+    const competitionId = crypto.randomUUID();
+    const start = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 3);
+    const end = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 3);
+    await TestSQL.createCompetition({
+        competitionId,
+        adminUserId: convertUserIdToBuffer(testUserId),
+        displayName: 'Step Challenge',
+        startDate: start,
+        endDate: end,
+        accessToken: 'stp',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'daily', metric: 'steps' },
+    });
+    competitionsToCleanup.push(competitionId);
+    await TestSQL.addUserToCompetition({ competitionId, userId: convertUserIdToBuffer(testUserId) });
+
+    await TestSQL.insertActivitySummary({
+        userId: convertUserIdToBuffer(testUserId),
+        date: now,
+        caloriesBurned: 0, caloriesGoal: 500,
+        exerciseTime: 0, exerciseTimeGoal: 30,
+        standTime: 0, standTimeGoal: 12,
+        stepCount: 9000,
+        distanceWalkingRunningMeters: 4000,
+        flightsClimbed: 5,
+    });
+    const yesterday = new Date(now.getTime() - 1000 * 60 * 60 * 24);
+    await TestSQL.insertActivitySummary({
+        userId: convertUserIdToBuffer(testUserId),
+        date: yesterday,
+        caloriesBurned: 0, caloriesGoal: 500,
+        exerciseTime: 0, exerciseTimeGoal: 30,
+        standTime: 0, standTimeGoal: 12,
+        stepCount: 6500,
+        distanceWalkingRunningMeters: 3000,
+        flightsClimbed: 3,
+    });
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${competitionId}/overview?timezone=America/New_York`, accessToken);
+
+    expect(response.status).toBe(200);
+    expect(response.data.scoringUnit).toBe('steps');
+    expect(response.data.scoringRules).toMatchObject({ kind: 'daily', metric: 'steps' });
+
+    const userResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
+    expect(userResult.activityPoints).toBe(15500);
+    expect(userResult.pointsToday).toBe(9000);
+});
+
+test('Get competition overview: rings rule with minGoal floors the per-ring percentage', async () => {
+    const competitionId = crypto.randomUUID();
+    const start = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 3);
+    const end = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 3);
+    await TestSQL.createCompetition({
+        competitionId,
+        adminUserId: convertUserIdToBuffer(testUserId),
+        displayName: 'Min-Goal Comp',
+        startDate: start,
+        endDate: end,
+        accessToken: 'mg',
+        ianaTimezone: 'America/New_York',
+        scoringRules: { kind: 'rings', minGoals: { calories: 500 } },
+    });
+    competitionsToCleanup.push(competitionId);
+    await TestSQL.addUserToCompetition({ competitionId, userId: convertUserIdToBuffer(testUserId) });
+
+    // User set a trivial calorie goal of 1 to game the score, burned only 1 calorie.
+    await TestSQL.insertActivitySummary({
+        userId: convertUserIdToBuffer(testUserId),
+        date: now,
+        caloriesBurned: 1, caloriesGoal: 1,
+        exerciseTime: 0, exerciseTimeGoal: 30,
+        standTime: 0, standTimeGoal: 12,
+    });
+
+    const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${competitionId}/overview?timezone=America/New_York`, accessToken);
+
+    expect(response.status).toBe(200);
+    const userResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
+    // With minGoal: 1/500 * 100 = 0.2 pts (legacy would have given 100).
+    expect(userResult.activityPoints).toBeCloseTo(0.2, 5);
 });

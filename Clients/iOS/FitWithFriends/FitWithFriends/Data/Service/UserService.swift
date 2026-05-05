@@ -8,6 +8,11 @@
 import Foundation
 
 public class UserService: ServiceBase, IUserService {
+    public func deleteAccount() async throws {
+        let url = "\(serverEnvironmentManager.baseUrl)/users/me"
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: url, method: .delete)
+    }
+
     /// Creates a new user with the given credentials/user info. Will return an error if the username already exists
     public func createUser(firstName: String,
                     lastName: String,

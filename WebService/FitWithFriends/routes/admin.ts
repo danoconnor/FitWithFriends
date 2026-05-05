@@ -1,6 +1,7 @@
 'use strict';
 import * as express from 'express';
 import * as CompetitionQueries from '../sql/competitions.queries';
+import { Json } from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import * as OAuthQueries from '../sql/oauth.queries';
 import * as ActivityDataQueries from '../sql/activityData.queries';
@@ -8,9 +9,8 @@ import { sendPushNotifications } from '../utilities/apnsHelper';
 import { CompetitionState } from '../utilities/enums/CompetitionState';
 import { handleError } from '../utilities/errorHelpers';
 import * as UserHelpers from '../utilities/userHelpers';
-import { getCompetitionStandings } from '../utilities/competitionStandingsHelper';
+import { getCompetitionStandings, validateScoringRulesInput } from '../utilities/competitionStandingsHelper';
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
-import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
 
@@ -37,6 +37,7 @@ router.post('/createPublicCompetition', function (req, res) {
     const displayName: string = req.body['displayName'];
     const timezone: string = req.body['ianaTimezone'];
     const adminUserId: string = req.body['adminUserId'];
+    const rawScoringRules: unknown = req.body['scoringRules'];
 
     if (!startDate || !endDate || !displayName || !timezone || !adminUserId) {
         handleError(null, 400, 'Missing required parameter', res);
@@ -66,10 +67,20 @@ router.post('/createPublicCompetition', function (req, res) {
         return;
     }
 
+    if (rawScoringRules !== undefined && rawScoringRules !== null) {
+        const validationError = validateScoringRulesInput(rawScoringRules);
+        if (validationError) {
+            handleError(null, 400, `Invalid scoringRules: ${validationError}`, res, true);
+            return;
+        }
+    }
+
     const startDateUTC = new Date(startDate.toUTCString());
     const endDateUTC = new Date(endDate.toUTCString());
     const accessToken = cryptoHelpers.getRandomToken();
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
+
+    const scoringRulesForDb: Json | null = (rawScoringRules !== undefined && rawScoringRules !== null) ? (rawScoringRules as Json) : null;
 
     CompetitionQueries.createPublicCompetition({
         startDate: startDateUTC,
@@ -78,7 +89,8 @@ router.post('/createPublicCompetition', function (req, res) {
         adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
         accessToken,
         ianaTimezone: timezone,
-        competitionId
+        competitionId,
+        scoringRules: scoringRulesForDb
     })
         .then(async (_result) => {
             const botUsers = await UserQueries.getBotUsers();
@@ -116,7 +128,7 @@ router.post('/createBotUsers', async function (req, res) {
     const botUserIds: string[] = [];
     await Promise.all(
         Array.from({ length: canCreate }, async () => {
-            const userId = uuid().replace(/-/g, '');
+            const userId = crypto.randomUUID().replace(/-/g, '');
             const firstName = BOT_FIRST_NAMES[Math.floor(Math.random() * BOT_FIRST_NAMES.length)];
             const lastName = BOT_LAST_NAMES[Math.floor(Math.random() * BOT_LAST_NAMES.length)];
             await UserQueries.createBotUser({
@@ -161,12 +173,9 @@ router.post('/performDailyTasks', async function (req, res) {
     // "now" means for this run without restarting the server.
     const now = req.body['currentDate'] ? new Date(req.body['currentDate']) : new Date();
 
-    const deleteExpiredTokensPromise = deleteExpiredRefreshTokens(now);
-    const seedBotActivityDataPromise = seedBotActivityData(now);
-
-    // Do not parallelize the competition tasks
-    // because we do not want to move a competition to processing to archiving in the same run
-    // This should not happen but could happen if the cron job has not been run recently
+    // Run tasks sequentially to avoid unhandled rejections from pre-started promises failing
+    // while awaiting other tasks. Competition tasks are serialized to prevent a competition
+    // from advancing two states in one run.
     try {
         taskResults.push({ name: 'archiveCompetitions', result: await archiveCompetitions(now) });
     } catch (err) {
@@ -180,7 +189,7 @@ router.post('/performDailyTasks', async function (req, res) {
     }
 
     try {
-        taskResults.push({ name: 'deleteExpiredRefreshTokens', result: await deleteExpiredTokensPromise });
+        taskResults.push({ name: 'deleteExpiredRefreshTokens', result: await deleteExpiredRefreshTokens(now) });
     } catch (err) {
         errors.push(['deleteExpiredRefreshTokens', err]);
     }
@@ -192,14 +201,18 @@ router.post('/performDailyTasks', async function (req, res) {
     }
 
     try {
-        taskResults.push({ name: 'seedBotActivityData', result: await seedBotActivityDataPromise });
+        taskResults.push({ name: 'seedBotActivityData', result: await seedBotActivityData(now) });
     } catch (err) {
         errors.push(['seedBotActivityData', err]);
     }
 
     const summary = {
         tasks: taskResults,
-        errors: errors.map(([name, error]) => ({ name, error: error.message }))
+        errors: errors.map(([name, error]) => ({
+            name,
+            error: error.message,
+            errorType: error.constructor?.name ?? 'Error'
+        }))
     };
 
     if (errors.length > 0) {
@@ -379,7 +392,7 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
 
     const endDate = new Date(upcomingMonday);
     endDate.setUTCDate(upcomingMonday.getUTCDate() + 7);
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
 
     await CompetitionQueries.createPublicCompetition({
         startDate: upcomingMonday,
@@ -388,7 +401,8 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
         adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
         accessToken: cryptoHelpers.getRandomToken(),
         ianaTimezone: 'UTC',
-        competitionId
+        competitionId,
+        scoringRules: null
     });
 
     const botUsers = await UserQueries.getBotUsers();
@@ -428,16 +442,22 @@ async function seedBotActivityData(now: Date): Promise<string> {
         const currentCalories = existing?.calories_burned ?? 0;
         const currentExercise = existing?.exercise_time ?? 0;
         const currentStand = existing?.stand_time ?? 0;
+        const currentSteps = existing?.step_count ?? 0;
+        const currentDistance = existing?.distance_walking_running_meters ?? 0;
+        const currentFlights = existing?.flights_climbed ?? 0;
 
         return {
             userId: UserHelpers.convertUserIdToBuffer(bot.userId),
             date: easternDateStr,
-            caloriesBurned: currentCalories + Math.floor(Math.random() * 25) + 5,  // +5–30 per run
-            caloriesGoal: 400,
-            exerciseTime: currentExercise + Math.floor(Math.random() * 3),           // +0–2 min per run
+            caloriesBurned: currentCalories + Math.floor(Math.random() * 61) + 5,  // +5–65 per run
+            caloriesGoal: 500,
+            exerciseTime: currentExercise + Math.floor(Math.random() * 8),           // +0–7 min per run
             exerciseTimeGoal: 30,
             standTime: Math.min(currentStand + (Math.random() < 0.6 ? 1 : 0), easternHour), // capped at Eastern hour
             standTimeGoal: 12,
+            stepCount: currentSteps + Math.floor(Math.random() * 600) + 100,         // +100–700 per run
+            distanceWalkingRunningMeters: currentDistance + Math.floor(Math.random() * 500) + 50, // +50–550 m per run
+            flightsClimbed: currentFlights + (Math.random() < 0.3 ? 1 : 0),          // occasional flight
         };
     });
 

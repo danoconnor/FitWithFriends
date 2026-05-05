@@ -12,6 +12,18 @@ export async function makePostRequest(relativeUrl: string, requestBody: any, aut
     }
 }
 
+export async function makeDeleteRequest(relativeUrl: string, authToken: string | undefined = undefined): Promise<any> {
+    try {
+        const response = await axios.delete('http://localhost:3000/' + relativeUrl,
+        {
+            headers: getHeaders(authToken, undefined)
+        });
+        return response;
+    } catch (error) {
+        return error.response;
+    }
+}
+
 export async function makeGetRequest(relativeUrl: string, authToken: string | undefined = undefined, contentType: string | undefined = undefined): Promise<any> {
     try {
         const response = await axios.get('http://localhost:3000/' + relativeUrl,

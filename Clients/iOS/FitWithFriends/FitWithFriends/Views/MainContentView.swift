@@ -11,13 +11,13 @@ import SwiftUI
 struct MainContentView: View {
     let objectGraph: IObjectGraph
 
-    @ObservedObject private var viewModel: AppStateViewModel
-    @ObservedObject private var versionViewModel: AppVersionViewModel
+    @StateObject private var viewModel: AppStateViewModel
+    @StateObject private var versionViewModel: AppVersionViewModel
 
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
-        viewModel = AppStateViewModel(authenticationManager: objectGraph.authenticationManager)
-        versionViewModel = AppVersionViewModel(appVersionManager: objectGraph.appVersionManager)
+        _viewModel = StateObject(wrappedValue: AppStateViewModel(authenticationManager: objectGraph.authenticationManager))
+        _versionViewModel = StateObject(wrappedValue: AppVersionViewModel(appVersionManager: objectGraph.appVersionManager))
     }
 
     var body: some View {

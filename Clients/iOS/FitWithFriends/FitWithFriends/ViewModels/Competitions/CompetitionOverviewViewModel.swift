@@ -33,22 +33,21 @@ public class CompetitionOverviewViewModel: ObservableObject {
     private let competitionManager: ICompetitionManager
     private let competitionOverview: CompetitionOverview
     private let serverEnvironmentManager: IServerEnvironmentManager
-
-    /// When false, it will only show the top three users in the competition
     private let showAllDetails: Bool
 
+    private var overviewCancellable: AnyCancellable?
+
     let competitionName: String
-    let isCompetitionActive: Bool
-    let userPositionDescription: String
     let competitionDatesDescription: String
     let availableActions: [CompetitionAction]
-    private(set) var results: [UserPosition]
+
+    @Published private(set) var isCompetitionActive: Bool
+    @Published private(set) var userPositionDescription: String
+    @Published private(set) var results: [UserPosition]
 
     @Published var shouldShowSheet = false
     var shareUrl: URL?
 
-    // Currently we only show an alert for one case: to confirm that the user
-    // wants to delete the competition.
     @Published var shouldShowAlert = false
 
     init(authenticationManager: IAuthenticationManager,
@@ -63,67 +62,47 @@ public class CompetitionOverviewViewModel: ObservableObject {
         self.showAllDetails = showAllDetails
 
         competitionName = competitionOverview.competitionName
-        isCompetitionActive = competitionOverview.isCompetitionActive
 
         if competitionOverview.isUserAdmin {
-            // If the user is the competition admin,
-            // then they can generate a link to share the competition with others
-            // and allow them to join
             availableActions = [.share, .deleteCompetition]
         } else {
-            // Only allow non-admins to leave the competition
             availableActions = [.leave]
         }
-
-        let allResults = competitionOverview.currentResults.sorted()
 
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
         dateFormatter.timeStyle = .none
-
         let startString = dateFormatter.string(from: competitionOverview.startDate)
         let endString = dateFormatter.string(from: competitionOverview.endDate)
         competitionDatesDescription = "\(startString) - \(endString)"
 
-        // Find the user's current position in the results
-        let userPositionZeroIndex = allResults.firstIndex { $0.userId == authenticationManager.loggedInUserId } ?? -1
-        let userPosition = userPositionZeroIndex + 1
-        
-        let userPositionString: String
-        if userPosition > 3 {
-            userPositionString = "th"
-        } else if userPosition == 3 {
-            userPositionString = "rd"
-        } else if userPosition == 2 {
-            userPositionString = "nd"
-        } else {
-            userPositionString = "st"
-        }
+        // Compute initial values for live-updating properties
+        let (initialResults, initialPositionDescription, initialIsActive) =
+            CompetitionOverviewViewModel.computeDynamicProperties(
+                overview: competitionOverview,
+                userId: authenticationManager.loggedInUserId,
+                showAllDetails: showAllDetails
+            )
+        isCompetitionActive = initialIsActive
+        userPositionDescription = initialPositionDescription
+        results = initialResults
 
-        // If we aren't showing all details, then only show the top three users
-        let numResultsToInclude = showAllDetails ? allResults.count : min(allResults.count, 3)
-
-        // allResults has been sorted above already
-        results = []
-        for i in 0 ..< numResultsToInclude {
-            results.append(UserPosition(userCompetitionPoints: allResults[i], position: UInt(i + 1)))
-        }
-
-        // Always include the current user, even if they're not in the top 3
-        if userPosition > numResultsToInclude {
-            results.append(UserPosition(userCompetitionPoints: allResults[userPositionZeroIndex], position: UInt(userPosition)))
-        }
-
-        if competitionOverview.hasCompetitionStarted && userPosition > 0 {
-            if competitionOverview.isCompetitionProcessingResults {
-                userPositionDescription = "Processing final results..."
-            } else {
-                let userPositionPrefix = Date() > competitionOverview.endDate ? "You finished in" : "You're in"
-                userPositionDescription = "\(userPositionPrefix) \(userPosition)\(userPositionString)"
+        let competitionId = competitionOverview.competitionId
+        overviewCancellable = competitionManager.competitionOverviewsPublisher
+            .receive(on: DispatchQueue.main)
+            .compactMap { $0[competitionId] }
+            .sink { [weak self] updated in
+                guard let self else { return }
+                let (newResults, newPositionDescription, newIsActive) =
+                    CompetitionOverviewViewModel.computeDynamicProperties(
+                        overview: updated,
+                        userId: self.authenticationManager.loggedInUserId,
+                        showAllDetails: self.showAllDetails
+                    )
+                self.isCompetitionActive = newIsActive
+                self.userPositionDescription = newPositionDescription
+                self.results = newResults
             }
-        } else {
-            userPositionDescription = "Not started"
-        }
     }
 
     func performAction(_ action: CompetitionAction) async {
@@ -143,17 +122,12 @@ public class CompetitionOverviewViewModel: ObservableObject {
 
     func getUserContextMenuActions(for userId: String) -> [CompetitionAction] {
         var actions = [CompetitionAction]()
-
-        // Allow the admin user to remove other users from the competition via the context menu
         if competitionOverview.isUserAdmin && userId != authenticationManager.loggedInUserId {
             actions.append(.removeUser(userId))
         }
-
         return actions
     }
 
-    /// Once the user has confirmed the deletion via the alert, the view will call this func to actually
-    /// perform the deletion
     func deleteCompetitionConfirmed() async {
         do {
             try await competitionManager.deleteCompetition(competitionId: competitionOverview.competitionId)
@@ -197,5 +171,49 @@ public class CompetitionOverviewViewModel: ObservableObject {
         } catch {
             Logger.traceError(message: "Failed to get admin details for \(competitionOverview.competitionId)", error: error)
         }
+    }
+
+    private static func computeDynamicProperties(
+        overview: CompetitionOverview,
+        userId: String?,
+        showAllDetails: Bool
+    ) -> (results: [UserPosition], userPositionDescription: String, isCompetitionActive: Bool) {
+        let allResults = overview.currentResults.sorted()
+        let userPositionZeroIndex = allResults.firstIndex { $0.userId == userId } ?? -1
+        let userPosition = userPositionZeroIndex + 1
+
+        let userPositionSuffix: String
+        if userPosition > 3 {
+            userPositionSuffix = "th"
+        } else if userPosition == 3 {
+            userPositionSuffix = "rd"
+        } else if userPosition == 2 {
+            userPositionSuffix = "nd"
+        } else {
+            userPositionSuffix = "st"
+        }
+
+        let numResultsToInclude = showAllDetails ? allResults.count : min(allResults.count, 3)
+        var results: [UserPosition] = []
+        for i in 0 ..< numResultsToInclude {
+            results.append(UserPosition(userCompetitionPoints: allResults[i], position: UInt(i + 1)))
+        }
+        if userPosition > numResultsToInclude {
+            results.append(UserPosition(userCompetitionPoints: allResults[userPositionZeroIndex], position: UInt(userPosition)))
+        }
+
+        let userPositionDescription: String
+        if overview.hasCompetitionStarted && userPosition > 0 {
+            if overview.isCompetitionProcessingResults {
+                userPositionDescription = "Processing final results..."
+            } else {
+                let prefix = Date() > overview.endDate ? "You finished in" : "You're in"
+                userPositionDescription = "\(prefix) \(userPosition)\(userPositionSuffix)"
+            }
+        } else {
+            userPositionDescription = "Not started"
+        }
+
+        return (results, userPositionDescription, overview.isCompetitionActive)
     }
 }

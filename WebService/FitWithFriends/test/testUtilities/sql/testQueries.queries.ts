@@ -3,6 +3,8 @@ import { DatabaseConnectionPool } from '../../../utilities/database';
 
 export type DateOrString = Date | string;
 
+export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
+
 /** 'ClearAllData' parameters type */
 export type IClearAllDataParams = void;
 
@@ -212,10 +214,13 @@ export interface IGetActivitySummariesForUserResult {
   calories_burned: number;
   calories_goal: number;
   date: Date;
+  distance_walking_running_meters: number;
   exercise_time: number;
   exercise_time_goal: number;
+  flights_climbed: number;
   stand_time: number;
   stand_time_goal: number;
+  step_count: number;
   user_id: Buffer;
 }
 
@@ -246,10 +251,13 @@ export interface IInsertActivitySummaryParams {
   caloriesBurned: number;
   caloriesGoal: number;
   date: DateOrString;
+  distanceWalkingRunningMeters?: number | null | void;
   exerciseTime: number;
   exerciseTimeGoal: number;
+  flightsClimbed?: number | null | void;
   standTime: number;
   standTimeGoal: number;
+  stepCount?: number | null | void;
   userId: Buffer;
 }
 
@@ -262,20 +270,58 @@ export interface IInsertActivitySummaryQuery {
   result: IInsertActivitySummaryResult;
 }
 
-const insertActivitySummaryIR: any = {"usedParamSet":{"userId":true,"date":true,"caloriesBurned":true,"caloriesGoal":true,"exerciseTime":true,"exerciseTimeGoal":true,"standTime":true,"standTimeGoal":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":150,"b":157}]},{"name":"date","required":true,"transform":{"type":"scalar"},"locs":[{"a":160,"b":165}]},{"name":"caloriesBurned","required":true,"transform":{"type":"scalar"},"locs":[{"a":168,"b":183}]},{"name":"caloriesGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":186,"b":199}]},{"name":"exerciseTime","required":true,"transform":{"type":"scalar"},"locs":[{"a":202,"b":215}]},{"name":"exerciseTimeGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":218,"b":235}]},{"name":"standTime","required":true,"transform":{"type":"scalar"},"locs":[{"a":238,"b":248}]},{"name":"standTimeGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":251,"b":265}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)\nVALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!)\nON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal"};
+const insertActivitySummaryIR: any = {"usedParamSet":{"userId":true,"date":true,"caloriesBurned":true,"caloriesGoal":true,"exerciseTime":true,"exerciseTimeGoal":true,"standTime":true,"standTimeGoal":true,"stepCount":true,"distanceWalkingRunningMeters":true,"flightsClimbed":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":212,"b":219}]},{"name":"date","required":true,"transform":{"type":"scalar"},"locs":[{"a":222,"b":227}]},{"name":"caloriesBurned","required":true,"transform":{"type":"scalar"},"locs":[{"a":230,"b":245}]},{"name":"caloriesGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":248,"b":261}]},{"name":"exerciseTime","required":true,"transform":{"type":"scalar"},"locs":[{"a":264,"b":277}]},{"name":"exerciseTimeGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":280,"b":297}]},{"name":"standTime","required":true,"transform":{"type":"scalar"},"locs":[{"a":300,"b":310}]},{"name":"standTimeGoal","required":true,"transform":{"type":"scalar"},"locs":[{"a":313,"b":327}]},{"name":"stepCount","required":false,"transform":{"type":"scalar"},"locs":[{"a":339,"b":348}]},{"name":"distanceWalkingRunningMeters","required":false,"transform":{"type":"scalar"},"locs":[{"a":364,"b":392}]},{"name":"flightsClimbed","required":false,"transform":{"type":"scalar"},"locs":[{"a":408,"b":422}]}],"statement":"INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, step_count, distance_walking_running_meters, flights_climbed)\nVALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!, COALESCE(:stepCount, 0), COALESCE(:distanceWalkingRunningMeters, 0), COALESCE(:flightsClimbed, 0))\nON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal, step_count = EXCLUDED.step_count, distance_walking_running_meters = EXCLUDED.distance_walking_running_meters, flights_climbed = EXCLUDED.flights_climbed"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal)
- * VALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!)
- * ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal
+ * INSERT INTO activity_summaries(user_id, date, calories_burned, calories_goal, exercise_time, exercise_time_goal, stand_time, stand_time_goal, step_count, distance_walking_running_meters, flights_climbed)
+ * VALUES (:userId!, :date!, :caloriesBurned!, :caloriesGoal!, :exerciseTime!, :exerciseTimeGoal!, :standTime!, :standTimeGoal!, COALESCE(:stepCount, 0), COALESCE(:distanceWalkingRunningMeters, 0), COALESCE(:flightsClimbed, 0))
+ * ON CONFLICT (user_id, date) DO UPDATE SET calories_burned = EXCLUDED.calories_burned, calories_goal = EXCLUDED.calories_goal, exercise_time = EXCLUDED.exercise_time, exercise_time_goal = EXCLUDED.exercise_time_goal, stand_time = EXCLUDED.stand_time, stand_time_goal = EXCLUDED.stand_time_goal, step_count = EXCLUDED.step_count, distance_walking_running_meters = EXCLUDED.distance_walking_running_meters, flights_climbed = EXCLUDED.flights_climbed
  * ```
  */
 export function insertActivitySummary(params: IInsertActivitySummaryParams): Promise<Array<IInsertActivitySummaryResult>> {
   return import('@pgtyped/runtime').then(pgtyped => {
     const insertActivitySummary = new pgtyped.PreparedQuery<IInsertActivitySummaryParams,IInsertActivitySummaryResult>(insertActivitySummaryIR);
     return insertActivitySummary.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'InsertWorkout' parameters type */
+export interface IInsertWorkoutParams {
+  caloriesBurned: number;
+  distance?: number | null | void;
+  duration: number;
+  startDate: DateOrString;
+  unit?: number | null | void;
+  userId: Buffer;
+  workoutType: number;
+}
+
+/** 'InsertWorkout' return type */
+export type IInsertWorkoutResult = void;
+
+/** 'InsertWorkout' query type */
+export interface IInsertWorkoutQuery {
+  params: IInsertWorkoutParams;
+  result: IInsertWorkoutResult;
+}
+
+const insertWorkoutIR: any = {"usedParamSet":{"userId":true,"startDate":true,"caloriesBurned":true,"workoutType":true,"duration":true,"distance":true,"unit":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":108,"b":115}]},{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":128}]},{"name":"caloriesBurned","required":true,"transform":{"type":"scalar"},"locs":[{"a":131,"b":146}]},{"name":"workoutType","required":true,"transform":{"type":"scalar"},"locs":[{"a":149,"b":161}]},{"name":"duration","required":true,"transform":{"type":"scalar"},"locs":[{"a":164,"b":173}]},{"name":"distance","required":false,"transform":{"type":"scalar"},"locs":[{"a":176,"b":184}]},{"name":"unit","required":false,"transform":{"type":"scalar"},"locs":[{"a":187,"b":191}]}],"statement":"INSERT INTO workouts (user_id, start_date, calories_burned, workout_type, duration, distance, unit)\nVALUES (:userId!, :startDate!, :caloriesBurned!, :workoutType!, :duration!, :distance, :unit)\nON CONFLICT (user_id, start_date, workout_type) DO NOTHING"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * INSERT INTO workouts (user_id, start_date, calories_burned, workout_type, duration, distance, unit)
+ * VALUES (:userId!, :startDate!, :caloriesBurned!, :workoutType!, :duration!, :distance, :unit)
+ * ON CONFLICT (user_id, start_date, workout_type) DO NOTHING
+ * ```
+ */
+export function insertWorkout(params: IInsertWorkoutParams): Promise<Array<IInsertWorkoutResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const insertWorkout = new pgtyped.PreparedQuery<IInsertWorkoutParams,IInsertWorkoutResult>(insertWorkoutIR);
+    return insertWorkout.run(params, DatabaseConnectionPool);
   });
 }
 
@@ -288,6 +334,7 @@ export interface ICreateCompetitionParams {
   displayName: string;
   endDate: DateOrString;
   ianaTimezone: string;
+  scoringRules?: Json | null | void;
   startDate: DateOrString;
 }
 
@@ -300,13 +347,13 @@ export interface ICreateCompetitionQuery {
   result: ICreateCompetitionResult;
 }
 
-const createCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":131,"b":141}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":144,"b":152}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":155,"b":167}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":170,"b":182}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":185,"b":197}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":200,"b":213}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":216,"b":230}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) \nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!)"};
+const createCompetitionIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true,"scoringRules":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":145,"b":155}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":158,"b":166}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":181}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":184,"b":196}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":199,"b":211}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":214,"b":227}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":230,"b":244}]},{"name":"scoringRules","required":false,"transform":{"type":"scalar"},"locs":[{"a":247,"b":259}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules)\nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :scoringRules)"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id) 
- * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!)
+ * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, scoring_rules)
+ * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :scoringRules)
  * ```
  */
 export function createCompetition(params: ICreateCompetitionParams): Promise<Array<ICreateCompetitionResult>> {
@@ -325,6 +372,7 @@ export interface ICreateCompetitionWithStateParams {
   displayName: string;
   endDate: DateOrString;
   ianaTimezone: string;
+  scoringRules?: Json | null | void;
   startDate: DateOrString;
   state: number;
 }
@@ -338,13 +386,13 @@ export interface ICreateCompetitionWithStateQuery {
   result: ICreateCompetitionWithStateResult;
 }
 
-const createCompetitionWithStateIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true,"state":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":138,"b":148}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":159}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":162,"b":174}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":177,"b":189}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":192,"b":204}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":207,"b":220}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":223,"b":237}]},{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":240,"b":246}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state) \nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!)"};
+const createCompetitionWithStateIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"displayName":true,"adminUserId":true,"accessToken":true,"ianaTimezone":true,"competitionId":true,"state":true,"scoringRules":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":152,"b":162}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":165,"b":173}]},{"name":"displayName","required":true,"transform":{"type":"scalar"},"locs":[{"a":176,"b":188}]},{"name":"adminUserId","required":true,"transform":{"type":"scalar"},"locs":[{"a":191,"b":203}]},{"name":"accessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":206,"b":218}]},{"name":"ianaTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":221,"b":234}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":237,"b":251}]},{"name":"state","required":true,"transform":{"type":"scalar"},"locs":[{"a":254,"b":260}]},{"name":"scoringRules","required":false,"transform":{"type":"scalar"},"locs":[{"a":263,"b":275}]}],"statement":"INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state, scoring_rules)\nVALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!, :scoringRules)"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state) 
- * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!)
+ * INSERT INTO competitions (start_date, end_date, display_name, admin_user_id, access_token, iana_timezone, competition_id, state, scoring_rules)
+ * VALUES (:startDate!, :endDate!, :displayName!, :adminUserId!, :accessToken!, :ianaTimezone!, :competitionId!, :state!, :scoringRules)
  * ```
  */
 export function createCompetitionWithState(params: ICreateCompetitionWithStateParams): Promise<Array<ICreateCompetitionWithStateResult>> {
@@ -435,6 +483,7 @@ export interface IGetCompetitionResult {
   end_date: Date;
   iana_timezone: string;
   is_public: boolean;
+  scoring_rules: Json | null;
   start_date: Date;
   state: number;
 }

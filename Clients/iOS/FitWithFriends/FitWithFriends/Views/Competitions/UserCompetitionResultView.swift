@@ -10,6 +10,8 @@ import SwiftUI
 struct UserCompetitionResultView: View {
     let result: UserPosition
     let isCompetitionActive: Bool
+    /// Unit to use when formatting the leaderboard values. Defaults to points to preserve legacy behaviour.
+    var scoringUnit: ScoringUnit = .points
 
     private var positionBackgroundColor: Color {
         guard result.shouldShowPosition else {
@@ -56,7 +58,7 @@ struct UserCompetitionResultView: View {
                     .font(.body.weight(.medium))
 
                 if isCompetitionActive, let todayPts = result.userCompetitionPoints.pointsToday, todayPts > 0 {
-                    Text("+\(Int(todayPts)) today")
+                    Text("+\(ScoringValueFormatter.format(todayPts, unit: scoringUnit)) today")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -64,9 +66,9 @@ struct UserCompetitionResultView: View {
 
             Spacer()
 
-            // Total points
+            // Total score in the rule's native unit
             if let totalPoints = result.userCompetitionPoints.totalPoints {
-                Text("\(Int(totalPoints))")
+                Text(ScoringValueFormatter.formatCompact(totalPoints, unit: scoringUnit))
                     .font(.title3.weight(.semibold).monospacedDigit())
             }
         }

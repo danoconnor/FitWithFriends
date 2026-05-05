@@ -21,4 +21,7 @@ public protocol IUserService {
                     userId: String,
                     idToken: String,
                     authorizationCode: String) async throws
+
+    /// Permanently deletes the currently authenticated user's account and all associated data.
+    func deleteAccount() async throws
 }

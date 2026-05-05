@@ -5,7 +5,6 @@ import * as CompetitionQueries from '../sql/competitions.queries';
 import * as UserQueries from '../sql/users.queries';
 import { handleError } from '../utilities/errorHelpers';
 import * as UserHelpers from '../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 
 const router = express.Router();
 
@@ -49,6 +48,9 @@ interface DayValues {
     exerciseTimeGoal: number;
     standTime: number;
     standTimeGoal: number;
+    stepCount?: number;
+    distanceWalkingRunningMeters?: number;
+    flightsClimbed?: number;
 }
 
 router.post('/seedCompetitionUsers', async function (req, res) {
@@ -89,7 +91,7 @@ router.post('/seedCompetitionUsers', async function (req, res) {
         const createdUserIds: string[] = [];
 
         for (const user of users) {
-            const userId = uuid().replace(/-/g, '');
+            const userId = crypto.randomUUID().replace(/-/g, '');
             const userIdBuffer = UserHelpers.convertUserIdToBuffer(userId);
 
             await UserQueries.createUser({
@@ -117,7 +119,10 @@ router.post('/seedCompetitionUsers', async function (req, res) {
                             exerciseTime: day.exerciseTime,
                             exerciseTimeGoal: day.exerciseTimeGoal,
                             standTime: day.standTime,
-                            standTimeGoal: day.standTimeGoal
+                            standTimeGoal: day.standTimeGoal,
+                            stepCount: day.stepCount ?? 0,
+                            distanceWalkingRunningMeters: day.distanceWalkingRunningMeters ?? 0,
+                            flightsClimbed: day.flightsClimbed ?? 0
                         };
                     })
                 });

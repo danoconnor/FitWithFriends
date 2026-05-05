@@ -52,10 +52,8 @@ final class PublicCompetitionTests: FWFUITestBase {
         XCTAssertTrue(upgradeButton.waitForExistence(timeout: 5))
         upgradeButton.tap()
 
-        // Verify the Pro upgrade sheet is presented with the expected content
-        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Upgrade to Pro"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["Public Competitions"].waitForExistence(timeout: 3))
+        // SubscriptionStoreView provides its own Close button — verify the sheet appeared
+        XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 5))
 
         takeScreenshot(name: "08_ProUpgradeSheet")
     }
@@ -69,11 +67,12 @@ final class PublicCompetitionTests: FWFUITestBase {
         XCTAssertTrue(app.staticTexts["Dismiss Test"].waitForExistence(timeout: 10))
 
         app.buttons["Upgrade to Pro"].firstMatch.tap()
-        XCTAssertTrue(app.navigationBars["Pro"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 5))
 
-        app.buttons["Done"].tap()
+        app.buttons["Close"].tap()
 
-        // Verify we returned to the home screen after dismissing the sheet
+        // The Close button must disappear — if it's still present the sheet never dismissed
+        XCTAssertTrue(app.buttons["Close"].waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 5))
     }
 

@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer, convertBufferToUserId } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 
 /*
     Tests the /competitions/description route for getting the details of a competition
@@ -46,7 +45,7 @@ afterEach(async () => {
 test('Get competition detail: user is member of competition', async () => {
     const now = new Date();
     const competitionAccessToken = 'CompetitionsTestToken';
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
     const competitionInfo = {
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition',
@@ -82,7 +81,7 @@ test('Get competition detail: user is member of competition', async () => {
 test('Get competition detail: user is not member of competition', async () => {
     const now = new Date();
     const competitionAccessToken = 'CompetitionsTestToken';
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
     const competitionInfo = {
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition',
@@ -132,7 +131,7 @@ test('Get competition detail: user is not member of competition', async () => {
 test('Get competition detail: multiple users in competition', async () => {
     const now = new Date();
     const competitionAccessToken = 'CompetitionsTestToken';
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
     const competitionInfo = {
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition',
@@ -185,7 +184,7 @@ test('Get competition detail: multiple users in competition', async () => {
 test('Get competition detail: competition does not exist', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest(`competitions/description`, {
-            competitionId: uuid(),
+            competitionId: crypto.randomUUID(),
             competitionAccessToken: 'CompetitionsTestToken'
         },
         accessToken);
@@ -197,7 +196,7 @@ test('Get competition detail: competition does not exist', async () => {
 test('Get competition detail: competition access token is incorrect', async () => {
     const now = new Date();
     const competitionAccessToken = 'CompetitionsTestToken';
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
     const competitionInfo = {
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition',
@@ -227,7 +226,7 @@ test('Get competition detail: competition access token is incorrect', async () =
 test('Get competition detail: user is not authenticated', async () => {
     const now = new Date();
     const competitionAccessToken = 'CompetitionsTestToken';
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
     const competitionInfo = {
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition',
@@ -256,7 +255,7 @@ test('Get competition detail: user is not authenticated', async () => {
 test('Get competition detail: missing competitionId', async () => {
     const now = new Date();
     const competitionAccessToken = 'CompetitionsTestToken';
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
     const competitionInfo = {
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition',
@@ -286,7 +285,7 @@ test('Get competition detail: missing competitionId', async () => {
 test('Get competition detail: missing competitionAccessToken', async () => {
     const now = new Date();
     const competitionAccessToken = 'CompetitionsTestToken';
-    const competitionId = uuid();
+    const competitionId = crypto.randomUUID();
     const competitionInfo = {
         adminUserId: convertUserIdToBuffer(testUserId),
         displayName: 'Test Competition',

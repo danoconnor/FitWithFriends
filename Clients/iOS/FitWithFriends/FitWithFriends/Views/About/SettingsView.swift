@@ -1,5 +1,5 @@
 //
-//  AboutView.swift
+//  SettingsView.swift
 //  FitWithFriends
 //
 //  Created by Dan O'Connor on 4/23/22.
@@ -7,9 +7,13 @@
 
 import SwiftUI
 
-struct AboutView: View {
+struct SettingsView: View {
     let emailUtility: IEmailUtility
     let serverEnvironmentManager: IServerEnvironmentManager
+    let onDeleteAccount: () async -> Bool
+
+    @State private var showDeleteAccountAlert = false
+    @State private var showDeleteAccountErrorAlert = false
 
     var body: some View {
         NavigationView {
@@ -52,17 +56,44 @@ struct AboutView: View {
                         Label("Privacy policy", systemImage: "hand.raised")
                     }
                 }
+
+                Section("Account") {
+                    Button(role: .destructive) {
+                        showDeleteAccountAlert = true
+                    } label: {
+                        Label("Delete Account", systemImage: "person.crop.circle.badge.minus")
+                    }
+                }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("About")
+            .navigationTitle("Settings")
         }
         .presentationDragIndicator(.visible)
+        .alert("Delete Account", isPresented: $showDeleteAccountAlert) {
+            Button("Delete", role: .destructive) {
+                Task {
+                    let success = await onDeleteAccount()
+                    if !success {
+                        showDeleteAccountErrorAlert = true
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will permanently delete your account and all your data. This cannot be undone.")
+        }
+        .alert("Error", isPresented: $showDeleteAccountErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Failed to delete your account. Please try again later.")
+        }
     }
 }
 
-struct AboutView_Previews: PreviewProvider {
+struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        AboutView(emailUtility: MockEmailUtility(),
-                  serverEnvironmentManager: ServerEnvironmentManager(userDefaults: UserDefaults.standard))
+        SettingsView(emailUtility: MockEmailUtility(),
+                     serverEnvironmentManager: ServerEnvironmentManager(userDefaults: UserDefaults.standard),
+                     onDeleteAccount: { return true })
     }
 }

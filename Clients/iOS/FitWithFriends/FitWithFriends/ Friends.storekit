@@ -34,7 +34,40 @@
     "_timeRate" : 0
   },
   "subscriptionGroups" : [
-
+    {
+      "id" : "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
+      "localizations" : [
+        {
+          "description" : "FitWithFriends Pro subscription",
+          "displayName" : "FitWithFriends Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "FitWithFriends Pro",
+      "subscriptions" : [
+        {
+          "adHocOfferCodeRedemption" : false,
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "F1E2D3C4-B5A6-7890-1234-567890ABCDEF",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Full access to all Pro features",
+              "displayName" : "Pro Monthly",
+              "locale" : "en_US",
+              "state" : "APPROVED"
+            }
+          ],
+          "productID" : "com.danoconnor.FitWithFriends.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Pro Monthly",
+          "subscriptionGroupID" : "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
   ],
   "version" : {
     "major" : 5,

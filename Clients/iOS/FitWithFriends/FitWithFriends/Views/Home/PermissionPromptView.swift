@@ -62,17 +62,8 @@ struct PermissionPromptView: View {
                 }
 
                 // Buttons
-                VStack(spacing: 8) {
-                    FWFPrimaryButton("Next") {
-                        permissionPromptViewModel.requestHealthPermission()
-                    }
-
-                    Button("Not now") {
-                        permissionPromptViewModel.dismiss()
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 4)
+                FWFPrimaryButton("Next") {
+                    permissionPromptViewModel.requestHealthPermission()
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)

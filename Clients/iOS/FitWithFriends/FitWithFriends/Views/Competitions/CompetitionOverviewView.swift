@@ -14,7 +14,7 @@ struct CompetitionOverviewView: View {
 
     private let competitionOverview: CompetitionOverview
     private let homepageSheetViewModel: HomepageSheetViewModel
-    @ObservedObject private var viewModel: CompetitionOverviewViewModel
+    @StateObject private var viewModel: CompetitionOverviewViewModel
 
     @State private var actionInProgress = false
 
@@ -23,10 +23,11 @@ struct CompetitionOverviewView: View {
         self.competitionOverview = competitionOverview
         self.homepageSheetViewModel = homepageSheetViewModel
         self.showAllDetails = showAllDetails
-        viewModel = CompetitionOverviewViewModel(authenticationManager: objectGraph.authenticationManager,
-                                                 competitionManager: objectGraph.competitionManager,
-                                                 competitionOverview: competitionOverview, serverEnrivonmentManager: objectGraph.serverEnvironmentManager,
-                                                 showAllDetails: showAllDetails)
+        _viewModel = StateObject(wrappedValue: CompetitionOverviewViewModel(authenticationManager: objectGraph.authenticationManager,
+                                                                            competitionManager: objectGraph.competitionManager,
+                                                                            competitionOverview: competitionOverview,
+                                                                            serverEnrivonmentManager: objectGraph.serverEnvironmentManager,
+                                                                            showAllDetails: showAllDetails))
     }
 
     var body: some View {
@@ -125,6 +126,22 @@ struct CompetitionOverviewView: View {
 
             Divider()
 
+            // Scoring rule summary — only show in the detail sheet to keep the homepage card compact.
+            if showAllDetails {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Scoring")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Text(competitionOverview.scoringRules.humanReadableDescription)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.vertical, 4)
+
+                Divider()
+            }
+
             // Leaderboard
             VStack(spacing: 2) {
                 ForEach(0 ..< viewModel.results.count, id: \.self) { position in
@@ -140,7 +157,8 @@ struct CompetitionOverviewView: View {
                                 objectGraph: objectGraph)
                         } label: {
                             UserCompetitionResultView(result: result,
-                                                      isCompetitionActive: viewModel.isCompetitionActive)
+                                                      isCompetitionActive: viewModel.isCompetitionActive,
+                                                      scoringUnit: competitionOverview.scoringUnit)
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
@@ -166,7 +184,8 @@ struct CompetitionOverviewView: View {
                                     userName: result.userCompetitionPoints.displayName))
                         } label: {
                             UserCompetitionResultView(result: result,
-                                                      isCompetitionActive: viewModel.isCompetitionActive)
+                                                      isCompetitionActive: viewModel.isCompetitionActive,
+                                                      scoringUnit: competitionOverview.scoringUnit)
                         }
                         .buttonStyle(.plain)
                         .contextMenu {

@@ -3,7 +3,6 @@ import * as RequestUtilities from '../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../utilities/userHelpers';
 import PushNotificationPlatform from '../../utilities/enums/PushNotificationPlatform';
-import { v4 as uuid } from 'uuid';
 
 /*
     Tests the /pushNotifications routes
@@ -35,7 +34,7 @@ afterEach(async () => {
 test('Register: happy path', async () => {
     const pushToken = '1234';
     const platform = PushNotificationPlatform.iOS;
-    const appInstallId = uuid();
+    const appInstallId = crypto.randomUUID();
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const resposne = await RequestUtilities.makePostRequest('pushNotifications/register', {
@@ -57,7 +56,7 @@ test('Register: happy path', async () => {
 test('Register: update existing push token', async () => {
     const pushToken = '1234';
     const platform = PushNotificationPlatform.iOS;
-    const appInstallId = uuid();
+    const appInstallId = crypto.randomUUID();
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const resposne = await RequestUtilities.makePostRequest('pushNotifications/register', {
@@ -89,10 +88,10 @@ test('Register: update existing push token', async () => {
 test('Register: push tokens for multiple app intsallations', async () => {
     const platform = PushNotificationPlatform.iOS;
     const pushToken1 = '1234';
-    const appInstallId1 = uuid();
+    const appInstallId1 = crypto.randomUUID();
 
     const pushToken2 = '5678';
-    const appInstallId2 = uuid();
+    const appInstallId2 = crypto.randomUUID();
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response1 = await RequestUtilities.makePostRequest('pushNotifications/register', {
@@ -128,7 +127,7 @@ test('Register: push tokens for multiple app intsallations', async () => {
 
 test('Register: missing push token', async () => {
     const platform = PushNotificationPlatform.iOS;
-    const appInstallId = uuid();
+    const appInstallId = crypto.randomUUID();
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('pushNotifications/register', {
@@ -142,7 +141,7 @@ test('Register: missing push token', async () => {
 
 test('Register: missing platform', async () => {
     const pushToken = '1234';
-    const appInstallId = uuid();
+    const appInstallId = crypto.randomUUID();
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('pushNotifications/register', {
@@ -187,7 +186,7 @@ test('Register: invalid app install id', async () => {
 test('Register: invalid platform', async () => {
     const platform = 999; // Invalid platform
     const pushToken = '1234';
-    const appInstallId = uuid();
+    const appInstallId = crypto.randomUUID();
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('pushNotifications/register', {
@@ -204,7 +203,7 @@ test('Register: missing access token', async () => {
     const response = await RequestUtilities.makePostRequest('pushNotifications/register', {
         platform: PushNotificationPlatform.iOS,
         pushToken: '1234',
-        appInstallId: uuid()
+        appInstallId: crypto.randomUUID()
     });
 
     // The auth middleware treats a missing token as a bad request

@@ -16,6 +16,15 @@ public class MockUserService: IUserService {
     public var return_creatUser_error: Error?
     public var createUserCallCount = 0
     
+    public var return_deleteAccount_error: Error?
+    public var deleteAccountCallCount = 0
+    public func deleteAccount() async throws {
+        deleteAccountCallCount += 1
+        if let error = return_deleteAccount_error {
+            throw error
+        }
+    }
+
     public func createUser(firstName: String,
                     lastName: String,
                     userId: String,

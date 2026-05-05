@@ -2,7 +2,6 @@ import * as TestSQL from '../../testUtilities/sql/testQueries.queries';
 import * as RequestUtilities from '../../testUtilities/testRequestUtilities';
 import * as AuthUtilities from '../../testUtilities/testAuthUtilities';
 import { convertUserIdToBuffer } from '../../../utilities/userHelpers';
-import { v4 as uuid } from 'uuid';
 
 /*
     Tests the /competitions/:competitionId/adminDetail route for getting the admin-only details of the competition
@@ -15,7 +14,7 @@ const adminUserId = Math.random().toString().slice(2, 8);
 // The competitionId that will be created in the database during the test setup
 const now = new Date();
 const testCompetitionInfo: TestSQL.ICreateCompetitionParams = {
-    competitionId: uuid(),
+    competitionId: crypto.randomUUID(),
     adminUserId: convertUserIdToBuffer(adminUserId),
     displayName: 'Test Competition',
     startDate: new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
@@ -105,7 +104,7 @@ test('Get admin detial: missing access token', async () => {
 test('Get admin detail: invalid competitionId', async () => {
     // Make the request for a competition that doesn't exist
     const accessToken = await AuthUtilities.getAccessTokenForUser(adminUserId);
-    const response = await RequestUtilities.makeGetRequest(`competitions/${uuid()}/adminDetail`, accessToken);
+    const response = await RequestUtilities.makeGetRequest(`competitions/${crypto.randomUUID()}/adminDetail`, accessToken);
 
     expect(response.status).toBe(404);
     expect(response.data.context).toContain('Competition not found or user is not admin');
