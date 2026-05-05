@@ -1567,7 +1567,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nfi\n";
+			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    PLIST_PATH=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n    if [ -f \"$PLIST_PATH\" ]; then\n        /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"$PLIST_PATH\"\n    fi\nfi\n";
 		};
 		0BCF64992BCCB4F4004E98C7 /* Configure Settings bundle for build type */ = {
 			isa = PBXShellScriptBuildPhase;
