@@ -2,6 +2,7 @@
 import * as express from 'express';
 import * as CompetitionQueries from '../sql/competitions.queries';
 import { Json } from '../sql/competitions.queries';
+import { getWeekTemplates } from '../utilities/weeklyCompetitionSchedule';
 import * as UserQueries from '../sql/users.queries';
 import * as OAuthQueries from '../sql/oauth.queries';
 import * as ActivityDataQueries from '../sql/activityData.queries';
@@ -391,28 +392,31 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
 
     const endDate = new Date(upcomingMonday);
     endDate.setUTCDate(upcomingMonday.getUTCDate() + 7);
-    const competitionId = crypto.randomUUID();
 
-    await CompetitionQueries.createPublicCompetition({
-        startDate: upcomingMonday,
-        endDate,
-        displayName: 'Weekly challenge - see how you stack up',
-        adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
-        accessToken: cryptoHelpers.getRandomToken(),
-        ianaTimezone: 'UTC',
-        competitionId,
-        scoringRules: null
-    });
-
+    const [templateA, templateB] = getWeekTemplates(upcomingMonday);
     const botUsers = await UserQueries.getBotUsers();
-    await Promise.all(botUsers.map(bot =>
-        CompetitionQueries.addUserToCompetition({
-            userId: UserHelpers.convertUserIdToBuffer(bot.userId),
-            competitionId
-        })
-    ));
 
-    return `Created weekly competition starting ${upcomingMonday.toISOString()}`;
+    for (const template of [templateA, templateB]) {
+        const competitionId = crypto.randomUUID();
+        await CompetitionQueries.createPublicCompetition({
+            startDate: upcomingMonday,
+            endDate,
+            displayName: template.displayName,
+            adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
+            accessToken: cryptoHelpers.getRandomToken(),
+            ianaTimezone: 'UTC',
+            competitionId,
+            scoringRules: template.scoringRules
+        });
+        await Promise.all(botUsers.map(bot =>
+            CompetitionQueries.addUserToCompetition({
+                userId: UserHelpers.convertUserIdToBuffer(bot.userId),
+                competitionId
+            })
+        ));
+    }
+
+    return `Created 2 weekly competitions starting ${upcomingMonday.toISOString()}`;
 }
 
 
