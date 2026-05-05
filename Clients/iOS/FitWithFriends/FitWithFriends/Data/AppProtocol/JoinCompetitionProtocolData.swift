@@ -50,11 +50,11 @@ public class JoinCompetitionProtocolData: AppProtocolData {
         return URL(string: url)!
     }
 
-    /// Expected url: https://<service base>/joincompetition?competitionToken=COMPETITIONTOKEN&competitionId=10
+    /// Expected url: https://<service base>/joinCompetition?competitionToken=COMPETITIONTOKEN&competitionId=10
     /// Associated domains should cause this website URL to open in the app, if the app is installed on the device
     /// If the app is not installed, then the webpage will load and prompt the user to download the app from the App Store
     public static func createWebsiteUrl(serverBaseUrl: String, competitionId: UUID, competitionToken: String) -> URL {
-        let url = "\(serverBaseUrl)/\(action.rawValue)?\(JoinCompetitionProtocolData.competitionTokenKey)=\(competitionToken)&\(JoinCompetitionProtocolData.competitionIdKey)=\(competitionId.description)"
+        let url = "\(serverBaseUrl)/joinCompetition?\(JoinCompetitionProtocolData.competitionTokenKey)=\(competitionToken)&\(JoinCompetitionProtocolData.competitionIdKey)=\(competitionId.description)"
         return URL(string: url)!
     }
 }
