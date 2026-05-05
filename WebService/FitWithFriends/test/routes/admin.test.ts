@@ -404,30 +404,33 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         await Promise.all(upcomingWeekComps.map(c => TestSQL.clearDataForCompetition({ competitionId: c.competition_id })));
     });
 
-    test('creates a weekly public competition when none exists', async () => {
+    test('creates two weekly public competitions when none exist', async () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
             currentDate: sundayNoonUTC.toISOString()
         });
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
-        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created weekly competition starting /);
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created 2 weekly competitions starting /);
 
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
         });
-        const competition = publicCompetitions.find(c =>
+        const upcomingWeekComps = publicCompetitions.filter(c =>
             new Date(c.start_date).getTime() === expectedMonday.getTime()
         );
-        expect(competition).toBeDefined();
-        competitionsToCleanup.push(competition.competition_id);
+        expect(upcomingWeekComps).toHaveLength(2);
+        upcomingWeekComps.forEach(c => competitionsToCleanup.push(c.competition_id));
 
-        const startDate = new Date(competition.start_date);
-        expect(startDate.getDay()).toBe(1); // starts on Monday (local)
+        for (const competition of upcomingWeekComps) {
+            const startDate = new Date(competition.start_date);
+            expect(startDate.getDay()).toBe(1); // starts on Monday (local)
 
-        const durationDays = (new Date(competition.end_date).getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
-        expect(durationDays).toBe(7);
+            const durationDays = (new Date(competition.end_date).getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+            expect(durationDays).toBe(7);
+        }
 
-        expect(competition.display_name).toBe('Weekly challenge - see how you stack up');
+        // Both competitions should have different names (different templates)
+        expect(upcomingWeekComps[0].display_name).not.toBe(upcomingWeekComps[1].display_name);
     });
 
     test('does not create a competition on weekdays', async () => {
@@ -827,23 +830,25 @@ describe('performDailyTasks - createWeeklyPublicCompetition - bot enrollment', (
         });
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
-        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created weekly competition starting /);
+        expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created 2 weekly competitions starting /);
 
-        // Find the created competition
+        // Find the created competitions
         const publicCompetitions = await CompetitionQueries.getPublicCompetitions({
             activeState: CompetitionState.NotStartedOrActive
         });
-        const competition = publicCompetitions.find(c =>
+        const upcomingWeekComps = publicCompetitions.filter(c =>
             new Date(c.start_date).getTime() === expectedMonday.getTime()
         );
-        expect(competition).toBeDefined();
-        competitionsToCleanup.push(competition.competition_id);
+        expect(upcomingWeekComps).toHaveLength(2);
+        upcomingWeekComps.forEach(c => competitionsToCleanup.push(c.competition_id));
 
-        // Verify both bots are in the competition
-        const usersInCompetition = await TestSQL.getUsersInCompetition({ competitionId: competition.competition_id });
-        const competitionUserIds = usersInCompetition.map(u => Buffer.from(u.user_id).toString('hex'));
-        expect(competitionUserIds).toContain(botId1);
-        expect(competitionUserIds).toContain(botId2);
+        // Verify both bots are enrolled in both competitions
+        for (const competition of upcomingWeekComps) {
+            const usersInCompetition = await TestSQL.getUsersInCompetition({ competitionId: competition.competition_id });
+            const competitionUserIds = usersInCompetition.map(u => Buffer.from(u.user_id).toString('hex'));
+            expect(competitionUserIds).toContain(botId1);
+            expect(competitionUserIds).toContain(botId2);
+        }
     });
 });
 
