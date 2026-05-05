@@ -1567,7 +1567,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nfi\n";
+			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    # Skip the undefined_arch preprocessing pass used during archive — no real product exists yet\n    if [ \"$ARCHS\" = \"undefined_arch\" ]; then\n        exit 0\n    fi\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    PLIST_PATH=\"${CODESIGNING_FOLDER_PATH}/Info.plist\"\n    if [ ! -f \"$PLIST_PATH\" ]; then\n        echo \"error: Info.plist not found at $PLIST_PATH — cannot set bundle version\"\n        exit 1\n    fi\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"$PLIST_PATH\"\nfi\n";
 		};
 		0BCF64992BCCB4F4004E98C7 /* Configure Settings bundle for build type */ = {
 			isa = PBXShellScriptBuildPhase;
