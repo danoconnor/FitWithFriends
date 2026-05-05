@@ -65,11 +65,11 @@ jobs:
       - name: Test
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |
-          device=$(xcrun xctrace list devices 2>&1 | grep -E 'Apple Watch.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
+          device_id=$(xcrun simctl list devices available --json | jq -r '[.devices | to_entries[] | select(.key | contains("watchOS")) | {os: .key, udid: .value[].udid}] | sort_by(.os) | last | .udid')
           xcodebuild test \
             -scheme "FitWithFriends Watch App" \
             -workspace $WORKSPACE_NAME \
-            -destination "platform=watchOS Simulator,OS=latest,name=$device" \
+            -destination "platform=watchOS Simulator,id=$device_id" \
             CODE_SIGNING_ALLOWED=NO
 
   watch-ui-tests:
