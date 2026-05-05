@@ -36,6 +36,11 @@ struct FitWithFriendsApp: App {
                     Logger.traceInfo(message: "Application launched with url \($0.absoluteString)")
                     _ = FitWithFriendsApp.objectGraph.appProtocolHandler.handleProtocol(url: $0)
                 }
+                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
+                    guard let url = activity.webpageURL else { return }
+                    Logger.traceInfo(message: "Application launched with universal link \(url.absoluteString)")
+                    _ = FitWithFriendsApp.objectGraph.appProtocolHandler.handleProtocol(url: url)
+                }
         }
     }
 }
