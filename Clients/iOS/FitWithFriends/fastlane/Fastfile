@@ -65,6 +65,47 @@ lane :screenshots_ci do
 end
 
 # --------------------------------------------------------------------------
+# watch_screenshots
+# Generates watchOS screenshots via SwiftUI snapshot rendering.
+# fastlane's snapshot (XCUITest) does not support watchOS, so we use
+# pointfreeco/swift-snapshot-testing to render views to PNGs at exact
+# App Store Connect watch dimensions. The screenshot tests live in the
+# iOS UnitTests target (not the watchOS test target) because
+# swift-snapshot-testing requires UIImage which isn't available on watchOS.
+# --------------------------------------------------------------------------
+lane :watch_screenshots do
+  # Record mode regenerates the PNG references under __Snapshots__/
+  scan(
+    project: "FitWithFriends.xcodeproj",
+    scheme: "FitWithFriends",
+    destination: "platform=iOS Simulator,name=iPhone 16 Plus",
+    only_testing: ["FitWithFriends_UnitTests/WatchScreenshotTests"],
+    xcargs: "SNAPSHOT_RECORD_MODE=1",
+    fail_build: false
+  )
+
+  # swift-snapshot-testing writes PNGs as "testFuncName.descriptiveName.png" into
+  # __Snapshots__/. Strip the test-function prefix and copy into screenshots/en-US/
+  # so upload_to_app_store picks them up by device-class suffix (APP_WATCH_ULTRA, etc.).
+  # Note: sh() runs from the fastlane/ subdirectory, so paths are relative to that.
+  sh(<<~BASH)
+    snapshot_dir="../FitWithFriends Watch App Tests/__Snapshots__/WatchScreenshotTests"
+    output_dir="../screenshots/en-US"
+    mkdir -p "$output_dir"
+    count=0
+    for png in "$snapshot_dir"/*.png; do
+      [ -f "$png" ] || continue
+      basename=$(basename "$png" .png)
+      clean_name="${basename#*.}"
+      [ "$clean_name" = "$basename" ] && clean_name="$basename"
+      cp "$png" "$output_dir/${clean_name}.png"
+      count=$((count + 1))
+    done
+    echo "Collected $count watch screenshot(s) into $output_dir"
+  BASH
+end
+
+# --------------------------------------------------------------------------
 # release
 # Uploads App Store metadata and screenshots to App Store Connect.
 # The binary must already have been uploaded by the ios-deploy CI workflow.

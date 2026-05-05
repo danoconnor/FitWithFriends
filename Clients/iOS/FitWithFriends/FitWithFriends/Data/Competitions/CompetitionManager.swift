@@ -166,6 +166,7 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
     }
 }
 
+#if !os(watchOS)
 extension CompetitionManager: ActivityUpdateDelegate {
     public func activityDataUpdated() {
         // When we have new activity data in the service, re-fetch the competition data
@@ -175,3 +176,4 @@ extension CompetitionManager: ActivityUpdateDelegate {
         }
     }
 }
+#endif

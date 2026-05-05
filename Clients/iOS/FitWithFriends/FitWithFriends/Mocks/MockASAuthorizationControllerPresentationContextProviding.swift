@@ -5,6 +5,7 @@
 //  Created by Dan O'Connor on 8/14/25.
 //
 
+#if !os(watchOS)
 import AuthenticationServices
 
 public class MockASAuthorizationControllerPresentationContextProviding: NSObject, ASAuthorizationControllerPresentationContextProviding {
@@ -12,3 +13,4 @@ public class MockASAuthorizationControllerPresentationContextProviding: NSObject
         return ASPresentationAnchor()
     }
 }
+#endif

@@ -14,6 +14,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BCD02D9723624FD8DF535CFB"
+               BuildableName = "FitWithFriends Watch App.app"
+               BlueprintName = "FitWithFriends Watch App"
+               ReferencedContainer = "container:FitWithFriends.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "0B99FBC9256A016900673133"
                BuildableName = "Fit with Friends.app"
                BlueprintName = "FitWithFriends"
