@@ -109,8 +109,14 @@ async function getAPNSToken(): Promise<string> {
         const secretClient = new SecretClient(vaultUrl, new DefaultAzureCredential());
         secret = await secretClient.getSecret(secretId);
     } catch (err: unknown) {
-        const statusCode = (err as Record<string, unknown>)?.['statusCode'];
-        console.error(`Key Vault getSecret failed with statusCode=${statusCode}`);
+        const e = err as Record<string, unknown>;
+        const statusCode = e?.['statusCode'];
+        // 'details' is the parsed Key Vault response body: { error: { code, message } }
+        // Log only the code — the message may contain the secret name.
+        const kvErrorCode = (e?.['details'] as Record<string, unknown>)?.['error']
+            ? ((e['details'] as Record<string, unknown>)['error'] as Record<string, unknown>)?.['code']
+            : undefined;
+        console.error(`Key Vault getSecret failed: statusCode=${statusCode}, kvErrorCode=${kvErrorCode}`);
         throw err;
     }
     if (!secret.value) {
