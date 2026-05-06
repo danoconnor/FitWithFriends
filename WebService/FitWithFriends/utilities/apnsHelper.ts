@@ -97,8 +97,28 @@ async function getAPNSToken(): Promise<string> {
         throw new Error('Missing required APNS environment variables');
     }
 
-    const secretClient = new SecretClient(vaultUrl, new DefaultAzureCredential());
-    const secret = await secretClient.getSecret(secretId);
+    // Secret names can only contain alphanumeric characters and hyphens.
+    // A full URL in APNS_KEY_SECRET_ID is a common misconfiguration that causes 400.
+    const secretNameValid = /^[a-zA-Z0-9-]+$/.test(secretId);
+    if (!secretNameValid) {
+        throw new Error('APNS_KEY_SECRET_ID is not a valid Key Vault secret name (only alphanumeric + hyphens allowed). If it looks like a URL, set it to just the secret name.');
+    }
+
+    let secret: Awaited<ReturnType<SecretClient['getSecret']>>;
+    try {
+        const secretClient = new SecretClient(vaultUrl, new DefaultAzureCredential());
+        secret = await secretClient.getSecret(secretId);
+    } catch (err: unknown) {
+        const e = err as Record<string, unknown>;
+        const statusCode = e?.['statusCode'];
+        // 'details' is the parsed Key Vault response body: { error: { code, message } }
+        // Log only the code — the message may contain the secret name.
+        const kvErrorCode = (e?.['details'] as Record<string, unknown>)?.['error']
+            ? ((e['details'] as Record<string, unknown>)['error'] as Record<string, unknown>)?.['code']
+            : undefined;
+        console.error(`Key Vault getSecret failed: statusCode=${statusCode}, kvErrorCode=${kvErrorCode}`);
+        throw err;
+    }
     if (!secret.value) {
         throw new Error('APNS secret value is empty in Key Vault');
     }
