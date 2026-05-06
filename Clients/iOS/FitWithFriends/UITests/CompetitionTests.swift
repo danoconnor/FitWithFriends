@@ -154,9 +154,10 @@ final class CompetitionTests: FWFUITestBase {
         XCTAssertTrue(doneButton.waitForExistence(timeout: 3), "Keyboard Done button should be visible")
         doneButton.tap()
 
-        // After tapping Done the keyboard should be dismissed
-        // The Done button should no longer be present (keyboard hidden)
-        XCTAssertFalse(app.keyboards.firstMatch.exists)
+        // After tapping Done the keyboard should be dismissed — wait for the
+        // dismissal animation to complete before asserting (synchronous .exists
+        // is unreliable on slow CI runners where the animation may still be in progress)
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3))
     }
 
     func testCreateCompetitionProUpgradeShownForNonProUser() {
