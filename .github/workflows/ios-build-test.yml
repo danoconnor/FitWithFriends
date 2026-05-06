@@ -101,6 +101,9 @@ jobs:
           done
           echo "Backend not ready after 30s" && exit 1
 
+      - name: Clear SwiftPM cache
+        run: rm -rf ~/Library/Caches/org.swift.swiftpm
+
       - name: Test
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |

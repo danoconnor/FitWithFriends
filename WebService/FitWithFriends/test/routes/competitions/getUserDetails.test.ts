@@ -14,6 +14,7 @@ const testUserId = Math.random().toString().slice(2, 8);
 const testUserName = 'Test User';
 
 const now = new Date();
+now.setUTCHours(12, 0, 0, 0); // Noon UTC keeps UTC and Eastern dates in agreement
 const testCompetitionInfo: ICreateCompetitionParams = {
     competitionId: crypto.randomUUID(),
     adminUserId: convertUserIdToBuffer(testUserId),
