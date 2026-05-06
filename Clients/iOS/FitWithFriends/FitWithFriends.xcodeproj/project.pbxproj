@@ -1565,9 +1565,9 @@
 			name = "Set Bundle Version";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "# Only set version for non-Debug builds (Release, App Store, etc.)\nif [ \"$CONFIGURATION\" != \"Debug\" ]; then\n    # Skip the undefined_arch preprocessing pass used during archive — no real product exists yet\n    if [ \"$ARCHS\" = \"undefined_arch\" ]; then\n        exit 0\n    fi\n    BUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\n    # Use BUILT_PRODUCTS_DIR (not TARGET_BUILD_DIR or CODESIGNING_FOLDER_PATH).\n    # During archive, TARGET_BUILD_DIR and CODESIGNING_FOLDER_PATH both resolve to\n    # InstallationBuildProductsLocation (post-install path), which doesn't exist yet\n    # when this script runs. BUILT_PRODUCTS_DIR always points to where the build system\n    # just placed the compiled app (BuildProductsPath/Release-iphoneos), which exists.\n    PLIST_PATH=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Info.plist\"\n    if [ ! -f \"$PLIST_PATH\" ]; then\n        echo \"error: Info.plist not found at $PLIST_PATH — cannot set bundle version\"\n        exit 1\n    fi\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"$PLIST_PATH\"\nfi\n";
+			shellScript = "# Runs only during deployment post-processing (i.e. xcodebuild archive).\n# At this point the app has been fully assembled and installed to CODESIGNING_FOLDER_PATH,\n# so Info.plist is guaranteed to exist there.\nBUILD_VERSION=$(date +\"%Y%m%d.%H%M\")\nPLIST_PATH=\"${CODESIGNING_FOLDER_PATH}/Info.plist\"\nif [ ! -f \"$PLIST_PATH\" ]; then\n    echo \"error: Info.plist not found at $PLIST_PATH — cannot set bundle version\"\n    exit 1\nfi\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_VERSION\" \"$PLIST_PATH\"\n";
 		};
 		0BCF64992BCCB4F4004E98C7 /* Configure Settings bundle for build type */ = {
 			isa = PBXShellScriptBuildPhase;
