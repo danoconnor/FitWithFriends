@@ -101,18 +101,16 @@ async function getAPNSToken(): Promise<string> {
     // A full URL in APNS_KEY_SECRET_ID is a common misconfiguration that causes 400.
     const secretNameValid = /^[a-zA-Z0-9-]+$/.test(secretId);
     if (!secretNameValid) {
-        throw new Error(`APNS_KEY_SECRET_ID '${secretId}' is not a valid Key Vault secret name (only alphanumeric + hyphens allowed). If it looks like a URL, set it to just the secret name.`);
+        throw new Error('APNS_KEY_SECRET_ID is not a valid Key Vault secret name (only alphanumeric + hyphens allowed). If it looks like a URL, set it to just the secret name.');
     }
 
-    console.log(`Fetching APNS secret '${secretId}' from vault '${vaultUrl}'`);
     let secret: Awaited<ReturnType<SecretClient['getSecret']>>;
     try {
         const secretClient = new SecretClient(vaultUrl, new DefaultAzureCredential());
         secret = await secretClient.getSecret(secretId);
     } catch (err: unknown) {
-        const details = (err as Record<string, unknown>)?.['details'];
         const statusCode = (err as Record<string, unknown>)?.['statusCode'];
-        console.error(`Key Vault getSecret failed. statusCode=${statusCode}, details=${JSON.stringify(details)}, message=${(err as Error)?.message}`);
+        console.error(`Key Vault getSecret failed with statusCode=${statusCode}`);
         throw err;
     }
     if (!secret.value) {
