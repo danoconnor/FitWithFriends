@@ -87,7 +87,8 @@ jobs:
             -authenticationKeyID "$AUTH_KEY_ID" \
             -authenticationKeyIssuerID "$AUTH_KEY_ISSUER_ID" \
             -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM="$TEAM_ID"
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CURRENT_PROJECT_VERSION="$(date +'%Y%m%d.%H%M')"
 
       - name: Export and upload to App Store Connect
         env:
