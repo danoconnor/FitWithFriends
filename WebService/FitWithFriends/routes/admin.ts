@@ -324,19 +324,20 @@ async function archiveCompetitions(now: Date): Promise<string> {
                 });
             }
 
-            // Send push notifications
-            const pushNotificationsPromise = sendPushNotifications(notifications);
-
-            // Set final results in the UsersCompetitions table
-            await Promise.all(Object.values(competitionResults).map(userPoints => {
-                return CompetitionQueries.updateCompetitionFinalPoints({
-                    userId: UserHelpers.convertUserIdToBuffer(userPoints.userId),
-                    competitionId: competition.competition_id,
-                    finalPoints: userPoints.activityPoints
-                });
-            }));
-
-            await pushNotificationsPromise;
+            // Run notifications and final-point DB writes in parallel.
+            // Both must be inside the same Promise.all so a rejection from either
+            // is caught by the surrounding try/catch instead of becoming an
+            // unhandled rejection that crashes the process.
+            await Promise.all([
+                sendPushNotifications(notifications),
+                Promise.all(Object.values(competitionResults).map(userPoints =>
+                    CompetitionQueries.updateCompetitionFinalPoints({
+                        userId: UserHelpers.convertUserIdToBuffer(userPoints.userId),
+                        competitionId: competition.competition_id,
+                        finalPoints: userPoints.activityPoints
+                    })
+                ))
+            ]);
         } catch (err) {
             // Log the error but continue processing other competitions
             console.error(`Error calculating final results for competition ${competition.competition_id}:`, err);
