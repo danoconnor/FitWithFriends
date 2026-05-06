@@ -277,6 +277,8 @@ async function archiveCompetitions(now: Date): Promise<string> {
         return 'No competitions to archive';
     }
 
+    let totalNotificationsSent = 0;
+
     // Calculate the final results for each competition
     for (const competition of competitionsToArchive) {
         try {
@@ -328,6 +330,7 @@ async function archiveCompetitions(now: Date): Promise<string> {
             // Both must be inside the same Promise.all so a rejection from either
             // is caught by the surrounding try/catch instead of becoming an
             // unhandled rejection that crashes the process.
+            totalNotificationsSent += notifications.length;
             await Promise.all([
                 sendPushNotifications(notifications),
                 Promise.all(Object.values(competitionResults).map(userPoints =>
@@ -349,7 +352,7 @@ async function archiveCompetitions(now: Date): Promise<string> {
         return CompetitionQueries.updateCompetitionState({ competitionId: competition.competition_id, newState: CompetitionState.Archived });
     }));
 
-    return `Archived ${competitionsToArchive.length} competition(s)`;
+    return `Archived ${competitionsToArchive.length} competition(s), sent ${totalNotificationsSent} push notifications`;
 }
 
 async function deleteExpiredRefreshTokens(now: Date): Promise<string> {
