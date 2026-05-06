@@ -226,7 +226,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
-        expect(getTaskResult(response, 'archiveCompetitions')).toBe('Archived 1 competition(s)');
+        expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
 
         // Verify the competition state was updated to Archived
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -282,7 +282,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
-        expect(getTaskResult(response, 'archiveCompetitions')).toBe('Archived 1 competition(s)');
+        expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
 
         // Competition should still be archived even with no users
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -752,7 +752,7 @@ describe('performDailyTasks - comprehensive integration', () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
-        expect(getTaskResult(response, 'archiveCompetitions')).toBe('Archived 1 competition(s)');
+        expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
         expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('Moved 1 competition(s) to processing state');
         expect(getTaskResult(response, 'deleteExpiredRefreshTokens')).toBe('Deleted expired refresh tokens');
         expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBeDefined();

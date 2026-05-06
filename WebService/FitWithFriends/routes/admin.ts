@@ -277,6 +277,9 @@ async function archiveCompetitions(now: Date): Promise<string> {
         return 'No competitions to archive';
     }
 
+    let totalNotificationsSent = 0;
+    const notificationErrors: string[] = [];
+
     // Calculate the final results for each competition
     for (const competition of competitionsToArchive) {
         try {
@@ -328,16 +331,23 @@ async function archiveCompetitions(now: Date): Promise<string> {
             // Both must be inside the same Promise.all so a rejection from either
             // is caught by the surrounding try/catch instead of becoming an
             // unhandled rejection that crashes the process.
-            await Promise.all([
-                sendPushNotifications(notifications),
-                Promise.all(Object.values(competitionResults).map(userPoints =>
-                    CompetitionQueries.updateCompetitionFinalPoints({
-                        userId: UserHelpers.convertUserIdToBuffer(userPoints.userId),
-                        competitionId: competition.competition_id,
-                        finalPoints: userPoints.activityPoints
-                    })
-                ))
-            ]);
+            try {
+                await Promise.all([
+                    sendPushNotifications(notifications),
+                    Promise.all(Object.values(competitionResults).map(userPoints =>
+                        CompetitionQueries.updateCompetitionFinalPoints({
+                            userId: UserHelpers.convertUserIdToBuffer(userPoints.userId),
+                            competitionId: competition.competition_id,
+                            finalPoints: userPoints.activityPoints
+                        })
+                    ))
+                ]);
+                totalNotificationsSent += notifications.length;
+            } catch (notifErr) {
+                const msg = `competition ${competition.competition_id}: ${(notifErr as Error).message}`;
+                notificationErrors.push(msg);
+                console.error(`Error sending notifications/writing final points for ${msg}`, notifErr);
+            }
         } catch (err) {
             // Log the error but continue processing other competitions
             console.error(`Error calculating final results for competition ${competition.competition_id}:`, err);
@@ -349,7 +359,10 @@ async function archiveCompetitions(now: Date): Promise<string> {
         return CompetitionQueries.updateCompetitionState({ competitionId: competition.competition_id, newState: CompetitionState.Archived });
     }));
 
-    return `Archived ${competitionsToArchive.length} competition(s)`;
+    const errorSuffix = notificationErrors.length > 0
+        ? `; notification/points errors: ${notificationErrors.join(', ')}`
+        : '';
+    return `Archived ${competitionsToArchive.length} competition(s), sent ${totalNotificationsSent} push notifications${errorSuffix}`;
 }
 
 async function deleteExpiredRefreshTokens(now: Date): Promise<string> {
