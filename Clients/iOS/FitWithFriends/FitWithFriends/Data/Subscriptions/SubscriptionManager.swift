@@ -66,7 +66,32 @@ public class SubscriptionManager: ISubscriptionManager, ObservableObject {
 
     func restorePurchases() async throws {
         try await AppStore.sync()
-        await checkSubscriptionStatus()
+
+        for await entitlement in Transaction.currentEntitlements {
+            let jwsRepresentation = entitlement.jwsRepresentation
+            guard case .verified(let transaction) = entitlement,
+                  transaction.productID == Self.proMonthlyProductId else {
+                continue
+            }
+
+            if let expirationDate = transaction.expirationDate, expirationDate < Date() {
+                Logger.traceInfo(message: "Restore: skipping expired Pro entitlement")
+                continue
+            }
+
+            Logger.traceInfo(message: "Restore: found valid Pro entitlement, syncing with server")
+            let status = try await subscriptionService.validateTransaction(signedTransaction: jwsRepresentation)
+            Logger.traceInfo(message: "Restore: server sync complete, isPro: \(status.isPro)")
+            await MainActor.run {
+                isUserPro = status.isPro
+            }
+            return
+        }
+
+        Logger.traceInfo(message: "Restore: no valid Pro entitlement found")
+        await MainActor.run {
+            isUserPro = false
+        }
     }
 
     func checkSubscriptionStatus() async {
