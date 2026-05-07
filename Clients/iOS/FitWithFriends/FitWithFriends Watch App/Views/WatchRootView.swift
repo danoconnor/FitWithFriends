@@ -52,6 +52,7 @@ struct WatchRootView: View {
             CompetitionsPagerView(
                 overviews: overviews,
                 currentUserId: objectGraph.authenticationManager.loggedInUserId,
+                competitionManager: objectGraph.competitionManager,
                 onRefresh: { await forceRefresh() }
             )
         }

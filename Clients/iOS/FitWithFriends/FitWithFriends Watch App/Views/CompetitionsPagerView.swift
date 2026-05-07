@@ -10,6 +10,7 @@ import SwiftUI
 struct CompetitionsPagerView: View {
     let overviews: [CompetitionOverview]
     let currentUserId: String?
+    let competitionManager: ICompetitionManager
     let onRefresh: () async -> Void
 
     var body: some View {
@@ -20,7 +21,8 @@ struct CompetitionsPagerView: View {
                         viewModel: WatchCompetitionDetailViewModel(
                             competition: overview,
                             currentUserId: currentUserId
-                        )
+                        ),
+                        competitionManager: competitionManager
                     )
                 } label: {
                     CompetitionCardView(

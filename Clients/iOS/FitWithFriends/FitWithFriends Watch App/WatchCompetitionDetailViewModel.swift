@@ -12,6 +12,7 @@ import Foundation
 class WatchCompetitionDetailViewModel {
     struct LeaderboardEntry: Equatable {
         let position: Int
+        let userId: String
         let displayName: String
         let totalPoints: Int
         let pointsToday: Int
@@ -64,6 +65,7 @@ class WatchCompetitionDetailViewModel {
             let position = index + 1
             return LeaderboardEntry(
                 position: position,
+                userId: result.userId,
                 displayName: result.displayName,
                 totalPoints: Int(result.totalPoints ?? 0),
                 pointsToday: Int(result.pointsToday ?? 0),
