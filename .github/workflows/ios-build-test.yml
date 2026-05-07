@@ -84,7 +84,7 @@ jobs:
           device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
           xcodebuild build-for-testing -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" CODE_SIGNING_ALLOWED=NO
 
-      - name: Test (unit tests, parallel)
+      - name: Test (unit tests)
         env:
           scheme: ${{ 'FitWithFriends' }}
           platform: ${{ 'iOS Simulator' }}
@@ -99,8 +99,6 @@ jobs:
             -destination "platform=$platform,OS=latest,name=$device" \
             -only-testing:FitWithFriends_UnitTests \
             -skip-testing:FitWithFriends_UnitTests/WatchScreenshotTests \
-            -parallel-testing-enabled YES \
-            -parallel-testing-worker-count 2 \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Test (UI tests)
