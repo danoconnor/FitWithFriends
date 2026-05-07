@@ -18,6 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Cache SPM packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-spm-
+
       - name: Archive
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
         run: |
@@ -59,6 +66,13 @@ jobs:
       - name: Start UI test backend
         run: Scripts/start-ui-test-backend-native.sh
 
+      - name: Cache SPM packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-spm-
+
       - name: Build
         env:
           scheme: ${{ 'FitWithFriends' }}
@@ -70,7 +84,7 @@ jobs:
           device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
           xcodebuild build-for-testing -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" CODE_SIGNING_ALLOWED=NO
 
-      - name: Test
+      - name: Test (unit tests, parallel)
         env:
           scheme: ${{ 'FitWithFriends' }}
           platform: ${{ 'iOS Simulator' }}
@@ -79,7 +93,30 @@ jobs:
           # Pick the iPhone simulator with the highest available OS version
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
-          xcodebuild test-without-building -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" -skip-testing:FitWithFriends_UnitTests/WatchScreenshotTests CODE_SIGNING_ALLOWED=NO
+          xcodebuild test-without-building \
+            -scheme "$scheme" \
+            -workspace $WORKSPACE_NAME \
+            -destination "platform=$platform,OS=latest,name=$device" \
+            -only-testing:FitWithFriends_UnitTests \
+            -parallel-testing-enabled YES \
+            -parallel-testing-worker-count 2 \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Test (UI tests)
+        env:
+          scheme: ${{ 'FitWithFriends' }}
+          platform: ${{ 'iOS Simulator' }}
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
+        run: |
+          # Pick the iPhone simulator with the highest available OS version
+          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
+          device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
+          xcodebuild test-without-building \
+            -scheme "$scheme" \
+            -workspace $WORKSPACE_NAME \
+            -destination "platform=$platform,OS=latest,name=$device" \
+            -only-testing:FitWithFriends_UITests \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Stop UI test backend
         if: always()
@@ -92,6 +129,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Cache SPM packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-spm-
 
       - name: Test
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
@@ -132,8 +176,12 @@ jobs:
           done
           echo "Backend not ready after 30s" && exit 1
 
-      - name: Clear SwiftPM cache
-        run: rm -rf ~/Library/Caches/org.swift.swiftpm
+      - name: Cache SPM packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-spm-
 
       - name: Test
         working-directory: ${{ env.XCODE_PROJECT_DIR }}
