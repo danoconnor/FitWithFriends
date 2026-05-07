@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { createPrivateKey } from 'crypto';
 import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
 import * as PushNotificationQueries from '../sql/pushNotifications.queries';
@@ -123,8 +124,7 @@ async function getAPNSToken(): Promise<string> {
         throw new Error('APNS secret value is empty in Key Vault');
     }
 
-    // Key Vault may store the PEM with literal \n sequences instead of real newlines.
-    const privateKey = secret.value.replace(/\\n/g, '\n');
+    const privateKey = parsePemKey(secret.value);
     const token = jwt.sign({ iss: teamId, iat: nowSeconds }, privateKey, {
         algorithm: 'ES256',
         keyid: apnsKeyId,
@@ -195,6 +195,42 @@ async function sendPushNotification(userId: string, pushToken: string, notificat
     } catch (error) {
         // Do not throw so we can continue processing other notifications
         console.error('Error sending push notification:', error);
+    }
+}
+
+// Parse and normalize an EC/PKCS8 private key stored in Key Vault.
+// Key Vault can return the PEM with literal \n sequences, \r\n line endings,
+// \r characters, or as a fully flattened single line. We reconstruct the PEM
+// from scratch so Node.js crypto can always parse it, then return a KeyObject
+// so jwt.sign recognizes it as asymmetric without ambiguity.
+function parsePemKey(raw: string): ReturnType<typeof createPrivateKey> {
+    // Decode all common escape/newline variants to real newlines
+    const decoded = raw
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\n')
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n');
+
+    const isPkcs8 = decoded.includes('BEGIN PRIVATE KEY');
+    const label = isPkcs8 ? 'PRIVATE KEY' : 'EC PRIVATE KEY';
+
+    // Extract the raw base64 content between the PEM delimiters.
+    // Using a regex handles both normally-formatted PEMs and fully-flat ones
+    // (where the header and footer are concatenated directly to the base64 content).
+    const pemMatch = decoded.match(/-----BEGIN [^-]+-----([A-Za-z0-9+/=\s]+)-----END [^-]+-----/);
+    const base64 = pemMatch
+        ? pemMatch[1].replace(/\s/g, '')
+        : decoded.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('-----')).join('');
+
+    // Re-wrap at the standard PEM line length of 64 characters
+    const wrapped = (base64.match(/.{1,64}/g) ?? []).join('\n');
+    const pem = `-----BEGIN ${label}-----\n${wrapped}\n-----END ${label}-----`;
+
+    try {
+        return createPrivateKey(pem);
+    } catch (err) {
+        throw new Error(`Failed to parse APNS private key: ${(err as Error).message}`);
     }
 }
 
