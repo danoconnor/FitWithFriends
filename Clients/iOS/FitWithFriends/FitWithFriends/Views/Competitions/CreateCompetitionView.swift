@@ -86,6 +86,7 @@ struct CreateCompetitionView: View {
 
                                 DatePicker("Start date",
                                            selection: $startDate,
+                                           in: Date()...,
                                            displayedComponents: .date)
 
                                 DatePicker("End date",
