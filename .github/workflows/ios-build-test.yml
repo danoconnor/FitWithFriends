@@ -48,8 +48,45 @@ jobs:
             exit 1
           fi
 
-  ios-tests:
-    name: iOS build and test
+  ios-unit-tests:
+    name: iOS unit tests
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache SPM packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-spm-
+
+      - name: Build
+        env:
+          scheme: ${{ 'FitWithFriends' }}
+          platform: ${{ 'iOS Simulator' }}
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
+        run: |
+          # Pick the iPhone simulator with the highest available OS version
+          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
+          device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
+          xcodebuild build-for-testing -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" CODE_SIGNING_ALLOWED=NO
+
+      - name: Test
+        env:
+          scheme: ${{ 'FitWithFriends' }}
+          platform: ${{ 'iOS Simulator' }}
+        working-directory: ${{ env.XCODE_PROJECT_DIR }}
+        run: |
+          # Pick the iPhone simulator with the highest available OS version
+          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
+          device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
+          xcodebuild test-without-building -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" -only-testing:FitWithFriends_UnitTests -skip-testing:FitWithFriends_UnitTests/WatchScreenshotTests CODE_SIGNING_ALLOWED=NO
+
+  ios-ui-tests:
+    name: iOS UI tests
     runs-on: macos-26
 
     steps:
@@ -93,7 +130,7 @@ jobs:
           # Pick the iPhone simulator with the highest available OS version
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device=$(xcrun xctrace list devices 2>&1 | grep -E 'iPhone.*Simulator \(' | sort -t'(' -k2 -V -k1,1 | tail -1 | sed -E 's/ Simulator \([0-9.]+\).*$//' | xargs)
-          xcodebuild test-without-building -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" -skip-testing:FitWithFriends_UnitTests/WatchScreenshotTests CODE_SIGNING_ALLOWED=NO
+          xcodebuild test-without-building -scheme "$scheme" -workspace $WORKSPACE_NAME -destination "platform=$platform,OS=latest,name=$device" -only-testing:FitWithFriends_UITests CODE_SIGNING_ALLOWED=NO
 
       - name: Stop UI test backend
         if: always()
