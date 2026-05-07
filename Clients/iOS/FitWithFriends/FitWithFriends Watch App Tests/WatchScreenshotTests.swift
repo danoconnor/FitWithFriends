@@ -100,6 +100,7 @@ final class WatchScreenshotTests: XCTestCase {
         let view = CompetitionsPagerView(
             overviews: overviews,
             currentUserId: "u_me",
+            competitionManager: MockCompetitionManager(),
             onRefresh: {}
         )
         snapshot(view, named: "01_CompetitionsPager_Active")
@@ -110,6 +111,7 @@ final class WatchScreenshotTests: XCTestCase {
         let view = CompetitionsPagerView(
             overviews: overviews,
             currentUserId: "u_me",
+            competitionManager: MockCompetitionManager(),
             onRefresh: {}
         )
         snapshot(view, named: "02_CompetitionsPager_Winning")
@@ -121,7 +123,7 @@ final class WatchScreenshotTests: XCTestCase {
             competition: overviews[0],
             currentUserId: "u_me"
         )
-        let view = WatchCompetitionDetailView(viewModel: viewModel)
+        let view = WatchCompetitionDetailView(viewModel: viewModel, competitionManager: MockCompetitionManager())
         snapshot(view, named: "03_CompetitionDetail_FullLeaderboard")
     }
 

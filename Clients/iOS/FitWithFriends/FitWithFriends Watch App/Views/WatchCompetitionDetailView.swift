@@ -9,12 +9,21 @@ import SwiftUI
 
 struct WatchCompetitionDetailView: View {
     let viewModel: WatchCompetitionDetailViewModel
+    let competitionManager: ICompetitionManager
 
     var body: some View {
         List {
             Section {
                 ForEach(viewModel.leaderboardEntries, id: \.position) { entry in
-                    WatchUserResultRow(entry: entry, isCompetitionActive: viewModel.isCompetitionActive)
+                    NavigationLink {
+                        WatchUserCompetitionDailyDetailsView(
+                            competitionId: viewModel.competition.competitionId,
+                            userId: entry.userId,
+                            userName: entry.displayName,
+                            competitionManager: competitionManager)
+                    } label: {
+                        WatchUserResultRow(entry: entry, isCompetitionActive: viewModel.isCompetitionActive)
+                    }
                 }
             } header: {
                 Text(viewModel.userPositionDescription)

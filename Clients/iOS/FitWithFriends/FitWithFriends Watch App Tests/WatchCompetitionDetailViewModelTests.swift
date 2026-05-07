@@ -26,6 +26,7 @@ final class WatchCompetitionDetailViewModelTests: XCTestCase {
         let entries = viewModel.leaderboardEntries
         XCTAssertEqual(entries.map { $0.displayName }, ["Bob B", "Carol C", "Alice A"])
         XCTAssertEqual(entries.map { $0.position }, [1, 2, 3])
+        XCTAssertEqual(entries.map { $0.userId }, ["b", "c", "a"])
     }
 
     func test_leaderboardEntries_markTopThree() {

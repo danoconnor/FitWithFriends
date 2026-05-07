@@ -335,6 +335,9 @@
 		WATCHAPP00000000000000S1 /* ScoringRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000000B /* ScoringRules.swift */; };
 		WATCHAPP00000000000000S2 /* WorkoutActivityTypeCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000000D /* WorkoutActivityTypeCatalog.swift */; };
 		WATCHAPP00000000000000S3 /* ScoringValueFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600000000000F /* ScoringValueFormatter.swift */; };
+		WATCHAPP00000000000000V2 /* WatchUserCompetitionDailyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WATCHAPP00000000000000V1 /* WatchUserCompetitionDailyDetailsView.swift */; };
+		WATCHAPP00000000000000V3 /* WatchUserCompetitionDailyDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WATCHAPP00000000000000V1 /* WatchUserCompetitionDailyDetailsView.swift */; };
+		WATCHAPP00000000000000V4 /* UserCompetitionDailyDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000000000005 /* UserCompetitionDailyDetailsViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -573,6 +576,7 @@
 		DE177B1CCDC6233E8E7C737C /* WatchCompetitionDetailViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchCompetitionDetailViewModel.swift; sourceTree = "<group>"; };
 		E2CD78E019B0DB2D6805AEA9 /* WatchRefreshThrottle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchRefreshThrottle.swift; sourceTree = "<group>"; };
 		F77B1DD88CD6AE72A0B332B3 /* WatchUserResultRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchUserResultRow.swift; sourceTree = "<group>"; };
+		WATCHAPP00000000000000V1 /* WatchUserCompetitionDailyDetailsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchUserCompetitionDailyDetailsView.swift; sourceTree = "<group>"; };
 		F8D645D6E45AF6C8C5171425 /* WatchSessionReceiver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchSessionReceiver.swift; sourceTree = "<group>"; };
 		FA97B7481BA2FE74AE5DCB40 /* WatchRefreshThrottleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchRefreshThrottleTests.swift; sourceTree = "<group>"; };
 		FE00000100000000000001A1 /* FitWithFriends_UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitWithFriends_UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -703,6 +707,7 @@
 				9D7C80395F30BDD8142CFDAE /* CompetitionCardView.swift */,
 				5BFBBF09D143D0B2D95F5484 /* WatchCompetitionDetailView.swift */,
 				F77B1DD88CD6AE72A0B332B3 /* WatchUserResultRow.swift */,
+				WATCHAPP00000000000000V1 /* WatchUserCompetitionDailyDetailsView.swift */,
 				6EBB03229B6E9623F4DE5CAA /* SignedOutView.swift */,
 				42E105028519EF7F16754AB2 /* NoCompetitionsView.swift */,
 			);
@@ -1802,6 +1807,7 @@
 				A1B2C3D4E5F6000000000004 /* UserCompetitionDailyDetails.swift in Sources */,
 				A1B2C3D4E5F6000000000006 /* UserCompetitionDailyDetailsViewModel.swift in Sources */,
 				A1B2C3D4E5F6000000000008 /* UserCompetitionDailyDetailsView.swift in Sources */,
+				WATCHAPP00000000000000V3 /* WatchUserCompetitionDailyDetailsView.swift in Sources */,
 				C7BD62F10D25B0300C02BF41 /* WatchObjectGraph.swift in Sources */,
 				4E1D969372A3CF204A9A30E0 /* WatchAuthenticationManager.swift in Sources */,
 				6508F2E348F2D03DFE84786D /* WatchRefreshThrottle.swift in Sources */,
@@ -1904,6 +1910,8 @@
 				WATCHAPP00000000000000S1 /* ScoringRules.swift in Sources */,
 				WATCHAPP00000000000000S2 /* WorkoutActivityTypeCatalog.swift in Sources */,
 				WATCHAPP00000000000000S3 /* ScoringValueFormatter.swift in Sources */,
+				WATCHAPP00000000000000V4 /* UserCompetitionDailyDetailsViewModel.swift in Sources */,
+				WATCHAPP00000000000000V2 /* WatchUserCompetitionDailyDetailsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
