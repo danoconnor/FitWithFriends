@@ -10,10 +10,14 @@ import SwiftUI
 struct SettingsView: View {
     let emailUtility: IEmailUtility
     let serverEnvironmentManager: IServerEnvironmentManager
+    let subscriptionManager: ISubscriptionManager
     let onDeleteAccount: () async -> Bool
 
     @State private var showDeleteAccountAlert = false
     @State private var showDeleteAccountErrorAlert = false
+    @State private var isRestoringPurchases = false
+    @State private var showRestoreSuccessAlert = false
+    @State private var showRestoreErrorAlert = false
 
     var body: some View {
         NavigationView {
@@ -43,6 +47,33 @@ struct SettingsView: View {
                     } label: {
                         Label("Activity data troubleshooting", systemImage: "heart.text.square")
                     }
+                }
+
+                Section("Subscription") {
+                    Button {
+                        Task {
+                            isRestoringPurchases = true
+                            defer { isRestoringPurchases = false }
+                            do {
+                                try await subscriptionManager.restorePurchases()
+                                showRestoreSuccessAlert = true
+                            } catch {
+                                showRestoreErrorAlert = true
+                            }
+                        }
+                    } label: {
+                        if isRestoringPurchases {
+                            HStack {
+                                Text("Restore Purchases")
+                                Spacer()
+                                ProgressView()
+                            }
+                        } else {
+                            Label("Restore Purchases", systemImage: "arrow.clockwise")
+                        }
+                    }
+                    .disabled(isRestoringPurchases)
+                    .accessibilityIdentifier("RestorePurchasesButton")
                 }
 
                 Section("More") {
@@ -87,6 +118,16 @@ struct SettingsView: View {
         } message: {
             Text("Failed to delete your account. Please try again later.")
         }
+        .alert("Purchases Restored", isPresented: $showRestoreSuccessAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your subscription has been restored.")
+        }
+        .alert("Restore Failed", isPresented: $showRestoreErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Failed to restore purchases. Please try again.")
+        }
     }
 }
 
@@ -94,6 +135,7 @@ struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView(emailUtility: MockEmailUtility(),
                      serverEnvironmentManager: ServerEnvironmentManager(userDefaults: UserDefaults.standard),
+                     subscriptionManager: MockSubscriptionManager(),
                      onDeleteAccount: { return true })
     }
 }
