@@ -21,6 +21,13 @@ jobs:
           echo "Response status: $status"
           echo "Full response:"
           jq . "$body_file" 2>/dev/null || cat "$body_file"
+          warned_tasks=$(jq -r '.warnings[]? | "  - \(.name): \(.warning)"' "$body_file" 2>/dev/null)
+          if [ -n "$warned_tasks" ]; then
+            echo ""
+            echo "::warning::performDailyTasks completed with warnings"
+            echo "Warnings:"
+            echo "$warned_tasks"
+          fi
           if [ "$status" -ne 200 ]; then
             echo ""
             echo "::error::performDailyTasks failed with HTTP $status"
