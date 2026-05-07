@@ -182,6 +182,7 @@ struct LoggedInContentView: View {
                     case .settings:
                         SettingsView(emailUtility: objectGraph.emailUtility,
                                      serverEnvironmentManager: objectGraph.serverEnvironmentManager,
+                                     subscriptionManager: objectGraph.subscriptionManager,
                                      onDeleteAccount: { return await homepageViewModel.deleteAccount() })
                     case .proUpgrade:
                         ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
