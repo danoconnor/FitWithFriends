@@ -123,7 +123,9 @@ async function getAPNSToken(): Promise<string> {
         throw new Error('APNS secret value is empty in Key Vault');
     }
 
-    const token = jwt.sign({ iss: teamId, iat: nowSeconds }, secret.value, {
+    // Key Vault may store the PEM with literal \n sequences instead of real newlines.
+    const privateKey = secret.value.replace(/\\n/g, '\n');
+    const token = jwt.sign({ iss: teamId, iat: nowSeconds }, privateKey, {
         algorithm: 'ES256',
         keyid: apnsKeyId,
         noTimestamp: true,
