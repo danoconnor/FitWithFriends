@@ -167,7 +167,7 @@ router.post('/createBotUsers', async function (req, res) {
 });
 
 router.post('/performDailyTasks', async function (req, res) {
-    let taskResults: { name: string; result: string }[] = [];
+    let taskResults: { name: string; result: string; warning?: string }[] = [];
     let errors: [taskName: string, error: Error][] = [];
 
     // Optional currentDate override — allows callers (e.g. tests) to specify what
@@ -178,7 +178,7 @@ router.post('/performDailyTasks', async function (req, res) {
     // while awaiting other tasks. Competition tasks are serialized to prevent a competition
     // from advancing two states in one run.
     try {
-        taskResults.push({ name: 'archiveCompetitions', result: await archiveCompetitions(now) });
+        taskResults.push({ name: 'archiveCompetitions', ...await archiveCompetitions(now) });
     } catch (err) {
         errors.push(['archiveCompetitions', err]);
     }
@@ -209,6 +209,7 @@ router.post('/performDailyTasks', async function (req, res) {
 
     const summary = {
         tasks: taskResults,
+        warnings: taskResults.filter(t => t.warning).map(t => ({ name: t.name, warning: t.warning! })),
         errors: errors.map(([name, error]) => ({
             name,
             error: error.message,
@@ -266,7 +267,7 @@ async function processesRecentlyEndedCompetitions(now: Date): Promise<string> {
 // Get competitions that have been in the processing state for more than 24 hours
 // Move them to the archived state and archive results
 // Send final results push notifications
-async function archiveCompetitions(now: Date): Promise<string> {
+async function archiveCompetitions(now: Date): Promise<{ result: string; warning?: string }> {
     const olderThan24Hrs = new Date(now.getTime() - (24 * 60 * 60 * 1000));
      const competitionsToArchive = await CompetitionQueries.getCompetitionsInState({
         state: CompetitionState.ProcessingResults,
@@ -274,10 +275,11 @@ async function archiveCompetitions(now: Date): Promise<string> {
      });
 
     if (competitionsToArchive.length === 0) {
-        return 'No competitions to archive';
+        return { result: 'No competitions to archive' };
     }
 
-    let totalNotificationsSent = 0;
+    let totalSent = 0;
+    let totalFailed = 0;
     const notificationErrors: string[] = [];
 
     // Calculate the final results for each competition
@@ -332,7 +334,7 @@ async function archiveCompetitions(now: Date): Promise<string> {
             // is caught by the surrounding try/catch instead of becoming an
             // unhandled rejection that crashes the process.
             try {
-                await Promise.all([
+                const [sendResult] = await Promise.all([
                     sendPushNotifications(notifications),
                     Promise.all(Object.values(competitionResults).map(userPoints =>
                         CompetitionQueries.updateCompetitionFinalPoints({
@@ -342,7 +344,8 @@ async function archiveCompetitions(now: Date): Promise<string> {
                         })
                     ))
                 ]);
-                totalNotificationsSent += notifications.length;
+                totalSent += sendResult.sent;
+                totalFailed += sendResult.failed;
             } catch (notifErr) {
                 const msg = `competition ${competition.competition_id}: ${(notifErr as Error).message}`;
                 notificationErrors.push(msg);
@@ -353,16 +356,26 @@ async function archiveCompetitions(now: Date): Promise<string> {
             console.error(`Error calculating final results for competition ${competition.competition_id}:`, err);
         }
     }
-    
+
     // Update competitions to archived state
     await Promise.all(competitionsToArchive.map(competition => {
         return CompetitionQueries.updateCompetitionState({ competitionId: competition.competition_id, newState: CompetitionState.Archived });
     }));
 
-    const errorSuffix = notificationErrors.length > 0
-        ? `; notification/points errors: ${notificationErrors.join(', ')}`
-        : '';
-    return `Archived ${competitionsToArchive.length} competition(s), sent ${totalNotificationsSent} push notifications${errorSuffix}`;
+    const total = totalSent + totalFailed;
+    const result = `Archived ${competitionsToArchive.length} competition(s), ${totalSent}/${total} push notifications sent`;
+
+    const warningParts: string[] = [];
+    if (totalFailed > 0) {
+        warningParts.push(`${totalFailed} push notification(s) failed to deliver`);
+    }
+    if (notificationErrors.length > 0) {
+        warningParts.push(`notification/points errors: ${notificationErrors.join(', ')}`);
+    }
+
+    return warningParts.length > 0
+        ? { result, warning: warningParts.join('; ') }
+        : { result };
 }
 
 async function deleteExpiredRefreshTokens(now: Date): Promise<string> {
@@ -388,14 +401,22 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
     }
 
     const upcomingMonday = getNextMondayStartDate(now);
+    // Use UTC date strings so pg does not apply a local-timezone offset when writing
+    // to the DATE column (which has no time component).
+    const startDateStr = upcomingMonday.toISOString().slice(0, 10);
+    const endDateStr = new Date(upcomingMonday.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-    // Check if a competition for the upcoming week already exists
+    // Check if a competition for the upcoming week already exists.
+    // Compare date strings directly to avoid local-vs-UTC midnight mismatches.
     const activePublicCompetitions = await CompetitionQueries.getPublicCompetitions({
         activeState: CompetitionState.NotStartedOrActive
     });
-    const alreadyScheduled = activePublicCompetitions.some(c =>
-        new Date(c.start_date).getTime() >= upcomingMonday.getTime()
-    );
+    const alreadyScheduled = activePublicCompetitions.some(c => {
+        const storedDate = c.start_date instanceof Date
+            ? c.start_date.toISOString().slice(0, 10)
+            : String(c.start_date).slice(0, 10);
+        return storedDate >= startDateStr;
+    });
     if (alreadyScheduled) {
         return 'Skipped: competition for upcoming week already exists';
     }
@@ -405,17 +426,14 @@ async function createWeeklyPublicCompetition(now: Date): Promise<string> {
         throw new Error('FWF_SYSTEM_ADMIN_USER_ID environment variable is not set');
     }
 
-    const endDate = new Date(upcomingMonday);
-    endDate.setUTCDate(upcomingMonday.getUTCDate() + 7);
-
     const [templateA, templateB] = getWeekTemplates(upcomingMonday);
     const botUsers = await UserQueries.getBotUsers();
 
     for (const template of [templateA, templateB]) {
         const competitionId = crypto.randomUUID();
         await CompetitionQueries.createPublicCompetition({
-            startDate: upcomingMonday,
-            endDate,
+            startDate: startDateStr,
+            endDate: endDateStr,
             displayName: template.displayName,
             adminUserId: UserHelpers.convertUserIdToBuffer(adminUserId),
             accessToken: cryptoHelpers.getRandomToken(),

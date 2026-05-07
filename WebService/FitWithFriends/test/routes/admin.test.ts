@@ -21,6 +21,10 @@ function getTaskResult(response: any, taskName: string): string | undefined {
     return response.data?.tasks?.find((t: any) => t.name === taskName)?.result;
 }
 
+function getTaskWarning(response: any, taskName: string): string | undefined {
+    return response.data?.warnings?.find((w: any) => w.name === taskName)?.warning;
+}
+
 function getTaskError(response: any, taskName: string): { name: string; error: string; errorType: string } | undefined {
     return response.data?.errors?.find((e: any) => e.name === taskName);
 }
@@ -227,6 +231,8 @@ describe('performDailyTasks - archiveCompetitions', () => {
         expect(response.status).toBe(200);
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
+        expect(getTaskResult(response, 'archiveCompetitions')).toContain('2/2 push notifications sent');
+        expect(getTaskWarning(response, 'archiveCompetitions')).toBeUndefined();
 
         // Verify the competition state was updated to Archived
         const competition = await TestSQL.getCompetition({ competitionId });
@@ -285,6 +291,39 @@ describe('performDailyTasks - archiveCompetitions', () => {
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
 
         // Competition should still be archived even with no users
+        const competition = await TestSQL.getCompetition({ competitionId });
+        expect(competition[0].state).toBe(CompetitionState.Archived);
+    });
+
+    test('sets a warning when users have no registered push token', async () => {
+        const competitionId = crypto.randomUUID();
+        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+
+        await TestSQL.createCompetitionWithState({
+            competitionId,
+            displayName: 'No Token Competition',
+            startDate: twoDaysAgo,
+            endDate: twoDaysAgo,
+            adminUserId: convertUserIdToBuffer(testUserId1),
+            accessToken: 'test-token',
+            ianaTimezone: 'America/New_York',
+            state: CompetitionState.ProcessingResults
+        });
+        competitionsToCleanup.push(competitionId);
+
+        // Add a user with NO push token registered
+        await TestSQL.addUserToCompetition({
+            userId: convertUserIdToBuffer(testUserId1),
+            competitionId
+        });
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        expect(response.status).toBe(200);
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
+        expect(getTaskResult(response, 'archiveCompetitions')).toContain('0/1 push notifications sent');
+        expect(getTaskWarning(response, 'archiveCompetitions')).toContain('1 push notification(s) failed to deliver');
+
         const competition = await TestSQL.getCompetition({ competitionId });
         expect(competition[0].state).toBe(CompetitionState.Archived);
     });

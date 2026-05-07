@@ -11,22 +11,27 @@ export interface Notification {
     body: string;
 }
 
+export interface SendResult {
+    sent: number;
+    failed: number;
+}
+
 // Cache the token and its expiry to avoid re-signing on every request.
 // APNs tokens are valid for 1 hour; we refresh 5 minutes early.
 let cachedToken: string | null = null;
 let cachedTokenExpiresAt: number = 0;
 
-export async function sendPushNotifications(notifications: Notification[]) {
+export async function sendPushNotifications(notifications: Notification[]): Promise<SendResult> {
     if (notifications.length === 0) {
         console.log('No notifications to send');
-        return;
+        return { sent: 0, failed: 0 };
     }
 
     // Get distinct user IDs from notifications
     const userIds = Array.from(new Set(notifications.map(n => n.userId)));
     if (userIds.length === 0) {
         console.log('No distinct user IDs found in notifications');
-        return;
+        return { sent: 0, failed: 0 };
     }
 
     const [pushTokenResults, apnsToken] = await Promise.all([
@@ -37,7 +42,10 @@ export async function sendPushNotifications(notifications: Notification[]) {
         pushTokenResults.map(result => [result.userId, result.tokens])
     );
 
-    // Create an entry for each notification/push token pair that we are going to send
+    // Create an entry for each notification/push token pair that we are going to send.
+    // Notifications for users with no registered token count as immediate failures.
+    let sent = 0;
+    let failed = 0;
     const notificationTokenPairs: Array<{
         userId: string;
         pushToken: string;
@@ -46,6 +54,10 @@ export async function sendPushNotifications(notifications: Notification[]) {
     }> = [];
     for (const notification of notifications) {
         const tokens = usersToPushTokens[notification.userId] || [];
+        if (tokens.length === 0) {
+            console.warn(`No push tokens found for userId ${notification.userId} — notification not delivered`);
+            failed++;
+        }
         for (const pushToken of tokens) {
             notificationTokenPairs.push({
                 userId: notification.userId,
@@ -60,21 +72,21 @@ export async function sendPushNotifications(notifications: Notification[]) {
     const batchSize = 10;
     for (let i = 0; i < notificationTokenPairs.length; i += batchSize) {
         const batch = notificationTokenPairs.slice(i, i + batchSize);
-        await Promise.all(
+        const results = await Promise.all(
             batch.map(({ userId, pushToken, title, body }) =>
                 sendPushNotification(userId, pushToken, title, body, apnsToken)
             )
         );
+        for (const delivered of results) {
+            if (delivered) { sent++; } else { failed++; }
+        }
     }
+
+    return { sent, failed };
 }
 
 async function getPushTokenForUser(userId: string): Promise<{ userId: string, tokens: string[] }> {
     const pushTokens = await PushNotificationQueries.getPushTokensForUser({ userId: convertUserIdToBuffer(userId) });
-    if (pushTokens.length === 0) {
-        console.warn(`No push tokens found for userId ${userId}`);
-        return { userId, tokens: [] };
-    }
-
     return { userId, tokens: pushTokens.map(token => token.push_token) };
 }
 
@@ -138,10 +150,10 @@ async function getAPNSToken(): Promise<string> {
     return token;
 }
 
-async function sendPushNotification(userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string) {
+async function sendPushNotification(userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string): Promise<boolean> {
     if (isTestEnvironment()) {
         console.log(`Mock push notification to userId ${userId} with token ${pushToken}: ${notificationTitle} - ${notificationBody}`);
-        return;
+        return true;
     }
 
     const bundleId = process.env.APNS_BUNDLE_ID;
@@ -187,14 +199,19 @@ async function sendPushNotification(userId: string, pushToken: string, notificat
             } catch (err) {
                 console.error(`Failed to delete invalid push token for userId ${userId}:`, err);
             }
+            return false;
         } else if (statusCode < 200 || statusCode >= 300) {
             // Do not throw so we can continue processing other notifications
             const data = await response.text();
             console.error(`APNs request failed with status code ${statusCode}. Details: ${data}`);
+            return false;
         }
+
+        return true;
     } catch (error) {
         // Do not throw so we can continue processing other notifications
         console.error('Error sending push notification:', error);
+        return false;
     }
 }
 
