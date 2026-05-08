@@ -346,6 +346,13 @@ async function archiveCompetitions(now: Date): Promise<{ result: string; warning
                 ]);
                 totalSent += sendResult.sent;
                 totalFailed += sendResult.failed;
+                if (sendResult.failures.length > 0) {
+                    const failureDetails = sendResult.failures
+                        .map(f => `userId=${f.userId}: ${f.reason}`)
+                        .join('; ');
+                    console.warn(`Push notification failures for competition ${competition.competition_id}: ${failureDetails}`);
+                    notificationErrors.push(`competition ${competition.competition_id} — ${failureDetails}`);
+                }
             } catch (notifErr) {
                 const msg = `competition ${competition.competition_id}: ${(notifErr as Error).message}`;
                 notificationErrors.push(msg);
