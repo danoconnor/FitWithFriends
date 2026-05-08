@@ -14,6 +14,7 @@ export interface Notification {
 export interface SendResult {
     sent: number;
     failed: number;
+    failures: Array<{ userId: string; reason: string }>;
 }
 
 // Cache the token and its expiry to avoid re-signing on every request.
@@ -24,14 +25,14 @@ let cachedTokenExpiresAt: number = 0;
 export async function sendPushNotifications(notifications: Notification[]): Promise<SendResult> {
     if (notifications.length === 0) {
         console.log('No notifications to send');
-        return { sent: 0, failed: 0 };
+        return { sent: 0, failed: 0, failures: [] };
     }
 
     // Get distinct user IDs from notifications
     const userIds = Array.from(new Set(notifications.map(n => n.userId)));
     if (userIds.length === 0) {
         console.log('No distinct user IDs found in notifications');
-        return { sent: 0, failed: 0 };
+        return { sent: 0, failed: 0, failures: [] };
     }
 
     const [pushTokenResults, apnsToken] = await Promise.all([
@@ -46,6 +47,7 @@ export async function sendPushNotifications(notifications: Notification[]): Prom
     // Notifications for users with no registered token count as immediate failures.
     let sent = 0;
     let failed = 0;
+    const failures: Array<{ userId: string; reason: string }> = [];
     const notificationTokenPairs: Array<{
         userId: string;
         pushToken: string;
@@ -57,6 +59,7 @@ export async function sendPushNotifications(notifications: Notification[]): Prom
         if (tokens.length === 0) {
             console.warn(`No push tokens found for userId ${notification.userId} — notification not delivered`);
             failed++;
+            failures.push({ userId: notification.userId, reason: 'no registered push token' });
         }
         for (const pushToken of tokens) {
             notificationTokenPairs.push({
@@ -77,12 +80,17 @@ export async function sendPushNotifications(notifications: Notification[]): Prom
                 sendPushNotification(userId, pushToken, title, body, apnsToken)
             )
         );
-        for (const delivered of results) {
-            if (delivered) { sent++; } else { failed++; }
+        for (let j = 0; j < results.length; j++) {
+            if (results[j].delivered) {
+                sent++;
+            } else {
+                failed++;
+                failures.push({ userId: batch[j].userId, reason: results[j].reason });
+            }
         }
     }
 
-    return { sent, failed };
+    return { sent, failed, failures };
 }
 
 async function getPushTokenForUser(userId: string): Promise<{ userId: string, tokens: string[] }> {
@@ -150,10 +158,10 @@ async function getAPNSToken(): Promise<string> {
     return token;
 }
 
-async function sendPushNotification(userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string): Promise<boolean> {
+async function sendPushNotification(userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string): Promise<{ delivered: boolean; reason: string }> {
     if (isTestEnvironment()) {
         console.log(`Mock push notification to userId ${userId} with token ${pushToken}: ${notificationTitle} - ${notificationBody}`);
-        return true;
+        return { delivered: true, reason: '' };
     }
 
     const bundleId = process.env.APNS_BUNDLE_ID;
@@ -199,19 +207,20 @@ async function sendPushNotification(userId: string, pushToken: string, notificat
             } catch (err) {
                 console.error(`Failed to delete invalid push token for userId ${userId}:`, err);
             }
-            return false;
+            return { delivered: false, reason: 'APNs 410: device token no longer valid (token deleted)' };
         } else if (statusCode < 200 || statusCode >= 300) {
             // Do not throw so we can continue processing other notifications
             const data = await response.text();
+            const reason = `APNs HTTP ${statusCode}: ${data}`;
             console.error(`APNs request failed with status code ${statusCode}. Details: ${data}`);
-            return false;
+            return { delivered: false, reason };
         }
 
-        return true;
+        return { delivered: true, reason: '' };
     } catch (error) {
-        // Do not throw so we can continue processing other notifications
+        const reason = `network error: ${(error as Error).message}`;
         console.error('Error sending push notification:', error);
-        return false;
+        return { delivered: false, reason };
     }
 }
 
