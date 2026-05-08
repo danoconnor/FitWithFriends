@@ -106,7 +106,7 @@ test('Get user details: returns daily summaries with correct points', async () =
         accessToken
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.userId).toBe(testUserId);
     expect(response.data.firstName).toBe('Test');
     expect(response.data.lastName).toBe('User');
@@ -146,7 +146,7 @@ test('Get user details: no activity data returns empty dailySummaries', async ()
         accessToken
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.userId).toBe(testUserId);
     expect(response.data.dailySummaries).toHaveLength(0);
 });
@@ -171,7 +171,7 @@ test('Get user details: points capped at 600 per day', async () => {
         accessToken
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.dailySummaries).toHaveLength(1);
     expect(response.data.dailySummaries[0].points).toBe(600);
 });
@@ -211,7 +211,7 @@ test('Get user details: only returns data within competition date range', async 
         accessToken
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     // Only the data within the range should be returned
     expect(response.data.dailySummaries).toHaveLength(1);
     expect(response.data.dailySummaries[0].caloriesBurned).toBe(300);
@@ -236,7 +236,7 @@ test('Get user details: requesting user is not a competition member', async () =
         accessToken
     );
 
-    expect(response.status).toBe(401);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
     expect(response.data.context).toContain('User is not a member of the competition');
 });
 
@@ -260,7 +260,7 @@ test('Get user details: target user is not a competition member', async () => {
         accessToken
     );
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     expect(response.data.context).toContain('Target user is not a member of the competition');
 });
 
@@ -271,7 +271,7 @@ test('Get user details: competition does not exist', async () => {
         accessToken
     );
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     expect(response.data.context).toContain('Could not find competition info');
 });
 
@@ -282,7 +282,7 @@ test('Get user details: invalid timezone', async () => {
         accessToken
     );
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Invalid timezone query param');
 });
 
@@ -332,7 +332,7 @@ test('Get user details: archived competition still returns daily activity data',
         accessToken
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.dailySummaries).toHaveLength(1);
 
     // Should return the actual daily activity data, not just final_points
@@ -379,7 +379,7 @@ test('Get user details: user can view another user in the same competition', asy
         accessToken
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.userId).toBe(testUserId2);
     expect(response.data.firstName).toBe('Other');
     expect(response.data.lastName).toBe('Member');
@@ -406,7 +406,7 @@ test('Get user details: rings rule includes scoringUnit=points and ring fields',
         accessToken,
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.scoringUnit).toBe('points');
     expect(response.data.dailySummaries[0]).toMatchObject({
         caloriesBurned: 250,
@@ -449,7 +449,7 @@ test('Get user details: daily-steps rule returns per-day step values', async () 
         accessToken,
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.scoringUnit).toBe('steps');
     expect(response.data.dailySummaries).toHaveLength(1);
     // Daily-rule path: `value`/`points` are the step count.
@@ -521,7 +521,7 @@ test('Get user details: workouts rule aggregates per-day and respects activityTy
         accessToken,
     );
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.scoringUnit).toBe('meters');
     expect(response.data.dailySummaries).toHaveLength(2);
 

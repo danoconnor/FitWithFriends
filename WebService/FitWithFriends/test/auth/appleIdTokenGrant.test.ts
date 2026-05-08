@@ -37,7 +37,7 @@ test('Happy path', async () => {
         userId: testUserId,
     });
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('access_token');
     expect(response.data).toHaveProperty('refresh_token');
 });
@@ -48,7 +48,7 @@ test('Missing userId', async () => {
         idToken: 'test'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.error_details).toContain('Missing parameter');
     expect(response.data.error_details).toContain('userId');
 });
@@ -61,7 +61,7 @@ test('Nonexistent userId returns 400 and custom error code', async () => {
         userId: '1234567890abcdef' // Does not exist in the database
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.error_details).toContain('User does not exist');
     expect(response.data.custom_error_code).toEqual(FWFErrorCodes.AuthErrorCodes.UserNotFound);
 });
@@ -72,7 +72,7 @@ test('Missing idToken', async () => {
         userId: testUserId
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.error_details).toContain('Missing parameter');
     expect(response.data.error_details).toContain('idToken');
 });

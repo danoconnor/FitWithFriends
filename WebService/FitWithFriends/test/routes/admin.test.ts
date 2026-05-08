@@ -66,12 +66,12 @@ afterEach(async () => {
 describe('Admin authentication', () => {
     test('missing admin authorization returns 401', async () => {
         const response = await RequestUtilities.makePostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(401);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
     });
 
     test('invalid admin authorization returns 401', async () => {
         const response = await RequestUtilities.makePostRequest('admin/performDailyTasks', {}, 'invalid_auth_token');
-        expect(response.status).toBe(401);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
     });
 });
 
@@ -124,7 +124,7 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
             currentDate: twoDaysInFuture.toISOString()
         });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('Moved 1 competition(s) to processing state');
 
@@ -152,7 +152,7 @@ describe('performDailyTasks - processesRecentlyEndedCompetitions', () => {
 
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('No competitions to process');
 
@@ -228,7 +228,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
 
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('2/2 push notifications sent');
@@ -258,7 +258,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
 
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toBe('No competitions to archive');
 
@@ -286,7 +286,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
 
         // Run the admin task (should not crash)
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
 
@@ -318,7 +318,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
         });
 
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('0/1 push notifications sent');
@@ -352,7 +352,7 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
 
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'deleteExpiredRefreshTokens')).toBe('Deleted expired refresh tokens');
 
@@ -384,7 +384,7 @@ describe('performDailyTasks - deleteExpiredRefreshTokens', () => {
 
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'deleteExpiredRefreshTokens')).toBe('Deleted expired refresh tokens');
 
@@ -447,7 +447,7 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
             currentDate: sundayNoonUTC.toISOString()
         });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created 2 weekly competitions starting /);
 
@@ -476,7 +476,7 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
             currentDate: pastWeekdayNoonUTC.toISOString()
         });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBe('Skipped: not Sunday or Monday');
 
@@ -510,7 +510,7 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
             currentDate: sundayNoonUTC.toISOString()
         });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toBe('Skipped: competition for upcoming week already exists');
 
@@ -527,7 +527,7 @@ describe('performDailyTasks - createWeeklyPublicCompetition', () => {
 describe('createBotUsers', () => {
     test('creates N bots and returns userIds in response', async () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 3 });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.created).toBe(3);
         expect(response.data.userIds).toHaveLength(3);
         expect(response.data.total).toBe(3);
@@ -555,7 +555,7 @@ describe('createBotUsers', () => {
         competitionsToCleanup.push(competitionId);
 
         const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 2 });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.created).toBe(2);
 
         const botUserIds: string[] = response.data.userIds;
@@ -590,17 +590,17 @@ describe('createBotUsers', () => {
         }
 
         const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 1 });
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('returns 400 for count=0', async () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 0 });
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('returns 400 for count=-1', async () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: -1 });
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('caps creation at remaining capacity', async () => {
@@ -620,7 +620,7 @@ describe('createBotUsers', () => {
         }
 
         const response = await RequestUtilities.makeAdminPostRequest('admin/createBotUsers', { count: 5 });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.created).toBe(2);
         expect(response.data.total).toBe(100);
 
@@ -633,7 +633,7 @@ describe('createBotUsers', () => {
 describe('performDailyTasks - seedBotActivityData', () => {
     test('returns "No bot users found" when none exist', async () => {
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'seedBotActivityData')).toBe('No bot users found');
     });
@@ -661,7 +661,7 @@ describe('performDailyTasks - seedBotActivityData', () => {
         usersToCleanup.push(botId1, botId2);
 
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'seedBotActivityData')).toContain('Seeded activity data for 2 bot users');
 
@@ -689,13 +689,13 @@ describe('performDailyTasks - seedBotActivityData', () => {
 
         // First run
         const response1 = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response1.status).toBe(200);
+        expect({ status: response1.status, body: response1.data }).toEqual(expect.objectContaining({ status: 200 }));
         const activity1 = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId) });
         const firstCalories = activity1[0].calories_burned;
 
         // Second run
         const response2 = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response2.status).toBe(200);
+        expect({ status: response2.status, body: response2.data }).toEqual(expect.objectContaining({ status: 200 }));
         const activity2 = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId) });
         const secondCalories = activity2[0].calories_burned;
 
@@ -718,7 +718,7 @@ describe('performDailyTasks - seedBotActivityData', () => {
         usersToCleanup.push(botId);
 
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
         const activity = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(botId) });
         expect(activity.length).toBeGreaterThan(0);
@@ -789,7 +789,7 @@ describe('performDailyTasks - comprehensive integration', () => {
 
         // Run the admin task
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
         expect(getTaskResult(response, 'processRecentlyEndedCompetitions')).toBe('Moved 1 competition(s) to processing state');
@@ -867,7 +867,7 @@ describe('performDailyTasks - createWeeklyPublicCompetition - bot enrollment', (
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {
             currentDate: sundayNoonUTC.toISOString()
         });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'createWeeklyPublicCompetition')).toMatch(/^Created 2 weekly competitions starting /);
 
@@ -899,7 +899,7 @@ describe('performDailyTasks - error response structure', () => {
             currentDate: 'not-a-valid-date'
         });
 
-        expect(response.status).toBe(500);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 500 }));
         expect(Array.isArray(response.data.errors)).toBe(true);
         expect(response.data.errors.length).toBeGreaterThan(0);
         expect(Array.isArray(response.data.tasks)).toBe(true);
@@ -933,7 +933,7 @@ describe('performDailyTasks - error response structure', () => {
             currentDate: 'not-a-valid-date'
         });
 
-        expect(response.status).toBe(500);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 500 }));
 
         // With bot users present, Intl.DateTimeFormat throws RangeError on an invalid date
         const seedError = getTaskError(response, 'seedBotActivityData');
@@ -978,7 +978,7 @@ describe('createPublicCompetition - bot enrollment', () => {
             ianaTimezone: 'UTC',
             adminUserId: testUserId1
         });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         const competitionId = response.data.competition_id;
         competitionsToCleanup.push(competitionId);
 
@@ -1000,7 +1000,7 @@ describe('createPublicCompetition - bot enrollment', () => {
             adminUserId: testUserId1,
             scoringRules: { kind: 'workouts', metric: 'distance' },
         });
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         const competitionId = response.data.competition_id;
         competitionsToCleanup.push(competitionId);
 
@@ -1019,7 +1019,7 @@ describe('createPublicCompetition - bot enrollment', () => {
             adminUserId: testUserId1,
             scoringRules: { kind: 'daily', metric: 'potato' },
         });
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
         expect(response.data.context).toContain('Invalid scoringRules');
     });
 });

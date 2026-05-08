@@ -95,7 +95,7 @@ test('Leave competition: user removes their self', async () => {
             userId: secondUserId
         }, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the user has been removed from the competition
     const competitionUsers = await TestSQL.getUsersInCompetition({ competitionId: testCompetitionInfo.competitionId });
@@ -120,7 +120,7 @@ test('Leave competition: admin removes another user', async () => {
             userId: secondUserId
         }, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the user has been removed from the competition
     const competitionUsers = await TestSQL.getUsersInCompetition({ competitionId: testCompetitionInfo.competitionId });
@@ -145,7 +145,7 @@ test('Leave competition: admin removes themself', async () => {
             userId: adminTestUserId
         }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 
     // Validate that the admin user and the second user are still in the competition
     const competitionUsers = await TestSQL.getUsersInCompetition({ competitionId: testCompetitionInfo.competitionId });
@@ -184,7 +184,7 @@ test('Leave competition: user removes another user', async () => {
             userId: thirdUserId
         }, accessToken);
 
-    expect(response.status).toBe(401);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
 
     // Validate that the third user is still in the competition
     const competitionUsers = await TestSQL.getUsersInCompetition({ competitionId: testCompetitionInfo.competitionId });
@@ -217,7 +217,7 @@ test('Leave competition: admin removes user not in competition', async () => {
         }, accessToken);
     
     // We return a success code even if the target user is not in the competition
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the competition has not changed
     const competitionUsers = await TestSQL.getUsersInCompetition({ competitionId: testCompetitionInfo.competitionId });
@@ -234,7 +234,7 @@ test('Leave competition: missing competitionId', async () => {
             userId: secondUserId
         }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Leave competition: missing userId', async () => {
@@ -245,7 +245,7 @@ test('Leave competition: missing userId', async () => {
             competitionId: testCompetitionInfo.competitionId
         }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Leave competition: invalid competitionId', async () => {
@@ -257,7 +257,7 @@ test('Leave competition: invalid competitionId', async () => {
             userId: secondUserId
         }, accessToken);
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
 });
 
 test('Leave competition: missing access token', async () => {
@@ -268,5 +268,5 @@ test('Leave competition: missing access token', async () => {
     });
 
     // The auth middleware treats the missing access token as a bad request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });

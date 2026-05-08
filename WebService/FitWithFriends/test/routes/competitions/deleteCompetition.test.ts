@@ -67,7 +67,7 @@ test('Delete competition: admin user', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(adminUserId);
     const response = await RequestUtilities.makePostRequest(`competitions/delete`, { competitionId: testCompetitionInfo.competitionId }, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 });
 
 test('Delete competition: non-admin user', async () => {
@@ -85,7 +85,7 @@ test('Delete competition: non-admin user', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(nonAdminUserId);
     const response = await RequestUtilities.makePostRequest(`competitions/delete`, { competitionId: testCompetitionInfo.competitionId }, accessToken);
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     expect(response.data.context).toContain('Competition not found or user is not admin');
 });
 
@@ -93,7 +93,7 @@ test('Delete competition: competition not found', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(adminUserId);
     const response = await RequestUtilities.makePostRequest(`competitions/delete`, { competitionId: crypto.randomUUID() }, accessToken);
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     expect(response.data.context).toContain('Competition not found or user is not admin');
 });
 
@@ -101,7 +101,7 @@ test('Delete competition: competitionId not provided', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(adminUserId);
     const response = await RequestUtilities.makePostRequest(`competitions/delete`, {}, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter competitionId');
 });
 
@@ -109,5 +109,5 @@ test('Delete competition: accessToken not provided', async () => {
     const response = await RequestUtilities.makePostRequest(`competitions/delete`, { competitionId: testCompetitionInfo.competitionId });
 
     // The auth middleware treats the missing AT as a bad request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });

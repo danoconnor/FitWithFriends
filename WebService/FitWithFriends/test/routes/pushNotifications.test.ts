@@ -43,7 +43,7 @@ test('Register: happy path', async () => {
         appInstallId
     }, accessToken);
 
-    expect(resposne.status).toBe(200);
+    expect({ status: resposne.status, body: resposne.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Check the database to make sure that the push token was saved
     const pushTokens = await TestSQL.getPushTokenForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -65,7 +65,7 @@ test('Register: update existing push token', async () => {
         appInstallId
     }, accessToken);
 
-    expect(resposne.status).toBe(200);
+    expect({ status: resposne.status, body: resposne.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Register a new push token for the same user/appInstallId
     const newPushToken = '5678';
@@ -75,7 +75,7 @@ test('Register: update existing push token', async () => {
         appInstallId
     }, accessToken);
 
-    expect(newResponse.status).toBe(200);
+    expect({ status: newResponse.status, body: newResponse.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the database has the new push token
     const pushTokens = await TestSQL.getPushTokenForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -100,7 +100,7 @@ test('Register: push tokens for multiple app intsallations', async () => {
         appInstallId: appInstallId1
     }, accessToken);
 
-    expect(response1.status).toBe(200);
+    expect({ status: response1.status, body: response1.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     const response2 = await RequestUtilities.makePostRequest('pushNotifications/register', {
         pushToken: pushToken2,
@@ -108,7 +108,7 @@ test('Register: push tokens for multiple app intsallations', async () => {
         appInstallId: appInstallId2
     }, accessToken);
 
-    expect(response2.status).toBe(200);
+    expect({ status: response2.status, body: response2.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that both push tokens are in the database
     const pushTokens = await TestSQL.getPushTokenForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -135,7 +135,7 @@ test('Register: missing push token', async () => {
         appInstallId
     }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -149,7 +149,7 @@ test('Register: missing platform', async () => {
         pushToken
     }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -163,7 +163,7 @@ test('Register: missing app install id', async () => {
         pushToken
     }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -179,7 +179,7 @@ test('Register: invalid app install id', async () => {
         appInstallId
     }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Invalid UUID');
 });
 
@@ -195,7 +195,7 @@ test('Register: invalid platform', async () => {
         appInstallId
     }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Invalid platform');
 });
 
@@ -207,5 +207,5 @@ test('Register: missing access token', async () => {
     });
 
     // The auth middleware treats a missing token as a bad request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });

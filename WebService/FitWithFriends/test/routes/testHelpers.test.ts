@@ -57,12 +57,12 @@ describe('testHelpers route guard', () => {
 
         test('setUserProStatus returns 401', async () => {
             const response = await axios.post(`${baseUrl}/setUserProStatus`, {}, { validateStatus: () => true });
-            expect(response.status).toBe(401);
+            expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
         });
 
         test('seedCompetitionUsers returns 401', async () => {
             const response = await axios.post(`${baseUrl}/seedCompetitionUsers`, {}, { validateStatus: () => true });
-            expect(response.status).toBe(401);
+            expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
         });
     });
 
@@ -73,12 +73,12 @@ describe('testHelpers route guard', () => {
 
         test('setUserProStatus returns 401', async () => {
             const response = await axios.post(`${baseUrl}/setUserProStatus`, {}, { validateStatus: () => true });
-            expect(response.status).toBe(401);
+            expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
         });
 
         test('seedCompetitionUsers returns 401', async () => {
             const response = await axios.post(`${baseUrl}/seedCompetitionUsers`, {}, { validateStatus: () => true });
-            expect(response.status).toBe(401);
+            expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
         });
     });
 

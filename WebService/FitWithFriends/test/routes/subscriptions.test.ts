@@ -43,7 +43,7 @@ describe('POST /subscriptions/validateTransaction', () => {
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makePostRequest('subscriptions/validateTransaction', {}, accessToken);
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
         expect(response.data.context).toContain('Missing required parameter');
     });
 
@@ -53,7 +53,7 @@ describe('POST /subscriptions/validateTransaction', () => {
             signedTransaction: 'not-a-valid-jws'
         }, accessToken);
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
         expect(response.data.custom_error_code).toBe(FWFErrorCodes.SubscriptionErrorCodes.InvalidTransaction);
     });
 
@@ -63,6 +63,6 @@ describe('POST /subscriptions/validateTransaction', () => {
             signedTransaction: 'not-a-valid-jws'
         });
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 });

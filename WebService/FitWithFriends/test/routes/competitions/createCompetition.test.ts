@@ -53,7 +53,7 @@ test('Create competition happy path', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('competition_id');
     expect(response.data).toHaveProperty('accessCode');
     
@@ -91,7 +91,7 @@ test('Create competition missing access token', async () => {
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo);
     
     // The auth middleware will treat the missing AT as an invalid client request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Create competition missing start date', async () => {
@@ -105,7 +105,7 @@ test('Create competition missing start date', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Invalid date format');
 });
 
@@ -120,7 +120,7 @@ test('Create competition missing end date', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Invalid date format');
 });
 
@@ -135,7 +135,7 @@ test('Create competition missing display name', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -150,7 +150,7 @@ test('Create competition missing timezone', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -166,7 +166,7 @@ test('Create competition invalid timezone', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('not in list of valid timezones');
 });
 
@@ -183,7 +183,7 @@ test('Create competition end date before start date', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('End date was not valid');
 });
 
@@ -198,7 +198,7 @@ test('Create competition end date in the past', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('End date must be in the future');
 });
 
@@ -215,7 +215,7 @@ test('Create competition competition length too long', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('End date was not valid');
 });
 
@@ -243,7 +243,7 @@ test('Create competition too many active competitions', async () => {
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(oneCompUserId);
     const response1 = await RequestUtilities.makePostRequest('competitions', competitionInfo1, accessToken);
-    expect(response1.status).toBe(200);
+    expect({ status: response1.status, body: response1.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response1.data).toHaveProperty('competition_id');
     const createdCompetitionId: string = response1.data.competition_id;
     competitionsToCleanup.push(createdCompetitionId);
@@ -257,7 +257,7 @@ test('Create competition too many active competitions', async () => {
     };
 
     const response2 = await RequestUtilities.makePostRequest('competitions', competitionInfo2, accessToken);
-    expect(response2.status).toBe(400);
+    expect({ status: response2.status, body: response2.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response2.data.context).toContain('User is not eligible to join a new competition');
     expect(response2.data.custom_error_code).toEqual(FWFErrorCodes.CompetitionErrorCodes.TooManyActiveCompetitions);
 });
@@ -274,7 +274,7 @@ test('Create competition: display name is too long', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Display name is too long');
 });
 
@@ -291,7 +291,7 @@ test('Create competition: stores default rings rule as null when scoringRules om
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     const createdCompetitionId: string = response.data.competition_id;
     competitionsToCleanup.push(createdCompetitionId);
 
@@ -311,7 +311,7 @@ test('Create competition: free user blocked from custom rule (workouts)', async 
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(403);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 403 }));
     expect(response.data.custom_error_code).toEqual(FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
 });
 
@@ -327,7 +327,7 @@ test('Create competition: free user blocked from custom rule (daily)', async () 
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(403);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 403 }));
     expect(response.data.custom_error_code).toEqual(FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
 });
 
@@ -343,7 +343,7 @@ test('Create competition: free user blocked from rings with minGoals', async () 
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(403);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 403 }));
 });
 
 test('Create competition: Pro user can create a workouts-distance competition', async () => {
@@ -368,7 +368,7 @@ test('Create competition: Pro user can create a workouts-distance competition', 
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(proUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     const createdCompetitionId: string = response.data.competition_id;
     competitionsToCleanup.push(createdCompetitionId);
 
@@ -388,7 +388,7 @@ test('Create competition: invalid scoringRules shape rejected with 400', async (
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Invalid scoringRules');
 });
 
@@ -414,7 +414,7 @@ test('Create competition: dailyCap exceeds 200 × included rings is rejected', a
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(proUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('dailyCap');
 });
 
@@ -431,7 +431,7 @@ test('Create competition: explicit full-set includedRings is NOT treated as cust
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     competitionsToCleanup.push(response.data.competition_id);
 });
 
@@ -457,6 +457,6 @@ test('Create competition: non-integer dailyCap is rejected', async () => {
 
     const accessToken = await AuthUtilities.getAccessTokenForUser(proUserId);
     const response = await RequestUtilities.makePostRequest('competitions', competitionInfo, accessToken);
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('dailyCap');
 });

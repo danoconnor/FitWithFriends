@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { createPrivateKey } from 'crypto';
+import * as http2 from 'node:http2';
 import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
 import * as PushNotificationQueries from '../sql/pushNotifications.queries';
@@ -158,6 +159,49 @@ async function getAPNSToken(): Promise<string> {
     return token;
 }
 
+// Reuse a single HTTP/2 session across requests — APNs multiplexes over one connection.
+// node:http2 is used directly because Node.js's built-in fetch (undici) only advertises
+// http/1.1 in ALPN by default (allowH2 is false), and APNs requires HTTP/2.
+let apnsSession: http2.ClientHttp2Session | null = null;
+
+function getApnsSession(): http2.ClientHttp2Session {
+    if (!apnsSession || apnsSession.destroyed || apnsSession.closed) {
+        apnsSession = http2.connect('https://api.push.apple.com');
+        apnsSession.on('error', (err) => {
+            console.error('APNs HTTP/2 session error:', err);
+            apnsSession = null;
+        });
+        apnsSession.on('close', () => { apnsSession = null; });
+    }
+    return apnsSession;
+}
+
+function makeApnsRequest(path: string, bodyStr: string, apnsToken: string, bundleId: string): Promise<{ statusCode: number; body: string }> {
+    return new Promise((resolve, reject) => {
+        const session = getApnsSession();
+        const req = session.request({
+            ':method': 'POST',
+            ':path': path,
+            'content-type': 'application/json',
+            'content-length': String(Buffer.byteLength(bodyStr)),
+            'apns-push-type': 'alert',
+            'apns-topic': bundleId,
+            'authorization': `bearer ${apnsToken}`,
+        });
+
+        let statusCode = 0;
+        req.on('response', (headers) => { statusCode = headers[':status'] as number; });
+
+        let responseBody = '';
+        req.on('data', (chunk: Buffer) => { responseBody += chunk.toString(); });
+        req.on('end', () => resolve({ statusCode, body: responseBody }));
+        req.on('error', reject);
+
+        req.write(bodyStr);
+        req.end();
+    });
+}
+
 async function sendPushNotification(userId: string, pushToken: string, notificationTitle: string, notificationBody: string, apnsToken: string): Promise<{ delivered: boolean; reason: string }> {
     if (isTestEnvironment()) {
         console.log(`Mock push notification to userId ${userId} with token ${pushToken}: ${notificationTitle} - ${notificationBody}`);
@@ -179,21 +223,11 @@ async function sendPushNotification(userId: string, pushToken: string, notificat
         }
     };
 
-    try {
-        // fetch uses undici which negotiates HTTP/2 via ALPN, required by APNs
-        // See https://developer.apple.com/documentation/usernotifications/handling-notification-responses-from-apns
-        const response = await fetch(`https://api.push.apple.com/3/device/${pushToken}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apns-push-type': 'alert',
-                'apns-topic': bundleId,
-                'authorization': `bearer ${apnsToken}`,
-            },
-            body: JSON.stringify(payload)
-        });
+    const bodyStr = JSON.stringify(payload);
 
-        const statusCode = response.status;
+    try {
+        // See https://developer.apple.com/documentation/usernotifications/handling-notification-responses-from-apns
+        const { statusCode, body: data } = await makeApnsRequest(`/3/device/${pushToken}`, bodyStr, apnsToken, bundleId);
         console.log(`APNs statusCode: ${statusCode}`);
 
         if (statusCode === 410) {
@@ -210,7 +244,6 @@ async function sendPushNotification(userId: string, pushToken: string, notificat
             return { delivered: false, reason: 'APNs 410: device token no longer valid (token deleted)' };
         } else if (statusCode < 200 || statusCode >= 300) {
             // Do not throw so we can continue processing other notifications
-            const data = await response.text();
             const reason = `APNs HTTP ${statusCode}: ${data}`;
             console.error(`APNs request failed with status code ${statusCode}. Details: ${data}`);
             return { delivered: false, reason };

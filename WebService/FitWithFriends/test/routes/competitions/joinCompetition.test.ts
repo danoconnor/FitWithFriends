@@ -83,7 +83,7 @@ test('Join competition with valid access code', async () => {
         accessToken: testCompetitionAccessCode
     }, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 });
 
 test('Join competition with invalid access code', async () => {
@@ -94,7 +94,7 @@ test('Join competition with invalid access code', async () => {
     }, accessToken);
 
     // We expect a 404 because the access code is invalid
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
 });
 
 test('Join competition with missing access code', async () => {
@@ -106,7 +106,7 @@ test('Join competition with missing access code', async () => {
     }, accessToken);
 
     // We expect a 404 because the access code is invalid
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Join competition with invalid competitionId', async () => {
@@ -117,7 +117,7 @@ test('Join competition with invalid competitionId', async () => {
     }, accessToken);
 
     // We expect a 404 because the competitionId is invalid
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
 });
 
 test('Join competition with missing competitionId', async () => {
@@ -129,7 +129,7 @@ test('Join competition with missing competitionId', async () => {
     }, accessToken);
 
     // We expect a 404 because the competitionId is invalid
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Join competition with user already in competition', async () => {
@@ -147,7 +147,7 @@ test('Join competition with user already in competition', async () => {
     }, accessToken);
 
     // Should still get a successs response because the user is in the competition
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 });
 
 test('Join competition with user already at competition limit', async () => {
@@ -190,7 +190,7 @@ test('Join competition with user already at competition limit', async () => {
         accessToken: testCompetitionAccessCode
     }, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.custom_error_code).toBe(FWFErrorCodes.CompetitionErrorCodes.TooManyActiveCompetitions);
 });
 
@@ -236,5 +236,5 @@ test('Join competition with user who has joined past competitions', async () => 
         accessToken: testCompetitionAccessCode
     }, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 });

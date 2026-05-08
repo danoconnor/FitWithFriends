@@ -58,7 +58,7 @@ describe('GET /competitions/public', () => {
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makeGetRequest('competitions/public', accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         // Only check that the response structure is correct and isUserPro is false
         // (other tests may have left public competitions in the shared database)
         expect(Array.isArray(response.data.competitions)).toBe(true);
@@ -90,7 +90,7 @@ describe('GET /competitions/public', () => {
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makeGetRequest('competitions/public', accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         // Find the specific competition we created rather than assuming it's the only one
         const created = response.data.competitions.find((c: any) => c.competitionId === competitionId);
         expect(created).toBeDefined();
@@ -124,7 +124,7 @@ describe('GET /competitions/public', () => {
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makeGetRequest('competitions/public', accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         const created = response.data.competitions.find((c: any) => c.competitionId === competitionId);
         expect(created).toBeDefined();
         expect(created.isUserMember).toBe(true);
@@ -141,7 +141,7 @@ describe('GET /competitions/public', () => {
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makeGetRequest('competitions/public', accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.isUserPro).toBe(true);
     });
 });
@@ -175,7 +175,7 @@ describe('POST /competitions/joinPublic', () => {
             competitionId
         }, accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     });
 
     test('non-pro user cannot join a public competition', async () => {
@@ -199,7 +199,7 @@ describe('POST /competitions/joinPublic', () => {
             competitionId
         }, accessToken);
 
-        expect(response.status).toBe(403);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 403 }));
         expect(response.data.custom_error_code).toBe(FWFErrorCodes.SubscriptionErrorCodes.ProSubscriptionRequired);
     });
 
@@ -215,14 +215,14 @@ describe('POST /competitions/joinPublic', () => {
             competitionId: crypto.randomUUID()
         }, accessToken);
 
-        expect(response.status).toBe(404);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     });
 
     test('returns 400 when missing competitionId', async () => {
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makePostRequest('competitions/joinPublic', {}, accessToken);
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('returns 400 for an inactive (archived) public competition', async () => {
@@ -258,7 +258,7 @@ describe('POST /competitions/joinPublic', () => {
             competitionId
         }, accessToken);
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 });
 
@@ -275,7 +275,7 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.competition_id).toBeDefined();
         competitionsToCleanup.push(response.data.competition_id);
 
@@ -296,7 +296,7 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        expect(response.status).toBe(401);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
     });
 
     test('rejects with missing parameters', async () => {
@@ -304,7 +304,7 @@ describe('POST /admin/createPublicCompetition', () => {
             displayName: 'Weekly Challenge'
         });
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('rejects when display name is too long', async () => {
@@ -319,7 +319,7 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('rejects when date format is invalid', async () => {
@@ -331,7 +331,7 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('rejects when end date is in the past', async () => {
@@ -346,7 +346,7 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('rejects when competition is shorter than 1 day', async () => {
@@ -361,7 +361,7 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('rejects when competition is longer than 30 days', async () => {
@@ -376,7 +376,7 @@ describe('POST /admin/createPublicCompetition', () => {
             adminUserId: adminUserId
         });
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 });
 
@@ -436,6 +436,6 @@ describe('Public competitions and private competition limits', () => {
             accessToken: 'private-token'
         }, accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     });
 });

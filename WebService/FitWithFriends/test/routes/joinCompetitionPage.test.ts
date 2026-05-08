@@ -24,7 +24,7 @@ test('Returns 400 when competitionId is missing', async () => {
         'joinCompetition?competitiontoken=tok456',
         USER_AGENTS.iPhone
     );
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Returns 400 when competitionToken is missing', async () => {
@@ -32,14 +32,14 @@ test('Returns 400 when competitionToken is missing', async () => {
         'joinCompetition?competitionid=abc123',
         USER_AGENTS.iPhone
     );
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 // ── iOS devices: should see the App Store CTA ─────────────────────────────────
 
 test('iPhone: shows App Store button and deep link', async () => {
     const response = await RequestUtilities.makeGetRequestWithUserAgent(VALID_PARAMS, USER_AGENTS.iPhone);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toContain('appstore-btn');
     expect(response.data).toContain('Download on the App Store');
     expect(response.data).toContain('Open Fit With Friends');
@@ -50,7 +50,7 @@ test('iPhone: shows App Store button and deep link', async () => {
 // falsely blocking iPad users.
 test('macOS/iPadOS UA: shows App Store button (treated as potentially iOS)', async () => {
     const response = await RequestUtilities.makeGetRequestWithUserAgent(VALID_PARAMS, USER_AGENTS.iPadOS13);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toContain('appstore-btn');
     expect(response.data).not.toContain('ios-only-banner');
 });
@@ -59,21 +59,21 @@ test('macOS/iPadOS UA: shows App Store button (treated as potentially iOS)', asy
 
 test('Android: shows iOS-only banner, no App Store button', async () => {
     const response = await RequestUtilities.makeGetRequestWithUserAgent(VALID_PARAMS, USER_AGENTS.android);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toContain('ios-only-banner');
     expect(response.data).not.toContain('appstore-btn');
 });
 
 test('Windows: shows iOS-only banner, no App Store button', async () => {
     const response = await RequestUtilities.makeGetRequestWithUserAgent(VALID_PARAMS, USER_AGENTS.windows);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toContain('ios-only-banner');
     expect(response.data).not.toContain('appstore-btn');
 });
 
 test('No User-Agent: shows iOS-only banner, no App Store button', async () => {
     const response = await RequestUtilities.makeGetRequestWithUserAgent(VALID_PARAMS, '');
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toContain('ios-only-banner');
     expect(response.data).not.toContain('appstore-btn');
 });

@@ -19,7 +19,7 @@ router.post('/dailySummary', function (req, res) {
 
     var summariesToInsert: {
         userId: Buffer;
-        date: Date;
+        date: string;
         caloriesBurned: number;
         caloriesGoal: number;
         exerciseTime: number;
@@ -62,7 +62,7 @@ router.post('/dailySummary', function (req, res) {
 
         summariesToInsert.push({
             userId: userIdBuffer,
-            date,
+            date: dateStr,
             caloriesBurned,
             caloriesGoal,
             exerciseTime,
@@ -80,7 +80,7 @@ router.post('/dailySummary', function (req, res) {
     // PostgreSQL cannot update the same target row twice in one statement.
     const summaryByDate = new Map<string, typeof summariesToInsert[0]>();
     for (const summary of summariesToInsert) {
-        const key = summary.date.toISOString();
+        const key = summary.date;
         const existing = summaryByDate.get(key);
         if (existing) {
             existing.caloriesBurned = Math.max(existing.caloriesBurned, summary.caloriesBurned);

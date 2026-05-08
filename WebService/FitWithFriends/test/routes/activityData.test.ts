@@ -43,7 +43,7 @@ test('Add activityData happy path', async () => {
 
     const token = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [expectedData] }, token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     
     // Validate that the data was inserted into the database
     const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -68,7 +68,7 @@ test('Add activityData update data for existing date', async () => {
         standTimeGoal: 12
     }] },
     token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Send an update for the same date, the DB should update the existing data
     const newUpdateData = {
@@ -82,7 +82,7 @@ test('Add activityData update data for existing date', async () => {
     };
 
     response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [newUpdateData] }, token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the data was updated in the database
     const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -115,7 +115,7 @@ test('Add activityData for multiple days', async () => {
     };
 
     var response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [firstDayExpectedData, secondDayExpectedData] }, token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the data was inserted into the database
     const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -142,7 +142,7 @@ test('Add activityData missing token', async () => {
     });
 
     // The OAuth middleware treats the missing token as an invalid client request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Add activityData missing date', async () => {
@@ -157,7 +157,7 @@ test('Add activityData missing date', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -173,7 +173,7 @@ test('Add activityData missing activeCaloriesBurned', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -189,7 +189,7 @@ test('Add activityData missing activeCaloriesGoal', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -205,7 +205,7 @@ test('Add activityData missing exerciseTime', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -221,7 +221,7 @@ test('Add activityData missing exerciseTimeGoal', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -237,7 +237,7 @@ test('Add activityData missing standTime', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -253,7 +253,7 @@ test('Add activityData missing standTimeGoal', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -270,7 +270,7 @@ test('Add activityData invalid date', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Could not parse date');
 });
 
@@ -287,7 +287,7 @@ test('Add one workout', async () => {
     };
 
     const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [expectedData] }, token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the data was inserted into the database
     const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -319,7 +319,7 @@ test('Add multiple workouts', async () => {
     ];
 
     const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: expectedData }, token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the data was inserted into the database
     const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -346,7 +346,7 @@ test('Add workout missing token', async () => {
     }] });
 
     // The OAuth middleware treats the missing token as an invalid client request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Add workout missing startDate', async () => {
@@ -360,7 +360,7 @@ test('Add workout missing startDate', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -376,7 +376,7 @@ test('Add workout malformed start date', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Could not parse date');
 });
 
@@ -391,7 +391,7 @@ test('Add workout missing duration', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -406,7 +406,7 @@ test('Add workout missing appleActivityTypeRawValue', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -421,7 +421,7 @@ test('Add workout missing caloriesBurned', async () => {
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -438,7 +438,7 @@ test('Add workout missing distance', async () => {
     token);
 
     // distance and unit must both be provided or both be omitted
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('distance and unit must both be provided or both be omitted');
 });
 
@@ -466,7 +466,7 @@ test('Add activityData duplicate dates in same batch - takes max values', async 
     };
 
     const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [firstEntry, secondEntry] }, token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Should result in a single row with the max value of each field
     const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -513,7 +513,7 @@ test('Add activityData duplicate dates in same batch with other days - only dedu
     };
 
     const response = await RequestUtilities.makePostRequest('activityData/dailySummary', { values: [dupEntry1, dupEntry2, otherDayEntry] }, token);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     const activityDatas = await TestSQL.getActivitySummariesForUser({ userId: convertUserIdToBuffer(testUserId) });
     expect(activityDatas.length).toBe(2);
@@ -548,10 +548,10 @@ test('Add duplicate workout - second submission is ignored', async () => {
 
     // Submit the same workout twice
     const firstResponse = await RequestUtilities.makePostRequest('activityData/workouts', { values: [workout] }, token);
-    expect(firstResponse.status).toBe(200);
+    expect({ status: firstResponse.status, body: firstResponse.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     const secondResponse = await RequestUtilities.makePostRequest('activityData/workouts', { values: [workout] }, token);
-    expect(secondResponse.status).toBe(200);
+    expect({ status: secondResponse.status, body: secondResponse.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Only one row should exist in the database
     const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
@@ -572,7 +572,7 @@ test('Add workout missing unit', async () => {
     token);
 
     // distance and unit must both be provided or both be omitted
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('distance and unit must both be provided or both be omitted');
 });
 
@@ -592,7 +592,7 @@ test('Add workout with unit=none (unit=0) and no distance - should succeed', asy
 
     const response = await RequestUtilities.makePostRequest('activityData/workouts', { values: [expectedData] }, token);
     console.log(response.data);
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(testUserId) });
     expect(workouts.length).toBe(1);
@@ -612,7 +612,7 @@ test('Add workout with unit=none (unit=0) and distance provided - should fail', 
     }] },
     token);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('distance and unit must both be provided or both be omitted');
 });
 
