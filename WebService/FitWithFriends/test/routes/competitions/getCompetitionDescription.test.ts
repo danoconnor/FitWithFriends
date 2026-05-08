@@ -68,7 +68,7 @@ test('Get competition detail: user is member of competition', async () => {
         accessToken);
 
     // Expect a success code with the competition details
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('competitionName', competitionInfo.displayName);
     expect(response.data).toHaveProperty('competitionStart');
     expect(new Date(response.data.competitionStart).getUTCDate()).toBe(competitionInfo.startDate.getDate());
@@ -118,7 +118,7 @@ test('Get competition detail: user is not member of competition', async () => {
         accessToken);
 
     // Expect a success code with the competition details
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('competitionName', competitionInfo.displayName);
     expect(response.data).toHaveProperty('competitionStart');
     expect(new Date(response.data.competitionStart).getUTCDate()).toBe(competitionInfo.startDate.getDate());
@@ -171,7 +171,7 @@ test('Get competition detail: multiple users in competition', async () => {
         accessToken);
 
     // Expect a success code with the competition details
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('competitionName', competitionInfo.displayName);
     expect(response.data).toHaveProperty('competitionStart');
     expect(new Date(response.data.competitionStart).getUTCDate()).toBe(competitionInfo.startDate.getDate());
@@ -190,7 +190,7 @@ test('Get competition detail: competition does not exist', async () => {
         accessToken);
 
     // Expect a 404 error
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
 });
 
 test('Get competition detail: competition access token is incorrect', async () => {
@@ -220,7 +220,7 @@ test('Get competition detail: competition access token is incorrect', async () =
         accessToken);
 
     // Expect a 404 error because the token is incorrect
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
 });
 
 test('Get competition detail: user is not authenticated', async () => {
@@ -249,7 +249,7 @@ test('Get competition detail: user is not authenticated', async () => {
         });
 
     // Expect a 400 error because the user is not authenticated
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Get competition detail: missing competitionId', async () => {
@@ -279,7 +279,7 @@ test('Get competition detail: missing competitionId', async () => {
         accessToken);
 
     // Expect a 400 error because the competitionId is missing
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Get competition detail: missing competitionAccessToken', async () => {
@@ -309,5 +309,5 @@ test('Get competition detail: missing competitionAccessToken', async () => {
         accessToken);
 
     // Expect a 400 error because the competitionAccessToken is missing
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });

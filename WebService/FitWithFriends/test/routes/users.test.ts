@@ -23,7 +23,7 @@ test('userFromAppleID happy path', async () => {
         idToken: 'some_token' // Local testing skips validating the Apple idToken
     });
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
 
     // Validate that the user was created in the database
     const user = await TestSQL.getUser({ userId: convertUserIdToBuffer(expectedUserId) });
@@ -37,7 +37,7 @@ test('userFromAppleID missing userId', async () => {
         idToken: 'some_token'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -48,7 +48,7 @@ test('userFromAppleID missing firstName', async () => {
         idToken: 'some_token'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -59,7 +59,7 @@ test('userFromAppleID missing lastName', async () => {
         idToken: 'some_token'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -70,7 +70,7 @@ test('userFromAppleID missing idToken', async () => {
         lastName: 'User'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Missing required parameter');
 });
 
@@ -82,7 +82,7 @@ test('userFromAppleID userId too long', async () => {
         idToken: 'some_token'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Parameter too long');
 });
 
@@ -94,7 +94,7 @@ test('userFromAppleID firstName too long', async () => {
         idToken: 'some_token'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Parameter too long');
 });
 
@@ -106,7 +106,7 @@ test('userFromAppleID lastName too long', async () => {
         idToken: 'some_token'
     });
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Parameter too long');
 });
 
@@ -135,7 +135,7 @@ describe('DELETE /users/me', () => {
 
         const response = await RequestUtilities.makeDeleteRequest('users/me', accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         const user = await TestSQL.getUser({ userId: userIdBuffer });
         expect(user.length).toBe(0);
     });
@@ -155,7 +155,7 @@ describe('DELETE /users/me', () => {
         const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
         const response = await RequestUtilities.makeDeleteRequest('users/me', accessToken);
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         const summaries = await TestSQL.getActivitySummariesForUser({ userId: userIdBuffer });
         expect(summaries.length).toBe(0);
     });
@@ -163,7 +163,7 @@ describe('DELETE /users/me', () => {
     test('unauthenticated - returns 400 and does not delete user', async () => {
         const response = await RequestUtilities.makeDeleteRequest('users/me');
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
         const user = await TestSQL.getUser({ userId: userIdBuffer });
         expect(user.length).toBe(1);
     });

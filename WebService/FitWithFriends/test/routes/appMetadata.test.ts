@@ -14,20 +14,20 @@ const testRequiredBuild = '20260301.0900';
 describe('GET /appMetadata/iosBuildVersions', () => {
     test('returns 200 with correct build version data', async () => {
         const response = await RequestUtilities.makeGetRequest('appMetadata/iosBuildVersions');
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.recommendedBuild).toBe(testRecommendedBuild);
         expect(response.data.requiredBuild).toBe(testRequiredBuild);
     });
 
     test('returns string values for build versions', async () => {
         const response = await RequestUtilities.makeGetRequest('appMetadata/iosBuildVersions');
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(typeof response.data.recommendedBuild).toBe('string');
         expect(typeof response.data.requiredBuild).toBe('string');
     });
 
     test('is accessible without an auth token', async () => {
         const response = await RequestUtilities.makeGetRequest('appMetadata/iosBuildVersions', undefined);
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     });
 });

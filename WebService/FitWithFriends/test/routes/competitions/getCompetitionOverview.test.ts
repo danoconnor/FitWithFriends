@@ -114,7 +114,7 @@ test('Get competition overview: validate score calculation', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.competitionName).toBe(testCompetitionInfo.displayName);
     // expect(new Date(response.data.competitionStart).getUTCDate()).toBe(new Date(testCompetitionInfo.startDate).getUTCDate());
     // expect(new Date(response.data.competitionEnd).getUTCDate()).toBe(new Date(testCompetitionInfo.endDate).getUTCDate());
@@ -135,7 +135,7 @@ test('Get competition overview: validate score calculation with no activity data
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('currentResults');
     expect(response.data.currentResults.length).toBe(1);
     
@@ -167,7 +167,7 @@ test('Get competition overview: validate score calculation with no activity data
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('currentResults');
     expect(response.data.currentResults.length).toBe(1);
     
@@ -279,7 +279,7 @@ test('Get competition overview: validate score calculation for multiple users', 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('currentResults');
     expect(response.data.currentResults.length).toBe(2);
     
@@ -304,7 +304,7 @@ test('Get competition overview: no activity data for users', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('currentResults');
     expect(response.data.currentResults.length).toBe(1);
 
@@ -359,7 +359,7 @@ test('Get competition overview: does not include users who are not in the compet
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveProperty('currentResults');
     expect(response.data.currentResults.length).toBe(1);
     expect(response.data.currentResults.find((r: any) => r.userId === testUserId)).not.toBeUndefined();
@@ -384,7 +384,7 @@ test('Get competition overview: user is not part of competition', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId2);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(401);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
     expect(response.data.context).toContain('User is not a member of the competition');
 });
 
@@ -392,7 +392,7 @@ test('Get competition overview: competition does not exist', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${crypto.randomUUID()}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     expect(response.data.context).toContain('Could not find competition info');
 });
 
@@ -401,7 +401,7 @@ test('Get competition overview: invalid timezone', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=INVALIDTIMEZONE`, accessToken);
 
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     expect(response.data.context).toContain('Invalid timezone query param');
 });
 
@@ -428,7 +428,7 @@ test('Get competition overview: returns isPublic true for public competition', a
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${publicCompetitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.isPublic).toBe(true);
 });
 
@@ -437,7 +437,7 @@ test('Get competition overview: missing access token', async () => {
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`);
 
     // The auth middleware treats the missing AT as a bad request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Get competition overview: competition is processing results', async () => {
@@ -467,7 +467,7 @@ test('Get competition overview: competition is processing results', async () => 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfoProcessing.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.competitionName).toBe(testCompetitionInfoProcessing.displayName);
     expect(new Date(response.data.competitionStart).getUTCDate()).toBe(new Date(testCompetitionInfoProcessing.startDate).getUTCDate());
     expect(new Date(response.data.competitionEnd).getUTCDate()).toBe(new Date(testCompetitionInfoProcessing.endDate).getUTCDate());
@@ -520,7 +520,7 @@ test('Get competition overview: competition is archived', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfoArchived.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.competitionName).toBe(testCompetitionInfoArchived.displayName);
     expect(new Date(response.data.competitionStart).getUTCDate()).toBe(new Date(testCompetitionInfoArchived.startDate).getUTCDate());
     expect(new Date(response.data.competitionEnd).getUTCDate()).toBe(new Date(testCompetitionInfoArchived.endDate).getUTCDate());
@@ -546,7 +546,7 @@ test('Get competition overview: default rule returns rings/points and rule objec
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     // Legacy competitions store NULL → response should fall back to the default rings rule.
     expect(response.data.scoringRules).toEqual({ kind: 'rings' });
     expect(response.data.scoringUnit).toBe('points');
@@ -605,7 +605,7 @@ test('Get competition overview: workouts-distance rule scores from workouts and 
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.scoringUnit).toBe('meters');
     expect(response.data.scoringRules).toMatchObject({ kind: 'workouts', metric: 'distance' });
 
@@ -658,7 +658,7 @@ test('Get competition overview: daily steps rule reads step_count column', async
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data.scoringUnit).toBe('steps');
     expect(response.data.scoringRules).toMatchObject({ kind: 'daily', metric: 'steps' });
 
@@ -696,7 +696,7 @@ test('Get competition overview: rings rule with minGoal floors the per-ring perc
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${competitionId}/overview?timezone=America/New_York`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     const userResult = response.data.currentResults.find((r: any) => r.userId === testUserId);
     // With minGoal: 1/500 * 100 = 0.2 pts (legacy would have given 100).
     expect(userResult.activityPoints).toBeCloseTo(0.2, 5);

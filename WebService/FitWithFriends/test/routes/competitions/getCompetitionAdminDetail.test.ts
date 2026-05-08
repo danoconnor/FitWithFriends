@@ -67,7 +67,7 @@ test('Get admin detail: admin user makes request', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(adminUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/adminDetail`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toEqual({
         competitionId: testCompetitionInfo.competitionId,
         competitionAccessToken: testCompetitionInfo.accessToken
@@ -89,7 +89,7 @@ test('Get admin detail: non-admin user makes request', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(nonAdminUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/adminDetail`, accessToken);
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     expect(response.data.context).toContain('Competition not found or user is not admin');
 });
 
@@ -98,7 +98,7 @@ test('Get admin detial: missing access token', async () => {
     const response = await RequestUtilities.makeGetRequest(`competitions/${testCompetitionInfo.competitionId}/adminDetail`);
 
     // The auth middleware treats a missing token as a bad request
-    expect(response.status).toBe(400);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
 });
 
 test('Get admin detail: invalid competitionId', async () => {
@@ -106,6 +106,6 @@ test('Get admin detail: invalid competitionId', async () => {
     const accessToken = await AuthUtilities.getAccessTokenForUser(adminUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions/${crypto.randomUUID()}/adminDetail`, accessToken);
 
-    expect(response.status).toBe(404);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 404 }));
     expect(response.data.context).toContain('Competition not found or user is not admin');
 });

@@ -13,7 +13,7 @@ describe('POST /appstore', () => {
     test('returns 400 when signedPayload is missing', async () => {
         const response = await RequestUtilities.makePostRequest('appstore', {});
 
-        expect(response.status).toBe(400);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
     });
 
     test('returns 200 for invalid JWS (Apple retry prevention)', async () => {
@@ -23,7 +23,7 @@ describe('POST /appstore', () => {
             signedPayload: 'not-a-valid-jws'
         });
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     });
 
     test('returns 200 for malformed but structurally valid JWS', async () => {
@@ -33,6 +33,6 @@ describe('POST /appstore', () => {
             signedPayload: fakeJws
         });
 
-        expect(response.status).toBe(200);
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     });
 });

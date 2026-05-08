@@ -45,7 +45,7 @@ test('Get user competitions: No competitions', async () => {
     const response = await RequestUtilities.makeGetRequest('competitions', accessToken);
 
     // Expect a success code with an empty array
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveLength(0);
 });
 
@@ -66,7 +66,7 @@ test('Get user competitions: One competition', async () => {
     const response = await RequestUtilities.makeGetRequest('competitions', accessToken);
 
     // Expect a success code with an array containing the competitionIds that the user is a part of
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveLength(1);
     expect(response.data[0]).toBe(competitionInfo.competitionId);
 });
@@ -112,7 +112,7 @@ test('Get user competitions: Multiple competitions', async () => {
     const response = await RequestUtilities.makeGetRequest('competitions', accessToken);
 
     // Expect a success code with an array containing the competitionIds that the user is a part of
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveLength(3);
     expect(response.data).toContain(competitionInfo1.competitionId);
     expect(response.data).toContain(competitionInfo2.competitionId);
@@ -177,7 +177,7 @@ test('Get users competitions: only authenticated users competitions returned', a
     const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
     const response = await RequestUtilities.makeGetRequest(`competitions`, accessToken);
 
-    expect(response.status).toBe(200);
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response.data).toHaveLength(2);
     expect(response.data).toContain(competitionInfoOnlyUser1.competitionId);
     expect(response.data).toContain(competitionInfoBothUsers.competitionId);
@@ -186,7 +186,7 @@ test('Get users competitions: only authenticated users competitions returned', a
     const accessToken2 = await AuthUtilities.getAccessTokenForUser(secondUserId);
     const response2 = await RequestUtilities.makeGetRequest(`competitions`, accessToken2);
 
-    expect(response2.status).toBe(200);
+    expect({ status: response2.status, body: response2.data }).toEqual(expect.objectContaining({ status: 200 }));
     expect(response2.data).toHaveLength(2);
     expect(response2.data).toContain(competitionInfoOnlyUser2.competitionId);
     expect(response2.data).toContain(competitionInfoBothUsers.competitionId);
