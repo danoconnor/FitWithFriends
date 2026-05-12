@@ -152,6 +152,18 @@ async function getAPNSToken(): Promise<string> {
         noTimestamp: true,
     });
 
+    // Decode the JWT header and payload (not the signature) for diagnostic logging.
+    // Both parts are base64url-encoded JSON; the signature is opaque and not logged.
+    try {
+        const [headerB64, payloadB64] = token.split('.');
+        const header = JSON.parse(Buffer.from(headerB64, 'base64url').toString());
+        const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString());
+        console.log(`APNs JWT header: ${JSON.stringify(header)}`);
+        console.log(`APNs JWT payload: ${JSON.stringify(payload)}`);
+    } catch {
+        console.warn('Could not decode APNs JWT for diagnostic logging');
+    }
+
     // Cache for 55 minutes (token is valid for 60)
     cachedToken = token;
     cachedTokenExpiresAt = nowSeconds + 55 * 60;
@@ -242,6 +254,27 @@ async function sendPushNotification(userId: string, pushToken: string, notificat
                 console.error(`Failed to delete invalid push token for userId ${userId}:`, err);
             }
             return { delivered: false, reason: 'APNs 410: device token no longer valid (token deleted)' };
+        } else if (statusCode === 403) {
+            let apnsReason = '';
+            try { apnsReason = (JSON.parse(data) as { reason?: string }).reason ?? ''; } catch { /* non-JSON body */ }
+            if (apnsReason === 'InvalidProviderToken' || apnsReason === 'ExpiredProviderToken') {
+                // APNs rejected our JWT — invalidate the cache and retry once with a fresh token.
+                // This handles mid-run token expiry or revocation without failing the whole batch.
+                console.warn(`APNs 403 ${apnsReason} for userId ${userId} — refreshing token and retrying`);
+                cachedToken = null;
+                cachedTokenExpiresAt = 0;
+                const freshToken = await getAPNSToken();
+                const retry = await makeApnsRequest(`/3/device/${pushToken}`, bodyStr, freshToken, bundleId);
+                if (retry.statusCode >= 200 && retry.statusCode < 300) {
+                    return { delivered: true, reason: '' };
+                }
+                const retryReason = `APNs HTTP ${retry.statusCode} (after token refresh): ${retry.body}`;
+                console.error(`APNs retry failed for userId ${userId}: ${retryReason}`);
+                return { delivered: false, reason: retryReason };
+            }
+            const reason = `APNs HTTP 403: ${data}`;
+            console.error(`APNs request failed with status code 403 for userId ${userId}. Details: ${data}`);
+            return { delivered: false, reason };
         } else if (statusCode < 200 || statusCode >= 300) {
             // Do not throw so we can continue processing other notifications
             const reason = `APNs HTTP ${statusCode}: ${data}`;
