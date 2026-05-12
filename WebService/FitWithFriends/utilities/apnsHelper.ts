@@ -149,7 +149,6 @@ async function getAPNSToken(): Promise<string> {
     const token = jwt.sign({ iss: teamId, iat: nowSeconds }, privateKey, {
         algorithm: 'ES256',
         keyid: apnsKeyId,
-        noTimestamp: true,
     });
 
     // Decode the JWT header and payload (not the signature) for diagnostic logging.

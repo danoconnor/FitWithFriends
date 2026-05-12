@@ -145,6 +145,22 @@ describe('apnsHelper - 403 InvalidProviderToken retry', () => {
         expect(session.request).toHaveBeenCalledTimes(1);
     });
 
+    test('signs JWT with iat claim (noTimestamp must not be set)', async () => {
+        const jwtSignMock = jest.fn().mockReturnValue('mock-jwt');
+        const session = makeMockSession([{ statusCode: 200, body: '' }]);
+        setupMocks(session);
+        jest.doMock('jsonwebtoken', () => ({ sign: jwtSignMock }));
+
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { sendPushNotifications } = require('../../utilities/apnsHelper') as typeof import('../../utilities/apnsHelper');
+        await sendPushNotifications([{ userId: 'user-1', title: 'T', body: 'B' }]);
+
+        expect(jwtSignMock).toHaveBeenCalledTimes(1);
+        const [payload, , options] = jwtSignMock.mock.calls[0] as [Record<string, unknown>, unknown, Record<string, unknown>];
+        expect(typeof payload.iat).toBe('number');
+        expect(options).not.toHaveProperty('noTimestamp');
+    });
+
     test('retries with a fresh token after 403 ExpiredProviderToken', async () => {
         const session = makeMockSession([
             { statusCode: 403, body: JSON.stringify({ reason: 'ExpiredProviderToken' }) },
