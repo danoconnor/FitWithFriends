@@ -183,4 +183,201 @@ final class HealthKitManagerTests: XCTestCase {
         XCTAssertEqual(reportedWorkout.distance, workout.distance)
         XCTAssertEqual(reportedWorkout.unit, workout.unit)
     }
+
+    /// Verifies that a step count reported by HealthKit statistics actually appears in the
+    /// ActivitySummary that reaches the backend.  This is the end-to-end test that was
+    /// missing when the closure-capture date bug was introduced: `test_setupObserverQueries_updateHandler`
+    /// checked ring-data fields (calories, exercise, stand) but never asserted on `stepCount`,
+    /// so the bug was invisible until a user noticed wrong numbers in production.
+    func test_setupObserverQueries_updateHandler_stepCountPropagatesIntoReportedSummary() {
+        // Use a 2-day window (yesterday → today) so the stats loop is short and deterministic.
+        let calendar = Calendar.current
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: Date())!
+        userDefaults.set(yesterday.timeIntervalSince1970, forKey: HealthKitManager.lastActivityDataUpdateKey)
+
+        // Use startOfDay so the activity-summary key matches the statistics results keys.
+        // Real HKActivitySummary dates are always start-of-day; tests should mirror that.
+        let todayStart = calendar.startOfDay(for: Date())
+
+        let expectedStepCount: UInt = 5_432
+        healthStoreWrapper.return_statisticsQuery_statistics = [
+            HKQuantityType(.stepCount): StatisticDTO(sumValue: expectedStepCount)
+        ]
+
+        let todayActivitySummary = ActivitySummaryDTO(date: todayStart,
+                                                       activeEnergyBurned: 300,
+                                                       activeEnergyBurnedGoal: 500,
+                                                       appleExerciseTime: 20,
+                                                       appleExerciseTimeGoal: 30,
+                                                       appleStandHours: 8,
+                                                       appleStandHoursGoal: 12)
+        healthStoreWrapper.return_activitySummaryQuery_activitySummaries = [todayActivitySummary]
+
+        healthKitManager.setupObserverQueries()
+        XCTAssertNotNil(healthStoreWrapper.param_updateHandler)
+
+        let completionExpectation = expectation(description: "Observer update handler should call its completion block")
+        healthStoreWrapper.param_updateHandler!(
+            healthStoreWrapper.return_observerQuery!,
+            Set([HKQuantityType(.stepCount)]),
+            { completionExpectation.fulfill() },
+            nil
+        )
+
+        waitForExpectations(timeout: 10)
+
+        guard let reportedSummaries = activityDataService.param_reportActivitySummaries_activitySummaries else {
+            XCTFail("No activity summaries were reported to the backend")
+            return
+        }
+
+        let todaySummary = reportedSummaries.first { calendar.startOfDay(for: $0.date) == todayStart }
+
+        XCTAssertNotNil(todaySummary, "Expected a reported activity summary for today")
+        XCTAssertEqual(todaySummary?.stepCount, expectedStepCount,
+                       "Step count from HealthKit statistics should appear in the reported summary")
+    }
+
+    /// Verifies that a multi-day sync window (3 days) reports exactly one summary per day,
+    /// each dated on its own correct day, with step counts correctly attributed rather than
+    /// all collapsed under a single (wrong) date.
+    ///
+    /// With the closure-capture bug, all three callbacks would have written to `results[tomorrow]`,
+    /// producing one spurious future-dated entry instead of three properly-dated entries.
+    func test_setupObserverQueries_updateHandler_multiDayWindowReportsAllDates() {
+        let calendar = Calendar.current
+
+        // 3-day window: 2 days ago, yesterday, today
+        let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: Date())!
+        userDefaults.set(twoDaysAgo.timeIntervalSince1970, forKey: HealthKitManager.lastActivityDataUpdateKey)
+
+        let expectedStepCount: UInt = 4_000
+        healthStoreWrapper.return_statisticsQuery_statistics = [
+            HKQuantityType(.stepCount): StatisticDTO(sumValue: expectedStepCount)
+        ]
+
+        // Use startOfDay so the activity-summary key matches the statistics results keys.
+        // Real HKActivitySummary dates are always start-of-day; tests should mirror that.
+        let todayStart = calendar.startOfDay(for: Date())
+        let todayActivitySummary = ActivitySummaryDTO(date: todayStart,
+                                                       activeEnergyBurned: 300,
+                                                       activeEnergyBurnedGoal: 500,
+                                                       appleExerciseTime: 20,
+                                                       appleExerciseTimeGoal: 30,
+                                                       appleStandHours: 8,
+                                                       appleStandHoursGoal: 12)
+        healthStoreWrapper.return_activitySummaryQuery_activitySummaries = [todayActivitySummary]
+
+        healthKitManager.setupObserverQueries()
+        XCTAssertNotNil(healthStoreWrapper.param_updateHandler)
+
+        let completionExpectation = expectation(description: "Observer update handler should call its completion block")
+        healthStoreWrapper.param_updateHandler!(
+            healthStoreWrapper.return_observerQuery!,
+            Set([HKQuantityType(.stepCount)]),
+            { completionExpectation.fulfill() },
+            nil
+        )
+
+        waitForExpectations(timeout: 10)
+
+        guard let reportedSummaries = activityDataService.param_reportActivitySummaries_activitySummaries else {
+            XCTFail("No activity summaries were reported to the backend")
+            return
+        }
+
+        // No summary should be dated in the future
+        let tomorrow = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: Date())!)
+        let futureSummaries = reportedSummaries.filter { calendar.startOfDay(for: $0.date) >= tomorrow }
+        XCTAssertTrue(futureSummaries.isEmpty,
+                      "No summary should be dated in the future; found: \(futureSummaries.map { $0.date })")
+
+        // All three days in the window should be represented
+        XCTAssertEqual(reportedSummaries.count, 3,
+                       "Expected exactly 3 summaries for the 3-day window, got \(reportedSummaries.count)")
+
+        let twoDaysAgoStart = calendar.startOfDay(for: twoDaysAgo)
+        let yesterdayStart  = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -1, to: Date())!)
+
+        let twoDaysAgoSummary = reportedSummaries.first { calendar.startOfDay(for: $0.date) == twoDaysAgoStart }
+        let yesterdaySummary  = reportedSummaries.first { calendar.startOfDay(for: $0.date) == yesterdayStart }
+        let todaySummary      = reportedSummaries.first { calendar.startOfDay(for: $0.date) == todayStart }
+
+        XCTAssertNotNil(twoDaysAgoSummary, "Expected a summary for 2 days ago")
+        XCTAssertNotNil(yesterdaySummary,  "Expected a summary for yesterday")
+        XCTAssertNotNil(todaySummary,      "Expected a summary for today")
+
+        // Each day should carry its own step count, not have them all collapsed under one date
+        XCTAssertEqual(twoDaysAgoSummary?.stepCount, expectedStepCount,
+                       "Two-days-ago summary should have its step count correctly attributed")
+        XCTAssertEqual(yesterdaySummary?.stepCount, expectedStepCount,
+                       "Yesterday's summary should have its step count correctly attributed")
+        XCTAssertEqual(todaySummary?.stepCount, expectedStepCount,
+                       "Today's summary should have its step count correctly attributed")
+    }
+
+    /// Regression test for a closure capture bug in getAllDailySumsSinceLastUpdate.
+    ///
+    /// The loop variable `date` was captured by reference in the async callback closure.
+    /// By the time callbacks fired, `date` had already advanced past the loop — causing all
+    /// quantity results (steps, distance, etc.) to be keyed under tomorrow's date instead of
+    /// the day they were actually queried for.
+    func test_getAllDailySumsSinceLastUpdate_attributesStepCountToCorrectDate() {
+        let calendar = Calendar.current
+
+        // Set last update to yesterday so the loop covers exactly two days: yesterday + today.
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: Date())!
+        userDefaults.set(yesterday.timeIntervalSince1970, forKey: HealthKitManager.lastActivityDataUpdateKey)
+
+        // Return a known step count for all statistics queries
+        let expectedStepCount: UInt = 7_500
+        healthStoreWrapper.return_statisticsQuery_statistics = [
+            HKQuantityType(.stepCount): StatisticDTO(sumValue: expectedStepCount)
+        ]
+
+        // Return a matching activity summary for today
+        let todayActivitySummary = ActivitySummaryDTO(date: Date(),
+                                                      activeEnergyBurned: 300,
+                                                      activeEnergyBurnedGoal: 500,
+                                                      appleExerciseTime: 20,
+                                                      appleExerciseTimeGoal: 30,
+                                                      appleStandHours: 8,
+                                                      appleStandHoursGoal: 12)
+        healthStoreWrapper.return_activitySummaryQuery_activitySummaries = [todayActivitySummary]
+
+        healthKitManager.setupObserverQueries()
+        XCTAssertNotNil(healthStoreWrapper.param_updateHandler)
+
+        let completionExpectation = expectation(description: "Observer update handler should call its completion block")
+        healthStoreWrapper.param_updateHandler!(
+            healthStoreWrapper.return_observerQuery!,
+            Set([HKQuantityType(.stepCount)]),
+            { completionExpectation.fulfill() },
+            nil
+        )
+
+        // Allow enough time for all async HealthKit callbacks to settle
+        waitForExpectations(timeout: 10)
+
+        guard let reportedSummaries = activityDataService.param_reportActivitySummaries_activitySummaries else {
+            XCTFail("No activity summaries were reported to the backend")
+            return
+        }
+
+        // No summary should carry a future date — that would indicate the closure capture bug
+        // where `date` was read after the loop had already advanced it to tomorrow.
+        let tomorrow = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: Date())!)
+        let futureSummaries = reportedSummaries.filter { calendar.startOfDay(for: $0.date) >= tomorrow }
+        XCTAssertTrue(
+            futureSummaries.isEmpty,
+            "Activity summaries should not be dated in the future; found dates: \(futureSummaries.map { $0.date })"
+        )
+
+        // Today's summary should carry the step count that was reported by HealthKit
+        let todayStart = calendar.startOfDay(for: Date())
+        let todaySummary = reportedSummaries.first { calendar.startOfDay(for: $0.date) == todayStart }
+        XCTAssertNotNil(todaySummary, "Expected a reported activity summary for today")
+        XCTAssertEqual(todaySummary?.stepCount, expectedStepCount,
+                       "Step count should be attributed to today, not a future date")
+    }
 }

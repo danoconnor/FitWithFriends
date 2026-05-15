@@ -535,14 +535,15 @@ public class HealthKitManager: IHealthKitManager {
         // and query the sum for each day
         let today = Date()
         while date <= today {
+            let capturedDate = date  // capture value before the loop advances `date`
             dispatchGroup.enter()
-            getQuantityForDay(quantityTypeId: quantityTypeId, date: date) { error, statistics in
+            getQuantityForDay(quantityTypeId: quantityTypeId, date: capturedDate) { error, statistics in
                 defer {
                     dispatchGroup.leave()
                 }
 
                 guard let statistics = statistics else {
-                    Logger.traceError(message: "Failed to get data for \(String(describing: quantityTypeId)) on \(date)",
+                    Logger.traceError(message: "Failed to get data for \(String(describing: quantityTypeId)) on \(capturedDate)",
                                       error: error)
                     resultsQueue.sync {
                         hasFailure = true
@@ -550,7 +551,7 @@ public class HealthKitManager: IHealthKitManager {
                     return
                 }
 
-                let startOfDay = calendar.startOfDay(for: date)
+                let startOfDay = calendar.startOfDay(for: capturedDate)
                 resultsQueue.sync {
                     results[startOfDay] = statistics
                 }
