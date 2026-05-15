@@ -635,6 +635,51 @@ describe('performDailyTasks - seedBotActivityData', () => {
         expect(activity2[0].calories_burned).toBeGreaterThan(0);
     });
 
+    test('seeds workouts for bots with valid types and durations', async () => {
+        const now = new Date();
+        const botId = crypto.randomUUID().replace(/-/g, '');
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botId),
+            firstName: 'Workout',
+            lastName: 'Bot',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: now
+        });
+        usersToCleanup.push(botId);
+
+        // Run seeding multiple times to increase the chance of at least one workout being created
+        for (let i = 0; i < 5; i++) {
+            await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
+        }
+
+        const workouts = await TestSQL.getWorkoutsForUser({ userId: convertUserIdToBuffer(botId) });
+
+        // Each run may create 0–2 workouts; after 5 runs we expect at least one
+        expect(workouts.length).toBeGreaterThan(0);
+
+        const validWorkoutTypes = [37, 46, 50]; // running, swimming, traditionalStrengthTraining
+        for (const workout of workouts) {
+            expect(validWorkoutTypes).toContain(workout.workout_type);
+            expect(workout.duration).toBeGreaterThanOrEqual(1800);  // 30 min
+            expect(workout.duration).toBeLessThanOrEqual(10800);    // 180 min
+            expect(workout.calories_burned).toBeGreaterThanOrEqual(200);
+            expect(workout.calories_burned).toBeLessThanOrEqual(1200);
+
+            // Running and swimming should have distance in meters; strength has null distance
+            if (workout.workout_type === 37) { // running
+                expect(workout.distance).not.toBeNull();
+                expect(workout.unit).toBe(2);
+            } else if (workout.workout_type === 46) { // swimming
+                expect(workout.distance).not.toBeNull();
+                expect(workout.unit).toBe(2);
+            } else { // strength training
+                expect(workout.distance).toBeNull();
+                expect(workout.unit).toBeNull();
+            }
+        }
+    });
+
     test('increments existing data on subsequent runs', async () => {
         const now = new Date();
         const botId = crypto.randomUUID().replace(/-/g, '');

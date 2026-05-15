@@ -466,6 +466,56 @@ async function seedBotActivityData(now: Date): Promise<string> {
     });
 
     await ActivityDataQueries.insertActivitySummaries({ summaries });
+
+    // Seed 0–2 workouts per bot for today.
+    // HKWorkoutActivityType raw values: 37 = running, 46 = swimming, 50 = traditionalStrengthTraining
+    const BOT_WORKOUT_TYPES = [37, 46, 50];
+    // Fixed UTC time slots make re-seeding idempotent via ON CONFLICT DO NOTHING
+    const BOT_WORKOUT_SLOTS_UTC = ['T08:00:00.000Z', 'T14:00:00.000Z'];
+
+    const workoutsToInsert: {
+        userId: Buffer;
+        startDate: Date;
+        caloriesBurned: number;
+        workoutType: number;
+        duration: number;
+        distance: number | null;
+        unit: number | null;
+    }[] = [];
+
+    for (const bot of botUsers) {
+        const numWorkouts = Math.floor(Math.random() * 3); // 0, 1, or 2
+        for (let i = 0; i < numWorkouts; i++) {
+            const workoutType = BOT_WORKOUT_TYPES[Math.floor(Math.random() * BOT_WORKOUT_TYPES.length)];
+            const durationSecs = Math.floor(Math.random() * 9001) + 1800; // 30–180 min
+            const caloriesBurned = Math.floor(Math.random() * 1001) + 200; // 200–1200 kcal
+
+            let distance: number | null = null;
+            let unit: number | null = null;
+            if (workoutType === 37) { // running
+                distance = Math.floor(Math.random() * 8000) + 2000; // 2–10 km in meters
+                unit = 2; // meter
+            } else if (workoutType === 46) { // swimming
+                distance = Math.floor(Math.random() * 1500) + 500; // 500–2000 m
+                unit = 2; // meter
+            }
+
+            workoutsToInsert.push({
+                userId: UserHelpers.convertUserIdToBuffer(bot.userId),
+                startDate: new Date(`${easternDateStr}${BOT_WORKOUT_SLOTS_UTC[i]}`),
+                caloriesBurned,
+                workoutType,
+                duration: durationSecs,
+                distance,
+                unit,
+            });
+        }
+    }
+
+    if (workoutsToInsert.length > 0) {
+        await ActivityDataQueries.insertWorkouts({ workouts: workoutsToInsert });
+    }
+
     return `Seeded activity data for ${botUsers.length} bot users`;
 }
 
