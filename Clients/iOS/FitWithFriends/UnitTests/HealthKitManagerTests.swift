@@ -316,6 +316,98 @@ final class HealthKitManagerTests: XCTestCase {
                        "Today's summary should have its step count correctly attributed")
     }
 
+    /// Verifies that the last-update timestamp is persisted after a fully successful sync.
+    ///
+    /// Bug: getAllDailySumsSinceLastUpdate called completion(hasFailure, results) instead of
+    /// completion(!hasFailure, results). When all HealthKit queries succeeded (hasFailure=false),
+    /// the caller received success=false → containsFailures=true → lastActivityDataUpdateKey was
+    /// never written → the query window kept expanding on every subsequent sync.
+    func test_successfulSync_savesLastUpdateTimestamp() {
+        let calendar = Calendar.current
+
+        // Set a known start point so the query window is short
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: Date())!
+        userDefaults.set(yesterday.timeIntervalSince1970, forKey: HealthKitManager.lastActivityDataUpdateKey)
+
+        healthStoreWrapper.return_statisticsQuery_statistics = [
+            HKQuantityType(.stepCount): StatisticDTO(sumValue: 3_000),
+            HKQuantityType(.distanceWalkingRunning): StatisticDTO(sumValue: 2_000),
+            HKQuantityType(.flightsClimbed): StatisticDTO(sumValue: 5),
+        ]
+
+        let todayStart = calendar.startOfDay(for: Date())
+        healthStoreWrapper.return_activitySummaryQuery_activitySummaries = [
+            ActivitySummaryDTO(date: todayStart,
+                               activeEnergyBurned: 200, activeEnergyBurnedGoal: 500,
+                               appleExerciseTime: 10, appleExerciseTimeGoal: 30,
+                               appleStandHours: 5, appleStandHoursGoal: 12)
+        ]
+
+        healthKitManager.setupObserverQueries()
+
+        let completionExpectation = expectation(description: "Update handler completion should be called")
+        healthStoreWrapper.param_updateHandler!(
+            healthStoreWrapper.return_observerQuery!,
+            Set([HKQuantityType(.stepCount)]),
+            { completionExpectation.fulfill() },
+            nil
+        )
+
+        waitForExpectations(timeout: 10)
+
+        let savedTimestamp = userDefaults.double(forKey: HealthKitManager.lastActivityDataUpdateKey)
+        XCTAssertGreaterThan(savedTimestamp, yesterday.timeIntervalSince1970,
+                             "lastActivityDataUpdateKey should be updated after a successful sync; it was stuck at the old value, meaning containsFailures was wrongly true")
+    }
+
+    /// Verifies that a stale last-update date older than 30 days is clamped to 30 days ago.
+    ///
+    /// Bug: thirtyDaysAgo was calculated relative to the stored date (not today), so
+    /// `thirtyDaysAgo > date` was always false. Users with a stored date from months ago
+    /// would have their query window expand to cover that entire period, making the sync
+    /// time out the 60-second background-task budget before any data could be uploaded.
+    func test_staleLastUpdateTimestamp_isCappedToThirtyDays() {
+        let calendar = Calendar.current
+
+        // Set the last update to 90 days ago (well beyond the 30-day cap)
+        let ninetyDaysAgo = calendar.date(byAdding: .day, value: -90, to: Date())!
+        userDefaults.set(ninetyDaysAgo.timeIntervalSince1970, forKey: HealthKitManager.lastActivityDataUpdateKey)
+
+        healthStoreWrapper.return_statisticsQuery_statistics = [
+            HKQuantityType(.stepCount): StatisticDTO(sumValue: 500),
+            HKQuantityType(.distanceWalkingRunning): StatisticDTO(sumValue: 300),
+            HKQuantityType(.flightsClimbed): StatisticDTO(sumValue: 2),
+        ]
+
+        let todayStart = calendar.startOfDay(for: Date())
+        healthStoreWrapper.return_activitySummaryQuery_activitySummaries = [
+            ActivitySummaryDTO(date: todayStart,
+                               activeEnergyBurned: 100, activeEnergyBurnedGoal: 500,
+                               appleExerciseTime: 5, appleExerciseTimeGoal: 30,
+                               appleStandHours: 3, appleStandHoursGoal: 12)
+        ]
+
+        healthKitManager.setupObserverQueries()
+
+        let completionExpectation = expectation(description: "Update handler completion should be called")
+        healthStoreWrapper.param_updateHandler!(
+            healthStoreWrapper.return_observerQuery!,
+            Set([HKQuantityType(.stepCount)]),
+            { completionExpectation.fulfill() },
+            nil
+        )
+
+        waitForExpectations(timeout: 10)
+
+        // With 3 statistics types (step, distance, flights) and at most 31 days (30-day cap + today),
+        // the maximum expected call count is 31 × 3 = 93.
+        // Without the fix, a 90-day stale timestamp would produce 90 × 3 = 270 calls.
+        let callCount = healthStoreWrapper.executeStatisticsQueryCallCount
+        XCTAssertLessThanOrEqual(callCount, 93,
+                                 "With a 90-day stale timestamp the 30-day cap should limit statistics queries to ≤93 (31 days × 3 types), got \(callCount)")
+        XCTAssertGreaterThan(callCount, 0, "Should have executed at least one statistics query")
+    }
+
     /// Regression test for a closure capture bug in getAllDailySumsSinceLastUpdate.
     ///
     /// The loop variable `date` was captured by reference in the async callback closure.
