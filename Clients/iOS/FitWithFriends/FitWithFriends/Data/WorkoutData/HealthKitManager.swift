@@ -50,6 +50,14 @@ public class HealthKitManager: IHealthKitManager {
         .flightsClimbed
     ]
 
+    /// Subset of quantityTypesToObserve that are supported by HKStatisticsQuery (cumulative sum).
+    /// .activeEnergyBurned and .appleExerciseTime are covered by HKActivitySummary, not statistics queries.
+    private static let quantityTypesToQueryStatistics: [HKQuantityTypeIdentifier] = [
+        .stepCount,
+        .distanceWalkingRunning,
+        .flightsClimbed
+    ]
+
     /// Hold onto a reference to our query so it doesn't get deinitialized
     private var observerQuery: HKQuery?
 
@@ -403,6 +411,7 @@ public class HealthKitManager: IHealthKitManager {
             return
         }
 
+        let calendar = Calendar.current
         let resultQueue = DispatchQueue(label: "reportActivitySummariesQueue")
         let dispatchGroup = DispatchGroup()
 
@@ -420,7 +429,12 @@ public class HealthKitManager: IHealthKitManager {
                 }
 
                 for activityResult in activityResults {
-                    activitySummaries[activityResult.date] = activityResult
+                    // Normalize to midnight so the key matches the startOfDay keys used by
+                    // the statistics query results. HKActivitySummary.dateComponents(for:).date
+                    // can carry sub-millisecond precision that differs from startOfDay, causing
+                    // Set<Date> to treat the same calendar day as two distinct entries.
+                    let normalizedDate = calendar.startOfDay(for: activityResult.date)
+                    activitySummaries[normalizedDate] = activityResult
                 }
             }
 
@@ -428,7 +442,7 @@ public class HealthKitManager: IHealthKitManager {
         }
 
         var quantityResults: [HKQuantityTypeIdentifier: [Date: StatisticDTO]] = [:]
-        for quantityType in HealthKitManager.quantityTypesToObserve {
+        for quantityType in HealthKitManager.quantityTypesToQueryStatistics {
             dispatchGroup.enter()
             getAllDailySumsSinceLastUpdate(for: quantityType) { success, result in
                 resultQueue.sync {
@@ -569,7 +583,7 @@ public class HealthKitManager: IHealthKitManager {
         }
 
         dispatchGroup.notify(queue: .global()) {
-            completion(hasFailure, results)
+            completion(!hasFailure, results)
         }
     }
 
@@ -622,8 +636,8 @@ public class HealthKitManager: IHealthKitManager {
             let date = Date(timeIntervalSince1970: lastUpdate)
 
             // Only query a max of 30 days of data
-            let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: date)!
-            if thirtyDaysAgo > date {
+            let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: Date())!
+            if date < thirtyDaysAgo {
                 Logger.traceWarning(message: "Last update for \(key) is more than thirty days ago. Only returning 30 days of data. Last update time: \(date). Thirty days ago is \(thirtyDaysAgo)")
                 return thirtyDaysAgo
             }

@@ -80,7 +80,10 @@ router.post('/dailySummary', function (req, res) {
     // PostgreSQL cannot update the same target row twice in one statement.
     const summaryByDate = new Map<string, typeof summariesToInsert[0]>();
     for (const summary of summariesToInsert) {
-        const key = summary.date;
+        // Normalize to a YYYY-MM-DD UTC date string so that two timestamps representing
+        // the same calendar day (e.g. identical moments in different timezone formats) are
+        // treated as one row — matching how PostgreSQL stores the value in a `date` column.
+        const key = new Date(summary.date).toISOString().split('T')[0];
         const existing = summaryByDate.get(key);
         if (existing) {
             existing.caloriesBurned = Math.max(existing.caloriesBurned, summary.caloriesBurned);
