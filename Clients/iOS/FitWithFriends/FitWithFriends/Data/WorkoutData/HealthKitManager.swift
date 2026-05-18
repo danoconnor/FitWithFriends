@@ -411,6 +411,7 @@ public class HealthKitManager: IHealthKitManager {
             return
         }
 
+        let calendar = Calendar.current
         let resultQueue = DispatchQueue(label: "reportActivitySummariesQueue")
         let dispatchGroup = DispatchGroup()
 
@@ -428,7 +429,12 @@ public class HealthKitManager: IHealthKitManager {
                 }
 
                 for activityResult in activityResults {
-                    activitySummaries[activityResult.date] = activityResult
+                    // Normalize to midnight so the key matches the startOfDay keys used by
+                    // the statistics query results. HKActivitySummary.dateComponents(for:).date
+                    // can carry sub-millisecond precision that differs from startOfDay, causing
+                    // Set<Date> to treat the same calendar day as two distinct entries.
+                    let normalizedDate = calendar.startOfDay(for: activityResult.date)
+                    activitySummaries[normalizedDate] = activityResult
                 }
             }
 
