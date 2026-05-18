@@ -228,7 +228,7 @@ public class HealthKitManager: IHealthKitManager {
         }
 
         // Get all the various statistics that we care about for today (step count, stairs climbed, etc.)
-        for quantityType in HealthKitManager.quantityTypesToObserve {
+        for quantityType in HealthKitManager.quantityTypesToQueryStatistics {
             dispatchGroup.enter()
             getQuantityForDay(quantityTypeId: quantityType, date: now) { error, result in
                 defer {
@@ -484,6 +484,11 @@ public class HealthKitManager: IHealthKitManager {
                 }
 
                 updatedActivitySummaries.append(activitySummary)
+            }
+
+            Logger.traceInfo(message: "Uploading \(updatedActivitySummaries.count) activity summaries")
+            for summary in updatedActivitySummaries {
+                Logger.traceVerbose(message: "  \(summary.date.formatted(date: .abbreviated, time: .omitted)): cal=\(summary.activeCaloriesBurned)/\(summary.activeCaloriesGoal) ex=\(summary.exerciseTime)/\(summary.exerciseTimeGoal) stand=\(summary.standTime)/\(summary.standTimeGoal) steps=\(summary.stepCount ?? 0) dist=\(summary.distanceWalkingRunning ?? 0)m flights=\(summary.flightsClimbed ?? 0)")
             }
 
             self.activityDataService.reportActivitySummaries(updatedActivitySummaries) { error in
