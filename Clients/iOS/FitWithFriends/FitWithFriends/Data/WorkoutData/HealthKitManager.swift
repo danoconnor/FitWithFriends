@@ -177,9 +177,6 @@ public class HealthKitManager: IHealthKitManager {
         var today = calendar.dateComponents([.day, .month, .year, .era], from: now)
         today.calendar = calendar
 
-        var utcCalendar = Calendar.current
-        utcCalendar.timeZone = TimeZone.gmt
-
         Logger.traceVerbose(message: "Begin get activity summary for \(today)")
 
         guard healthStoreWrapper.isHealthDataAvailable else {
@@ -206,10 +203,9 @@ public class HealthKitManager: IHealthKitManager {
                 return
             }
 
-            // The summaries are being returned as UTC dates, so we need to parse them with the UTC calendar to get the day to match
-            // the current day in our local timezone
+            // ActivitySummaryDTO.date is local midnight, so compare using the local calendar
             let summary = summaries?.first {
-                let summaryDate = utcCalendar.dateComponents([.day, .month, .year, .era], from: $0.date)
+                let summaryDate = calendar.dateComponents([.day, .month, .year, .era], from: $0.date)
                 return summaryDate.year == today.year && summaryDate.month == today.month && summaryDate.day == today.day
             }
 
@@ -429,10 +425,9 @@ public class HealthKitManager: IHealthKitManager {
                 }
 
                 for activityResult in activityResults {
-                    // Normalize to midnight so the key matches the startOfDay keys used by
-                    // the statistics query results. HKActivitySummary.dateComponents(for:).date
-                    // can carry sub-millisecond precision that differs from startOfDay, causing
-                    // Set<Date> to treat the same calendar day as two distinct entries.
+                    // ActivitySummaryDTO.date is already local midnight; startOfDay is a
+                    // no-op for dates produced by the HK initializer but guards against
+                    // sub-millisecond drift in dates constructed elsewhere (e.g. unit tests).
                     let normalizedDate = calendar.startOfDay(for: activityResult.date)
                     activitySummaries[normalizedDate] = activityResult
                 }
