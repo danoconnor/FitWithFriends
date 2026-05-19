@@ -62,7 +62,9 @@ router.post('/dailySummary', function (req, res) {
 
         summariesToInsert.push({
             userId: userIdBuffer,
-            date: dateStr,
+            // Normalize to YYYY-MM-DD (UTC) so PostgreSQL stores the correct calendar day
+            // regardless of the server's local timezone setting.
+            date: date.toISOString().split('T')[0],
             caloriesBurned,
             caloriesGoal,
             exerciseTime,

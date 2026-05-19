@@ -26,12 +26,19 @@ public struct ActivitySummaryDTO {
     public let hkActivitySummary: HKActivitySummary
 
     public init?(hkActivitySummary: HKActivitySummary) {
-        guard let date = hkActivitySummary.dateComponents(for: Calendar.current).date else {
+        // HKActivitySummary.dateComponents(for:) returns midnight UTC for the local calendar day
+        // regardless of the calendar passed in. Extract year/month/day from the UTC date, then
+        // reconstruct as local midnight so the date aligns with statistics query results
+        // (which use Calendar.current.startOfDay on local dates).
+        var utcCalendar = Calendar.current
+        utcCalendar.timeZone = TimeZone.gmt
+        guard let utcMidnight = hkActivitySummary.dateComponents(for: utcCalendar).date,
+              let localMidnight = Calendar.current.date(from: utcCalendar.dateComponents([.year, .month, .day], from: utcMidnight)) else {
             Logger.traceError(message: "Tried to initialize ActivitySummaryDTO without valid date")
             return nil
         }
 
-        self.date = date
+        self.date = Calendar.current.startOfDay(for: localMidnight)
 
         activeEnergyBurned = UInt(round(hkActivitySummary.activeEnergyBurned.doubleValue(for: .largeCalorie())))
         activeEnergyBurnedGoal = UInt(round(hkActivitySummary.activeEnergyBurnedGoal.doubleValue(for: .largeCalorie())))
