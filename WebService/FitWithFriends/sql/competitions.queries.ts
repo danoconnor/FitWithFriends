@@ -687,3 +687,76 @@ export function isUserInCompetition(params: IIsUserInCompetitionParams): Promise
 }
 
 
+/** 'GetCompetitionInviteDetails' parameters type */
+export interface IGetCompetitionInviteDetailsParams {
+  competitionAccessToken: string;
+  competitionId: string;
+}
+
+/** 'GetCompetitionInviteDetails' return type */
+export interface IGetCompetitionInviteDetailsResult {
+  admin_first_name: string;
+  admin_last_name: string | null;
+  competition_id: string;
+  display_name: string;
+  end_date: Date;
+  is_public: boolean;
+  member_count: number;
+  members: Json;
+  scoring_rules: Json | null;
+  start_date: Date;
+}
+
+/** 'GetCompetitionInviteDetails' query type */
+export interface IGetCompetitionInviteDetailsQuery {
+  params: IGetCompetitionInviteDetailsParams;
+  result: IGetCompetitionInviteDetailsResult;
+}
+
+const getCompetitionInviteDetailsIR: any = {"usedParamSet":{"competitionId":true,"competitionAccessToken":true},"params":[{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":1146,"b":1160}]},{"name":"competitionAccessToken","required":true,"transform":{"type":"scalar"},"locs":[{"a":1185,"b":1208}]}],"statement":"                                                                                                                                                                                                                                                \nSELECT\n    c.competition_id,\n    c.display_name,\n    c.start_date,\n    c.end_date,\n    c.is_public,\n    c.scoring_rules,\n    admin_user.first_name AS \"admin_first_name!\",\n    admin_user.last_name AS \"admin_last_name\",\n    (\n        SELECT COUNT(*)::INTEGER FROM users_competitions uc_count\n        WHERE uc_count.competition_id = c.competition_id\n    ) AS \"member_count!\",\n    (\n        SELECT COALESCE(\n            json_agg(\n                json_build_object(\n                    'firstName', mu.first_name,\n                    'lastName', mu.last_name\n                ) ORDER BY mu.first_name\n            ),\n            '[]'::json\n        )\n        FROM users_competitions uc\n        JOIN users mu ON mu.user_id = uc.user_id\n        WHERE uc.competition_id = c.competition_id\n    ) AS \"members!\"\nFROM competitions c\nJOIN users admin_user ON admin_user.user_id = c.admin_user_id\nWHERE c.competition_id = :competitionId!\n  AND c.access_token = :competitionAccessToken!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ *                                                                                                                                                                                                                                                 
+ * SELECT
+ *     c.competition_id,
+ *     c.display_name,
+ *     c.start_date,
+ *     c.end_date,
+ *     c.is_public,
+ *     c.scoring_rules,
+ *     admin_user.first_name AS "admin_first_name!",
+ *     admin_user.last_name AS "admin_last_name",
+ *     (
+ *         SELECT COUNT(*)::INTEGER FROM users_competitions uc_count
+ *         WHERE uc_count.competition_id = c.competition_id
+ *     ) AS "member_count!",
+ *     (
+ *         SELECT COALESCE(
+ *             json_agg(
+ *                 json_build_object(
+ *                     'firstName', mu.first_name,
+ *                     'lastName', mu.last_name
+ *                 ) ORDER BY mu.first_name
+ *             ),
+ *             '[]'::json
+ *         )
+ *         FROM users_competitions uc
+ *         JOIN users mu ON mu.user_id = uc.user_id
+ *         WHERE uc.competition_id = c.competition_id
+ *     ) AS "members!"
+ * FROM competitions c
+ * JOIN users admin_user ON admin_user.user_id = c.admin_user_id
+ * WHERE c.competition_id = :competitionId!
+ *   AND c.access_token = :competitionAccessToken!
+ * ```
+ */
+export function getCompetitionInviteDetails(params: IGetCompetitionInviteDetailsParams): Promise<Array<IGetCompetitionInviteDetailsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getCompetitionInviteDetails = new pgtyped.PreparedQuery<IGetCompetitionInviteDetailsParams,IGetCompetitionInviteDetailsResult>(getCompetitionInviteDetailsIR);
+    return getCompetitionInviteDetails.run(params, DatabaseConnectionPool);
+  });
+}
+
+

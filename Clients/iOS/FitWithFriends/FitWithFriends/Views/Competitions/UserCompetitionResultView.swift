@@ -10,57 +10,62 @@ import SwiftUI
 struct UserCompetitionResultView: View {
     let result: UserPosition
     let isCompetitionActive: Bool
-    /// Unit to use when formatting the leaderboard values. Defaults to points to preserve legacy behaviour.
+    /// Unit used when formatting the leaderboard values. Defaults to points for legacy callers.
     var scoringUnit: ScoringUnit = .points
+    /// `true` when the row represents the currently logged-in user. Drives the
+    /// brand-tinted highlight on the competition detail leaderboard.
+    var isCurrentUser: Bool = false
 
-    private var positionBackgroundColor: Color {
-        guard result.shouldShowPosition else {
-            return Color(.tertiarySystemFill)
-        }
-
+    private var medalColor: Color? {
+        guard result.shouldShowPosition else { return nil }
         switch result.position {
-        case 1: return Color.gold
-        case 2: return Color.silver
-        case 3: return Color.bronze
-        default: return Color.clear
+        case 1: return Color("Gold")
+        case 2: return Color("Silver")
+        case 3: return Color("Bronze")
+        default: return nil
         }
     }
 
     private var isTopThree: Bool {
-        result.shouldShowPosition && result.position <= 3
+        medalColor != nil
     }
 
     var body: some View {
         HStack(spacing: 12) {
-            // Position indicator
+            // Rank chip — filled for medals, hairline circle for everyone else.
             ZStack {
-                if isTopThree {
-                    Circle()
-                        .fill(positionBackgroundColor)
-                        .frame(width: 36, height: 36)
+                if let medalColor {
+                    Circle().fill(medalColor)
                 } else {
-                    Circle()
-                        .stroke(Color(.separator), lineWidth: 1)
-                        .frame(width: 36, height: 36)
+                    Circle().strokeBorder(Color("Border"), lineWidth: 1)
                 }
 
                 if result.shouldShowPosition {
                     Text(result.position.description)
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(isTopThree ? .white : .secondary)
+                        .font(.system(size: 14, weight: .bold))
+                        .monospacedDigit()
+                        .foregroundStyle(isTopThree ? .white : Color("InkSoft"))
                 }
             }
-            .frame(width: 36, height: 36)
+            .frame(width: 32, height: 32)
+
+            FWFAvatar(name: result.userCompetitionPoints.displayName, size: 32)
 
             // Name and today's points
             VStack(alignment: .leading, spacing: 2) {
-                Text(result.userCompetitionPoints.displayName)
-                    .font(.body.weight(.medium))
+                Text(isCurrentUser ? "You" : result.userCompetitionPoints.displayName)
+                    .font(.system(size: 15, weight: isCurrentUser ? .bold : .semibold))
+                    .foregroundStyle(Color("Ink"))
 
                 if isCompetitionActive, let todayPts = result.userCompetitionPoints.pointsToday, todayPts > 0 {
-                    Text("+\(ScoringValueFormatter.format(todayPts, unit: scoringUnit)) today")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(Color("Exercise"))
+                        Text("+\(ScoringValueFormatter.format(todayPts, unit: scoringUnit)) today")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color("InkSoft"))
+                    }
                 }
             }
 
@@ -68,17 +73,62 @@ struct UserCompetitionResultView: View {
 
             // Total score in the rule's native unit
             if let totalPoints = result.userCompetitionPoints.totalPoints {
-                Text(ScoringValueFormatter.formatCompact(totalPoints, unit: scoringUnit))
-                    .font(.title3.weight(.semibold).monospacedDigit())
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text(ScoringValueFormatter.formatCompact(totalPoints, unit: scoringUnit))
+                        .font(.system(size: 20, weight: .bold))
+                        .monospacedDigit()
+                        .foregroundStyle(Color("Ink"))
+                    Text(unitSuffix)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color("InkMute"))
+                }
             }
         }
-        .padding(.vertical, 4)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(isCurrentUser ? Color("BrandSoft") : Color("Surface"))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(isCurrentUser ? Color("Brand") : Color("Border"),
+                              lineWidth: isCurrentUser ? 1.5 : 1)
+        )
+        .shadow(color: isCurrentUser ? Color("Brand").opacity(0.18) : .clear, radius: 8, x: 0, y: 4)
+    }
+
+    private var unitSuffix: String {
+        switch scoringUnit {
+        case .points: return "pts"
+        case .steps: return "steps"
+        case .kcal: return "kcal"
+        case .minutes: return "min"
+        case .meters: return ""
+        }
     }
 }
 
 struct UserCompetitionResultView_Previews: PreviewProvider {
     static var previews: some View {
-        UserCompetitionResultView(result: UserPosition(userCompetitionPoints: UserCompetitionPoints(), position: 1), isCompetitionActive: true)
+        VStack(spacing: 8) {
+            UserCompetitionResultView(
+                result: UserPosition(userCompetitionPoints: UserCompetitionPoints(firstName: "Alice", lastName: "Chen", total: 480, today: 110), position: 1),
+                isCompetitionActive: true,
+                isCurrentUser: false
+            )
+            UserCompetitionResultView(
+                result: UserPosition(userCompetitionPoints: UserCompetitionPoints(firstName: "You", lastName: "", total: 422, today: 235), position: 2),
+                isCompetitionActive: true,
+                isCurrentUser: true
+            )
+            UserCompetitionResultView(
+                result: UserPosition(userCompetitionPoints: UserCompetitionPoints(firstName: "Sam", lastName: "Smith", total: 100, today: 0), position: 4),
+                isCompetitionActive: true,
+                isCurrentUser: false
+            )
+        }
+        .padding()
+        .background(Color("Bg"))
     }
 }

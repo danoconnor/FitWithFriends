@@ -26,12 +26,12 @@ struct PublicCompetitionCard: View {
 
                 Label("Public", systemImage: "globe")
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(Color("FwFBrandingColor"))
+                    .foregroundStyle(Color("Brand"))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(
                         Capsule()
-                            .fill(Color("FwFBrandingColor").opacity(0.12))
+                            .fill(Color("Brand").opacity(0.12))
                     )
             }
 
@@ -43,7 +43,7 @@ struct PublicCompetitionCard: View {
                     .padding(.vertical, 4)
                     .background(
                         Capsule()
-                            .fill(Color("FwFBrandingColor").opacity(0.12))
+                            .fill(Color("Brand").opacity(0.12))
                     )
 
                 Spacer()
@@ -63,7 +63,7 @@ struct PublicCompetitionCard: View {
             if competition.isUserMember {
                 Label("You've joined", systemImage: "checkmark.circle.fill")
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(Color("FwFBrandingColor"))
+                    .foregroundStyle(Color("Brand"))
             } else if isUserPro {
                 Button(action: onJoin) {
                     Text("Join Competition")
@@ -73,7 +73,7 @@ struct PublicCompetitionCard: View {
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(Color("FwFBrandingColor"))
+                                .fill(Color("Brand"))
                         )
                 }
                 .buttonStyle(.plain)
@@ -86,7 +86,7 @@ struct PublicCompetitionCard: View {
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(Color("FwFBrandingColor"))
+                                .fill(Color("Brand"))
                         )
                 }
                 .buttonStyle(.plain)

@@ -32,216 +32,242 @@ struct LoggedInContentView: View {
 
     var body: some View {
         ZStack {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // App title
-                    HStack {
-                        Text("Fit with Friends")
-                            .font(.largeTitle.bold())
-                        Spacer()
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 4)
+            Color("Bg").ignoresSafeArea()
 
-                    // Today's activity section
-                    if let activitySummary = homepageViewModel.todayActivitySummary {
-                        TodaySummaryView(activitySummary: activitySummary,
-                                         homepageSheetViewModel: homepageSheetViewModel,
-                                         objectGraph: objectGraph)
-                            .fwfCard()
-                            .padding(.horizontal, 16)
-                    } else if homepageViewModel.loadedActivitySummary {
-                        // Health data access issue
-                        VStack(spacing: 12) {
-                            Image(systemName: "heart.text.square")
-                                .font(.system(size: 32))
-                                .foregroundStyle(.secondary)
+            NavigationView {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Greeting + settings gear (replaces the navy toolbar)
+                        greetingRow
 
-                            Text("We're having trouble reading your activity information. Please check permissions in iOS Settings > Privacy > Health > Fit w/ Friends.")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .fwfCard()
-                        .padding(.horizontal, 16)
-                    }
-
-                    // Public competitions section
-                    if let publicCompetitions = homepageViewModel.publicCompetitions, !publicCompetitions.isEmpty {
-                        HStack {
-                            Text("Public Competitions")
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 4)
-
-                        ForEach(publicCompetitions) { competition in
-                            PublicCompetitionCard(
-                                competition: competition,
-                                isUserPro: homepageViewModel.isUserPro,
-                                onJoin: {
-                                    Task {
-                                        try? await objectGraph.competitionManager.joinPublicCompetition(competitionId: competition.competitionId)
-                                    }
-                                },
-                                onUpgrade: {
-                                    homepageSheetViewModel.updateState(sheet: .proUpgrade, state: true)
-                                }
+                        // Today's activity
+                        if let activitySummary = homepageViewModel.todayActivitySummary {
+                            TodaySummaryView(
+                                activitySummary: activitySummary,
+                                headline: homepageViewModel.todayRingsHeadline,
+                                stripItems: homepageViewModel.todayActivityStrip
                             )
                             .fwfCard()
                             .padding(.horizontal, 16)
+                        } else if homepageViewModel.loadedActivitySummary {
+                            healthDataMissing
                         }
-                    }
 
-                    // Competitions section
-                    if let competitions = homepageViewModel.currentCompetitions, !competitions.isEmpty {
-                        HStack {
-                            Text("Your Competitions")
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 4)
+                        // Public competitions section
+                        if let publicCompetitions = homepageViewModel.publicCompetitions, !publicCompetitions.isEmpty {
+                            sectionHeader("Public Competitions")
 
-                        ForEach(competitions) { competitionOverview in
-                            CompetitionOverviewView(objectGraph: objectGraph,
-                                                    competitionOverview: competitionOverview,
-                                                    homepageSheetViewModel: homepageSheetViewModel,
-                                                    showAllDetails: false)
+                            ForEach(publicCompetitions) { competition in
+                                PublicCompetitionCard(
+                                    competition: competition,
+                                    isUserPro: homepageViewModel.isUserPro,
+                                    onJoin: {
+                                        Task {
+                                            try? await objectGraph.competitionManager.joinPublicCompetition(competitionId: competition.competitionId)
+                                        }
+                                    },
+                                    onUpgrade: {
+                                        homepageSheetViewModel.updateState(sheet: .proUpgrade, state: true)
+                                    }
+                                )
                                 .fwfCard()
                                 .padding(.horizontal, 16)
-                        }
-                    } else if homepageViewModel.currentCompetitions != nil {
-                        // Empty state
-                        VStack(spacing: 12) {
-                            Image(systemName: "trophy")
-                                .font(.system(size: 48))
-                                .foregroundStyle(.secondary)
-
-                            Text("No competitions yet")
-                                .font(.headline)
-
-                            Text("Create a competition and invite your friends to get started!")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .fwfCard()
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
-                    }
-
-                    // Create competition button
-                    FWFPrimaryButton("New Competition", icon: "plus.circle.fill") {
-                        homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 4)
-                    .padding(.bottom, 24)
-                }
-                .padding(.top, 8)
-                .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
-                    homepageSheetViewModel.dismissCurrentSheet()
-                }, content: {
-                    switch homepageSheetViewModel.sheetToShow {
-                    case .createCompetition:
-                        CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
-                                              objectGraph: objectGraph)
-                    case .permissionPrompt:
-                        PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel,
-                                             objectGraph: objectGraph)
-                    case .joinCompetition:
-                        JoinCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
-                                            objectGraph: objectGraph)
-                    case .competitionDetails:
-                        if let competitionOverview = homepageSheetViewModel.sheetContextData as? CompetitionOverview {
-                            CompetitionDetailView(competitionOverview: competitionOverview,
-                                                  homepageSheetViewModel: homepageSheetViewModel,
-                                                  objectGraph: objectGraph)
-                        } else {
-                            Text("Error showing competition details")
-                        }
-                    case .userDetails:
-                        if let context = homepageSheetViewModel.sheetContextData as? UserDetailsSheetContext {
-                            NavigationView {
-                                UserCompetitionDailyDetailsView(
-                                    competitionId: context.competitionId,
-                                    userId: context.userId,
-                                    userName: context.userName,
-                                    objectGraph: objectGraph)
                             }
-                            .presentationDragIndicator(.visible)
-                        } else {
-                            Text("Error showing user details")
                         }
-                    case .settings:
-                        SettingsView(emailUtility: objectGraph.emailUtility,
-                                     serverEnvironmentManager: objectGraph.serverEnvironmentManager,
-                                     subscriptionManager: objectGraph.subscriptionManager,
-                                     onDeleteAccount: { return await homepageViewModel.deleteAccount() })
-                    case .proUpgrade:
-                        ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
-                                       subscriptionManager: objectGraph.subscriptionManager,
-                                       serverEnvironmentManager: objectGraph.serverEnvironmentManager)
-                    default:
-                        Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
-                    }
-                })
-            }
-            .refreshable {
-                await homepageViewModel.refreshData()
-            }
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(Color("FwFBrandingColor"), for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                Menu {
-                    Button("Logout") {
-                        self.homepageViewModel.logout()
-                    }
-                    .accessibilityIdentifier("LogoutMenuButton")
 
-                    Button("Settings") {
-                        self.homepageSheetViewModel.updateState(sheet: .settings,
-                                                                state: true)
+                        // Competitions section
+                        if let competitions = homepageViewModel.currentCompetitions, !competitions.isEmpty {
+                            sectionHeader("Your Competitions")
+
+                            ForEach(competitions) { competitionOverview in
+                                CompetitionOverviewView(objectGraph: objectGraph,
+                                                        competitionOverview: competitionOverview,
+                                                        homepageSheetViewModel: homepageSheetViewModel,
+                                                        showAllDetails: false)
+                                    .fwfCard()
+                                    .padding(.horizontal, 16)
+                            }
+                        } else if homepageViewModel.currentCompetitions != nil {
+                            noCompetitionsEmptyState
+                        }
+
+                        // Start a new competition (dashed-outline secondary)
+                        FWFSecondaryButton("Start a new competition", icon: "plus") {
+                            homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 4)
+                        .padding(.bottom, 24)
                     }
-                    .accessibilityIdentifier("SettingsMenuButton")
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.body)
-                        .foregroundStyle(.white)
+                    .padding(.top, 8)
+                    .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
+                        homepageSheetViewModel.dismissCurrentSheet()
+                    }, content: {
+                        switch homepageSheetViewModel.sheetToShow {
+                        case .createCompetition:
+                            CreateCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
+                                                  objectGraph: objectGraph)
+                        case .permissionPrompt:
+                            PermissionPromptView(homepageSheetViewModel: homepageSheetViewModel,
+                                                 objectGraph: objectGraph)
+                        case .joinCompetition:
+                            JoinCompetitionView(homepageSheetViewModel: homepageSheetViewModel,
+                                                objectGraph: objectGraph)
+                        case .competitionDetails:
+                            if let competitionOverview = homepageSheetViewModel.sheetContextData as? CompetitionOverview {
+                                CompetitionDetailView(competitionOverview: competitionOverview,
+                                                      homepageSheetViewModel: homepageSheetViewModel,
+                                                      objectGraph: objectGraph)
+                            } else {
+                                Text("Error showing competition details")
+                            }
+                        case .userDetails:
+                            if let context = homepageSheetViewModel.sheetContextData as? UserDetailsSheetContext {
+                                NavigationView {
+                                    UserCompetitionDailyDetailsView(
+                                        competitionId: context.competitionId,
+                                        userId: context.userId,
+                                        userName: context.userName,
+                                        objectGraph: objectGraph)
+                                }
+                                .presentationDragIndicator(.visible)
+                            } else {
+                                Text("Error showing user details")
+                            }
+                        case .settings:
+                            SettingsView(emailUtility: objectGraph.emailUtility,
+                                         serverEnvironmentManager: objectGraph.serverEnvironmentManager,
+                                         subscriptionManager: objectGraph.subscriptionManager,
+                                         onDeleteAccount: { return await homepageViewModel.deleteAccount() })
+                        case .proUpgrade:
+                            ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
+                                           subscriptionManager: objectGraph.subscriptionManager,
+                                           serverEnvironmentManager: objectGraph.serverEnvironmentManager)
+                        default:
+                            Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")
+                        }
+                    })
                 }
-                .accessibilityIdentifier("SettingsMenu")
+                .scrollContentBackground(.hidden)
+                .background(Color("Bg"))
+                .refreshable {
+                    await homepageViewModel.refreshData()
+                }
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .navigationBarHidden(true)
             }
-        }
-        .navigationViewStyle(.stack)
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-            guard ProcessInfo.processInfo.environment["FWF_UI_TESTING"] != "1" else { return }
-            Task.detached {
-                await self.homepageViewModel.refreshData()
+            .navigationViewStyle(.stack)
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                guard ProcessInfo.processInfo.environment["FWF_UI_TESTING"] != "1" else { return }
+                Task.detached {
+                    await self.homepageViewModel.refreshData()
+                }
             }
-        }
 
-        if competitionEndAlertViewModel.shouldShowConfetti {
-            ConfettiOverlayView()
+            if competitionEndAlertViewModel.shouldShowConfetti {
+                ConfettiOverlayView()
+            }
         }
-        }
-        .alert(
-            competitionEndAlertViewModel.alertTitle,
+        .fullScreenCover(
             isPresented: Binding(
-                get: { competitionEndAlertViewModel.currentAlertCompetition != nil },
-                set: { if !$0 { competitionEndAlertViewModel.alertDismissed() } }
+                get: { competitionEndAlertViewModel.currentEndCompetition != nil },
+                set: { if !$0 { competitionEndAlertViewModel.dismissCurrent() } }
             )
         ) {
-            Button("OK") { competitionEndAlertViewModel.alertDismissed() }
-        } message: {
-            Text(competitionEndAlertViewModel.alertMessage)
+            CompetitionEndView(
+                viewModel: competitionEndAlertViewModel,
+                homepageSheetViewModel: homepageSheetViewModel
+            )
         }
+    }
+
+    // MARK: - Subviews
+
+    private var greetingRow: some View {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(homepageViewModel.greetingSubtitle)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color("InkMute"))
+
+                Text(homepageViewModel.greetingTitle)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundStyle(Color("Ink"))
+            }
+
+            Spacer()
+
+            Menu {
+                Button("Logout") {
+                    self.homepageViewModel.logout()
+                }
+                .accessibilityIdentifier("LogoutMenuButton")
+
+                Button("Settings") {
+                    self.homepageSheetViewModel.updateState(sheet: .settings, state: true)
+                }
+                .accessibilityIdentifier("SettingsMenuButton")
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color("Ink"))
+                    .frame(width: 40, height: 40)
+                    .background(Circle().fill(Color("Surface")))
+                    .overlay(Circle().strokeBorder(Color("Border"), lineWidth: 1))
+            }
+            .accessibilityIdentifier("SettingsMenu")
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder
+    private func sectionHeader(_ title: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 19, weight: .semibold))
+                .tracking(-0.02 * 19)
+                .foregroundStyle(Color("Ink"))
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 4)
+    }
+
+    private var healthDataMissing: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "heart.text.square")
+                .font(.system(size: 32))
+                .foregroundStyle(Color("InkMute"))
+
+            Text("We're having trouble reading your activity information. Please check permissions in iOS Settings > Privacy > Health > Fit w/ Friends.")
+                .font(.subheadline)
+                .foregroundStyle(Color("InkSoft"))
+                .multilineTextAlignment(.center)
+        }
+        .fwfCard()
+        .padding(.horizontal, 16)
+    }
+
+    private var noCompetitionsEmptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "trophy")
+                .font(.system(size: 48))
+                .foregroundStyle(Color("InkMute"))
+
+            Text("No competitions yet")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Color("Ink"))
+
+            Text("Create a competition and invite your friends to get started!")
+                .font(.subheadline)
+                .foregroundStyle(Color("InkSoft"))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .fwfCard()
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
     }
 }
 

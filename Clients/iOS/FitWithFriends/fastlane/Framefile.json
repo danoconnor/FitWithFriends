@@ -4,37 +4,44 @@
     "background": "./background.png",
     "title_below_image": false,
     "font": "Arial Bold.ttf",
-    "color": "#FFFFFF",
+    "color": "#16181D",
     "padding": 50
   },
   "data": [
     {
       "filter": "01_WelcomeScreen",
-      "title": { "text": "Compete. Move. Win." }
+      "title": { "text": "The group chat finally moves." },
+      "keyword": { "text": "Weekly fitness competitions with your friends — powered by Apple Watch." }
     },
     {
       "filter": "02_HomeScreen",
-      "title": { "text": "See how you stack up" }
+      "title": { "text": "One screen. Three rivalries." },
+      "keyword": { "text": "See where you stand in every competition — at a glance." }
     },
     {
       "filter": "03_CompetitionDetail",
-      "title": { "text": "Live leaderboard" }
+      "title": { "text": "Live leaderboards. Real bragging rights." },
+      "keyword": { "text": "Updates hourly. Your row stays pinned. Everyone sees who's gaining and who's slipping." }
     },
     {
       "filter": "03b_UserDailyDetails",
-      "title": { "text": "Day-by-day breakdown" }
+      "title": { "text": "See exactly how you stack up." },
+      "keyword": { "text": "Daily breakdowns. Move streaks. Personal records." }
     },
     {
       "filter": "04_CreateCompetition",
-      "title": { "text": "Start a challenge in seconds" }
+      "title": { "text": "Rings, steps, or workouts. Your rules." },
+      "keyword": { "text": "Most apps pick one. We let you pick the scoring rule that fits your group." }
     },
     {
       "filter": "05_ProUpgradeSheet",
-      "title": { "text": "Unlock public competitions" }
+      "title": { "text": "Make this actually competitive." },
+      "keyword": { "text": "Pro unlocks custom scoring, public leaderboards, and unlimited competitions." }
     },
     {
       "filter": "06_CompetitionEndAlert",
-      "title": { "text": "Celebrate every win" }
+      "title": { "text": "Make every week count." },
+      "keyword": { "text": "A real ending screen — not a system alert. Share the win, then demand a rematch." }
     }
   ]
 }

@@ -44,7 +44,7 @@ struct JoinCompetitionView: View {
                                 .font(.title3.weight(.semibold))
                         } icon: {
                             Image(systemName: "trophy.fill")
-                                .foregroundStyle(Color("FwFBrandingColor"))
+                                .foregroundStyle(Color("Brand"))
                         }
 
                         Label {

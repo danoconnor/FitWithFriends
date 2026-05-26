@@ -1,220 +1,334 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+:root {
+    --bg: #F6F4EF;
+    --bg-deep: #EFECE4;
+    --surface: #FFFFFF;
+    --surface-alt: #F1EEE6;
+    --ink: #16181D;
+    --ink-soft: #4B5160;
+    --ink-mute: #8A8F9C;
+    --ink-faint: #B7BBC4;
+    --brand: #2A3F7A;
+    --brand-hi: #3C5BBF;
+    --brand-soft: #E9ECF7;
+    --move: #FA114F;
+    --move-soft: #FFE6EC;
+    --exercise: #92E82A;
+    --exercise-soft: #EAF8D6;
+    --stand: #1EEAEF;
+    --sun: #F2A03E;
+    --border: rgba(22, 24, 29, 0.08);
+    --border-strong: rgba(22, 24, 29, 0.14);
+    --shadow-card: 0 1px 2px rgba(22, 24, 29, 0.04), 0 8px 24px rgba(22, 24, 29, 0.06);
+    --radius-card: 22px;
+    --radius-button: 16px;
 }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    background: #f0f2f5;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 24px 16px 48px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-a {
-    color: #007AFF;
-}
+a { color: inherit; text-decoration: none; }
 
-/* ── Join Competition Page ─────────────────────────── */
+/* ── Page layout ──────────────────────────────────── */
 
-.join-container {
+.page {
     width: 100%;
-    max-width: 420px;
-}
-
-.join-card {
-    background: #ffffff;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
-}
-
-/* Brand header */
-.app-brand {
-    background: linear-gradient(135deg, #007AFF 0%, #00C2FF 100%);
-    padding: 36px 24px 28px;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 16px 18px 32px;
     display: flex;
     flex-direction: column;
+    gap: 20px;
+}
+
+.wordmark {
+    display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    padding-top: 4px;
 }
 
-.app-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 18px;
+.wordmark-mark {
+    width: 32px; height: 32px;
+    background: var(--brand);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.brand-name {
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
+.wordmark-name {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+    flex: 1;
 }
 
-/* Invite section */
-.invite-section {
-    padding: 28px 24px 20px;
-    text-align: center;
+.skip-link {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--brand);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--brand-soft);
 }
 
-.invite-section h1 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #1c1c1e;
-    line-height: 1.3;
-    margin-bottom: 10px;
-}
-
-.invite-body {
-    font-size: 15px;
-    color: #6e6e73;
-    line-height: 1.5;
-}
-
-/* Feature list */
-.features {
-    padding: 8px 24px 24px;
+main {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 18px;
 }
 
-.feature-row {
+/* ── Tag + inviter ──────────────────────────────────── */
+
+.tag {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--brand);
+    background: var(--brand-soft);
+    padding: 5px 10px;
+    border-radius: 999px;
+    align-self: flex-start;
+}
+
+.inviter-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inviter-avatar {
+    width: 32px; height: 32px;
+    border-radius: 999px;
+    background: var(--brand);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.inviter-text {
+    font-size: 14px;
+    color: var(--ink-soft);
+}
+
+.inviter-text strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* ── Hero card ──────────────────────────────────── */
+
+.hero-card {
+    background: var(--surface);
+    border-radius: var(--radius-card);
+    padding: 22px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.hero-card-anonymous .hero-sub {
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.hero-name {
+    font-family: "Source Serif 4", "New York", Georgia, serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: -0.6px;
+    line-height: 1.05;
+    color: var(--ink);
+}
+
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    color: var(--ink-soft);
+}
+
+.chip-brand { color: var(--brand); background: var(--brand-soft); }
+.chip-public { color: var(--brand); background: var(--brand-soft); }
+.chip-private { color: var(--ink-soft); background: var(--surface-alt); }
+.chip-muted { color: var(--ink-mute); background: var(--surface-alt); }
+
+/* ── Members pile ──────────────────────────────────── */
+
+.members-pile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+.member-avatar, .member-extra {
+    width: 28px; height: 28px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    margin-right: -10px;
+    border: 2px solid var(--surface);
+    position: relative;
+    z-index: 1;
+}
+
+.member-extra {
+    background: var(--ink);
+    z-index: 0;
+}
+
+.members-label {
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-left: 16px;
+}
+
+/* ── Benefits ──────────────────────────────────── */
+
+.benefits {
+    background: var(--surface);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.benefit {
     display: flex;
     align-items: center;
     gap: 12px;
+    padding: 4px 6px;
 }
 
-.feature-icon {
-    width: 36px;
-    height: 36px;
-    background: #f0f2f5;
+.benefit-icon {
+    width: 36px; height: 36px;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    color: #007AFF;
 }
 
-.feature-text {
-    font-size: 15px;
-    color: #3a3a3c;
-    font-weight: 500;
-}
+.benefit-icon-brand    { background: var(--brand-soft); color: var(--brand); }
+.benefit-icon-exercise { background: var(--exercise-soft); color: #4f9b00; }
+.benefit-icon-move     { background: var(--move-soft); color: var(--move); }
 
-/* CTA section */
-.cta-section {
-    padding: 0 24px 32px;
+.benefit-text { display: flex; flex-direction: column; gap: 2px; }
+.benefit-text strong { font-size: 13px; font-weight: 600; color: var(--ink); }
+.benefit-text span   { font-size: 11.5px; color: var(--ink-soft); }
+
+/* ── CTA ──────────────────────────────────── */
+
+.cta-block {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    gap: 10px;
+    margin-top: 4px;
 }
 
-.appstore-btn {
+.cta-primary {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    width: 100%;
-    background: #000000;
-    color: #ffffff;
-    text-decoration: none;
-    padding: 16px 24px;
-    border-radius: 14px;
-    font-size: 17px;
+    background: var(--ink);
+    color: white;
+    padding: 16px 18px;
+    border-radius: var(--radius-button);
+    font-size: 16px;
     font-weight: 600;
-    letter-spacing: 0.2px;
     transition: opacity 0.15s ease;
 }
 
-.appstore-btn:hover {
-    opacity: 0.85;
-    color: #ffffff;
-}
+.cta-primary:hover { opacity: 0.88; }
+.cta-primary span { color: white; }
 
-.appstore-btn span {
-    color: #ffffff;
-}
-
-.already-have {
+.cta-secondary {
+    display: block;
     text-align: center;
-}
-
-.already-have p {
-    font-size: 14px;
-    color: #8e8e93;
-    margin-bottom: 4px;
-}
-
-.open-link {
-    font-size: 15px;
-    font-weight: 600;
-    color: #007AFF;
-    text-decoration: none;
-}
-
-.open-link:hover {
-    text-decoration: underline;
-}
-
-.privacy-link {
     font-size: 13px;
-    color: #8e8e93;
-    text-decoration: none;
+    font-weight: 600;
+    color: var(--brand);
+    padding: 8px;
 }
 
-.privacy-link:hover {
-    text-decoration: underline;
-}
-
-/* iOS-only blocking message */
-.ios-only-banner {
-    margin: 0 24px 32px;
-    background: #fff3cd;
-    border: 1px solid #f0c040;
-    border-radius: 14px;
-    padding: 20px;
+.ios-banner {
+    background: var(--brand-soft);
+    border-radius: var(--radius-card);
+    padding: 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     text-align: center;
-    color: #7a5800;
+    color: var(--ink);
 }
 
-.ios-only-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #7a5800;
+.ios-banner strong { font-size: 14px; font-weight: 600; }
+.ios-banner span   { font-size: 12.5px; color: var(--ink-soft); line-height: 1.4; }
+.ios-banner .cta-secondary { margin-top: 4px; }
+
+/* ── Footer ──────────────────────────────────── */
+
+.footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-mute);
+    padding-top: 6px;
 }
 
-.ios-only-body {
-    font-size: 14px;
-    color: #7a5800;
-    line-height: 1.5;
-}
-
-/* ── Legacy pages ──────────────────────────────────── */
+/* ── Legacy pages (kept for /support, /privacyPolicy, /) ──────── */
 
 .primary-button {
-    background: #000000;
+    background: var(--ink);
     color: #ffffff;
-    padding: 1vh;
-    border-radius: 1vh;
+    padding: 12px 18px;
+    border-radius: 14px;
     text-decoration: none;
-    font-size: 3vh;
+    font-size: 18px;
+    font-weight: 600;
+    display: inline-block;
 }
 
 h1 {
-    font-size: 5vh;
+    font-family: "Source Serif 4", "New York", Georgia, serif;
+    font-size: 36px;
+    font-weight: 400;
+    letter-spacing: -0.6px;
+    line-height: 1.1;
 }
 
-p {
-    font-size: 1vh;
-}
+p { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }

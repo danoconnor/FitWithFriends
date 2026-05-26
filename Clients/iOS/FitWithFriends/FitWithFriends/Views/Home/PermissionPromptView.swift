@@ -44,7 +44,7 @@ struct PermissionPromptView: View {
 
                             FWFFeatureRow(
                                 icon: "lock.fill",
-                                color: Color("FwFBrandingColor"),
+                                color: Color("Brand"),
                                 title: "Your Privacy",
                                 description: "We take your privacy seriously and do not share your data with any 3rd parties or advertisers. Only you and the people in your competition group will have access."
                             )

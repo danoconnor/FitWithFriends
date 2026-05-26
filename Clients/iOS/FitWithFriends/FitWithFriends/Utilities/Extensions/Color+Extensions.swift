@@ -64,4 +64,32 @@ extension Color {
     static let systemRed = Color(UIColor.systemRed)
     static let systemTeal = Color(UIColor.systemTeal)
     static let systemIndigo = Color(UIColor.systemIndigo)
+
+    /// Build a Color from a hex string. Accepts "RRGGBB", "#RRGGBB", or "AARRGGBB".
+    /// Used by the design-system palette (e.g. FWFAvatar's deterministic color list).
+    init(hex: String) {
+        var sanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if sanitized.hasPrefix("#") { sanitized.removeFirst() }
+
+        var value: UInt64 = 0
+        Scanner(string: sanitized).scanHexInt64(&value)
+
+        let a, r, g, b: Double
+        switch sanitized.count {
+        case 6:
+            a = 1.0
+            r = Double((value >> 16) & 0xFF) / 255.0
+            g = Double((value >> 8) & 0xFF) / 255.0
+            b = Double(value & 0xFF) / 255.0
+        case 8:
+            a = Double((value >> 24) & 0xFF) / 255.0
+            r = Double((value >> 16) & 0xFF) / 255.0
+            g = Double((value >> 8) & 0xFF) / 255.0
+            b = Double(value & 0xFF) / 255.0
+        default:
+            a = 1.0; r = 0; g = 0; b = 0
+        }
+
+        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
+    }
 }
