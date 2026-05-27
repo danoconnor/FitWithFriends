@@ -48,6 +48,8 @@ struct WelcomeView: View {
                     .padding(.bottom, 32)
             }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("welcomeScreen")
         .animation(.spring(duration: 0.4), value: viewModel.loginState.isFailed)
         .sheet(item: $viewModel.sheetToDisplay, onDismiss: {
             viewModel.dismissSheet()

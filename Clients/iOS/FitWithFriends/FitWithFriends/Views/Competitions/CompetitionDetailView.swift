@@ -34,6 +34,13 @@ struct CompetitionDetailView: View {
                 Color("Bg").ignoresSafeArea()
 
                 ScrollView {
+                    // Hidden accessibility marker so UI tests can confirm the detail
+                    // sheet finished presenting (the redesigned floating chrome doesn't
+                    // use a native navigation bar title we could match against).
+                    Text("competitionDetailScreen")
+                        .frame(width: 0, height: 0)
+                        .opacity(0.001)
+                        .accessibilityIdentifier("competitionDetailScreen")
                     VStack(spacing: 16) {
                         Spacer().frame(height: 56)  // room for floating chrome
 

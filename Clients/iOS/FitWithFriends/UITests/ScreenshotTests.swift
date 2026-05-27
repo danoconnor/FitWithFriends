@@ -9,13 +9,17 @@
 import XCTest
 
 final class ScreenshotTests: FWFUITestBase {
+    private var homeScreen: XCUIElement { app.otherElements["homeScreen"] }
+    private var welcomeScreen: XCUIElement { app.otherElements["welcomeScreen"] }
+    private var competitionDetailScreen: XCUIElement { app.staticTexts["competitionDetailScreen"] }
+    private var competitionEndScreen: XCUIElement { app.staticTexts["competitionEndScreen"] }
+    private var createWizard: XCUIElement { app.otherElements["createWizard"] }
 
     /// 01 — Welcome / sign-in screen
     func test01_WelcomeScreen() {
         launchApp(loggedIn: false)
 
-        XCTAssertTrue(app.staticTexts["Fit With Friends"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Compete. Move. Win."].exists)
+        XCTAssertTrue(welcomeScreen.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["signInButton"].waitForExistence(timeout: 3))
 
         snapshot("01_WelcomeScreen")
@@ -31,7 +35,7 @@ final class ScreenshotTests: FWFUITestBase {
 
         launchApp(loggedIn: true, isPro: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Move More, Win More"].waitForExistence(timeout: 10))
 
         snapshot("02_HomeScreen")
@@ -47,12 +51,12 @@ final class ScreenshotTests: FWFUITestBase {
 
         launchApp(loggedIn: true, isPro: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Move More, Win More"]
         XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
         competitionText.tap()
 
-        XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
+        XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
 
         snapshot("03_CompetitionDetail")
     }
@@ -83,12 +87,12 @@ final class ScreenshotTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Move More, Win More"]
         XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
         competitionText.tap()
 
-        XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
+        XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
 
         // Tap on Alice Chen — scope to the leaderboard in the detail sheet to avoid
         // matching the home screen leaderboard visible behind the modal
@@ -98,23 +102,28 @@ final class ScreenshotTests: FWFUITestBase {
         XCTAssertTrue(userRow.waitForExistence(timeout: 5))
         userRow.tap()
 
-        // Wait for the daily details to load
-        XCTAssertTrue(app.staticTexts["total points"].waitForExistence(timeout: 10))
+        // Wait for the daily details to load — uses an inline navigation title.
+        XCTAssertTrue(app.navigationBars["Alice Chen"].waitForExistence(timeout: 10))
 
         snapshot("03b_UserDailyDetails")
     }
 
-    /// 04 — Create competition sheet with name filled in
+    /// 04 — Create competition wizard with name filled in (Step 2)
     func test04_CreateCompetition() throws {
         launchApp(loggedIn: true, isPro: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        let newCompButton = app.buttons["New Competition"]
+        let newCompButton = app.buttons["createCompetitionButton"]
         XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
         newCompButton.tap()
 
-        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+        XCTAssertTrue(createWizard.waitForExistence(timeout: 5))
+
+        // Skip the templates step
+        let startBlank = app.buttons["createWizardStartBlank"]
+        XCTAssertTrue(startBlank.waitForExistence(timeout: 3))
+        startBlank.tap()
 
         let nameField = app.textFields["e.g., January Challenge"]
         XCTAssertTrue(nameField.waitForExistence(timeout: 3))
@@ -131,20 +140,21 @@ final class ScreenshotTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Community Run"].waitForExistence(timeout: 10))
 
         let upgradeButton = app.buttons["Upgrade to Pro"].firstMatch
         XCTAssertTrue(upgradeButton.waitForExistence(timeout: 5))
         upgradeButton.tap()
 
-        // SubscriptionStoreView provides its own Close button — verify the sheet appeared
+        // Custom Pro view exposes a "Close" button via accessibility label on the
+        // "Maybe later" pill — verify the sheet appeared.
         XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 5))
 
         snapshot("05_ProUpgradeSheet")
     }
 
-    /// 06 — Competition end alert with confetti (1st place finish)
+    /// 06 — Competition end view with confetti (1st place finish)
     func test06_CompetitionEndAlert() throws {
         let competitionId = try createCompetitionForScreenshots(name: "Move More, Win More")
         let seededUserIds = try seedCompetitionWithUsers(competitionId: competitionId)
@@ -164,10 +174,10 @@ final class ScreenshotTests: FWFUITestBase {
 
         launchApp(loggedIn: true, isPro: true)
 
-        // The view model starts confetti 0.8 s before showing the alert, so particles
-        // are already in motion when the dim overlay appears. Snapshot while the alert
-        // is visible — this is exactly what a user sees on their device.
-        XCTAssertTrue(app.staticTexts["Move More, Win More has ended!"].waitForExistence(timeout: 10))
+        // The redesign replaces the old `.alert(...)` with a full-screen cover
+        // containing the variant-specific celebration. Confetti is already in
+        // motion when the cover appears.
+        XCTAssertTrue(competitionEndScreen.waitForExistence(timeout: 30))
 
         snapshot("06_CompetitionEndAlert")
     }

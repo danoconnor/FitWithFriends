@@ -8,11 +8,15 @@
 import XCTest
 
 final class AboutScreenTests: FWFUITestBase {
+    private var homeScreen: XCUIElement {
+        app.otherElements["homeScreen"]
+    }
+
     func testAboutScreen() {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load — allow extra time in CI where app launch is slow
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
 
         navigateToSettings()
 
@@ -25,7 +29,7 @@ final class AboutScreenTests: FWFUITestBase {
 
     func testSettingsShowsRestorePurchasesButton() {
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
 
         navigateToSettings()
 
@@ -35,7 +39,7 @@ final class AboutScreenTests: FWFUITestBase {
 
     func testRestorePurchasesShowsSuccessAlert() {
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
 
         navigateToSettings()
 

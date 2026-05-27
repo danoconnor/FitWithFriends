@@ -95,6 +95,7 @@ struct LoggedInContentView: View {
                         FWFSecondaryButton("Start a new competition", icon: "plus") {
                             homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
                         }
+                        .accessibilityIdentifier("createCompetitionButton")
                         .padding(.horizontal, 16)
                         .padding(.top, 4)
                         .padding(.bottom, 24)
@@ -219,6 +220,8 @@ struct LoggedInContentView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("homeScreen")
     }
 
     @ViewBuilder

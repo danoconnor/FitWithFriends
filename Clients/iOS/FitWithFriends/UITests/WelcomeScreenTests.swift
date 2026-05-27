@@ -12,12 +12,19 @@ final class WelcomeScreenTests: FWFUITestBase {
         app.buttons["signInButton"]
     }
 
+    /// Stable handle for "welcome screen is presented" — the editorial copy may change
+    /// across the redesign, so prefer the accessibility identifier over text matching.
+    private var welcomeScreen: XCUIElement {
+        app.otherElements["welcomeScreen"]
+    }
+
     func testWelcomeScreenAppearance() {
         launchApp(loggedIn: false)
 
-        // Verify welcome screen elements
-        XCTAssertTrue(app.staticTexts["Fit With Friends"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Compete. Move. Win."].exists)
+        // Verify welcome screen is presented
+        XCTAssertTrue(welcomeScreen.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["FitWithFriends"].exists,
+                      "Welcome wordmark should be visible")
 
         // The Sign In with Apple button should be present
         XCTAssertTrue(signInButton.waitForExistence(timeout: 3))
@@ -49,8 +56,8 @@ final class WelcomeScreenTests: FWFUITestBase {
         signInButton.tap()
 
         // After successful login the welcome screen is replaced by the home screen
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-        XCTAssertFalse(app.staticTexts["Compete. Move. Win."].exists)
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
+        XCTAssertFalse(welcomeScreen.exists)
 
         takeScreenshot(name: "03_LoginSuccess")
     }

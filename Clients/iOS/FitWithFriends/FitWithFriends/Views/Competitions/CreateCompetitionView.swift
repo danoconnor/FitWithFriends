@@ -59,6 +59,8 @@ struct CreateCompetitionView: View {
                                         removal: .move(edge: .leading).combined(with: .opacity)))
             }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("createWizard")
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showingProUpgrade) {
             ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
@@ -144,6 +146,7 @@ struct CreateTemplatesStep: View {
                     FWFSecondaryButton("Start blank", icon: "square.and.pencil") {
                         viewModel.startBlank()
                     }
+                    .accessibilityIdentifier("createWizardStartBlank")
                     .padding(.top, 4)
 
                     smartTip
@@ -389,6 +392,7 @@ struct CreateScoringStep: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("scoringMode_\(label)")
     }
 
     // Rings mode
@@ -690,6 +694,8 @@ struct CreateScoringStep: View {
                             .background(Capsule().stroke(Color("Border"), lineWidth: 1))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("workoutTypesPickerButton")
+                    .accessibilityLabel("Workout types")
                 }
             }
             .fwfCard(padding: 14)
@@ -772,10 +778,14 @@ struct CreateScoringStep: View {
     private var submitButton: some View {
         if viewModel.requiresProUserMissing {
             FWFPrimaryButton("Start Pro · $19.99/yr") { onShowProUpgrade() }
+                .accessibilityIdentifier("createCompetitionProUpgradeButton")
+                .accessibilityLabel("Upgrade to Pro")
         } else {
             FWFPrimaryButton(viewModel.state == .inProgress ? "Creating…" : "Create competition") {
                 viewModel.createCompetition()
             }
+            .accessibilityIdentifier("createCompetitionSubmitButton")
+            .accessibilityLabel("Create")
             .disabled(!viewModel.canSubmit || viewModel.state == .inProgress)
             .opacity(viewModel.canSubmit ? 1.0 : 0.55)
         }

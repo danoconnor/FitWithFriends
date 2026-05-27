@@ -27,6 +27,7 @@ struct CompetitionEndView: View {
                     FWFTag(text: "Competition complete",
                            color: Color("Brand"),
                            background: Color("BrandSoft"))
+                        .accessibilityIdentifier("competitionEndScreen")
                         .padding(.top, 24)
 
                     headline
@@ -65,6 +66,8 @@ struct CompetitionEndView: View {
                             .shadow(color: Color("Ink").opacity(0.1), radius: 6, x: 0, y: 2)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("competitionEndDismiss")
+                    .accessibilityLabel("OK")
                     .padding(16)
                 }
                 Spacer()

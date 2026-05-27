@@ -71,6 +71,8 @@ struct ProUpgradeView: View {
                     .background(Capsule().fill(Color("SurfaceAlt")))
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("proUpgradeDismiss")
+            .accessibilityLabel("Close")
         }
     }
 
