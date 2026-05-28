@@ -14,18 +14,30 @@ import SwiftUI
 // MARK: - Card Modifier
 
 struct FWFCardModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
     var padding: CGFloat = 16
     var cornerRadius: CGFloat = 22
 
     func body(content: Content) -> some View {
-        content
+        // Dark mode: drop shadows on dark surfaces are invisible, so add a
+        // 1pt Border overlay as the elevation cue instead.
+        let isDark = colorScheme == .dark
+
+        return content
             .padding(padding)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(Color("Surface"))
             )
-            .shadow(color: Color("Ink").opacity(0.06), radius: 24, x: 0, y: 8)
-            .shadow(color: Color("Ink").opacity(0.04), radius: 2, x: 0, y: 1)
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(Color("Border"), lineWidth: isDark ? 1 : 0)
+            )
+            .shadow(color: .black.opacity(isDark ? 0.30 : 0.06),
+                    radius: isDark ? 16 : 24, x: 0, y: 8)
+            .shadow(color: .black.opacity(isDark ? 0.00 : 0.04),
+                    radius: 2, x: 0, y: 1)
     }
 }
 
@@ -160,7 +172,9 @@ struct FWFPrimaryButton: View {
                 Text(title)
                     .font(.system(size: 16, weight: .semibold))
             }
-            .foregroundStyle(.white)
+            // BgDeep is near-white in light mode and near-black in dark, so it
+            // inverts cleanly with Ink (the button background) in both modes.
+            .foregroundStyle(Color("BgDeep"))
             .frame(maxWidth: .infinity)
             .frame(height: 54)
             .background(

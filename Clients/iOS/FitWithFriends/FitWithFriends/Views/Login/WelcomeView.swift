@@ -129,7 +129,8 @@ struct WelcomeView: View {
                         Text("Sign in with Apple")
                             .font(.system(size: 16, weight: .semibold))
                     }
-                    .foregroundStyle(.white)
+                    // BgDeep inverts with Ink in both modes — see FWFPrimaryButton.
+                    .foregroundStyle(Color("BgDeep"))
                     .frame(maxWidth: .infinity)
                     .frame(height: 54)
                     .background(

@@ -10,7 +10,6 @@
 import SwiftUI
 
 struct ProUpgradeView: View {
-    @ObservedObject private var homepageSheetViewModel: HomepageSheetViewModel
     private let subscriptionManager: ISubscriptionManager
     private let serverEnvironmentManager: IServerEnvironmentManager
 
@@ -18,10 +17,14 @@ struct ProUpgradeView: View {
     @State private var restoreInProgress: Bool = false
     @State private var errorMessage: String?
 
-    init(homepageSheetViewModel: HomepageSheetViewModel,
-         subscriptionManager: ISubscriptionManager,
+    /// Use SwiftUI's environment dismiss action so this view can be presented from
+    /// any sheet (the homepage one or a nested sheet inside Settings/Create) and
+    /// close itself cleanly. The presenting sheet's onDismiss handler is responsible
+    /// for clearing any side-channel state (e.g. HomepageSheetViewModel.sheetToShow).
+    @Environment(\.dismiss) private var dismiss
+
+    init(subscriptionManager: ISubscriptionManager,
          serverEnvironmentManager: IServerEnvironmentManager) {
-        self.homepageSheetViewModel = homepageSheetViewModel
         self.subscriptionManager = subscriptionManager
         self.serverEnvironmentManager = serverEnvironmentManager
     }
@@ -61,7 +64,7 @@ struct ProUpgradeView: View {
         HStack {
             Spacer()
             Button {
-                homepageSheetViewModel.dismissCurrentSheet()
+                dismiss()
             } label: {
                 Text("Maybe later")
                     .font(.system(size: 12, weight: .semibold))
@@ -201,7 +204,7 @@ struct ProUpgradeView: View {
         defer { purchaseInProgress = false }
         do {
             try await subscriptionManager.purchaseProSubscription()
-            homepageSheetViewModel.dismissCurrentSheet()
+            dismiss()
         } catch SubscriptionError.userCancelled {
             // User cancelled — no surface needed.
         } catch {
@@ -217,7 +220,7 @@ struct ProUpgradeView: View {
         do {
             try await subscriptionManager.restorePurchases()
             if subscriptionManager.isUserPro {
-                homepageSheetViewModel.dismissCurrentSheet()
+                dismiss()
             } else {
                 errorMessage = "We couldn't find an active Pro subscription on this Apple ID."
             }

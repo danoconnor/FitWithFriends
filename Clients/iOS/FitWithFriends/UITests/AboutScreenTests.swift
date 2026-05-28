@@ -12,6 +12,13 @@ final class AboutScreenTests: FWFUITestBase {
         app.otherElements["homeScreen"]
     }
 
+    /// The redesigned Settings screen uses a custom title block ("Settings" rendered
+    /// at 40pt serif) rather than a system navigation title. Test for the title
+    /// staticText to confirm Settings is presented.
+    private var settingsTitle: XCUIElement {
+        app.staticTexts["Settings"]
+    }
+
     func testAboutScreen() {
         launchApp(loggedIn: true)
 
@@ -21,7 +28,8 @@ final class AboutScreenTests: FWFUITestBase {
         navigateToSettings()
 
         // Verify the settings screen
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsTitle.waitForExistence(timeout: 5))
+        // Footer always renders the version row
         XCTAssertTrue(app.staticTexts["Version"].exists)
 
         takeScreenshot(name: "06_SettingsScreen")
@@ -33,7 +41,7 @@ final class AboutScreenTests: FWFUITestBase {
 
         navigateToSettings()
 
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsTitle.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["RestorePurchasesButton"].waitForExistence(timeout: 5))
     }
 
@@ -43,7 +51,7 @@ final class AboutScreenTests: FWFUITestBase {
 
         navigateToSettings()
 
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsTitle.waitForExistence(timeout: 5))
 
         let restoreButton = app.buttons["RestorePurchasesButton"]
         XCTAssertTrue(restoreButton.waitForExistence(timeout: 5))

@@ -119,6 +119,28 @@ public class HomepageViewModel: ObservableObject {
         return nil
     }
 
+    /// Full display name for the Settings account header. Derived the same way
+    /// as `firstName` — first + last from the competition roster when the user
+    /// is in one. Falls back to nil when no roster data is available.
+    var displayName: String? {
+        guard let userId = authenticationManager.loggedInUserId,
+              let competitions = currentCompetitions else { return nil }
+        for comp in competitions {
+            if let me = comp.currentResults.first(where: { $0.userId == userId }) {
+                let trimmed = me.displayName.trimmingCharacters(in: .whitespaces)
+                return trimmed.isEmpty ? nil : trimmed
+            }
+        }
+        return nil
+    }
+
+    /// One-line subtitle under the display name in the Settings account header.
+    /// We don't have a `createdAt` field on User today, so fall back to the
+    /// Apple Sign-In acknowledgement alone — the brief explicitly allows this.
+    var memberSinceLabel: String {
+        return "Signed in with Apple"
+    }
+
     /// e.g. "Good morning, Jordan" — falls back to "Good morning" when the name
     /// isn't known yet (first launch, no competitions joined).
     var greetingTitle: String {

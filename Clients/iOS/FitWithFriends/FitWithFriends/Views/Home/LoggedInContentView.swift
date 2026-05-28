@@ -139,10 +139,12 @@ struct LoggedInContentView: View {
                             SettingsView(emailUtility: objectGraph.emailUtility,
                                          serverEnvironmentManager: objectGraph.serverEnvironmentManager,
                                          subscriptionManager: objectGraph.subscriptionManager,
-                                         onDeleteAccount: { return await homepageViewModel.deleteAccount() })
+                                         displayName: homepageViewModel.displayName,
+                                         memberSinceLabel: homepageViewModel.memberSinceLabel,
+                                         onDeleteAccount: { return await homepageViewModel.deleteAccount() },
+                                         onSignOut: { homepageViewModel.logout() })
                         case .proUpgrade:
-                            ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
-                                           subscriptionManager: objectGraph.subscriptionManager,
+                            ProUpgradeView(subscriptionManager: objectGraph.subscriptionManager,
                                            serverEnvironmentManager: objectGraph.serverEnvironmentManager)
                         default:
                             Text("Unknown sheet type: \(homepageSheetViewModel.sheetToShow.rawValue)")

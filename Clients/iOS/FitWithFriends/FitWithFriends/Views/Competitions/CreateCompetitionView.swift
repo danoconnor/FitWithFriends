@@ -63,8 +63,7 @@ struct CreateCompetitionView: View {
         .accessibilityIdentifier("createWizard")
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showingProUpgrade) {
-            ProUpgradeView(homepageSheetViewModel: homepageSheetViewModel,
-                           subscriptionManager: subscriptionManager,
+            ProUpgradeView(subscriptionManager: subscriptionManager,
                            serverEnvironmentManager: serverEnvironmentManager)
         }
     }
