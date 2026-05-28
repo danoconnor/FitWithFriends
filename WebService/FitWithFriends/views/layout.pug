@@ -3,6 +3,11 @@ html
   head
     title= title
     meta(name='viewport' content='width=device-width, initial-scale=1')
+    //- Editorial serif fallback for the hero headline. New York is iOS-only so
+    //- the web pages use Source Serif 4 as the closest free Apple-flavored serif.
+    link(rel='preconnect' href='https://fonts.googleapis.com')
+    link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin)
+    link(rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;1,400&display=swap')
     link(rel='stylesheet', href='/stylesheets/main.css')
   body
     block content

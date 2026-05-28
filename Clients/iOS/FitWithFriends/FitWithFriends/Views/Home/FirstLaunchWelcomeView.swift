@@ -18,8 +18,8 @@ struct FirstLaunchWelcomeView: View {
                     ZStack {
                         LinearGradient(
                             colors: [
-                                Color("FwFBrandingColor"),
-                                Color("FwFBrandingColor").opacity(0.7)
+                                Color("Brand"),
+                                Color("Brand").opacity(0.7)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -44,7 +44,7 @@ struct FirstLaunchWelcomeView: View {
 
                         FWFFeatureRow(
                             icon: "applewatch",
-                            color: Color("FwFBrandingColor"),
+                            color: Color("Brand"),
                             title: "Apple Watch Required",
                             description: "You'll need an Apple Watch to participate. Wear it throughout the day so your move, exercise, and stand rings progress."
                         )

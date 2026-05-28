@@ -1,5 +1,5 @@
 //
-//  CompetitionDetailView.swift
+//  CompetitionOverviewView.swift
 //  FitWithFriends
 //
 //  Created by Dan O'Connor on 1/23/22.
@@ -31,179 +31,12 @@ struct CompetitionOverviewView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header: title + menu
-            HStack(alignment: .top) {
-                // Tappable title with chevron
-                Button {
-                    if !showAllDetails {
-                        homepageSheetViewModel.updateState(sheet: .competitionDetails,
-                                                           state: true,
-                                                           contextData: competitionOverview)
-                    }
-                } label: {
-                    HStack(spacing: 6) {
-                        Text(viewModel.competitionName)
-                            .font(.title2.weight(.semibold))
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.leading)
-
-                        if competitionOverview.isPublic {
-                            Label("Public", systemImage: "globe")
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(Color("FwFBrandingColor"))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Capsule().fill(Color("FwFBrandingColor").opacity(0.12)))
-                        } else {
-                            Label("Private", systemImage: "lock.fill")
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Capsule().fill(Color(.tertiarySystemFill)))
-                        }
-
-                        if !showAllDetails {
-                            Image(systemName: "chevron.right")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.tertiary)
-                        }
-                    }
-                }
-                .buttonStyle(.plain)
-
-                Spacer()
-
-                // Action menu
-                Menu {
-                    ForEach(viewModel.availableActions.sorted(), id: \.self) { action in
-                        Button(action.description) {
-                            self.actionInProgress = true
-                            Task.detached {
-                                await self.viewModel.performAction(action)
-
-                                await MainActor.run {
-                                    self.actionInProgress = false
-                                }
-                            }
-                        }
-                        .disabled(actionInProgress)
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 36, height: 36)
-                        .background(
-                            Circle()
-                                .fill(Color(.tertiarySystemFill))
-                        )
-                }
-            }
-
-            // Metadata: position pill + visibility badge + dates
-            HStack(spacing: 10) {
-                Text(viewModel.userPositionDescription)
-                    .font(.subheadline.weight(.medium))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .fill(Color("FwFBrandingColor").opacity(0.12))
-                    )
-
-                Spacer()
-
-                HStack(spacing: 4) {
-                    Image(systemName: "calendar")
-                        .font(.caption)
-                    Text(viewModel.competitionDatesDescription)
-                        .font(.caption)
-                }
-                .foregroundStyle(.secondary)
-            }
-
-            Divider()
-
-            // Scoring rule summary — only show in the detail sheet to keep the homepage card compact.
+        Group {
             if showAllDetails {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Scoring")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    Text(competitionOverview.scoringRules.humanReadableDescription)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(.vertical, 4)
-
-                Divider()
+                detailCard
+            } else {
+                homeCard
             }
-
-            // Leaderboard
-            VStack(spacing: 2) {
-                ForEach(0 ..< viewModel.results.count, id: \.self) { position in
-                    let result = viewModel.results[position]
-
-                    if showAllDetails {
-                        // Inside the detail sheet: use NavigationLink to push within the existing NavigationView
-                        NavigationLink {
-                            UserCompetitionDailyDetailsView(
-                                competitionId: competitionOverview.competitionId,
-                                userId: result.userCompetitionPoints.userId,
-                                userName: result.userCompetitionPoints.displayName,
-                                objectGraph: objectGraph)
-                        } label: {
-                            UserCompetitionResultView(result: result,
-                                                      isCompetitionActive: viewModel.isCompetitionActive,
-                                                      scoringUnit: competitionOverview.scoringUnit)
-                        }
-                        .buttonStyle(.plain)
-                        .contextMenu {
-                            let availableActions = self.viewModel.getUserContextMenuActions(for: result.userCompetitionPoints.userId)
-
-                            ForEach(availableActions, id: \.self) { action in
-                                Button(action.description) {
-                                    Task.detached {
-                                        await self.viewModel.performAction(action)
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        // On the homepage: open user details as a sheet
-                        Button {
-                            homepageSheetViewModel.updateState(
-                                sheet: .userDetails,
-                                state: true,
-                                contextData: UserDetailsSheetContext(
-                                    competitionId: competitionOverview.competitionId,
-                                    userId: result.userCompetitionPoints.userId,
-                                    userName: result.userCompetitionPoints.displayName))
-                        } label: {
-                            UserCompetitionResultView(result: result,
-                                                      isCompetitionActive: viewModel.isCompetitionActive,
-                                                      scoringUnit: competitionOverview.scoringUnit)
-                        }
-                        .buttonStyle(.plain)
-                        .contextMenu {
-                            let availableActions = self.viewModel.getUserContextMenuActions(for: result.userCompetitionPoints.userId)
-
-                            ForEach(availableActions, id: \.self) { action in
-                                Button(action.description) {
-                                    Task.detached {
-                                        await self.viewModel.performAction(action)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .accessibilityElement(children: .contain)
-            .accessibilityIdentifier(showAllDetails ? "competitionLeaderboard" : "")
         }
         .sheet(isPresented: $viewModel.shouldShowSheet, content: {
             if let shareUrl = viewModel.shareUrl {
@@ -221,37 +54,279 @@ struct CompetitionOverviewView: View {
             Text("This will permanently delete the competition for all users.")
         }
     }
+
+    // MARK: - Home card (compact, rank-as-hero)
+
+    private var homeCard: some View {
+        Button {
+            homepageSheetViewModel.updateState(sheet: .competitionDetails,
+                                               state: true,
+                                               contextData: competitionOverview)
+        } label: {
+            VStack(alignment: .leading, spacing: 14) {
+                // Header: chips + menu
+                HStack(spacing: 8) {
+                    visibilityChip
+                    scoringChip
+                    Spacer()
+                    menuButton
+                }
+
+                // Competition name (serif)
+                Text(viewModel.competitionName)
+                    .font(.system(size: 24, weight: .regular, design: .serif))
+                    .foregroundStyle(Color("Ink"))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+
+                // Rank-as-hero row + today delta
+                HStack(alignment: .firstTextBaseline) {
+                    rankBlock
+                    Spacer()
+                    todayDeltaBlock
+                }
+
+                // Status line: leader + days left
+                HStack(spacing: 8) {
+                    if let leader = viewModel.leaderStatus {
+                        FWFAvatar(name: leader.name, size: 22)
+                        Text("**\(leader.name)** \(leader.relation)")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color("InkSoft"))
+                            .lineLimit(1)
+                    } else if viewModel.userRank == 1 {
+                        Text("You're in the lead 🏆")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color("Brand"))
+                    } else {
+                        Text(viewModel.userPositionDescription)
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color("InkSoft"))
+                    }
+
+                    Spacer(minLength: 8)
+
+                    if viewModel.daysLeft > 0 {
+                        Text("\(viewModel.daysLeft)d left")
+                            .font(.system(size: 11, weight: .semibold))
+                            .monospacedDigit()
+                            .foregroundStyle(viewModel.daysLeft <= 2 ? Color("Move") : Color("InkMute"))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule().fill(
+                                    viewModel.daysLeft <= 2 ? Color("MoveSoft") : Color("SurfaceAlt")
+                                )
+                            )
+                    }
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Detail card (showAllDetails == true)
+    // Used inside CompetitionDetailView. Keeps the leaderboard list — the detail
+    // screen itself layers a hero + standing card above this.
+
+    private var detailCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                visibilityChip
+                scoringChip
+                Spacer()
+                menuButton
+            }
+
+            Text(viewModel.competitionName)
+                .font(.system(size: 22, weight: .regular, design: .serif))
+                .foregroundStyle(Color("Ink"))
+
+            HStack {
+                Text(viewModel.userPositionDescription)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color("Brand"))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(Color("BrandSoft")))
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Image(systemName: "calendar").font(.caption)
+                    Text(viewModel.competitionDatesDescription).font(.caption)
+                }
+                .foregroundStyle(Color("InkMute"))
+            }
+
+            Divider().background(Color("Border"))
+
+            // Scoring rule blurb
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Scoring")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color("InkMute"))
+                Text(competitionOverview.scoringRules.humanReadableDescription)
+                    .font(.caption)
+                    .foregroundStyle(Color("InkSoft"))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.vertical, 4)
+
+            Divider().background(Color("Border"))
+
+            // Leaderboard
+            VStack(spacing: 6) {
+                ForEach(0 ..< viewModel.results.count, id: \.self) { position in
+                    let result = viewModel.results[position]
+                    NavigationLink {
+                        UserCompetitionDailyDetailsView(
+                            competitionId: competitionOverview.competitionId,
+                            userId: result.userCompetitionPoints.userId,
+                            userName: result.userCompetitionPoints.displayName,
+                            objectGraph: objectGraph)
+                    } label: {
+                        UserCompetitionResultView(result: result,
+                                                  isCompetitionActive: viewModel.isCompetitionActive,
+                                                  scoringUnit: competitionOverview.scoringUnit)
+                    }
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        let availableActions = self.viewModel.getUserContextMenuActions(for: result.userCompetitionPoints.userId)
+                        ForEach(availableActions, id: \.self) { action in
+                            Button(action.description) {
+                                Task.detached { await self.viewModel.performAction(action) }
+                            }
+                        }
+                    }
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("competitionLeaderboard")
+        }
+    }
+
+    // MARK: - Building blocks
+
+    private var visibilityChip: some View {
+        HStack(spacing: 4) {
+            Image(systemName: competitionOverview.isPublic ? "globe" : "lock.fill")
+                .font(.system(size: 10, weight: .semibold))
+            Text(competitionOverview.isPublic ? "Public" : "Private")
+                .font(.system(size: 10.5, weight: .semibold))
+                .tracking(0.6)
+        }
+        .foregroundStyle(competitionOverview.isPublic ? Color("Brand") : Color("InkMute"))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule().fill(competitionOverview.isPublic ? Color("BrandSoft") : Color("SurfaceAlt"))
+        )
+    }
+
+    private var scoringChip: some View {
+        HStack(spacing: 4) {
+            Image(systemName: viewModel.scoringRuleChipIcon)
+                .font(.system(size: 10, weight: .semibold))
+            Text(viewModel.scoringRuleChipLabel)
+                .font(.system(size: 10.5, weight: .semibold))
+                .tracking(0.6)
+        }
+        .foregroundStyle(viewModel.scoringRuleChipColor)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule().fill(viewModel.scoringRuleChipColor.opacity(0.12))
+        )
+    }
+
+    private var menuButton: some View {
+        Menu {
+            ForEach(viewModel.availableActions.sorted(), id: \.self) { action in
+                Button(action.description) {
+                    self.actionInProgress = true
+                    Task.detached {
+                        await self.viewModel.performAction(action)
+                        await MainActor.run { self.actionInProgress = false }
+                    }
+                }
+                .disabled(actionInProgress)
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color("InkSoft"))
+                .frame(width: 32, height: 32)
+                .background(Circle().fill(Color("SurfaceAlt")))
+        }
+    }
+
+    @ViewBuilder
+    private var rankBlock: some View {
+        if let ordinal = viewModel.userRankOrdinal, viewModel.totalParticipants > 0 {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(ordinal)
+                    .font(.system(size: 40, weight: .bold))
+                    .monospacedDigit()
+                    .tracking(-0.02 * 40)
+                    .foregroundStyle(viewModel.medalColor ?? Color("Ink"))
+                Text("of \(viewModel.totalParticipants)")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Color("InkMute"))
+            }
+        } else {
+            Text(viewModel.userPositionDescription)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Color("InkSoft"))
+        }
+    }
+
+    @ViewBuilder
+    private var todayDeltaBlock: some View {
+        if let delta = viewModel.todayDelta {
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(delta.value)
+                    .font(.system(size: 22, weight: .bold))
+                    .monospacedDigit()
+                    .foregroundStyle(delta.color)
+                Text(delta.unit)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Color("InkMute"))
+            }
+        }
+    }
 }
 
 struct CompetitionOverviewView_Previews: PreviewProvider {
     private static var competitionOverview: CompetitionOverview {
         let results = [
-            UserCompetitionPoints(userId: "user_0", firstName: "Test", lastName: "User 0", total: 400, today: 110),
-            UserCompetitionPoints(userId: "user_1", firstName: "Test", lastName: "User 1", total: 300, today: 125),
-            UserCompetitionPoints(userId: "user_2", firstName: "Test", lastName: "User 2", total: 425, today: 75),
-            UserCompetitionPoints(userId: "user_3", firstName: "Test", lastName: "User 3", total: 100, today: 0),
-            UserCompetitionPoints(userId: "user_4", firstName: "Test", lastName: "User 4", total: 50, today: 0),
-            UserCompetitionPoints(userId: "user_5", firstName: "Test", lastName: "User 5", total: 10, today: 10)
+            UserCompetitionPoints(userId: "user_0", firstName: "Alice",  lastName: "Chen",  total: 480, today: 110),
+            UserCompetitionPoints(userId: "user_1", firstName: "Marcus", lastName: "Lee",   total: 365, today: 125),
+            UserCompetitionPoints(userId: "user_2", firstName: "You",    lastName: "",      total: 422, today: 235),
+            UserCompetitionPoints(userId: "user_3", firstName: "Sam",    lastName: "Smith", total: 100, today: 0),
         ]
 
         return CompetitionOverview(
-            //name: "Really really really long competition name",
-            start: Date(),
-            end: Date().addingTimeInterval(TimeInterval.xtDays(7)),
+            start: Date().addingTimeInterval(-.xtDays(8)),
+            end: Date().addingTimeInterval(.xtDays(4)),
             currentResults: results)
     }
 
     static var previews: some View {
         CompetitionOverviewView(objectGraph: MockObjectGraph(),
-                                competitionOverview: competitionOverview, homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
-                                showAllDetails: true)
-            .fwfCard()
-            .padding(.horizontal, 16)
-
-        CompetitionOverviewView(objectGraph: MockObjectGraph(),
-                                competitionOverview: competitionOverview, homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
+                                competitionOverview: competitionOverview,
+                                homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
                                 showAllDetails: false)
             .fwfCard()
             .padding(.horizontal, 16)
+            .background(Color("Bg"))
+
+        CompetitionOverviewView(objectGraph: MockObjectGraph(),
+                                competitionOverview: competitionOverview,
+                                homepageSheetViewModel: HomepageSheetViewModel(appProtocolHandler: MockAppProtocolHandler(), healthKitManager: MockHealthKitManager()),
+                                showAllDetails: true)
+            .fwfCard()
+            .padding(.horizontal, 16)
+            .background(Color("Bg"))
     }
 }

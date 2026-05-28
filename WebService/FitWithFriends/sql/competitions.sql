@@ -78,3 +78,39 @@ WHERE competition_id = :competitionId! AND is_public = true;
 /* @name IsUserInCompetition */
 SELECT COUNT(*)::INTEGER AS "count!" FROM users_competitions
 WHERE user_id = :userId! AND competition_id = :competitionId!;
+
+/* @name GetCompetitionInviteDetails */
+/* Used by the web /joinCompetition route. Returns enough metadata to render an
+   inviter-aware hero card without requiring the visitor to authenticate. The
+   visitor proves they hold a valid access token by passing it in :accessToken. */
+SELECT
+    c.competition_id,
+    c.display_name,
+    c.start_date,
+    c.end_date,
+    c.is_public,
+    c.scoring_rules,
+    admin_user.first_name AS "admin_first_name!",
+    admin_user.last_name AS "admin_last_name",
+    (
+        SELECT COUNT(*)::INTEGER FROM users_competitions uc_count
+        WHERE uc_count.competition_id = c.competition_id
+    ) AS "member_count!",
+    (
+        SELECT COALESCE(
+            json_agg(
+                json_build_object(
+                    'firstName', mu.first_name,
+                    'lastName', mu.last_name
+                ) ORDER BY mu.first_name
+            ),
+            '[]'::json
+        )
+        FROM users_competitions uc
+        JOIN users mu ON mu.user_id = uc.user_id
+        WHERE uc.competition_id = c.competition_id
+    ) AS "members!"
+FROM competitions c
+JOIN users admin_user ON admin_user.user_id = c.admin_user_id
+WHERE c.competition_id = :competitionId!
+  AND c.access_token = :competitionAccessToken!;

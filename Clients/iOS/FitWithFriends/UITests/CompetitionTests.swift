@@ -4,23 +4,39 @@
 //
 //  Created by Dan O'Connor on 3/27/26.
 //
+//  Updated for the redesigned 3-step create wizard (Templates → Scoring → Invite).
+//  Tests tap "Start blank" on Step 1 to land on the scoring step, then drive the
+//  scoring config. The old single-form flow no longer exists.
+//
 
 import XCTest
 
 final class CompetitionTests: FWFUITestBase {
+    private var homeScreen: XCUIElement { app.otherElements["homeScreen"] }
+    private var createWizard: XCUIElement { app.otherElements["createWizard"] }
+    private var competitionDetailScreen: XCUIElement { app.staticTexts["competitionDetailScreen"] }
+
+    private var createButton: XCUIElement { app.buttons["createCompetitionButton"] }
+    private var startBlankButton: XCUIElement { app.buttons["createWizardStartBlank"] }
+    private var submitButton: XCUIElement { app.buttons["createCompetitionSubmitButton"] }
+    private var proUpgradeButton: XCUIElement { app.buttons["createCompetitionProUpgradeButton"] }
+
+    /// Tap "Start a new competition" then "Start blank" so we're on Step 2 (scoring).
+    /// Most wizard tests want to drive the scoring config directly without picking a template.
+    private func openScoringStep() {
+        XCTAssertTrue(createButton.waitForExistence(timeout: 5))
+        createButton.tap()
+
+        XCTAssertTrue(createWizard.waitForExistence(timeout: 5))
+        XCTAssertTrue(startBlankButton.waitForExistence(timeout: 3))
+        startBlankButton.tap()
+    }
+
     func testCreateCompetition() {
         launchApp(loggedIn: true)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        // Wait for the home screen to load
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-
-        // Tap "New Competition" button
-        let newCompButton = app.buttons["New Competition"]
-        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
-        newCompButton.tap()
-
-        // Verify the create competition form appears
-        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+        openScoringStep()
 
         // Fill in competition name
         let nameField = app.textFields["e.g., January Challenge"]
@@ -30,15 +46,14 @@ final class CompetitionTests: FWFUITestBase {
 
         takeScreenshot(name: "04_CreateCompetition")
 
-        // Tap Create button
-        let createButton = app.buttons["Create"]
-        XCTAssertTrue(createButton.exists)
-        createButton.tap()
+        // Tap Create button — uses an accessibility label of "Create" so we can
+        // match the legacy expectation, but identifier is more reliable.
+        XCTAssertTrue(submitButton.waitForExistence(timeout: 3))
+        submitButton.tap()
 
-        // Verify the sheet dismisses and we return to the home screen
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-
-        // The new competition should appear
+        // Wizard advances to the Invite step on success — we're still inside the
+        // sheet, so the home screen is hidden behind it. Verify the new competition
+        // appears in the manager (it should land in the invite step's share card).
         XCTAssertTrue(app.staticTexts["My Test Competition"].waitForExistence(timeout: 10))
     }
 
@@ -49,15 +64,15 @@ final class CompetitionTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load and competition to appear
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Detail Test Competition"]
         XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
 
         // Tap the competition to open detail
         competitionText.tap()
 
-        // Verify detail view appears
-        XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
+        // Verify detail view appears (replaces the old `Competition Details` nav bar)
+        XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
 
         takeScreenshot(name: "05_CompetitionDetail")
     }
@@ -74,25 +89,26 @@ final class CompetitionTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen and competition to load
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["User Detail Test"]
         XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
 
         // Open competition detail
         competitionText.tap()
-        XCTAssertTrue(app.navigationBars["Competition Details"].waitForExistence(timeout: 5))
+        XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
 
-        // Tap on Alice Chen (first seeded user) to view their daily details
-        // Scope to the leaderboard in the detail sheet to avoid matching the home screen leaderboard
+        // Tap on Alice Chen (first seeded user) to view their daily details.
+        // Scope to the leaderboard in the detail sheet to avoid matching the
+        // home screen leaderboard.
         let leaderboard = app.otherElements["competitionLeaderboard"].firstMatch
         XCTAssertTrue(leaderboard.waitForExistence(timeout: 5))
         let userRow = leaderboard.staticTexts["Alice Chen"]
         XCTAssertTrue(userRow.waitForExistence(timeout: 5))
         userRow.tap()
 
-        // Verify user details view appears with total points
-        XCTAssertTrue(app.staticTexts["total points"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.navigationBars["Alice Chen"].waitForExistence(timeout: 5))
+        // Verify user details view appears with the Alice Chen header.
+        // The redesigned daily details uses inline navigation title.
+        XCTAssertTrue(app.navigationBars["Alice Chen"].waitForExistence(timeout: 10))
 
         takeScreenshot(name: "06_UserDailyDetails")
     }
@@ -102,7 +118,7 @@ final class CompetitionTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Private Badge Test"].waitForExistence(timeout: 10))
 
         // Private competitions should show a "Private" badge
@@ -111,37 +127,25 @@ final class CompetitionTests: FWFUITestBase {
 
     func testCreateCompetitionScoringDropdownExists() {
         launchApp(loggedIn: true)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        openScoringStep()
 
-        let newCompButton = app.buttons["New Competition"]
-        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
-        newCompButton.tap()
-
-        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
-
-        // Verify the scoring type dropdown label button exists
-        let dropdownButton = app.buttons["Activity Rings"]
-        XCTAssertTrue(dropdownButton.waitForExistence(timeout: 3), "Scoring type dropdown should show 'Activity Rings' as the default label")
-
-        // Tap to open the menu
-        dropdownButton.tap()
-
-        // Verify the other options appear in the menu
-        XCTAssertTrue(app.buttons["Tracked Workouts"].waitForExistence(timeout: 3), "Menu should show 'Tracked Workouts' option")
-        XCTAssertTrue(app.buttons["Daily Totals"].waitForExistence(timeout: 3), "Menu should show 'Daily Totals' option")
+        // The redesign replaces the dropdown menu with a segmented control. All
+        // three scoring modes are visible at the same time.
+        XCTAssertTrue(app.buttons["scoringMode_Rings"].waitForExistence(timeout: 3),
+                      "Rings segment should be visible")
+        XCTAssertTrue(app.buttons["scoringMode_Daily"].exists,
+                      "Daily segment should be visible")
+        XCTAssertTrue(app.buttons["scoringMode_Workouts"].exists,
+                      "Workouts segment should be visible")
     }
 
     func testCreateCompetitionKeyboardDismiss() {
         launchApp(loggedIn: true)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-
-        let newCompButton = app.buttons["New Competition"]
-        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
-        newCompButton.tap()
-
-        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+        openScoringStep()
 
         // Tap the name field and type some text
         let nameField = app.textFields["e.g., January Challenge"]
@@ -155,90 +159,67 @@ final class CompetitionTests: FWFUITestBase {
         doneButton.tap()
 
         // After tapping Done the keyboard should be dismissed — wait for the
-        // dismissal animation to complete before asserting (synchronous .exists
-        // is unreliable on slow CI runners where the animation may still be in progress)
+        // dismissal animation to complete before asserting.
         XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3))
     }
 
     func testCreateCompetitionProUpgradeShownForNonProUser() {
         launchApp(loggedIn: true, isPro: false)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        openScoringStep()
 
-        let newCompButton = app.buttons["New Competition"]
-        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
-        newCompButton.tap()
+        // Switch to a Pro-only scoring mode
+        let workoutsSegment = app.buttons["scoringMode_Workouts"]
+        XCTAssertTrue(workoutsSegment.waitForExistence(timeout: 3))
+        workoutsSegment.tap()
 
-        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
+        // For a non-pro user selecting a pro-only scoring type, the wizard's
+        // submit button is the Pro upgrade CTA (accessibility label "Upgrade to Pro").
+        XCTAssertTrue(proUpgradeButton.waitForExistence(timeout: 3),
+                      "Pro upgrade CTA should appear in the wizard for non-pro users selecting a pro scoring type")
 
-        // Open the scoring type dropdown and select Tracked Workouts (pro-only)
-        let dropdownButton = app.buttons["Activity Rings"]
-        XCTAssertTrue(dropdownButton.waitForExistence(timeout: 3))
-        dropdownButton.tap()
-
-        let trackedWorkoutsOption = app.buttons["Tracked Workouts"]
-        XCTAssertTrue(trackedWorkoutsOption.waitForExistence(timeout: 3))
-        trackedWorkoutsOption.tap()
-
-        // For a non-pro user selecting a pro-only scoring type, the Upgrade to Pro button should appear
-        XCTAssertTrue(app.buttons["Upgrade to Pro"].waitForExistence(timeout: 3),
-                      "Upgrade to Pro button should appear for non-pro users selecting a pro scoring type")
-
-        // The Create button should NOT be present
-        XCTAssertFalse(app.buttons["Create"].exists,
-                       "Create button should not be shown when Upgrade to Pro is required")
+        // The regular Create button should NOT be present
+        XCTAssertFalse(submitButton.exists,
+                       "Create button should not be shown when Pro upgrade is required")
     }
 
     func testCreateCompetitionCreateButtonShownForProUser() {
         launchApp(loggedIn: true, isPro: true)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        openScoringStep()
 
-        let newCompButton = app.buttons["New Competition"]
-        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
-        newCompButton.tap()
-
-        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
-
-        // Fill in competition name
+        // Fill in competition name so canSubmit is true
         let nameField = app.textFields["e.g., January Challenge"]
         XCTAssertTrue(nameField.waitForExistence(timeout: 3))
         nameField.tap()
         nameField.typeText("Pro Competition")
 
         // For a pro user, the Create button should be visible
-        XCTAssertTrue(app.buttons["Create"].waitForExistence(timeout: 3),
+        XCTAssertTrue(submitButton.waitForExistence(timeout: 3),
                       "Create button should be visible for pro users")
 
-        // Upgrade to Pro button should NOT be present
-        XCTAssertFalse(app.buttons["Upgrade to Pro"].exists,
-                       "Upgrade to Pro button should not appear for pro users")
+        // Pro upgrade button should NOT be present
+        XCTAssertFalse(proUpgradeButton.exists,
+                       "Pro upgrade CTA should not appear for pro users")
     }
 
     func testCreateCompetitionWorkoutTypeAnyOption() {
         launchApp(loggedIn: true, isPro: true)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        openScoringStep()
 
-        let newCompButton = app.buttons["New Competition"]
-        XCTAssertTrue(newCompButton.waitForExistence(timeout: 5))
-        newCompButton.tap()
+        // Switch to the Workouts mode
+        let workoutsSegment = app.buttons["scoringMode_Workouts"]
+        XCTAssertTrue(workoutsSegment.waitForExistence(timeout: 3))
+        workoutsSegment.tap()
 
-        XCTAssertTrue(app.navigationBars["Create competition"].waitForExistence(timeout: 5))
-
-        // Open the scoring type dropdown and select Tracked Workouts
-        let dropdownButton = app.buttons["Activity Rings"]
-        XCTAssertTrue(dropdownButton.waitForExistence(timeout: 3))
-        dropdownButton.tap()
-
-        let trackedWorkoutsOption = app.buttons["Tracked Workouts"]
-        XCTAssertTrue(trackedWorkoutsOption.waitForExistence(timeout: 3))
-        trackedWorkoutsOption.tap()
-
-        // Tap the workout types row to open the picker sheet
-        let workoutTypesRow = app.buttons["Workout types"]
-        XCTAssertTrue(workoutTypesRow.waitForExistence(timeout: 3))
-        workoutTypesRow.tap()
+        // Open the workout types picker sheet
+        let workoutTypesButton = app.buttons["workoutTypesPickerButton"]
+        XCTAssertTrue(workoutTypesButton.waitForExistence(timeout: 3))
+        workoutTypesButton.tap()
 
         // Verify "Any workout type" appears at the top of the picker sheet
         XCTAssertTrue(app.staticTexts["Any workout type"].waitForExistence(timeout: 3),

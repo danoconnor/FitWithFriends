@@ -2,24 +2,26 @@
 //  CompetitionEndedAlertTests.swift
 //  FitWithFriends UITests
 //
+//  Note: the redesign replaces the old `UIAlert` with a full-screen
+//  `CompetitionEndView` cover. Tests now look for the screen's accessibility
+//  identifier rather than `app.alerts.firstMatch`.
+//
 
 import XCTest
 
 final class CompetitionEndedAlertTests: FWFUITestBase {
+    private var homeScreen: XCUIElement { app.otherElements["homeScreen"] }
+    private var endScreen: XCUIElement { app.staticTexts["competitionEndScreen"] }
+    private var endDismissButton: XCUIElement { app.buttons["competitionEndDismiss"] }
+
     func testAlertShownForArchivedCompetition() throws {
         let competitionId = try createTestCompetition(name: "Finished Competition")
         try setCompetitionArchived(competitionId: competitionId, userPoints: 500)
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
-
-        let alert = app.alerts.firstMatch
-        XCTAssertTrue(alert.waitForExistence(timeout: 30))
-        XCTAssertTrue(alert.staticTexts["Finished Competition has ended!"].exists)
-        XCTAssertTrue(
-            alert.staticTexts.matching(NSPredicate(format: "label CONTAINS 'place'")).firstMatch.waitForExistence(timeout: 3)
-        )
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
+        XCTAssertTrue(endScreen.waitForExistence(timeout: 30))
     }
 
     func testAlertNotShownAfterDismissal() throws {
@@ -27,30 +29,31 @@ final class CompetitionEndedAlertTests: FWFUITestBase {
         try setCompetitionArchived(competitionId: competitionId, userPoints: 500)
 
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
-        XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 30))
-        app.alerts.firstMatch.buttons["OK"].tap()
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
+        XCTAssertTrue(endScreen.waitForExistence(timeout: 30))
 
-        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 3))
+        endDismissButton.tap()
+        XCTAssertTrue(endScreen.waitForNonExistence(timeout: 5))
 
-        // Background and foreground the app
+        // Background and foreground the app — the dismissed competition should not
+        // reappear on relaunch (the VM marks it seen in UserDefaults).
         XCUIDevice.shared.press(.home)
         app.activate()
 
-        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertFalse(endScreen.waitForExistence(timeout: 5))
     }
 
     func testProcessingResultsCompetitionDoesNotShowAlert() throws {
         try createTestCompetition(name: "Still Processing")
 
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
+        XCTAssertFalse(endScreen.waitForExistence(timeout: 3))
     }
 
     func testNoAlertWhenNoCompetitions() {
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
-        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
+        XCTAssertFalse(endScreen.waitForExistence(timeout: 3))
     }
 }

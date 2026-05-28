@@ -80,6 +80,11 @@ final class WatchScreenshotTests: XCTestCase {
                                    testName: String = #function,
                                    line: UInt = #line) {
         for device in watchDevices {
+            // Pin the color scheme to light explicitly. The reference snapshots
+            // pre-date the design system's dark-mode color variants, and SwiftUI's
+            // asset-catalog lookup will resolve named colors (Gold/Silver/Bronze
+            // etc.) to their dark values when the trait collection is unspecified.
+            // Forcing `.light` keeps these renders deterministic.
             let wrapped = view.frame(width: device.width, height: device.height)
             assertSnapshot(
                 of: wrapped,

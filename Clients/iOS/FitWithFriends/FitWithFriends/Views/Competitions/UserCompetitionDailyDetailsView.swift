@@ -24,78 +24,192 @@ struct UserCompetitionDailyDetailsView: View {
     }
 
     var body: some View {
-        Group {
-            if viewModel.isLoading {
-                ProgressView()
-            } else if let error = viewModel.errorMessage {
-                VStack(spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 32))
-                        .foregroundStyle(.secondary)
+        ZStack {
+            Color("Bg").ignoresSafeArea()
 
-                    Text(error)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            } else if viewModel.dailySummaries.isEmpty {
-                VStack(spacing: 12) {
-                    Image(systemName: "figure.walk")
-                        .font(.system(size: 32))
-                        .foregroundStyle(.secondary)
-
-                    Text("No activity data yet")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            } else {
-                ScrollView {
-                    VStack(spacing: 16) {
-                        // Header: total in the rule's unit
-                        VStack(spacing: 4) {
-                            Text(ScoringValueFormatter.formatCompact(viewModel.totalPoints, unit: viewModel.scoringUnit))
-                                .font(.system(size: 36, weight: .bold, design: .rounded))
-
-                            Text(viewModel.totalLabel)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(.top, 8)
-
-                        // Daily cards — rings rule keeps the detailed ring breakdown, other rules
-                        // fall back to a simple date → value row.
-                        ForEach(viewModel.dailySummaries) { summary in
-                            if viewModel.scoringUnit == .points {
-                                DailySummaryCard(summary: summary)
-                                    .fwfCard()
-                                    .padding(.horizontal, 16)
-                            } else {
-                                DailyValueRow(summary: summary, unit: viewModel.scoringUnit)
-                                    .fwfCard()
-                                    .padding(.horizontal, 16)
-                            }
-                        }
-                    }
-                    .padding(.bottom, 24)
+            Group {
+                if viewModel.isLoading {
+                    ProgressView()
+                } else if let error = viewModel.errorMessage {
+                    errorView(error)
+                } else if viewModel.dailySummaries.isEmpty {
+                    emptyView
+                } else {
+                    loadedContent
                 }
             }
         }
         .navigationTitle(viewModel.userName)
         .navigationBarTitleDisplayMode(.inline)
-        .task {
-            await viewModel.loadDetails()
+        .task { await viewModel.loadDetails() }
+    }
+
+    // MARK: - Loaded content
+
+    @ViewBuilder
+    private var loadedContent: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                header
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+
+                summaryRow
+                    .padding(.horizontal, 16)
+
+                heatmapCard
+                    .padding(.horizontal, 16)
+
+                dailyRows
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
+            }
+        }
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        VStack(spacing: 12) {
+            FWFAvatar(name: viewModel.userName, size: 64)
+
+            Text(viewModel.userName)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(Color("Ink"))
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Summary stat row (Total / Daily avg / Streak)
+
+    private var summaryRow: some View {
+        HStack(spacing: 10) {
+            summaryStat(
+                value: ScoringValueFormatter.formatCompact(viewModel.totalPoints, unit: viewModel.scoringUnit),
+                label: viewModel.totalLabel.capitalized
+            )
+
+            summaryStat(
+                value: viewModel.dailyAverageDisplay,
+                label: "Daily avg"
+            )
+
+            summaryStat(
+                value: "\(viewModel.fullRingDayCount)",
+                label: "Full-ring days"
+            )
+        }
+    }
+
+    private func summaryStat(value: String, label: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(value)
+                .font(.system(size: 22, weight: .bold))
+                .monospacedDigit()
+                .foregroundStyle(Color("Ink"))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(Color("InkMute"))
+                .lineLimit(2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .fwfCard(padding: 12, cornerRadius: 16)
+    }
+
+    // MARK: - Heatmap
+
+    @ViewBuilder
+    private var heatmapCard: some View {
+        let items = viewModel.heatmapIntensities
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Daily intensity")
+                    .font(.system(size: 12, weight: .semibold))
+                    .tracking(0.6)
+                    .foregroundStyle(Color("InkMute"))
+
+                HStack(spacing: 4) {
+                    ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(Color("Brand").opacity(0.1 + 0.7 * item.intensity))
+                            .frame(height: 22)
+                    }
+                }
+
+                HStack {
+                    Text("Less")
+                        .font(.system(size: 10.5))
+                        .foregroundStyle(Color("InkFaint"))
+                    HStack(spacing: 2) {
+                        ForEach(0..<5, id: \.self) { i in
+                            RoundedRectangle(cornerRadius: 2, style: .continuous)
+                                .fill(Color("Brand").opacity(0.1 + 0.18 * Double(i)))
+                                .frame(width: 12, height: 6)
+                        }
+                    }
+                    Text("More")
+                        .font(.system(size: 10.5))
+                        .foregroundStyle(Color("InkFaint"))
+                    Spacer()
+                }
+            }
+            .fwfCard(padding: 14)
+        }
+    }
+
+    // MARK: - Per-day rows
+
+    private var dailyRows: some View {
+        VStack(spacing: 10) {
+            ForEach(viewModel.dailySummaries) { summary in
+                DailyBreakdownRow(
+                    summary: summary,
+                    scoringUnit: viewModel.scoringUnit,
+                    isPersonalBest: summary.date == viewModel.personalBestDate
+                )
+                .fwfCard(padding: 14)
+            }
+        }
+    }
+
+    // MARK: - States
+
+    private func errorView(_ message: String) -> some View {
+        VStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 32))
+                .foregroundStyle(Color("InkMute"))
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(Color("InkSoft"))
+        }
+    }
+
+    private var emptyView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "figure.walk")
+                .font(.system(size: 32))
+                .foregroundStyle(Color("InkMute"))
+            Text("No activity data yet")
+                .font(.subheadline)
+                .foregroundStyle(Color("InkSoft"))
         }
     }
 }
 
-// MARK: - Daily Summary Card
+// MARK: - Daily Breakdown Row
 
-struct DailySummaryCard: View {
+private struct DailyBreakdownRow: View {
     let summary: DailySummary
+    let scoringUnit: ScoringUnit
+    let isPersonalBest: Bool
 
     private var dateString: String {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
+        formatter.dateFormat = "EEE, MMM d"
         formatter.timeZone = TimeZone(identifier: "UTC")
         return formatter.string(from: summary.date)
     }
@@ -111,68 +225,65 @@ struct DailySummaryCard: View {
         return s
     }
 
+    private var hasRingData: Bool {
+        summary.caloriesGoal > 0
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Date + points header
-            HStack {
-                Text(dateString)
-                    .font(.headline)
-                Spacer()
-                Text("\(Int(summary.points)) pts")
-                    .font(.headline.weight(.semibold).monospacedDigit())
+        HStack(alignment: .center, spacing: 14) {
+            if hasRingData {
+                ActivityRingView(activitySummary: hkActivitySummary)
+                    .frame(width: 48, height: 48)
+            } else {
+                Image(systemName: "calendar")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color("InkMute"))
+                    .frame(width: 48, height: 48)
+                    .background(Circle().fill(Color("SurfaceAlt")))
             }
 
-            HStack(alignment: .center, spacing: 16) {
-                ActivityRingView(activitySummary: hkActivitySummary)
-                    .frame(width: 80, height: 80)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(dateString)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color("Ink"))
 
-                VStack(spacing: 8) {
-                    HStack(spacing: 16) {
-                        ActivityValueView(name: "Move",
-                                          unit: "Cal",
-                                          color: Color(red: 0.914, green: 0.078, blue: 0.204),
-                                          currentValue: summary.caloriesBurned,
-                                          goal: summary.caloriesGoal)
-
-                        ActivityValueView(name: "Exercise",
-                                          unit: "Min",
-                                          color: Color(red: 0.259, green: 0.914, blue: 0),
-                                          currentValue: summary.exerciseTime,
-                                          goal: summary.exerciseTimeGoal)
-
-                        ActivityValueView(name: "Stand",
-                                          unit: "h",
-                                          color: Color(red: 0.254, green: 0.749, blue: 0.847),
-                                          currentValue: summary.standTime,
-                                          goal: summary.standTimeGoal)
+                    if isPersonalBest {
+                        FWFTag(text: "Personal best", color: Color("Sun"), background: Color("Sun").opacity(0.18))
                     }
                 }
+
+                if hasRingData {
+                    HStack(spacing: 10) {
+                        ringValueChip(value: "\(summary.caloriesBurned)c", color: Color("Move"))
+                        ringValueChip(value: "\(summary.exerciseTime)m", color: Color("Exercise"))
+                        ringValueChip(value: "\(summary.standTime)h", color: Color("Stand"))
+                    }
+                } else if summary.stepCount > 0 {
+                    Text("\(summary.stepCount) steps")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color("InkSoft"))
+                }
             }
+
+            Spacer()
+
+            Text(ScoringValueFormatter.formatCompact(summary.points, unit: scoringUnit))
+                .font(.system(size: 17, weight: .semibold))
+                .monospacedDigit()
+                .foregroundStyle(Color("Ink"))
         }
     }
-}
 
-// MARK: - Non-rings per-day row
-
-struct DailyValueRow: View {
-    let summary: DailySummary
-    let unit: ScoringUnit
-
-    private var dateString: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        return formatter.string(from: summary.date)
-    }
-
-    var body: some View {
-        HStack {
-            Text(dateString)
-                .font(.headline)
-            Spacer()
-            Text(ScoringValueFormatter.format(summary.points, unit: unit))
-                .font(.headline.weight(.semibold).monospacedDigit())
+    private func ringValueChip(value: String, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 6, height: 6)
+            Text(value)
+                .font(.system(size: 11, weight: .medium))
+                .monospacedDigit()
+                .foregroundStyle(Color("InkSoft"))
         }
     }
 }

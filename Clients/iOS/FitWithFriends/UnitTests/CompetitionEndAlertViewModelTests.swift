@@ -306,6 +306,212 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         XCTAssertNil(vm.currentAlertCompetition)
     }
 
+    // MARK: - EndVariant tests (Phase 5 redesign)
+
+    func test_endVariant_firstPlace_won() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 1, totalUsers: 8)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.endVariant, .won)
+    }
+
+    func test_endVariant_secondPlace_silver() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 2, totalUsers: 8)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.endVariant, .silver)
+    }
+
+    func test_endVariant_thirdPlace_bronze() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 3, totalUsers: 8)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.endVariant, .bronze)
+    }
+
+    func test_endVariant_midPack() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 5, totalUsers: 8)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.endVariant, .midPack)
+    }
+
+    func test_endVariant_lastPlace() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 8, totalUsers: 8)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.endVariant, .last)
+    }
+
+    func test_userPositionOrdinal_correctFormat() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 2, totalUsers: 5)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.userPositionOrdinal, "2nd")
+    }
+
+    // MARK: - Derived stats (daily summaries)
+
+    /// Seeds daily summaries on the mock and triggers the loader. The VM fetches
+    /// summaries inside `showNextIfNeeded` via an unawaited Task, so we poll until
+    /// it lands.
+    private func seedSummariesAndShow(_ summaries: [DailySummary], userPosition: Int = 5, totalUsers: Int = 8) async -> CompetitionEndAlertViewModel {
+        let details = UserCompetitionDailyDetails(
+            userId: "test_user",
+            competitionId: UUID(),
+            dailySummaries: summaries)
+        mockCompetitionManager.return_getUserCompetitionDetails = details
+
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: userPosition, totalUsers: totalUsers)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.dailySummaries.count == summaries.count)
+        return vm
+    }
+
+    func test_daysClosedAllRings_countsOnlyDaysWithAllRings() async {
+        let summaries = [
+            DailySummary(caloriesBurned: 500, caloriesGoal: 400,
+                         exerciseTime: 40, exerciseTimeGoal: 30,
+                         standTime: 12, standTimeGoal: 12, points: 300),
+            DailySummary(caloriesBurned: 200, caloriesGoal: 400,
+                         exerciseTime: 40, exerciseTimeGoal: 30,
+                         standTime: 12, standTimeGoal: 12, points: 220),
+            DailySummary(caloriesBurned: 500, caloriesGoal: 400,
+                         exerciseTime: 40, exerciseTimeGoal: 30,
+                         standTime: 12, standTimeGoal: 12, points: 300),
+        ]
+        let vm = await seedSummariesAndShow(summaries)
+
+        XCTAssertEqual(vm.daysClosedAllRings, 2)
+    }
+
+    func test_moveRingStreak_findsLongestConsecutiveRun() async {
+        let day = TimeInterval(86_400)
+        let summaries = [
+            // chronological: closed, closed, missed, closed, closed, closed → streak 3
+            DailySummary(date: Date().addingTimeInterval(-day * 5),
+                         caloriesBurned: 500, caloriesGoal: 400, points: 100),
+            DailySummary(date: Date().addingTimeInterval(-day * 4),
+                         caloriesBurned: 500, caloriesGoal: 400, points: 100),
+            DailySummary(date: Date().addingTimeInterval(-day * 3),
+                         caloriesBurned: 200, caloriesGoal: 400, points: 50),
+            DailySummary(date: Date().addingTimeInterval(-day * 2),
+                         caloriesBurned: 500, caloriesGoal: 400, points: 100),
+            DailySummary(date: Date().addingTimeInterval(-day),
+                         caloriesBurned: 500, caloriesGoal: 400, points: 100),
+            DailySummary(date: Date(),
+                         caloriesBurned: 500, caloriesGoal: 400, points: 100),
+        ]
+        let vm = await seedSummariesAndShow(summaries)
+
+        XCTAssertEqual(vm.moveRingStreak, 3)
+    }
+
+    func test_moveRingStreak_zeroWhenNoClosures() async {
+        let summaries = [
+            DailySummary(caloriesBurned: 100, caloriesGoal: 400, points: 50),
+            DailySummary(caloriesBurned: 200, caloriesGoal: 400, points: 80),
+        ]
+        let vm = await seedSummariesAndShow(summaries)
+
+        XCTAssertEqual(vm.moveRingStreak, 0)
+    }
+
+    func test_bestDay_returnsHighestPointsDay() async {
+        let topDate = Date().addingTimeInterval(-86_400)
+        let summaries = [
+            DailySummary(date: Date(), points: 100),
+            DailySummary(date: topDate, points: 400),
+            DailySummary(date: Date().addingTimeInterval(-86_400 * 2), points: 250),
+        ]
+        let vm = await seedSummariesAndShow(summaries)
+
+        XCTAssertNotNil(vm.bestDay)
+        XCTAssertEqual(vm.bestDay?.date, topDate)
+        XCTAssertEqual(vm.bestDay?.points, 400)
+    }
+
+    func test_bestDay_nilWhenNoSummaries() async {
+        let vm = makeVM()
+        XCTAssertNil(vm.bestDay)
+    }
+
+    func test_winner_returnsFirstPlaceFinisher() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 3, totalUsers: 5)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        let winner = vm.winner
+        XCTAssertNotNil(winner)
+        // makeArchivedCompetition assigns descending points by index (totalUsers - i) * 100,
+        // so user_0 has the highest score.
+        XCTAssertEqual(winner?.userId, "other_user_0")
+    }
+
+    func test_gapToFirst_formatsPointsBehindWinner() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 2, totalUsers: 5)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        // Winner has (5-0)*100=500, position 2 has (5-1)*100=400 → gap is 100
+        XCTAssertEqual(vm.gapToFirst, "100 pts")
+    }
+
+    func test_gapToFirst_nilWhenUserIsWinner() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 1, totalUsers: 5)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertNil(vm.gapToFirst)
+    }
+
+    func test_totalDisplay_fallsBackToCompetitionRowWhenSummariesEmpty() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 2, totalUsers: 5)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        // No summaries seeded → loader will error from the mock and dailySummaries stays empty.
+        // The fallback path reads from currentResults: user at position 2 has 400 points.
+        XCTAssertEqual(vm.totalDisplay, "400 pts")
+    }
+
+    func test_totalDisplay_dashWhenNoData() async {
+        mockAuthManager.loggedInUserId = "unknown_user"
+        let vm = CompetitionEndAlertViewModel(
+            competitionManager: mockCompetitionManager,
+            authenticationManager: mockAuthManager,
+            userDefaults: testUserDefaults
+        )
+        let competition = makeArchivedCompetition(userPosition: 1, totalUsers: 5)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.totalDisplay, "—")
+    }
+
     func test_publisherUpdate_whileAlertShowing_doesNotOverwrite() async {
         let vm = makeVM()
         let comp1 = makeArchivedCompetition(id: UUID(), name: "First", userPosition: 1)

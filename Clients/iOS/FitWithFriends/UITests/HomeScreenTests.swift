@@ -8,6 +8,10 @@
 import XCTest
 
 final class HomeScreenTests: FWFUITestBase {
+    private var homeScreen: XCUIElement {
+        app.otherElements["homeScreen"]
+    }
+
     func testHomeScreenWithCompetition() throws {
         // Create a test competition via the backend API before launching the app
         try createTestCompetition(name: "Screenshot Competition")
@@ -15,7 +19,7 @@ final class HomeScreenTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
         // Verify the competition is visible
         XCTAssertTrue(app.staticTexts["Screenshot Competition"].waitForExistence(timeout: 10))
@@ -30,7 +34,7 @@ final class HomeScreenTests: FWFUITestBase {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
         // Verify empty state message
         XCTAssertTrue(app.staticTexts["No competitions yet"].waitForExistence(timeout: 5))

@@ -8,16 +8,28 @@
 import XCTest
 
 final class AboutScreenTests: FWFUITestBase {
+    private var homeScreen: XCUIElement {
+        app.otherElements["homeScreen"]
+    }
+
+    /// The redesigned Settings screen uses a custom title block ("Settings" rendered
+    /// at 40pt serif) rather than a system navigation title. Test for the title
+    /// staticText to confirm Settings is presented.
+    private var settingsTitle: XCUIElement {
+        app.staticTexts["Settings"]
+    }
+
     func testAboutScreen() {
         launchApp(loggedIn: true)
 
         // Wait for the home screen to load — allow extra time in CI where app launch is slow
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
 
         navigateToSettings()
 
         // Verify the settings screen
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsTitle.waitForExistence(timeout: 5))
+        // Footer always renders the version row
         XCTAssertTrue(app.staticTexts["Version"].exists)
 
         takeScreenshot(name: "06_SettingsScreen")
@@ -25,21 +37,21 @@ final class AboutScreenTests: FWFUITestBase {
 
     func testSettingsShowsRestorePurchasesButton() {
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
 
         navigateToSettings()
 
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsTitle.waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["RestorePurchasesButton"].waitForExistence(timeout: 5))
     }
 
     func testRestorePurchasesShowsSuccessAlert() {
         launchApp(loggedIn: true)
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 30))
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
 
         navigateToSettings()
 
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsTitle.waitForExistence(timeout: 5))
 
         let restoreButton = app.buttons["RestorePurchasesButton"]
         XCTAssertTrue(restoreButton.waitForExistence(timeout: 5))

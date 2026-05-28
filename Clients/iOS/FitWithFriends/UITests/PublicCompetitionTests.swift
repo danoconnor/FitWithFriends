@@ -13,7 +13,7 @@ final class PublicCompetitionTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
 
         // Verify the public competitions section header and competition name appear
         XCTAssertTrue(app.staticTexts["Public Competitions"].waitForExistence(timeout: 10))
@@ -30,7 +30,7 @@ final class PublicCompetitionTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Pro Challenge"].waitForExistence(timeout: 10))
 
         // Non-pro user should see the upgrade button instead of a join button
@@ -45,7 +45,7 @@ final class PublicCompetitionTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Sheet Test"].waitForExistence(timeout: 10))
 
         let upgradeButton = app.buttons["Upgrade to Pro"].firstMatch
@@ -63,7 +63,7 @@ final class PublicCompetitionTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Dismiss Test"].waitForExistence(timeout: 10))
 
         app.buttons["Upgrade to Pro"].firstMatch.tap()
@@ -73,7 +73,7 @@ final class PublicCompetitionTests: FWFUITestBase {
 
         // The Close button must disappear — if it's still present the sheet never dismissed
         XCTAssertTrue(app.buttons["Close"].waitForNonExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 5))
     }
 
     func testPublicBadgeShownWhenJoined() throws {
@@ -100,7 +100,7 @@ final class PublicCompetitionTests: FWFUITestBase {
 
         launchApp(loggedIn: true)
 
-        XCTAssertTrue(app.staticTexts["Fit with Friends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
 
         // Joined public competition appears in "Your Competitions" with a "Public" badge
         XCTAssertTrue(app.staticTexts["Your Competitions"].waitForExistence(timeout: 10))

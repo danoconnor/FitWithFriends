@@ -312,6 +312,9 @@
 		FWF00002000000000000010C /* AppVersionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF00002000000000000010D /* AppVersionManagerTests.swift */; };
 		FWF000020000000000000111 /* ConfettiOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000110 /* ConfettiOverlayView.swift */; };
 		FWF000020000000000000113 /* CompetitionEndAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */; };
+		FWF0000300000000000000A2 /* CompetitionEndView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000300000000000000A1 /* CompetitionEndView.swift */; };
+		FWF0000300000000000000B2 /* HomeRedesignViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000300000000000000B1 /* HomeRedesignViewModelTests.swift */; };
+		FWF0000300000000000000C2 /* ColorHexInitializerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF0000300000000000000C1 /* ColorHexInitializerTests.swift */; };
 		FWF000020000000000000115 /* CompetitionEndedAlertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000114 /* CompetitionEndedAlertTests.swift */; };
 		FWF000020000000000000116 /* CompetitionEndAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FWF000020000000000000117 /* CompetitionEndAlertViewModel.swift */; };
 		WATCHUI00000000000000B1 /* WatchUITestBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = WATCHUI00000000000000B0 /* WatchUITestBase.swift */; };
@@ -623,6 +626,9 @@
 		FWF00002000000000000010D /* AppVersionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManagerTests.swift; sourceTree = "<group>"; };
 		FWF000020000000000000110 /* ConfettiOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiOverlayView.swift; sourceTree = "<group>"; };
 		FWF000020000000000000112 /* CompetitionEndAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndAlertViewModelTests.swift; sourceTree = "<group>"; };
+		FWF0000300000000000000A1 /* CompetitionEndView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndView.swift; sourceTree = "<group>"; };
+		FWF0000300000000000000B1 /* HomeRedesignViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRedesignViewModelTests.swift; sourceTree = "<group>"; };
+		FWF0000300000000000000C1 /* ColorHexInitializerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHexInitializerTests.swift; sourceTree = "<group>"; };
 		FWF000020000000000000114 /* CompetitionEndedAlertTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndedAlertTests.swift; sourceTree = "<group>"; };
 		FWF000020000000000000117 /* CompetitionEndAlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompetitionEndAlertViewModel.swift; sourceTree = "<group>"; };
 		WATCHUI00000000000000A1 /* FitWithFriends Watch App UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "FitWithFriends Watch App UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -744,6 +750,8 @@
 				A1B2C3D4E5F6000000000015 /* CompetitionServiceTests.swift */,
 				CC000001000000000000AA01 /* MotivationalMessageProviderTests.swift */,
 				CC000001000000000000AA03 /* CreateCompetitionViewModelTests.swift */,
+				FWF0000300000000000000B1 /* HomeRedesignViewModelTests.swift */,
+				FWF0000300000000000000C1 /* ColorHexInitializerTests.swift */,
 			);
 			path = UnitTests;
 			sourceTree = "<group>";
@@ -1131,6 +1139,7 @@
 				0BD8B5BE27D42C92009BA5F2 /* CompetitionDetailView.swift */,
 				FWF0000200000000000000E4 /* PublicCompetitionCard.swift */,
 				A1B2C3D4E5F6000000000007 /* UserCompetitionDailyDetailsView.swift */,
+				FWF0000300000000000000A1 /* CompetitionEndView.swift */,
 			);
 			path = Competitions;
 			sourceTree = "<group>";
@@ -1625,6 +1634,8 @@
 				A1B2C3D4E5F6000000000016 /* CompetitionServiceTests.swift in Sources */,
 				CC000001000000000000AA02 /* MotivationalMessageProviderTests.swift in Sources */,
 				CC000001000000000000AA04 /* CreateCompetitionViewModelTests.swift in Sources */,
+				FWF0000300000000000000B2 /* HomeRedesignViewModelTests.swift in Sources */,
+				FWF0000300000000000000C2 /* ColorHexInitializerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1765,6 +1776,7 @@
 				0B67532E2574686D0032835D /* Workout.swift in Sources */,
 				0B1CBEA827C09FEC0008C72A /* IdentifiableBase.swift in Sources */,
 				0BD8B5BF27D42C92009BA5F2 /* CompetitionDetailView.swift in Sources */,
+				FWF0000300000000000000A2 /* CompetitionEndView.swift in Sources */,
 				0B99FC2E256A2CFB00673133 /* Token.swift in Sources */,
 				0B47A235279CB2ED00C2970E /* IObjectGraph.swift in Sources */,
 				0BBD7888259A3FF600E08EB2 /* CompetitionOverview.swift in Sources */,
