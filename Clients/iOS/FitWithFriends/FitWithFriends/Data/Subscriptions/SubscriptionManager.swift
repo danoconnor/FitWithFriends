@@ -96,6 +96,7 @@ public class SubscriptionManager: ISubscriptionManager, ObservableObject {
 
     func checkSubscriptionStatus() async {
         var foundValidEntitlement = false
+        var jwsToValidate: String? = nil
 
         for await entitlement in Transaction.currentEntitlements {
             guard case .verified(let transaction) = entitlement else {
@@ -114,7 +115,22 @@ public class SubscriptionManager: ISubscriptionManager, ObservableObject {
 
             Logger.traceInfo(message: "Found valid Pro entitlement")
             foundValidEntitlement = true
+            jwsToValidate = entitlement.jwsRepresentation
             break
+        }
+
+        // Sync with the server so is_pro is always up-to-date.
+        // This is critical for the restore-purchases path: already-finished transactions
+        // are NOT delivered via Transaction.updates (which listenForTransactionUpdates uses),
+        // so the server would never learn about them without this explicit validation call.
+        if let jws = jwsToValidate {
+            do {
+                let status = try await subscriptionService.validateTransaction(signedTransaction: jws)
+                Logger.traceInfo(message: "Subscription synced with server, isPro: \(status.isPro)")
+            } catch {
+                Logger.traceError(message: "Failed to sync subscription status with server", error: error)
+                // Local state still reflects StoreKit entitlements even if server sync fails
+            }
         }
 
         let validEntitlement = foundValidEntitlement
