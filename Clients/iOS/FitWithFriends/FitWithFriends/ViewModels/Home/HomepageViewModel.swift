@@ -27,7 +27,7 @@ public class HomepageViewModel: ObservableObject {
     @Published var isUserPro: Bool = false
 
     private var competitionLoadListener: AnyCancellable?
-    private var competitionFetchListener: AnyCancellable?
+    private var loadingStateListener: AnyCancellable?
     private var publicCompetitionLoadListener: AnyCancellable?
     private var proStatusListener: AnyCancellable?
 
@@ -55,14 +55,13 @@ public class HomepageViewModel: ObservableObject {
                     .sorted { $0 < $1 }
             }
 
-        // Use the explicit fetch-completed signal (a PassthroughSubject that never replays)
-        // rather than the @Published publisher to clear the loading state — this avoids the
-        // @Published replay-on-subscribe race where the initial empty dict could be mistaken
-        // for a real "no competitions" result.
-        competitionFetchListener = competitionManager.competitionFetchCompleted
+        // isLoadingOverviewsPublisher is @Published so it replays the current value to late
+        // subscribers. If the fetch already completed before this ViewModel was created, the
+        // subscriber still gets `false` on the next main-queue tick — no stuck spinner.
+        loadingStateListener = competitionManager.isLoadingOverviewsPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                self?.isLoadingCompetitions = false
+            .sink { [weak self] isLoading in
+                if !isLoading { self?.isLoadingCompetitions = false }
             }
 
         publicCompetitionLoadListener = competitionManager.publicCompetitionsPublisher

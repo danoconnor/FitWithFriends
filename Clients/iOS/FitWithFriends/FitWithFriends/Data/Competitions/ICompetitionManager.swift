@@ -11,11 +11,11 @@ protocol ICompetitionManager: AnyObject {
     /// A publisher for changes to the competitionOverviews
     var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { get }
 
-    /// Fires once after each real network fetch of competition overviews completes (success or
-    /// empty). Unlike `competitionOverviewsPublisher`, this never replays the current value to
-    /// new subscribers — observers can use it to detect "first load done" without the
-    /// @Published replay problem.
-    var competitionFetchCompleted: AnyPublisher<Void, Never> { get }
+    /// True while the first competition overview fetch is still in flight; false once any
+    /// fetch completes (success or error). Unlike a PassthroughSubject, this @Published value
+    /// replays to late subscribers, so ViewModels that subscribe after the fetch already
+    /// finished still see the correct state.
+    var isLoadingOverviewsPublisher: Published<Bool>.Publisher { get }
 
     /// Creates a new competition with the specified start date, end date, and name.
     /// - Parameters:

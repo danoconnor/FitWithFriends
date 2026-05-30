@@ -58,8 +58,9 @@ final class CompetitionsPagerViewModelTests: XCTestCase {
     }
 
     func test_loggedIn_withEmptyOverviews_afterDataReceived_showsNoCompetitions() {
-        // Re-assign to trigger competitionFetchCompleted (the mock fires it on any assignment
-        // after init, simulating a real network fetch completing with empty results).
+        // Assigning return_competitionOverviews after init sets isLoadingOverviews = false on
+        // the mock, which triggers the isLoadingOverviewsPublisher subscriber. Wait one main
+        // queue tick for the .receive(on: DispatchQueue.main) hop to deliver it.
         mockCompetitionManager.return_competitionOverviews = [:]
         let expectation = self.expectation(description: "hasReceivedData")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { expectation.fulfill() }
