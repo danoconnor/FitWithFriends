@@ -79,6 +79,8 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
             competitionIds = try await competitionService.getUsersCompetitions(userId: loggedInUserId)
         } catch {
             Logger.traceError(message: "Failed to fetch competitions for user \(loggedInUserId)", error: error)
+            // Signal fetch completed even on error so loading state doesn't get stuck
+            await MainActor.run { self._fetchCompleted.send() }
             return
         }
 
