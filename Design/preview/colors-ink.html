@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .ramp { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sw { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+  .sw .chip { height: 64px; }
+  .sw .meta { background: var(--surface); padding: 8px 10px; }
+  .sw .nm { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .sw .hx { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-mute); }
+</style></head>
+<body>
+  <div class="ramp">
+    <div class="sw"><div class="chip" style="background:var(--ink)"></div><div class="meta"><div class="nm">Ink</div><div class="hx">#16181d</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--ink-soft)"></div><div class="meta"><div class="nm">InkSoft</div><div class="hx">#4b5160</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--ink-mute)"></div><div class="meta"><div class="nm">InkMute</div><div class="hx">#8a8f9c</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--ink-faint)"></div><div class="meta"><div class="nm">InkFaint</div><div class="hx">#b7bbc4</div></div></div>
+  </div>
+</body></html>

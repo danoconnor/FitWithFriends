@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sw { border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-card); }
+  .sw .chip { height: 64px; }
+  .sw .meta { background: var(--surface); padding: 8px 10px; }
+  .sw .nm { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .sw .hx { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-mute); }
+</style></head>
+<body>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:var(--bg)"></div><div class="meta"><div class="nm">Bg</div><div class="hx">#f6f4ef</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--bg-deep)"></div><div class="meta"><div class="nm">BgDeep</div><div class="hx">#efece4</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--surface);border-bottom:1px solid var(--border)"></div><div class="meta"><div class="nm">Surface</div><div class="hx">#ffffff</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--surface-alt)"></div><div class="meta"><div class="nm">SurfaceAlt</div><div class="hx">#f1eee6</div></div></div>
+  </div>
+</body></html>

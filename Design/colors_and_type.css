@@ -1,0 +1,272 @@
+/* ============================================================================
+   FitWithFriends — Colors & Type
+   Source of truth: Clients/iOS/.../Resources/Colors.xcassets + FWFStyles.swift
+   (danoconnor/FitWithFriends @ main)
+
+   The redesigned Phone app is an "editorial sport" system: warm paper
+   backgrounds, near-black ink, a deep indigo brand, the three Apple Activity
+   ring colors as data accents, and a New York serif used only for display
+   moments. Everything below mirrors the native asset catalog 1:1.
+   ============================================================================ */
+
+:root {
+  /* --- Surfaces & backgrounds (light) --- */
+  --bg:            #f6f4ef;  /* app canvas — warm off-white "paper" */
+  --bg-deep:       #efece4;  /* deeper paper; also the INVERSE text color on Ink buttons */
+  --surface:       #ffffff;  /* cards */
+  --surface-alt:   #f1eee6;  /* chips, inset wells, secondary fills */
+
+  /* --- Ink (text) ramp (light) --- */
+  --ink:           #16181d;  /* primary text, primary buttons */
+  --ink-soft:      #4b5160;  /* body / secondary text */
+  --ink-mute:      #8a8f9c;  /* tertiary, captions, metadata */
+  --ink-faint:     #b7bbc4;  /* disabled, hairline glyphs, dots */
+
+  /* --- Borders (light) — defined as ink at low alpha --- */
+  --border:        rgba(22, 24, 29, 0.08);
+  --border-strong: rgba(22, 24, 29, 0.14);
+
+  /* --- Brand: deep indigo (light) --- */
+  --brand:         #2a3f7a;  /* primary brand */
+  --brand-hi:      #3c5bbf;  /* brighter brand, gradient end, links */
+  --brand-soft:    #e9ecf7;  /* brand-tinted fills / soft backgrounds */
+
+  /* --- Apple Activity ring colors (data accents) --- */
+  --move:          #fa114f;  /* red ring — Move / calories / urgency */
+  --move-soft:     #ffe6ec;
+  --exercise:      #92e82a;  /* green ring — Exercise / positive deltas */
+  --exercise-soft: #eaf8d6;
+  --stand:         #1eeaef;  /* cyan ring — Stand */
+  --stand-soft:    #d6f7f8;
+
+  /* --- Accents --- */
+  --sun:           #f2a03e;  /* amber — Pro / premium / star */
+
+  /* --- Medals --- */
+  --gold:          #d9a33a;
+  --silver:        #a8aeb8;
+  --bronze:        #b27042;
+
+  /* --- Legacy --- */
+  --brand-legacy:  #11468f;  /* original app-icon blue; still tints the Watch app */
+
+  /* ===== Type ramp ===== */
+  /* Apple system fonts. On Apple devices these render as SF Pro / New York
+     natively — the most authentic match. Fallbacks cover other platforms. */
+  --font-sans:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Arial, sans-serif;
+  --font-serif:   ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", system-ui, sans-serif; /* Watch hero numerals */
+  --font-mono:    ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Display (serif, regular weight, tight). Italic fragments take an accent color. */
+  --display-tracking: -0.02em;
+
+  /* Radii — observed in FWFStyles + screens */
+  --r-card:    22px;  /* fwfCard default */
+  --r-card-lg: 22px;
+  --r-button:  16px;  /* primary button */
+  --r-button-dashed: 18px; /* secondary dashed button */
+  --r-field:   14px;  /* leaderboard rows, inputs */
+  --r-chip:    999px; /* capsule chips */
+  --r-inset:   12px;  /* activity-strip cards, small wells */
+
+  /* Elevation — light mode uses soft layered shadows; dark mode uses borders */
+  --shadow-card: 0 8px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-float: 0 2px 8px rgba(22,24,29,0.10);
+  --shadow-selected: 0 4px 8px rgba(42,63,122,0.18);
+}
+
+/* ===== Dark mode — exact native dark variants ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:            #121316;
+    --bg-deep:       #0b0c0f;
+    --surface:       #1b1d22;
+    --surface-alt:   #252830;
+
+    --ink:           #f3f0ea;
+    --ink-soft:      #b5b7bd;
+    --ink-mute:      #74787f;
+    --ink-faint:     #4a4d54;
+
+    --border:        rgba(255, 255, 255, 0.06);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --brand:         #7c97ff;
+    --brand-hi:      #a5b6ff;
+    --brand-soft:    rgba(124, 151, 255, 0.14);
+
+    --move:          #ff2d63;
+    --move-soft:     rgba(255, 45, 99, 0.14);
+    --exercise:      #a8ff3d;
+    --exercise-soft: rgba(168, 255, 61, 0.12);
+    --stand:         #33f0f4;
+    --stand-soft:    rgba(51, 240, 244, 0.12);
+
+    --sun:           #ffb95e;
+    --gold:          #e8b458;
+    --silver:        #c0c5cd;
+    --bronze:        #c28358;
+
+    --shadow-card: 0 16px 32px rgba(0,0,0,0.30);
+  }
+}
+
+/* Opt-in dark via [data-theme="dark"] for prototypes that toggle manually */
+[data-theme="dark"] {
+  --bg:#121316; --bg-deep:#0b0c0f; --surface:#1b1d22; --surface-alt:#252830;
+  --ink:#f3f0ea; --ink-soft:#b5b7bd; --ink-mute:#74787f; --ink-faint:#4a4d54;
+  --border:rgba(255,255,255,0.06); --border-strong:rgba(255,255,255,0.14);
+  --brand:#7c97ff; --brand-hi:#a5b6ff; --brand-soft:rgba(124,151,255,0.14);
+  --move:#ff2d63; --move-soft:rgba(255,45,99,0.14);
+  --exercise:#a8ff3d; --exercise-soft:rgba(168,255,61,0.12);
+  --stand:#33f0f4; --stand-soft:rgba(51,240,244,0.12);
+  --sun:#ffb95e; --gold:#e8b458; --silver:#c0c5cd; --bronze:#c28358;
+  --shadow-card:0 16px 32px rgba(0,0,0,0.30);
+}
+
+/* ============================================================================
+   SEMANTIC TYPE CLASSES
+   Sizes taken from the SwiftUI views. iOS uses points; 1pt ≈ 1px here.
+   ============================================================================ */
+
+.fwf-display {            /* hero headline — FWFDisplay */
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 1.02;
+  letter-spacing: var(--display-tracking);
+  color: var(--ink);
+}
+.fwf-display .accent {    /* italic accent fragment, e.g. "Beat your friends." */
+  font-style: italic;
+  color: var(--brand);
+}
+
+.fwf-title-serif {        /* competition name in cards / detail header */
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 24px;
+  letter-spacing: var(--display-tracking);
+  color: var(--ink);
+}
+
+.fwf-h1 {                 /* greeting title */
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.fwf-h2 {                 /* section header */
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: var(--display-tracking);
+  color: var(--ink);
+}
+.fwf-h3 {                 /* card titles, row names */
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.fwf-body {               /* default body copy */
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+.fwf-subhead {            /* secondary body */
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.fwf-caption {            /* metadata, helper text */
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+
+.fwf-bignum {             /* hero stat — FWFBigNum, ranks, scores */
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.fwf-tag {                /* FWFTag — uppercase micro label */
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ============================================================================
+   CORE PRIMITIVES (optional helpers mirroring FWFStyles modifiers)
+   ============================================================================ */
+
+.fwf-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  .fwf-card { border: 1px solid var(--border); }
+}
+
+.fwf-chip {               /* capsule chip */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: var(--r-chip);
+  background: var(--surface-alt);
+  color: var(--ink-mute);
+}
+.fwf-chip--brand { background: var(--brand-soft); color: var(--brand); }
+
+.fwf-btn-primary {        /* FWFPrimaryButton — ink fill, inverted text */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 54px;
+  width: 100%;
+  border: none;
+  border-radius: var(--r-button);
+  background: var(--ink);
+  color: var(--bg-deep);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+.fwf-btn-secondary {      /* FWFSecondaryButton — dashed brand outline */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 56px;
+  width: 100%;
+  border-radius: var(--r-button-dashed);
+  background: transparent;
+  color: var(--brand);
+  border: 1.5px dashed color-mix(in srgb, var(--brand) 70%, transparent);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}

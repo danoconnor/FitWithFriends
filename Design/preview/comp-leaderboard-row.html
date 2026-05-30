@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .lb { display:flex; flex-direction:column; gap:10px; }
+  .rowi { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:14px; background:var(--surface); border:1px solid var(--border); }
+  .rowi.you { background:var(--brand-soft); border:1.5px solid var(--brand); box-shadow:0 4px 8px rgba(42,63,122,.18); }
+  .rank { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:14px; font-variant-numeric:tabular-nums; flex:none; }
+  .rank.gold { background:var(--gold); color:#fff; }
+  .rank.plain { border:1px solid var(--border); color:var(--ink-soft); }
+  .av { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:600; font-size:12px; flex:none; }
+  .nm { font-size:15px; font-weight:600; color:var(--ink); }
+  .nm.b { font-weight:700; }
+  .delta { font-size:12px; color:var(--ink-soft); }
+  .delta b { color:var(--exercise); }
+  .score { margin-left:auto; font-size:20px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .score span { font-size:11px; color:var(--ink-mute); font-weight:500; }
+</style></head>
+<body>
+  <div class="lb">
+    <div class="rowi"><div class="rank gold">1</div><div class="av" style="background:#fa114f;">AC</div><div><div class="nm">Alice Chen</div><div class="delta"><b>↑ +110</b> today</div></div><div class="score">480<span> pts</span></div></div>
+    <div class="rowi you"><div class="rank plain">2</div><div class="av" style="background:#2a8c66;">DK</div><div><div class="nm b">You</div><div class="delta"><b>↑ +235</b> today</div></div><div class="score">422<span> pts</span></div></div>
+  </div>
+</body></html>

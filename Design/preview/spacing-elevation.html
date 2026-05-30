@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .grid { display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
+  .e { height:80px; border-radius:18px; background:var(--surface); display:flex; align-items:flex-end; padding:10px; }
+  .card { box-shadow: 0 8px 24px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); }
+  .float { box-shadow: 0 2px 8px rgba(22,24,29,.10); }
+  .sel { box-shadow: 0 4px 8px rgba(42,63,122,.18); border:1.5px solid var(--brand); background:var(--brand-soft); }
+  .n { font-size:11px; font-weight:600; color:var(--ink); }
+  .d { font-size:10px; color:var(--ink-mute); }
+</style></head>
+<body>
+  <div class="grid">
+    <div class="e card"><div><div class="n">Card</div><div class="d">soft layered</div></div></div>
+    <div class="e float"><div><div class="n">Floating</div><div class="d">circular chrome</div></div></div>
+    <div class="e sel"><div><div class="n">Selected · "You"</div><div class="d">brand glow</div></div></div>
+  </div>
+  <div class="mono" style="margin-top:14px;">Dark mode: shadows → 1px hairline border (rgba(255,255,255,.06))</div>
+</body></html>

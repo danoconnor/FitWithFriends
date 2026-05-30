@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .gear { width:40px; height:40px; border-radius:50%; background:var(--surface); border:1px solid var(--border); display:grid; place-items:center; }
+  .float { width:38px; height:38px; border-radius:50%; background:var(--surface); display:grid; place-items:center; box-shadow:0 2px 8px rgba(22,24,29,.10); }
+  .small { width:32px; height:32px; border-radius:50%; background:var(--surface-alt); display:grid; place-items:center; }
+  svg { width:17px; height:17px; color:var(--ink); }
+</style>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script></head>
+<body>
+  <div class="row" style="gap:16px; align-items:center;">
+    <div class="gear"><i data-lucide="settings"></i></div>
+    <div class="float"><i data-lucide="chevron-left"></i></div>
+    <div class="float"><i data-lucide="share"></i></div>
+    <div class="small"><i data-lucide="more-horizontal"></i></div>
+    <div class="float"><i data-lucide="trophy"></i></div>
+  </div>
+  <div class="mono" style="margin-top:16px;">Circular icon buttons · SF Symbols on device → Lucide on web (⚠ substitution)</div>
+  <script>lucide.createIcons();</script>
+</body></html>

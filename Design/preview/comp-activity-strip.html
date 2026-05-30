@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .strip { display:flex; gap:10px; }
+  .item { width:120px; background:var(--bg); border-radius:12px; padding:12px; }
+  .l { font-size:12px; font-weight:500; color:var(--ink-mute); }
+  .v { font-size:22px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; margin-top:4px; }
+  .g { font-size:10.5px; font-weight:500; color:var(--ink-faint); margin-top:2px; }
+  .track { height:3px; border-radius:2px; margin-top:8px; }
+</style></head>
+<body>
+  <div class="strip">
+    <div class="item"><div class="l">Move</div><div class="v">510</div><div class="g">of 700 cal</div><div class="track" style="background:rgba(250,17,79,.15);"><div style="width:72%;height:3px;border-radius:2px;background:var(--move);"></div></div></div>
+    <div class="item"><div class="l">Exercise</div><div class="v">32</div><div class="g">of 30 min</div><div class="track" style="background:rgba(146,232,42,.15);"><div style="width:100%;height:3px;border-radius:2px;background:var(--exercise);"></div></div></div>
+    <div class="item"><div class="l">Stand</div><div class="v">9</div><div class="g">of 12 hr</div><div class="track" style="background:rgba(30,234,239,.15);"><div style="width:75%;height:3px;border-radius:2px;background:var(--stand);"></div></div></div>
+  </div>
+  <div class="mono" style="margin-top:14px;">Activity strip cards · 110–120px · tint per metric · 3px capsule progress</div>
+</body></html>

@@ -1,0 +1,18 @@
+/* Shared chrome for design-system specimen cards (preview/*.html).
+   Each card is ~700px wide; the asset name renders OUTSIDE the card. */
+@import url("../colors_and_type.css");
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { background: var(--bg); }
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  width: 700px;
+  padding: 22px 24px;
+  -webkit-font-smoothing: antialiased;
+}
+.row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.col { display: flex; flex-direction: column; gap: 6px; }
+.between { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.label { font-size: 11px; color: var(--ink-mute); font-weight: 500; }
+.mono { font-family: var(--font-mono); font-size: 11px; color: var(--ink-mute); }

@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .grid { display:grid; grid-template-columns: repeat(4,1fr); gap:12px; }
+  .sw { background:var(--surface); border-radius:14px; padding:10px; box-shadow:var(--shadow-card); display:flex; align-items:center; gap:10px; }
+  .dot { width:30px; height:30px; border-radius:50%; flex:none; }
+  .nm { font-size:12px; font-weight:600; color:var(--ink); }
+  .hx { font-family:var(--font-mono); font-size:10px; color:var(--ink-mute); }
+</style></head>
+<body>
+  <div class="grid">
+    <div class="sw"><div class="dot" style="background:var(--gold)"></div><div><div class="nm">Gold</div><div class="hx">#d9a33a</div></div></div>
+    <div class="sw"><div class="dot" style="background:var(--silver)"></div><div><div class="nm">Silver</div><div class="hx">#a8aeb8</div></div></div>
+    <div class="sw"><div class="dot" style="background:var(--bronze)"></div><div><div class="nm">Bronze</div><div class="hx">#b27042</div></div></div>
+    <div class="sw"><div class="dot" style="background:var(--sun)"></div><div><div class="nm">Sun · Pro</div><div class="hx">#f2a03e</div></div></div>
+  </div>
+</body></html>

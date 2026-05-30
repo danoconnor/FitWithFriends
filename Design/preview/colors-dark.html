@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  body { background:#121316; }
+  .grid { display:grid; grid-template-columns: repeat(5,1fr); gap:10px; }
+  .sw { border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,.10); }
+  .chip { height:48px; }
+  .meta { background:#1b1d22; padding:7px 9px; }
+  .nm { font-size:11px; font-weight:600; color:#f3f0ea; }
+  .hx { font-family:var(--font-mono); font-size:9.5px; color:#74787f; }
+  .hd { color:#74787f; font-size:11px; margin-bottom:12px; font-weight:600; letter-spacing:.04em; }
+</style></head>
+<body>
+  <div class="hd">DARK MODE — hand-tuned variants (elevation = hairline border, not shadow)</div>
+  <div class="grid">
+    <div class="sw"><div class="chip" style="background:#121316"></div><div class="meta"><div class="nm">Bg</div><div class="hx">#121316</div></div></div>
+    <div class="sw"><div class="chip" style="background:#1b1d22"></div><div class="meta"><div class="nm">Surface</div><div class="hx">#1b1d22</div></div></div>
+    <div class="sw"><div class="chip" style="background:#f3f0ea"></div><div class="meta"><div class="nm">Ink</div><div class="hx">#f3f0ea</div></div></div>
+    <div class="sw"><div class="chip" style="background:#7c97ff"></div><div class="meta"><div class="nm">Brand</div><div class="hx">#7c97ff</div></div></div>
+    <div class="sw"><div class="chip" style="background:#ff2d63"></div><div class="meta"><div class="nm">Move</div><div class="hx">#ff2d63</div></div></div>
+  </div>
+</body></html>

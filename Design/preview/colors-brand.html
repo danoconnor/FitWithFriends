@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .ramp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .sw { border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-card); }
+  .sw .chip { height: 70px; display:flex; align-items:flex-end; padding:8px 10px; }
+  .sw .meta { background: var(--surface); padding: 8px 10px; }
+  .sw .nm { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .sw .hx { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-mute); }
+  .role { font-size:10px; color:#fff; opacity:.9; font-weight:600; }
+</style></head>
+<body>
+  <div class="ramp">
+    <div class="sw"><div class="chip" style="background:var(--brand)"><span class="role">primary</span></div><div class="meta"><div class="nm">Brand</div><div class="hx">#2a3f7a</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--brand-hi)"><span class="role">gradient end · links</span></div><div class="meta"><div class="nm">BrandHi</div><div class="hx">#3c5bbf</div></div></div>
+    <div class="sw"><div class="chip" style="background:var(--brand-soft)"><span class="role" style="color:var(--brand)">tinted fill</span></div><div class="meta"><div class="nm">BrandSoft</div><div class="hx">#e9ecf7</div></div></div>
+  </div>
+</body></html>

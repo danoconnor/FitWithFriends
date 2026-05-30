@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+  .rings { display:grid; grid-template-columns: repeat(3,1fr); gap:14px; }
+  .ring { display:flex; align-items:center; gap:12px; background:var(--surface); border-radius:14px; padding:12px; box-shadow:var(--shadow-card); }
+  .dot { width:40px; height:40px; border-radius:50%; flex:none; }
+  .nm { font-size:13px; font-weight:600; color:var(--ink); }
+  .hx { font-family:var(--font-mono); font-size:10.5px; color:var(--ink-mute); }
+  .use { font-size:11px; color:var(--ink-soft); }
+</style></head>
+<body>
+  <div class="rings">
+    <div class="ring"><div class="dot" style="background:var(--move)"></div><div class="col"><div class="nm">Move</div><div class="hx">#fa114f</div><div class="use">calories · urgency</div></div></div>
+    <div class="ring"><div class="dot" style="background:var(--exercise)"></div><div class="col"><div class="nm">Exercise</div><div class="hx">#92e82a</div><div class="use">minutes · +delta</div></div></div>
+    <div class="ring"><div class="dot" style="background:var(--stand)"></div><div class="col"><div class="nm">Stand</div><div class="hx">#1eeaef</div><div class="use">hours</div></div></div>
+  </div>
+</body></html>
