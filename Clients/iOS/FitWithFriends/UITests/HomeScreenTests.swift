@@ -22,7 +22,7 @@ final class HomeScreenTests: FWFUITestBase {
         XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
         // Verify the competition is visible
-        XCTAssertTrue(app.staticTexts["Screenshot Competition"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Screenshot Competition"].waitForExistence(timeout: 15))
 
         // Verify the competitions section header
         XCTAssertTrue(app.staticTexts["Your Competitions"].exists)
@@ -36,8 +36,9 @@ final class HomeScreenTests: FWFUITestBase {
         // Wait for the home screen to load
         XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
 
-        // Verify empty state message
-        XCTAssertTrue(app.staticTexts["No competitions yet"].waitForExistence(timeout: 5))
+        // Verify empty state message — wait longer since the empty state now requires a network
+        // fetch to complete before the loading spinner clears.
+        XCTAssertTrue(app.staticTexts["No competitions yet"].waitForExistence(timeout: 15))
 
         takeScreenshot(name: "03_HomeScreen_Empty")
     }
