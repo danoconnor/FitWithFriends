@@ -344,10 +344,11 @@ public class CompetitionOverviewViewModel: ObservableObject {
             }
         }()
 
-        // Today's delta in the comp's own unit. Don't synthesize a value when the
-        // comp hasn't started — the empty state will show "Not started" instead.
+        // Today's delta in the comp's own unit. Only shown while the competition is
+        // actively running — suppressed before it starts and after it ends so we
+        // never show "+0 pts today" on a finished competition.
         var todayDelta: TodayDelta? = nil
-        if overview.hasCompetitionStarted, userPosition > 0,
+        if overview.isCompetitionActive, userPosition > 0,
            let userResult = allResults.first(where: { $0.userId == userId }),
            let today = userResult.pointsToday {
             let value = ScoringValueFormatter.formatCompact(today, unit: overview.scoringUnit)
