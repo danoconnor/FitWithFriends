@@ -58,9 +58,8 @@ final class CompetitionsPagerViewModelTests: XCTestCase {
     }
 
     func test_loggedIn_withEmptyOverviews_afterDataReceived_showsNoCompetitions() {
-        // Simulate a publish of an empty dict — the observer flips hasReceivedData.
+        // Re-assign to trigger a second publish (the first was dropped by .dropFirst() in init).
         mockCompetitionManager.return_competitionOverviews = [:]
-        // The publisher binding in init already sets hasReceivedData via sink; give runloop a tick.
         let expectation = self.expectation(description: "hasReceivedData")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { expectation.fulfill() }
         wait(for: [expectation], timeout: 1)

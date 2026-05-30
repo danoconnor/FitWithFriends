@@ -38,6 +38,7 @@ class CompetitionsPagerViewModel: ObservableObject {
             .store(in: &cancellables)
 
         competitionManager.competitionOverviewsPublisher
+            .dropFirst() // skip the initial @Published value; only react to real fetch results
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.hasReceivedData = true

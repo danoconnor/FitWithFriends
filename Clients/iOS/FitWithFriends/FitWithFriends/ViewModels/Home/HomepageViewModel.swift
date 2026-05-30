@@ -21,6 +21,7 @@ public class HomepageViewModel: ObservableObject {
     @Published var loadedActivitySummary: Bool
     @Published var todayActivitySummary: ActivitySummary?
 
+    @Published private(set) var isLoadingCompetitions: Bool = true
     @Published var currentCompetitions: [CompetitionOverview]?
     @Published var publicCompetitions: [PublicCompetition]?
     @Published var isUserPro: Bool = false
@@ -47,8 +48,10 @@ public class HomepageViewModel: ObservableObject {
 
         // Need to hold a reference to this, otherwise the sink callback will never be invoked
         competitionLoadListener = competitionManager.competitionOverviewsPublisher
+            .dropFirst() // skip the initial @Published value; only react to real fetch results
             .receive(on: DispatchQueue.main)
             .sink { [weak self] newValue in
+                self?.isLoadingCompetitions = false
                 self?.currentCompetitions = newValue.map { $0.value }
                     .sorted { $0 < $1 }
             }

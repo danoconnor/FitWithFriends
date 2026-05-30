@@ -76,7 +76,13 @@ struct LoggedInContentView: View {
                         }
 
                         // Competitions section
-                        if let competitions = homepageViewModel.currentCompetitions, !competitions.isEmpty {
+                        if homepageViewModel.isLoadingCompetitions {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 24)
+                                .fwfCard()
+                                .padding(.horizontal, 16)
+                        } else if let competitions = homepageViewModel.currentCompetitions, !competitions.isEmpty {
                             sectionHeader("Your Competitions")
 
                             ForEach(competitions) { competitionOverview in
@@ -87,7 +93,7 @@ struct LoggedInContentView: View {
                                     .fwfCard()
                                     .padding(.horizontal, 16)
                             }
-                        } else if homepageViewModel.currentCompetitions != nil {
+                        } else {
                             noCompetitionsEmptyState
                         }
 
