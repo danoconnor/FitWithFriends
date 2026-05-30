@@ -27,6 +27,7 @@ public class HomepageViewModel: ObservableObject {
     @Published var isUserPro: Bool = false
 
     private var competitionLoadListener: AnyCancellable?
+    private var competitionFetchListener: AnyCancellable?
     private var publicCompetitionLoadListener: AnyCancellable?
     private var proStatusListener: AnyCancellable?
 
@@ -48,12 +49,20 @@ public class HomepageViewModel: ObservableObject {
 
         // Need to hold a reference to this, otherwise the sink callback will never be invoked
         competitionLoadListener = competitionManager.competitionOverviewsPublisher
-            .dropFirst() // skip the initial @Published value; only react to real fetch results
             .receive(on: DispatchQueue.main)
             .sink { [weak self] newValue in
-                self?.isLoadingCompetitions = false
                 self?.currentCompetitions = newValue.map { $0.value }
                     .sorted { $0 < $1 }
+            }
+
+        // Use the explicit fetch-completed signal (a PassthroughSubject that never replays)
+        // rather than the @Published publisher to clear the loading state — this avoids the
+        // @Published replay-on-subscribe race where the initial empty dict could be mistaken
+        // for a real "no competitions" result.
+        competitionFetchListener = competitionManager.competitionFetchCompleted
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.isLoadingCompetitions = false
             }
 
         publicCompetitionLoadListener = competitionManager.publicCompetitionsPublisher

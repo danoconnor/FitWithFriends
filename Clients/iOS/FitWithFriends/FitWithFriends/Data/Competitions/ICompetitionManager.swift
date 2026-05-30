@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 /**
@@ -9,6 +10,12 @@ protocol ICompetitionManager: AnyObject {
 
     /// A publisher for changes to the competitionOverviews
     var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { get }
+
+    /// Fires once after each real network fetch of competition overviews completes (success or
+    /// empty). Unlike `competitionOverviewsPublisher`, this never replays the current value to
+    /// new subscribers — observers can use it to detect "first load done" without the
+    /// @Published replay problem.
+    var competitionFetchCompleted: AnyPublisher<Void, Never> { get }
 
     /// Creates a new competition with the specified start date, end date, and name.
     /// - Parameters:

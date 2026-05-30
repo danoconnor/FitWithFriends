@@ -17,6 +17,9 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
     @Published private(set) var competitionOverviews: [UUID: CompetitionOverview]
     var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { $competitionOverviews }
 
+    private let _fetchCompleted = PassthroughSubject<Void, Never>()
+    var competitionFetchCompleted: AnyPublisher<Void, Never> { _fetchCompleted.eraseToAnyPublisher() }
+
     @Published private(set) var publicCompetitions: [PublicCompetition] = []
     var publicCompetitionsPublisher: Published<[PublicCompetition]>.Publisher { $publicCompetitions }
 
@@ -103,6 +106,7 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
 
         await MainActor.run {
             self.competitionOverviews = refreshedData
+            self._fetchCompleted.send()
         }
 
         await refreshPublicCompetitions()

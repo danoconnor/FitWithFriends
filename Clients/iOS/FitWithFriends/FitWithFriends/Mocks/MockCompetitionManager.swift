@@ -5,6 +5,7 @@
 //  Created by Dan O'Connor on 1/22/22.
 //
 
+import Combine
 import Foundation
 
 public class MockCompetitionManager: ICompetitionManager {
@@ -16,6 +17,11 @@ public class MockCompetitionManager: ICompetitionManager {
     }
 
     var competitionOverviewsPublisher: Published<[UUID : CompetitionOverview]>.Publisher { $return_competitionOverviews }
+
+    // Fires when return_competitionOverviews is assigned after init (simulates a fetch completing).
+    var competitionFetchCompleted: AnyPublisher<Void, Never> {
+        $return_competitionOverviews.dropFirst().map { _ in () }.eraseToAnyPublisher()
+    }
 
     public init() {
         // Default to having a competition
