@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 /**
@@ -9,6 +10,12 @@ protocol ICompetitionManager: AnyObject {
 
     /// A publisher for changes to the competitionOverviews
     var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { get }
+
+    /// True while the first competition overview fetch is still in flight; false once any
+    /// fetch completes (success or error). Unlike a PassthroughSubject, this @Published value
+    /// replays to late subscribers, so ViewModels that subscribe after the fetch already
+    /// finished still see the correct state.
+    var isLoadingOverviewsPublisher: Published<Bool>.Publisher { get }
 
     /// Creates a new competition with the specified start date, end date, and name.
     /// - Parameters:

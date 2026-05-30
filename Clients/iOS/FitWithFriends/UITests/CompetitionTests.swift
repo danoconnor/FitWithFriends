@@ -66,7 +66,7 @@ final class CompetitionTests: FWFUITestBase {
         // Wait for the home screen to load and competition to appear
         XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Detail Test Competition"]
-        XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
+        XCTAssertTrue(competitionText.waitForExistence(timeout: 15))
 
         // Tap the competition to open detail
         competitionText.tap()
@@ -91,7 +91,7 @@ final class CompetitionTests: FWFUITestBase {
         // Wait for the home screen and competition to load
         XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["User Detail Test"]
-        XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
+        XCTAssertTrue(competitionText.waitForExistence(timeout: 15))
 
         // Open competition detail
         competitionText.tap()

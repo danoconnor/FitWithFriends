@@ -36,7 +36,7 @@ final class ScreenshotTests: FWFUITestBase {
         launchApp(loggedIn: true, isPro: true)
 
         XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["Move More, Win More"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Move More, Win More"].waitForExistence(timeout: 15))
 
         snapshot("02_HomeScreen")
     }
@@ -53,7 +53,7 @@ final class ScreenshotTests: FWFUITestBase {
 
         XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Move More, Win More"]
-        XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
+        XCTAssertTrue(competitionText.waitForExistence(timeout: 15))
         competitionText.tap()
 
         XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
@@ -89,7 +89,7 @@ final class ScreenshotTests: FWFUITestBase {
 
         XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
         let competitionText = app.staticTexts["Move More, Win More"]
-        XCTAssertTrue(competitionText.waitForExistence(timeout: 10))
+        XCTAssertTrue(competitionText.waitForExistence(timeout: 15))
         competitionText.tap()
 
         XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))

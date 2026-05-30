@@ -37,11 +37,15 @@ class CompetitionsPagerViewModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        competitionManager.competitionOverviewsPublisher
+        // isLoadingOverviewsPublisher is @Published and replays its current value to late
+        // subscribers, so hasReceivedData is set correctly even if the first fetch completed
+        // before this ViewModel was created.
+        competitionManager.isLoadingOverviewsPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.hasReceivedData = true
-                self?.recomputeDisplayState(loginState: authenticationManager.loginState)
+            .sink { [weak self] isLoading in
+                guard let self, !isLoading else { return }
+                self.hasReceivedData = true
+                self.recomputeDisplayState(loginState: authenticationManager.loginState)
             }
             .store(in: &cancellables)
     }

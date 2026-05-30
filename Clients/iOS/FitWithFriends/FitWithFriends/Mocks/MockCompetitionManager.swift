@@ -5,17 +5,30 @@
 //  Created by Dan O'Connor on 1/22/22.
 //
 
+import Combine
 import Foundation
 
 public class MockCompetitionManager: ICompetitionManager {
     var return_error: Error?
 
-    @Published var return_competitionOverviews: [UUID: CompetitionOverview] = [:]
+    @Published var return_competitionOverviews: [UUID: CompetitionOverview] = [:] {
+        didSet {
+            guard initComplete else { return }
+            isLoadingOverviews = false
+        }
+    }
     public var competitionOverviews: [UUID : CompetitionOverview] {
         return return_competitionOverviews
     }
 
     var competitionOverviewsPublisher: Published<[UUID : CompetitionOverview]>.Publisher { $return_competitionOverviews }
+
+    // Mirrors CompetitionManager.isLoadingOverviewsPublisher. Starts true; becomes false when
+    // return_competitionOverviews is set after init (simulating a real fetch completing).
+    @Published var isLoadingOverviews: Bool = true
+    var isLoadingOverviewsPublisher: Published<Bool>.Publisher { $isLoadingOverviews }
+
+    private var initComplete = false
 
     public init() {
         // Default to having a competition
@@ -30,6 +43,7 @@ public class MockCompetitionManager: ICompetitionManager {
             UUID(): CompetitionOverview(start: Date(), end: Date().addingTimeInterval(TimeInterval.xtDays(7)), currentResults: results),
             UUID(): CompetitionOverview(start: Date(), end: Date().addingTimeInterval(TimeInterval.xtDays(7)), currentResults: results),
         ]
+        initComplete = true
     }
 
     public var param_createCompetition_startDate: Date?

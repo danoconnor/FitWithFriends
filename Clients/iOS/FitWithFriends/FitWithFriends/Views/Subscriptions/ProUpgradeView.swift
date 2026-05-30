@@ -175,14 +175,14 @@ struct ProUpgradeView: View {
 
     private var ctaBlock: some View {
         VStack(spacing: 10) {
-            FWFPrimaryButton(purchaseInProgress ? "Starting Pro…" : "Start Pro · $19.99/yr") {
+            FWFPrimaryButton(purchaseInProgress ? "Starting Pro…" : "Start Pro · $2.99/mo") {
                 Task { await purchase() }
             }
             .disabled(purchaseInProgress || restoreInProgress)
             .opacity(purchaseInProgress ? 0.6 : 1)
 
             HStack(spacing: 4) {
-                Text("Renews yearly. Cancel any time in iOS Settings.")
+                Text("Renews monthly. Cancel any time in iOS Settings.")
                     .font(.system(size: 11))
                     .foregroundStyle(Color("InkMute"))
                 Button {

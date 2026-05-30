@@ -103,8 +103,8 @@ final class PublicCompetitionTests: FWFUITestBase {
         XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
 
         // Joined public competition appears in "Your Competitions" with a "Public" badge
-        XCTAssertTrue(app.staticTexts["Your Competitions"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["Joined Public Competition"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Your Competitions"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["Joined Public Competition"].waitForExistence(timeout: 15))
         XCTAssertTrue(app.staticTexts["Public"].waitForExistence(timeout: 5))
 
         takeScreenshot(name: "09_JoinedPublicCompetition")

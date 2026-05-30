@@ -17,6 +17,9 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
     @Published private(set) var competitionOverviews: [UUID: CompetitionOverview]
     var competitionOverviewsPublisher: Published<[UUID: CompetitionOverview]>.Publisher { $competitionOverviews }
 
+    @Published private(set) var isLoadingOverviews: Bool = true
+    var isLoadingOverviewsPublisher: Published<Bool>.Publisher { $isLoadingOverviews }
+
     @Published private(set) var publicCompetitions: [PublicCompetition] = []
     var publicCompetitionsPublisher: Published<[PublicCompetition]>.Publisher { $publicCompetitions }
 
@@ -76,6 +79,7 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
             competitionIds = try await competitionService.getUsersCompetitions(userId: loggedInUserId)
         } catch {
             Logger.traceError(message: "Failed to fetch competitions for user \(loggedInUserId)", error: error)
+            await MainActor.run { self.isLoadingOverviews = false }
             return
         }
 
@@ -103,6 +107,7 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
 
         await MainActor.run {
             self.competitionOverviews = refreshedData
+            self.isLoadingOverviews = false
         }
 
         await refreshPublicCompetitions()

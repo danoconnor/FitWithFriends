@@ -21,11 +21,13 @@ public class HomepageViewModel: ObservableObject {
     @Published var loadedActivitySummary: Bool
     @Published var todayActivitySummary: ActivitySummary?
 
+    @Published private(set) var isLoadingCompetitions: Bool = true
     @Published var currentCompetitions: [CompetitionOverview]?
     @Published var publicCompetitions: [PublicCompetition]?
     @Published var isUserPro: Bool = false
 
     private var competitionLoadListener: AnyCancellable?
+    private var loadingStateListener: AnyCancellable?
     private var publicCompetitionLoadListener: AnyCancellable?
     private var proStatusListener: AnyCancellable?
 
@@ -51,6 +53,15 @@ public class HomepageViewModel: ObservableObject {
             .sink { [weak self] newValue in
                 self?.currentCompetitions = newValue.map { $0.value }
                     .sorted { $0 < $1 }
+            }
+
+        // isLoadingOverviewsPublisher is @Published so it replays the current value to late
+        // subscribers. If the fetch already completed before this ViewModel was created, the
+        // subscriber still gets `false` on the next main-queue tick — no stuck spinner.
+        loadingStateListener = competitionManager.isLoadingOverviewsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if !isLoading { self?.isLoadingCompetitions = false }
             }
 
         publicCompetitionLoadListener = competitionManager.publicCompetitionsPublisher
