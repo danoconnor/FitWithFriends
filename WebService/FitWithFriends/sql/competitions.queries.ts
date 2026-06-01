@@ -530,6 +530,134 @@ export function updateCompetitionFinalPoints(params: IUpdateCompetitionFinalPoin
 }
 
 
+/** 'GetPendingCompetitionNotifications' parameters type */
+export interface IGetPendingCompetitionNotificationsParams {
+  archivedState: number;
+  finishedAfter: DateOrString;
+  processingState: number;
+}
+
+/** 'GetPendingCompetitionNotifications' return type */
+export interface IGetPendingCompetitionNotificationsResult {
+  competition_id: string;
+  display_name: string;
+  final_points: number | null;
+  iana_timezone: string;
+  preferred_timezone: string | null;
+  sent_complete_notification: boolean;
+  sent_processing_notification: boolean;
+  state: number;
+  user_id: string;
+}
+
+/** 'GetPendingCompetitionNotifications' query type */
+export interface IGetPendingCompetitionNotificationsQuery {
+  params: IGetPendingCompetitionNotificationsParams;
+  result: IGetPendingCompetitionNotificationsResult;
+}
+
+const getPendingCompetitionNotificationsIR: any = {"usedParamSet":{"finishedAfter":true,"processingState":true,"archivedState":true},"params":[{"name":"finishedAfter","required":true,"transform":{"type":"scalar"},"locs":[{"a":853,"b":867}]},{"name":"processingState","required":true,"transform":{"type":"scalar"},"locs":[{"a":919,"b":935}]},{"name":"archivedState","required":true,"transform":{"type":"scalar"},"locs":[{"a":1001,"b":1015}]}],"statement":"                                                                                                                                                                                                                                                                                                                                                                                                 \nSELECT\n    c.competition_id,\n    c.display_name,\n    c.iana_timezone,\n    c.state,\n    encode(uc.user_id::bytea, 'hex') AS \"user_id!\",\n    u.preferred_timezone,\n    uc.final_points,\n    uc.sent_processing_notification AS \"sent_processing_notification!\",\n    uc.sent_complete_notification AS \"sent_complete_notification!\"\nFROM competitions c\nJOIN users_competitions uc ON uc.competition_id = c.competition_id\nJOIN users u ON u.user_id = uc.user_id\nWHERE c.end_date >= :finishedAfter!\n  AND u.is_bot = false\n  AND (\n        (c.state = :processingState! AND uc.sent_processing_notification = false)\n     OR (c.state = :archivedState! AND uc.sent_complete_notification = false)\n  )"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ *                                                                                                                                                                                                                                                                                                                                                                                                  
+ * SELECT
+ *     c.competition_id,
+ *     c.display_name,
+ *     c.iana_timezone,
+ *     c.state,
+ *     encode(uc.user_id::bytea, 'hex') AS "user_id!",
+ *     u.preferred_timezone,
+ *     uc.final_points,
+ *     uc.sent_processing_notification AS "sent_processing_notification!",
+ *     uc.sent_complete_notification AS "sent_complete_notification!"
+ * FROM competitions c
+ * JOIN users_competitions uc ON uc.competition_id = c.competition_id
+ * JOIN users u ON u.user_id = uc.user_id
+ * WHERE c.end_date >= :finishedAfter!
+ *   AND u.is_bot = false
+ *   AND (
+ *         (c.state = :processingState! AND uc.sent_processing_notification = false)
+ *      OR (c.state = :archivedState! AND uc.sent_complete_notification = false)
+ *   )
+ * ```
+ */
+export function getPendingCompetitionNotifications(params: IGetPendingCompetitionNotificationsParams): Promise<Array<IGetPendingCompetitionNotificationsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const getPendingCompetitionNotifications = new pgtyped.PreparedQuery<IGetPendingCompetitionNotificationsParams,IGetPendingCompetitionNotificationsResult>(getPendingCompetitionNotificationsIR);
+    return getPendingCompetitionNotifications.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'MarkProcessingNotificationSent' parameters type */
+export interface IMarkProcessingNotificationSentParams {
+  competitionId: string;
+  userId: Buffer;
+}
+
+/** 'MarkProcessingNotificationSent' return type */
+export type IMarkProcessingNotificationSentResult = void;
+
+/** 'MarkProcessingNotificationSent' query type */
+export interface IMarkProcessingNotificationSentQuery {
+  params: IMarkProcessingNotificationSentParams;
+  result: IMarkProcessingNotificationSentResult;
+}
+
+const markProcessingNotificationSentIR: any = {"usedParamSet":{"userId":true,"competitionId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":82,"b":89}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":112,"b":126}]}],"statement":"UPDATE users_competitions\nSET sent_processing_notification = true\nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users_competitions
+ * SET sent_processing_notification = true
+ * WHERE user_id = :userId! AND competition_id = :competitionId!
+ * ```
+ */
+export function markProcessingNotificationSent(params: IMarkProcessingNotificationSentParams): Promise<Array<IMarkProcessingNotificationSentResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const markProcessingNotificationSent = new pgtyped.PreparedQuery<IMarkProcessingNotificationSentParams,IMarkProcessingNotificationSentResult>(markProcessingNotificationSentIR);
+    return markProcessingNotificationSent.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'MarkCompleteNotificationSent' parameters type */
+export interface IMarkCompleteNotificationSentParams {
+  competitionId: string;
+  userId: Buffer;
+}
+
+/** 'MarkCompleteNotificationSent' return type */
+export type IMarkCompleteNotificationSentResult = void;
+
+/** 'MarkCompleteNotificationSent' query type */
+export interface IMarkCompleteNotificationSentQuery {
+  params: IMarkCompleteNotificationSentParams;
+  result: IMarkCompleteNotificationSentResult;
+}
+
+const markCompleteNotificationSentIR: any = {"usedParamSet":{"userId":true,"competitionId":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":308,"b":315}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":338,"b":352}]}],"statement":"                                                                                                                                                                                              \nUPDATE users_competitions\nSET sent_complete_notification = true, sent_processing_notification = true\nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ *                                                                                                                                                                                               
+ * UPDATE users_competitions
+ * SET sent_complete_notification = true, sent_processing_notification = true
+ * WHERE user_id = :userId! AND competition_id = :competitionId!
+ * ```
+ */
+export function markCompleteNotificationSent(params: IMarkCompleteNotificationSentParams): Promise<Array<IMarkCompleteNotificationSentResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const markCompleteNotificationSent = new pgtyped.PreparedQuery<IMarkCompleteNotificationSentParams,IMarkCompleteNotificationSentResult>(markCompleteNotificationSentIR);
+    return markCompleteNotificationSent.run(params, DatabaseConnectionPool);
+  });
+}
+
+
 /** 'GetPublicCompetitions' parameters type */
 export interface IGetPublicCompetitionsParams {
   activeState: number;

@@ -231,12 +231,15 @@ describe('performDailyTasks - archiveCompetitions', () => {
         expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
-        expect(getTaskResult(response, 'archiveCompetitions')).toContain('2/2 push notifications sent');
         expect(getTaskWarning(response, 'archiveCompetitions')).toBeUndefined();
 
         // Verify the competition state was updated to Archived
         const competition = await TestSQL.getCompetition({ competitionId });
         expect(competition[0].state).toBe(CompetitionState.Archived);
+
+        // Final points are frozen at archival (read by the per-user results notification)
+        const members = await TestSQL.getUsersInCompetition({ competitionId });
+        expect(members.every(m => m.final_points !== null)).toBe(true);
     });
 
     test('does not archive competitions in ProcessingResults state for less than 24 hours', async () => {
@@ -295,7 +298,7 @@ describe('performDailyTasks - archiveCompetitions', () => {
         expect(competition[0].state).toBe(CompetitionState.Archived);
     });
 
-    test('sets a warning when users have no registered push token', async () => {
+    test('archives even when a member has no registered push token', async () => {
         const competitionId = crypto.randomUUID();
         const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
@@ -317,15 +320,204 @@ describe('performDailyTasks - archiveCompetitions', () => {
             competitionId
         });
 
+        // Archival is independent of push delivery (which now happens per-user in
+        // sendCompetitionNotifications), so it succeeds without warnings.
         const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', {});
         expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
         expect(response.data.errors).toHaveLength(0);
         expect(getTaskResult(response, 'archiveCompetitions')).toContain('Archived 1 competition(s)');
-        expect(getTaskResult(response, 'archiveCompetitions')).toContain('0/1 push notifications sent');
-        expect(getTaskWarning(response, 'archiveCompetitions')).toContain('1 push notification(s) failed to deliver');
+        expect(getTaskWarning(response, 'archiveCompetitions')).toBeUndefined();
 
         const competition = await TestSQL.getCompetition({ competitionId });
         expect(competition[0].state).toBe(CompetitionState.Archived);
+    });
+});
+
+describe('performDailyTasks - sendCompetitionNotifications', () => {
+    // Helpers -----------------------------------------------------------------
+
+    // A competition whose end_date is the calendar day of `currentDate` is "ended"
+    // (its midnight-UTC end_date is before currentDate) but not yet old enough to
+    // archive (< 24h in processing), so it stays in whatever state we created it in.
+    function recentlyEndedDate(currentDateIso: string): Date {
+        return new Date(currentDateIso.slice(0, 10) + 'T00:00:00.000Z');
+    }
+
+    async function createNotificationCompetition(opts: {
+        currentDateIso: string;
+        state: CompetitionState;
+        ianaTimezone?: string;
+    }): Promise<string> {
+        const competitionId = crypto.randomUUID();
+        const endDate = recentlyEndedDate(opts.currentDateIso);
+        await TestSQL.createCompetitionWithState({
+            competitionId,
+            displayName: 'Notification Competition',
+            startDate: new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000),
+            endDate,
+            adminUserId: convertUserIdToBuffer(testUserId1),
+            accessToken: 'test-token-' + competitionId.slice(0, 8),
+            ianaTimezone: opts.ianaTimezone ?? 'UTC',
+            state: opts.state
+        });
+        competitionsToCleanup.push(competitionId);
+        return competitionId;
+    }
+
+    async function addMember(competitionId: string, userId: string, opts?: { withToken?: boolean; timezone?: string; finalPoints?: number }) {
+        await TestSQL.addUserToCompetition({ userId: convertUserIdToBuffer(userId), competitionId });
+        if (opts?.withToken !== false) {
+            await TestSQL.createPushToken({
+                userId: convertUserIdToBuffer(userId),
+                pushToken: 'tok-' + userId + '-' + competitionId.slice(0, 8),
+                platform: 1,
+                appInstallId: crypto.randomUUID()
+            });
+        }
+        if (opts?.timezone) {
+            await TestSQL.setUserPreferredTimezone({ userId: convertUserIdToBuffer(userId), preferredTimezone: opts.timezone });
+        }
+        if (opts?.finalPoints !== undefined) {
+            await TestSQL.updateUserCompetitionFinalPoints({ userId: convertUserIdToBuffer(userId), competitionId, finalPoints: opts.finalPoints });
+        }
+    }
+
+    async function memberFlags(competitionId: string, userId: string) {
+        const rows = await TestSQL.getUsersInCompetition({ competitionId });
+        const buf = convertUserIdToBuffer(userId);
+        return rows.find(r => r.user_id.equals(buf))!;
+    }
+
+    // Mid-morning (08:30) and pre-dawn (02:00) instants in UTC
+    const inWindowUtc = '2026-06-15T08:30:00.000Z';
+    const outOfWindowUtc = '2026-06-15T02:00:00.000Z';
+
+    // Tests -------------------------------------------------------------------
+
+    test('sends the processing notification within the local morning window and marks the flag', async () => {
+        const competitionId = await createNotificationCompetition({ currentDateIso: inWindowUtc, state: CompetitionState.ProcessingResults });
+        await addMember(competitionId, testUserId1);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate: inWindowUtc });
+        expect(response.data.errors).toHaveLength(0);
+
+        const flags = await memberFlags(competitionId, testUserId1);
+        expect(flags.sent_processing_notification).toBe(true);
+        expect(flags.sent_complete_notification).toBe(false);
+    });
+
+    test('does not send outside the local morning window', async () => {
+        const competitionId = await createNotificationCompetition({ currentDateIso: outOfWindowUtc, state: CompetitionState.ProcessingResults });
+        await addMember(competitionId, testUserId1);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate: outOfWindowUtc });
+        expect(response.data.errors).toHaveLength(0);
+
+        const flags = await memberFlags(competitionId, testUserId1);
+        expect(flags.sent_processing_notification).toBe(false);
+    });
+
+    test('respects each member\'s own timezone in the same run', async () => {
+        // 23:30 UTC = 08:30 next day in Tokyo (+9, in window), 13:30 in Honolulu (-10, out of window)
+        const currentDate = '2026-06-15T23:30:00.000Z';
+        const competitionId = await createNotificationCompetition({ currentDateIso: currentDate, state: CompetitionState.ProcessingResults });
+        await addMember(competitionId, testUserId1, { timezone: 'Asia/Tokyo' });
+        await addMember(competitionId, testUserId2, { timezone: 'Pacific/Honolulu' });
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate });
+        expect(response.data.errors).toHaveLength(0);
+
+        expect((await memberFlags(competitionId, testUserId1)).sent_processing_notification).toBe(true);
+        expect((await memberFlags(competitionId, testUserId2)).sent_processing_notification).toBe(false);
+    });
+
+    test('falls back to the competition timezone when a member has no preferred timezone', async () => {
+        // 13:30 UTC is out of the UTC morning window, but in-window for the competition's New York tz (09:30 EDT)
+        const currentDate = '2026-06-15T13:30:00.000Z';
+        const competitionId = await createNotificationCompetition({ currentDateIso: currentDate, state: CompetitionState.ProcessingResults, ianaTimezone: 'America/New_York' });
+        await addMember(competitionId, testUserId1); // no preferred timezone
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate });
+        expect(response.data.errors).toHaveLength(0);
+
+        expect((await memberFlags(competitionId, testUserId1)).sent_processing_notification).toBe(true);
+    });
+
+    test('sends the results notification for an archived competition and marks both flags', async () => {
+        const competitionId = await createNotificationCompetition({ currentDateIso: inWindowUtc, state: CompetitionState.Archived });
+        await addMember(competitionId, testUserId1, { finalPoints: 500 });
+        await addMember(competitionId, testUserId2, { finalPoints: 300 });
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate: inWindowUtc });
+        expect(response.data.errors).toHaveLength(0);
+
+        const flags1 = await memberFlags(competitionId, testUserId1);
+        expect(flags1.sent_complete_notification).toBe(true);
+        expect(flags1.sent_processing_notification).toBe(true); // completing makes processing moot
+        const flags2 = await memberFlags(competitionId, testUserId2);
+        expect(flags2.sent_complete_notification).toBe(true);
+    });
+
+    test('skips the processing notification once the competition has archived (catch-up)', async () => {
+        // Member never received the processing notification, but the competition is already archived
+        const competitionId = await createNotificationCompetition({ currentDateIso: inWindowUtc, state: CompetitionState.Archived });
+        await addMember(competitionId, testUserId1, { finalPoints: 100 });
+        // sanity: both flags start false
+        expect((await memberFlags(competitionId, testUserId1)).sent_processing_notification).toBe(false);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate: inWindowUtc });
+        expect(response.data.errors).toHaveLength(0);
+
+        const flags = await memberFlags(competitionId, testUserId1);
+        expect(flags.sent_complete_notification).toBe(true);
+        expect(flags.sent_processing_notification).toBe(true);
+    });
+
+    test('does not mark the flag when delivery fails, so it retries next run', async () => {
+        const competitionId = await createNotificationCompetition({ currentDateIso: inWindowUtc, state: CompetitionState.ProcessingResults });
+        await addMember(competitionId, testUserId1, { withToken: false }); // no push token -> delivery fails
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate: inWindowUtc });
+        expect(response.data.errors).toHaveLength(0);
+        expect(getTaskWarning(response, 'sendCompetitionNotifications')).toContain('not delivered');
+
+        expect((await memberFlags(competitionId, testUserId1)).sent_processing_notification).toBe(false);
+    });
+
+    test('does not notify bot users', async () => {
+        const botUserId = Math.random().toString().slice(2, 8);
+        await TestSQL.createBotUser({
+            userId: convertUserIdToBuffer(botUserId),
+            firstName: 'Bot',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: new Date()
+        });
+        usersToCleanup.push(botUserId);
+
+        const competitionId = await createNotificationCompetition({ currentDateIso: inWindowUtc, state: CompetitionState.ProcessingResults });
+        await addMember(competitionId, testUserId1);
+        await addMember(competitionId, botUserId);
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate: inWindowUtc });
+        expect(response.data.errors).toHaveLength(0);
+
+        expect((await memberFlags(competitionId, testUserId1)).sent_processing_notification).toBe(true);
+        expect((await memberFlags(competitionId, botUserId)).sent_processing_notification).toBe(false);
+    });
+
+    test('does not re-send to a member already notified', async () => {
+        const competitionId = await createNotificationCompetition({ currentDateIso: inWindowUtc, state: CompetitionState.ProcessingResults });
+        await addMember(competitionId, testUserId1);
+        await TestSQL.setNotificationFlags({ userId: convertUserIdToBuffer(testUserId1), competitionId, sentProcessing: true, sentComplete: false });
+
+        const response = await RequestUtilities.makeAdminPostRequest('admin/performDailyTasks', { currentDate: inWindowUtc });
+        expect(response.data.errors).toHaveLength(0);
+        // The competition has no un-notified members, so nothing is sent
+        expect(getTaskResult(response, 'sendCompetitionNotifications')).toBe('No competition notifications to send');
+
+        const flags = await memberFlags(competitionId, testUserId1);
+        expect(flags.sent_processing_notification).toBe(true);
     });
 });
 

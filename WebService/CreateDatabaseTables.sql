@@ -123,7 +123,8 @@ CREATE TABLE public.users (
     created_date date NOT NULL,
     apple_original_transaction_id text,
     subscription_expires_date timestamp,
-    is_bot boolean DEFAULT false NOT NULL
+    is_bot boolean DEFAULT false NOT NULL,
+    preferred_timezone text
 );
 
 
@@ -137,7 +138,9 @@ ALTER TABLE public.users OWNER TO postgres;
 CREATE TABLE public.users_competitions (
     user_id bytea NOT NULL,
     competition_id uuid NOT NULL,
-    final_points real
+    final_points real,
+    sent_processing_notification boolean DEFAULT false NOT NULL,
+    sent_complete_notification boolean DEFAULT false NOT NULL
 );
 
 

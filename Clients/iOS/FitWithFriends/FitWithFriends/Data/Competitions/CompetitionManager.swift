@@ -169,6 +169,10 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
     func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails {
         return try await competitionService.getUserCompetitionDetails(competitionId: competitionId, userId: userId)
     }
+
+    func markCompetitionNotificationsSeen(competitionId: UUID) async throws {
+        try await competitionService.markCompetitionNotificationsSeen(competitionId: competitionId)
+    }
 }
 
 #if !os(watchOS)

@@ -24,4 +24,9 @@ public protocol IUserService {
 
     /// Permanently deletes the currently authenticated user's account and all associated data.
     func deleteAccount() async throws
+
+    /// Reports the device's current IANA timezone so the server schedules end-of-competition
+    /// notifications at the user's local morning.
+    /// - Parameter timezone: An IANA timezone identifier (e.g. `TimeZone.current.identifier`)
+    func reportTimezone(_ timezone: String) async throws
 }

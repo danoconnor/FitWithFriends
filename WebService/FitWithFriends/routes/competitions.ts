@@ -345,6 +345,27 @@ router.post('/leave', function (req, res) {
         });
 });
 
+// Marks the end-of-competition notifications as satisfied for the authenticated
+// user. The client calls this when it shows the end-of-competition screen, so the
+// server doesn't also send the now-redundant push at the user's local 8am.
+router.post('/:competitionId/notificationsSeen', function (req, res) {
+    const competitionId: string = req.params['competitionId'];
+    const userIdBuffer = convertUserIdToBuffer(res.locals.oauth.token.user.id);
+
+    CompetitionQueries.isUserInCompetition({ userId: userIdBuffer, competitionId })
+        .then(membership => {
+            if (!membership.length || membership[0].count === 0) {
+                handleError(null, 401, 'User is not a member of the competition', res);
+                return;
+            }
+
+            CompetitionQueries.markCompleteNotificationSent({ userId: userIdBuffer, competitionId })
+                .then(() => res.sendStatus(200))
+                .catch(error => handleError(error, 500, 'Error marking competition notifications as seen', res));
+        })
+        .catch(error => handleError(error, 500, 'Error checking competition membership', res));
+});
+
 // Returns an overview of the given competition that contains a list of users and their current points for the competition
 // The user must be a member of this competition in order to receive the data
 //

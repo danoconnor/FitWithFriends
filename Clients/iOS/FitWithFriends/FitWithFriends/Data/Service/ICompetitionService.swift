@@ -67,6 +67,12 @@ public protocol ICompetitionService {
     /// - Parameter competitionId: The competition to join
     func joinPublicCompetition(competitionId: UUID) async throws
 
+    /// Marks the end-of-competition notifications as seen for the logged-in user, so the
+    /// server won't also send the (now-redundant) push. Called when the end-of-competition
+    /// screen is shown.
+    /// - Parameter competitionId: The competition id
+    func markCompetitionNotificationsSeen(competitionId: UUID) async throws
+
     /// Get daily activity details for a specific user within a competition.
     /// Both the logged-in user and the target user must be members of the competition.
     /// Only returns data within the competition's date range.

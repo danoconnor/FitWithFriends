@@ -102,6 +102,29 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         XCTAssertNotNil(vm.currentAlertCompetition)
     }
 
+    func test_archivedCompetition_marksNotificationsSeen() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 1)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+        // The mark-seen call is fire-and-forget in a detached Task
+        await waitUntil(mockCompetitionManager.markCompetitionNotificationsSeenCallCount > 0)
+
+        XCTAssertEqual(mockCompetitionManager.markCompetitionNotificationsSeenCallCount, 1)
+        XCTAssertEqual(mockCompetitionManager.param_markCompetitionNotificationsSeen_competitionId, competition.competitionId)
+    }
+
+    func test_nonArchivedCompetition_doesNotMarkNotificationsSeen() async {
+        let vm = makeVM()
+        let competition = makeCompetition(state: .processingResults)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.shouldShowConfetti == false)
+
+        XCTAssertEqual(mockCompetitionManager.markCompetitionNotificationsSeenCallCount, 0)
+    }
+
     func test_notStartedOrActiveCompetition_doesNotShowAlert() async {
         let vm = makeVM()
         let competition = makeCompetition(state: .notStartedOrActive)

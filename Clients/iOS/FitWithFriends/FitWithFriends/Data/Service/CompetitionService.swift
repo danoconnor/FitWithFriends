@@ -106,6 +106,11 @@ public class CompetitionService: ServiceBase, ICompetitionService {
                                                                            body: requestBody)
     }
 
+    public func markCompetitionNotificationsSeen(competitionId: UUID) async throws {
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/\(competitionId.uuidString)/notificationsSeen",
+                                                                           method: .post)
+    }
+
     public func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails {
         let ianaTimezone = TimeZone.current.identifier
 

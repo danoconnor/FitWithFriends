@@ -163,4 +163,16 @@ public class MockCompetitionService: ICompetitionService {
             throw HttpError.generic
         }
     }
+
+    public var param_markCompetitionNotificationsSeen_competitionId: UUID?
+    public var return_markCompetitionNotificationsSeen_error: Error?
+    public var markCompetitionNotificationsSeenCallCount = 0
+    public func markCompetitionNotificationsSeen(competitionId: UUID) async throws {
+        markCompetitionNotificationsSeenCallCount += 1
+        param_markCompetitionNotificationsSeen_competitionId = competitionId
+
+        if let error = return_markCompetitionNotificationsSeen_error {
+            throw error
+        }
+    }
 }

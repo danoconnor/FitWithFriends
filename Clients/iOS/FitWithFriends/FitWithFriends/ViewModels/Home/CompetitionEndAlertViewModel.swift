@@ -71,6 +71,10 @@ class CompetitionEndAlertViewModel: ObservableObject {
         guard currentEndCompetition == nil, let next = pendingCompetitions.first else { return }
         pendingCompetitions.removeFirst()
 
+        // The user is about to see the final results, so tell the server to suppress
+        // the fallback push for this competition.
+        markNotificationsSeen(for: next.competitionId)
+
         let position = userPosition(in: next) ?? Int.max
         let willShowConfetti = position <= 3
         if willShowConfetti {
@@ -201,6 +205,17 @@ class CompetitionEndAlertViewModel: ObservableObject {
         let sorted = competition.currentResults.sorted()
         guard let idx = sorted.firstIndex(where: { $0.userId == userId }) else { return nil }
         return idx + 1
+    }
+
+    private func markNotificationsSeen(for competitionId: UUID) {
+        guard let manager = competitionManager else { return }
+        Task.detached {
+            do {
+                try await manager.markCompetitionNotificationsSeen(competitionId: competitionId)
+            } catch {
+                Logger.traceWarning(message: "Failed to mark competition notifications seen: \(error)")
+            }
+        }
     }
 
     private func seenKey(for competitionId: UUID) -> String {
