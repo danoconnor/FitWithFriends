@@ -15,6 +15,10 @@ struct LoggedInContentView: View {
     @StateObject private var homepageViewModel: HomepageViewModel
     @StateObject private var competitionEndAlertViewModel: CompetitionEndAlertViewModel
 
+    // Option C drawer expansion — collapsed by default, persisted per session.
+    @State private var upcomingExpanded = false
+    @State private var completedExpanded = false
+
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
         _homepageSheetViewModel = StateObject(wrappedValue: HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
@@ -75,7 +79,7 @@ struct LoggedInContentView: View {
                             }
                         }
 
-                        // Competitions section
+                        // Competitions section (Option C — focus + drawers)
                         if homepageViewModel.isLoadingCompetitions {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
@@ -83,16 +87,7 @@ struct LoggedInContentView: View {
                                 .fwfCard()
                                 .padding(.horizontal, 16)
                         } else if let competitions = homepageViewModel.currentCompetitions, !competitions.isEmpty {
-                            sectionHeader("Your Competitions")
-
-                            ForEach(competitions) { competitionOverview in
-                                CompetitionOverviewView(objectGraph: objectGraph,
-                                                        competitionOverview: competitionOverview,
-                                                        homepageSheetViewModel: homepageSheetViewModel,
-                                                        showAllDetails: false)
-                                    .fwfCard()
-                                    .padding(.horizontal, 16)
-                            }
+                            competitionGroups(competitions)
                         } else {
                             noCompetitionsEmptyState
                         }
@@ -233,16 +228,76 @@ struct LoggedInContentView: View {
     }
 
     @ViewBuilder
-    private func sectionHeader(_ title: String) -> some View {
-        HStack {
+    private func sectionHeader(_ title: String, count: Int? = nil) -> some View {
+        HStack(spacing: 8) {
             Text(title)
                 .font(.system(size: 19, weight: .semibold))
                 .tracking(-0.02 * 19)
                 .foregroundStyle(Color("Ink"))
+            if let count {
+                Text("\(count)")
+                    .font(.system(size: 13, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(Color("InkFaint"))
+            }
             Spacer()
         }
         .padding(.horizontal, 20)
         .padding(.top, 4)
+    }
+
+    // MARK: - Competition groups (Active / Upcoming / Completed)
+
+    @ViewBuilder
+    private func competitionGroups(_ competitions: [CompetitionOverview]) -> some View {
+        let active = competitions.filter { $0.bucket == .active }
+        let upcoming = competitions.filter { $0.bucket == .upcoming }
+        let completed = competitions.filter { $0.bucket == .completed }
+        let loggedInUserId = objectGraph.authenticationManager.loggedInUserId
+
+        if !active.isEmpty {
+            sectionHeader("Active now", count: active.count)
+
+            ForEach(active) { competitionOverview in
+                CompetitionOverviewView(objectGraph: objectGraph,
+                                        competitionOverview: competitionOverview,
+                                        homepageSheetViewModel: homepageSheetViewModel,
+                                        showAllDetails: false)
+                    .fwfCard()
+                    .padding(.horizontal, 16)
+            }
+        }
+
+        if !upcoming.isEmpty {
+            CompetitionGroupDrawer(title: "Upcoming",
+                                   icon: "calendar",
+                                   accent: Color("Sun"),
+                                   data: upcoming,
+                                   isExpanded: $upcomingExpanded) { competitionOverview in
+                UpcomingCompetitionRow(competitionOverview: competitionOverview) {
+                    homepageSheetViewModel.updateState(sheet: .competitionDetails,
+                                                       state: true,
+                                                       contextData: competitionOverview)
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+
+        if !completed.isEmpty {
+            CompetitionGroupDrawer(title: "Completed",
+                                   icon: "trophy",
+                                   accent: Color("Gold"),
+                                   data: completed,
+                                   isExpanded: $completedExpanded) { competitionOverview in
+                CompletedCompetitionRow(competitionOverview: competitionOverview,
+                                        loggedInUserId: loggedInUserId) {
+                    homepageSheetViewModel.updateState(sheet: .competitionDetails,
+                                                       state: true,
+                                                       contextData: competitionOverview)
+                }
+            }
+            .padding(.horizontal, 16)
+        }
     }
 
     private var healthDataMissing: some View {
@@ -279,6 +334,149 @@ struct LoggedInContentView: View {
         .fwfCard()
         .padding(.horizontal, 16)
         .padding(.top, 8)
+    }
+}
+
+// MARK: - Competition group drawer (Option C)
+
+/// Collapsible "drawer" section used for the Upcoming and Completed competition
+/// groups. Collapsed by default; the header toggles expansion with a spring.
+struct CompetitionGroupDrawer<Data: RandomAccessCollection, RowContent: View>: View where Data.Element: Identifiable {
+    let title: String
+    let icon: String
+    let accent: Color
+    let data: Data
+    @Binding var isExpanded: Bool
+    @ViewBuilder let row: (Data.Element) -> RowContent
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var count: Int { data.count }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Button {
+                withAnimation(.spring(duration: 0.4)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: icon)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(accent)
+                        .frame(width: 30, height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                .fill(accent.opacity(0.16))
+                        )
+
+                    Text(title)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color("Ink"))
+
+                    Spacer()
+
+                    Text("\(count)")
+                        .font(.system(size: 13, weight: .bold))
+                        .monospacedDigit()
+                        .foregroundStyle(Color("InkMute"))
+
+                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(Color("InkFaint"))
+                }
+                .padding(.vertical, 14)
+                .padding(.horizontal, 16)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("competitionDrawer_\(title)")
+
+            if isExpanded {
+                hairline
+                ForEach(Array(data.enumerated()), id: \.element.id) { index, element in
+                    row(element)
+                    if index < count - 1 {
+                        hairline
+                    }
+                }
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color("Surface"))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(Color("Border"), lineWidth: colorScheme == .dark ? 1 : 0)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .shadow(color: .black.opacity(colorScheme == .dark ? 0.0 : 0.06), radius: 24, x: 0, y: 8)
+        .shadow(color: .black.opacity(colorScheme == .dark ? 0.0 : 0.04), radius: 2, x: 0, y: 1)
+    }
+
+    private var hairline: some View {
+        Rectangle()
+            .fill(Color("Border"))
+            .frame(height: 1)
+    }
+}
+
+// MARK: - Upcoming competition row (collapsed "Upcoming" drawer)
+
+/// Lightweight resting-state row for a competition that hasn't started yet.
+struct UpcomingCompetitionRow: View {
+    let competitionOverview: CompetitionOverview
+    let onTap: () -> Void
+
+    private var startsInDays: Int {
+        let seconds = competitionOverview.startDate.timeIntervalSince(Date())
+        return max(0, Int(ceil(seconds / 86_400)))
+    }
+
+    private var subtitle: String {
+        let startLabel = MedalPalette.shortMonthDay(competitionOverview.startDate)
+        if startsInDays <= 0 {
+            return "Starting today · \(startLabel)"
+        }
+        return "Starts in \(startsInDays)d · \(startLabel)"
+    }
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(Color("Sun").opacity(0.16))
+                    Image(systemName: "calendar")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color("Sun"))
+                }
+                .frame(width: 40, height: 40)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(competitionOverview.competitionName)
+                        .font(.system(size: 17, weight: .regular, design: .serif))
+                        .foregroundStyle(Color("Ink"))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Text(subtitle)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color("InkMute"))
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color("InkFaint"))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("upcomingCompetitionRow")
     }
 }
 

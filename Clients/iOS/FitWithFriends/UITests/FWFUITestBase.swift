@@ -324,6 +324,22 @@ class FWFUITestBase: XCTestCase {
         XCTAssertEqual(response.statusCode, 200, "Failed to archive competition")
     }
 
+    /// Shift a competition's start/end window via the test helpers endpoint. Used to
+    /// push a competition into the past so it lands in the app's "Completed" bucket
+    /// (the iOS app derives Active/Upcoming/Completed purely from these dates).
+    func setCompetitionDates(competitionId: String, start: Date, end: Date) throws {
+        let formatter = ISO8601DateFormatter()
+        let body: [String: Any] = [
+            "competitionId": competitionId,
+            "startDate": formatter.string(from: start),
+            "endDate": formatter.string(from: end)
+        ]
+        let (_, response) = try makeAuthenticatedRequest(
+            method: "POST", path: "testHelpers/setCompetitionDates", body: body
+        )
+        XCTAssertEqual(response.statusCode, 200, "Failed to set competition dates")
+    }
+
     /// Make the test user a Pro subscriber via the test helpers endpoint
     func makeUserPro() throws {
         guard let userId else { return }

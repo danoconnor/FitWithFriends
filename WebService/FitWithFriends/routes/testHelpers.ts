@@ -163,4 +163,30 @@ router.post('/setCompetitionArchived', async function (req, res) {
     }
 });
 
+// POST /testHelpers/setCompetitionDates
+// Body: { competitionId: string, startDate: string (ISO), endDate: string (ISO) }
+// Lets UI tests shift a competition's window into the past so it lands in the
+// "Completed" bucket (the iOS app derives Active/Upcoming/Completed from these dates).
+router.post('/setCompetitionDates', async function (req, res) {
+    const competitionId: string = req.body['competitionId'];
+    const startDate: string = req.body['startDate'];
+    const endDate: string = req.body['endDate'];
+
+    if (!competitionId || !startDate || !endDate) {
+        handleError(null, 400, 'Missing required parameter', res);
+        return;
+    }
+
+    try {
+        await CompetitionQueries.updateCompetitionDates({
+            competitionId,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate)
+        });
+        res.sendStatus(200);
+    } catch (error) {
+        handleError(error, 500, 'Error updating competition dates', res);
+    }
+});
+
 export default router;
