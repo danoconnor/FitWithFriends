@@ -13,6 +13,13 @@ public class UserService: ServiceBase, IUserService {
         let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: url, method: .delete)
     }
 
+    public func reportTimezone(_ timezone: String) async throws {
+        let url = "\(serverEnvironmentManager.baseUrl)/users/timezone"
+        let _: EmptyResponse = try await makeRequestWithUserAuthentication(url: url,
+                                                                           method: .post,
+                                                                           body: ["timezone": timezone])
+    }
+
     /// Creates a new user with the given credentials/user info. Will return an error if the username already exists
     public func createUser(firstName: String,
                     lastName: String,

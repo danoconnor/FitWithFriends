@@ -11,7 +11,13 @@ import { CompetitionState } from '../utilities/enums/CompetitionState';
 import { handleError } from '../utilities/errorHelpers';
 import * as UserHelpers from '../utilities/userHelpers';
 import { getCompetitionStandings, validateScoringRulesInput } from '../utilities/competitionStandingsHelper';
+import { isWithinNotificationWindow, isValidTimeZone } from '../utilities/timezoneHelpers';
 import * as cryptoHelpers from '../utilities/cryptoHelpers';
+
+// Competitions stay eligible for end-of-competition notifications for a few days
+// after they finish, giving every member's local morning window time to arrive
+// (even the westmost timezones, the morning after archival) plus slack for retries.
+const NOTIFICATION_WINDOW_DAYS = 3;
 
 const router = express.Router();
 
@@ -189,6 +195,14 @@ router.post('/performDailyTasks', async function (req, res) {
         errors.push(['processRecentlyEndedCompetitions', err]);
     }
 
+    // Runs after the state transitions above so a competition that advanced this
+    // run is immediately eligible to notify members whose local morning has arrived.
+    try {
+        taskResults.push({ name: 'sendCompetitionNotifications', ...await sendDueCompetitionNotifications(now) });
+    } catch (err) {
+        errors.push(['sendCompetitionNotifications', err]);
+    }
+
     try {
         taskResults.push({ name: 'deleteExpiredRefreshTokens', result: await deleteExpiredRefreshTokens(now) });
     } catch (err) {
@@ -226,47 +240,32 @@ router.post('/performDailyTasks', async function (req, res) {
     }
 });
 
-// Get recently ended competitions
-// Move them to the processing state
-// Send push notifications to users
+// Get recently ended competitions and move them to the processing state.
+// Push notifications are sent separately, per-user at each member's local 8am,
+// by sendDueCompetitionNotifications.
 async function processesRecentlyEndedCompetitions(now: Date): Promise<string> {
     const competitionsToMoveToProcessing = await CompetitionQueries.getCompetitionsInState({
         state: CompetitionState.NotStartedOrActive,
         finishedBeforeDate: now
      });
 
+     if (competitionsToMoveToProcessing.length === 0) {
+        return 'No competitions to process';
+     }
+
      // Update competitions to processing state
      await Promise.all(competitionsToMoveToProcessing.map(competition => {
          return CompetitionQueries.updateCompetitionState({ competitionId: competition.competition_id, newState: CompetitionState.ProcessingResults });
      }));
 
-     if (competitionsToMoveToProcessing.length === 0) {
-        return 'No competitions to process';
-     }
-
-     // For each competition, get the users and send a notification
-     const notifications = [];
-     for (const competition of competitionsToMoveToProcessing) {
-         const users = await CompetitionQueries.getUsersForCompetition({ competitionId: competition.competition_id });
-         for (const user of users) {
-             notifications.push({
-                 userId: UserHelpers.convertBufferToUserId(user.user_id),
-                 title: `The competition "${competition.display_name}" has ended!`,
-                 body: 'The final results are being processed and will be posted tomorrow',
-             });
-         }
-     }
-
-     if (notifications.length > 0) {
-         await sendPushNotifications(notifications);
-     }
-
      return `Moved ${competitionsToMoveToProcessing.length} competition(s) to processing state`;
 }
 
-// Get competitions that have been in the processing state for more than 24 hours
-// Move them to the archived state and archive results
-// Send final results push notifications
+// Get competitions that have been in the processing state for more than 24 hours.
+// Freeze each member's final points and move the competition to the archived state.
+// The final-results push notifications are sent separately, per-user at each
+// member's local 8am, by sendDueCompetitionNotifications (which reads the frozen
+// final_points to compute placement).
 async function archiveCompetitions(now: Date): Promise<{ result: string; warning?: string }> {
     const olderThan24Hrs = new Date(now.getTime() - (24 * 60 * 60 * 1000));
      const competitionsToArchive = await CompetitionQueries.getCompetitionsInState({
@@ -278,11 +277,9 @@ async function archiveCompetitions(now: Date): Promise<{ result: string; warning
         return { result: 'No competitions to archive' };
     }
 
-    let totalSent = 0;
-    let totalFailed = 0;
-    const notificationErrors: string[] = [];
+    const pointsErrors: string[] = [];
 
-    // Calculate the final results for each competition
+    // Calculate and freeze the final results for each competition
     for (const competition of competitionsToArchive) {
         try {
             const competitionUsers = await CompetitionQueries.getUsersForCompetition({ competitionId: competition.competition_id });
@@ -302,65 +299,20 @@ async function archiveCompetitions(now: Date): Promise<{ result: string; warning
                 })),
                 competition.iana_timezone);
 
-            // Send final results push notifications
-            // Sort users by most points to fewest
-            const sortedResults = Object.values(competitionResults).sort((a, b) => b.activityPoints - a.activityPoints);
-            const notifications = [];
-            for (let i = 0; i < sortedResults.length; i++) {
-                const userPoints = sortedResults[i];
-                let place: string;
-                switch (i) {
-                    case 0:
-                        place = 'first';
-                        break;
-                    case 1:
-                        place = 'second';
-                        break;
-                    case 2:
-                        place = 'third';
-                        break;
-                    default:
-                        place = `${i + 1}th`;
-                }
-                notifications.push({
-                    userId: userPoints.userId,
-                    title: `The competition "${competition.display_name}" has ended!`,
-                    body: `You came in ${place} place with ${userPoints.activityPoints} points!`,
-                });
-            }
-
-            // Run notifications and final-point DB writes in parallel.
-            // Both must be inside the same Promise.all so a rejection from either
-            // is caught by the surrounding try/catch instead of becoming an
-            // unhandled rejection that crashes the process.
-            try {
-                const [sendResult] = await Promise.all([
-                    sendPushNotifications(notifications),
-                    Promise.all(Object.values(competitionResults).map(userPoints =>
-                        CompetitionQueries.updateCompetitionFinalPoints({
-                            userId: UserHelpers.convertUserIdToBuffer(userPoints.userId),
-                            competitionId: competition.competition_id,
-                            finalPoints: userPoints.activityPoints
-                        })
-                    ))
-                ]);
-                totalSent += sendResult.sent;
-                totalFailed += sendResult.failed;
-                if (sendResult.failures.length > 0) {
-                    const failureDetails = sendResult.failures
-                        .map(f => `userId=${f.userId}: ${f.reason}`)
-                        .join('; ');
-                    console.warn(`Push notification failures for competition ${competition.competition_id}: ${failureDetails}`);
-                    notificationErrors.push(`competition ${competition.competition_id} — ${failureDetails}`);
-                }
-            } catch (notifErr) {
-                const msg = `competition ${competition.competition_id}: ${(notifErr as Error).message}`;
-                notificationErrors.push(msg);
-                console.error(`Error sending notifications/writing final points for ${msg}`, notifErr);
-            }
+            // Freeze each user's final points. The per-user results notification
+            // (sent later, at each member's local 8am) ranks members from these
+            // frozen values, so they must be written before the competition archives.
+            await Promise.all(Object.values(competitionResults).map(userPoints =>
+                CompetitionQueries.updateCompetitionFinalPoints({
+                    userId: UserHelpers.convertUserIdToBuffer(userPoints.userId),
+                    competitionId: competition.competition_id,
+                    finalPoints: userPoints.activityPoints
+                })
+            ));
         } catch (err) {
             // Log the error but continue processing other competitions
             console.error(`Error calculating final results for competition ${competition.competition_id}:`, err);
+            pointsErrors.push(`competition ${competition.competition_id}: ${(err as Error).message}`);
         }
     }
 
@@ -369,20 +321,128 @@ async function archiveCompetitions(now: Date): Promise<{ result: string; warning
         return CompetitionQueries.updateCompetitionState({ competitionId: competition.competition_id, newState: CompetitionState.Archived });
     }));
 
-    const total = totalSent + totalFailed;
-    const result = `Archived ${competitionsToArchive.length} competition(s), ${totalSent}/${total} push notifications sent`;
-
-    const warningParts: string[] = [];
-    if (totalFailed > 0) {
-        warningParts.push(`${totalFailed} push notification(s) failed to deliver`);
-    }
-    if (notificationErrors.length > 0) {
-        warningParts.push(`notification/points errors: ${notificationErrors.join(', ')}`);
-    }
-
-    return warningParts.length > 0
-        ? { result, warning: warningParts.join('; ') }
+    const result = `Archived ${competitionsToArchive.length} competition(s)`;
+    return pointsErrors.length > 0
+        ? { result, warning: `final-points errors: ${pointsErrors.join(', ')}` }
         : { result };
+}
+
+// Converts a 1-based placement into the wording used in the results notification.
+function ordinalPlace(place: number): string {
+    switch (place) {
+        case 1: return 'first';
+        case 2: return 'second';
+        case 3: return 'third';
+        default: return `${place}th`;
+    }
+}
+
+// Sends the two end-of-competition push notifications per-user, at each member's
+// local ~8am (their preferred_timezone, falling back to the competition timezone):
+//   - "processing" while the competition is in the ProcessingResults state
+//   - "final results" once it has archived (placement read from frozen final_points)
+// Delivery is tracked per (user, competition) via the sent_* flags so each member
+// is notified once at their own local morning. A member is marked only when a push
+// is actually delivered, so throttled/failed sends retry on the next run. Bots are
+// excluded by the query. Seeing the results in-app also satisfies the flags (the
+// client marks them), so this is a fallback for members who haven't opened the app.
+async function sendDueCompetitionNotifications(now: Date): Promise<{ result: string; warning?: string }> {
+    const finishedAfter = new Date(now.getTime() - NOTIFICATION_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+    const pending = await CompetitionQueries.getPendingCompetitionNotifications({
+        finishedAfter,
+        processingState: CompetitionState.ProcessingResults,
+        archivedState: CompetitionState.Archived
+    });
+
+    if (pending.length === 0) {
+        return { result: 'No competition notifications to send' };
+    }
+
+    // Group the pending member rows by competition
+    const byCompetition = new Map<string, typeof pending>();
+    for (const row of pending) {
+        const list = byCompetition.get(row.competition_id) ?? [];
+        list.push(row);
+        byCompetition.set(row.competition_id, list);
+    }
+
+    let totalSent = 0;
+    const warnings: string[] = [];
+
+    for (const [competitionId, rows] of byCompetition) {
+        const state = rows[0].state;
+        const displayName = rows[0].display_name;
+        const competitionTimezone = rows[0].iana_timezone;
+
+        // Build the placement ranking once (archived only) from frozen final_points,
+        // across ALL members including bots so positions match the leaderboard.
+        let placeByUser: Map<string, number> | null = null;
+        if (state === CompetitionState.Archived) {
+            const allMembers = await CompetitionQueries.getUsersForCompetition({ competitionId });
+            const ranked = allMembers
+                .map(m => ({ userId: UserHelpers.convertBufferToUserId(m.user_id), points: m.final_points ?? 0 }))
+                .sort((a, b) => b.points - a.points);
+            placeByUser = new Map(ranked.map((m, i) => [m.userId, i + 1]));
+        }
+
+        // Select the members whose local morning window has arrived and who still
+        // need this competition's notification.
+        const notifications: { userId: string; title: string; body: string }[] = [];
+        const eligibleUserIds: string[] = [];
+        for (const row of rows) {
+            const alreadySent = state === CompetitionState.Archived
+                ? row.sent_complete_notification
+                : row.sent_processing_notification;
+            if (alreadySent) continue;
+
+            // Use the member's reported timezone, falling back to the competition's
+            // when it's missing or not a resolvable IANA zone.
+            const tz = (row.preferred_timezone && isValidTimeZone(row.preferred_timezone))
+                ? row.preferred_timezone
+                : competitionTimezone;
+            if (!isWithinNotificationWindow(now, tz)) continue;
+
+            eligibleUserIds.push(row.user_id);
+            if (state === CompetitionState.Archived) {
+                const place = placeByUser!.get(row.user_id) ?? 0;
+                const points = row.final_points ?? 0;
+                notifications.push({
+                    userId: row.user_id,
+                    title: `The competition "${displayName}" has ended!`,
+                    body: `You came in ${ordinalPlace(place)} place with ${points} points!`,
+                });
+            } else {
+                notifications.push({
+                    userId: row.user_id,
+                    title: `The competition "${displayName}" has ended!`,
+                    body: 'The final results are being processed and will be posted tomorrow',
+                });
+            }
+        }
+
+        if (notifications.length === 0) continue;
+
+        const sendResult = await sendPushNotifications(notifications);
+        totalSent += sendResult.sent;
+
+        // Mark only the members we actually delivered to. Undelivered members keep
+        // their flag false and are retried on the next run (still in their window).
+        const markSent = state === CompetitionState.Archived
+            ? CompetitionQueries.markCompleteNotificationSent
+            : CompetitionQueries.markProcessingNotificationSent;
+        await Promise.all(sendResult.succeededUserIds.map(userId =>
+            markSent({ userId: UserHelpers.convertUserIdToBuffer(userId), competitionId })
+        ));
+
+        const undelivered = eligibleUserIds.length - sendResult.succeededUserIds.length;
+        if (undelivered > 0) {
+            const kind = state === CompetitionState.Archived ? 'results' : 'processing';
+            warnings.push(`competition ${competitionId}: ${undelivered} ${kind} notification(s) not delivered (will retry)`);
+        }
+    }
+
+    const result = `Sent ${totalSent} competition notification(s)`;
+    return warnings.length > 0 ? { result, warning: warnings.join('; ') } : { result };
 }
 
 async function deleteExpiredRefreshTokens(now: Date): Promise<string> {

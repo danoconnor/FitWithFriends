@@ -110,6 +110,78 @@ test('userFromAppleID lastName too long', async () => {
     expect(response.data.context).toContain('Parameter too long');
 });
 
+test('userFromAppleID stores a valid preferred timezone', async () => {
+    const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
+        userId: appleUserId,
+        firstName: 'Test',
+        lastName: 'User',
+        idToken: 'some_token',
+        timezone: 'America/Los_Angeles'
+    });
+
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
+    const user = await TestSQL.getUser({ userId: convertUserIdToBuffer(expectedUserId) });
+    expect(user[0].preferred_timezone).toBe('America/Los_Angeles');
+});
+
+test('userFromAppleID ignores an invalid timezone (stores null)', async () => {
+    const response = await RequestUtilities.makePostRequest('users/userFromAppleID', {
+        userId: appleUserId,
+        firstName: 'Test',
+        lastName: 'User',
+        idToken: 'some_token',
+        timezone: 'Not/AZone'
+    });
+
+    expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
+    const user = await TestSQL.getUser({ userId: convertUserIdToBuffer(expectedUserId) });
+    expect(user[0].preferred_timezone).toBeNull();
+});
+
+// MARK: - POST /users/timezone
+
+describe('POST /users/timezone', () => {
+    const testUserId = Math.random().toString().slice(2, 10);
+    const userIdBuffer = convertUserIdToBuffer(testUserId);
+
+    beforeEach(async () => {
+        await TestSQL.createUser({
+            userId: userIdBuffer,
+            firstName: 'Tz',
+            maxActiveCompetitions: 1,
+            isPro: false,
+            createdDate: new Date()
+        });
+    });
+
+    afterEach(async () => {
+        await TestSQL.clearDataForUser({ userId: userIdBuffer });
+    });
+
+    test('happy path - updates the preferred timezone', async () => {
+        const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+        const response = await RequestUtilities.makePostRequest('users/timezone', { timezone: 'Asia/Tokyo' }, accessToken);
+
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 200 }));
+        const user = await TestSQL.getUser({ userId: userIdBuffer });
+        expect(user[0].preferred_timezone).toBe('Asia/Tokyo');
+    });
+
+    test('rejects an invalid timezone with 400', async () => {
+        const accessToken = await AuthUtilities.getAccessTokenForUser(testUserId);
+        const response = await RequestUtilities.makePostRequest('users/timezone', { timezone: 'Mars/Phobos' }, accessToken);
+
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
+        const user = await TestSQL.getUser({ userId: userIdBuffer });
+        expect(user[0].preferred_timezone).toBeNull();
+    });
+
+    test('unauthenticated - returns 400', async () => {
+        const response = await RequestUtilities.makePostRequest('users/timezone', { timezone: 'Asia/Tokyo' });
+        expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 400 }));
+    });
+});
+
 // MARK: - DELETE /users/me
 
 describe('DELETE /users/me', () => {

@@ -178,6 +178,7 @@ export interface IGetUserResult {
   is_pro: boolean;
   last_name: string | null;
   max_active_competitions: number;
+  preferred_timezone: string | null;
   subscription_expires_date: Date | null;
   user_id: Buffer;
 }
@@ -451,13 +452,13 @@ export interface IUpdateUserCompetitionFinalPointsQuery {
   result: IUpdateUserCompetitionFinalPointsResult;
 }
 
-const updateUserCompetitionFinalPointsIR: any = {"usedParamSet":{"finalPoints":true,"userId":true,"competitionId":true},"params":[{"name":"finalPoints","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":58}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":77,"b":84}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":107,"b":121}]}],"statement":"UPDATE users_competitions \nSET final_points = :finalPoints! \nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+const updateUserCompetitionFinalPointsIR: any = {"usedParamSet":{"finalPoints":true,"userId":true,"competitionId":true},"params":[{"name":"finalPoints","required":true,"transform":{"type":"scalar"},"locs":[{"a":45,"b":57}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":75,"b":82}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":105,"b":119}]}],"statement":"UPDATE users_competitions\nSET final_points = :finalPoints!\nWHERE user_id = :userId! AND competition_id = :competitionId!"};
 
 /**
  * Query generated from SQL:
  * ```
- * UPDATE users_competitions 
- * SET final_points = :finalPoints! 
+ * UPDATE users_competitions
+ * SET final_points = :finalPoints!
  * WHERE user_id = :userId! AND competition_id = :competitionId!
  * ```
  */
@@ -465,6 +466,72 @@ export function updateUserCompetitionFinalPoints(params: IUpdateUserCompetitionF
   return import('@pgtyped/runtime').then(pgtyped => {
     const updateUserCompetitionFinalPoints = new pgtyped.PreparedQuery<IUpdateUserCompetitionFinalPointsParams,IUpdateUserCompetitionFinalPointsResult>(updateUserCompetitionFinalPointsIR);
     return updateUserCompetitionFinalPoints.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'SetUserPreferredTimezone' parameters type */
+export interface ISetUserPreferredTimezoneParams {
+  preferredTimezone?: string | null | void;
+  userId: Buffer;
+}
+
+/** 'SetUserPreferredTimezone' return type */
+export type ISetUserPreferredTimezoneResult = void;
+
+/** 'SetUserPreferredTimezone' query type */
+export interface ISetUserPreferredTimezoneQuery {
+  params: ISetUserPreferredTimezoneParams;
+  result: ISetUserPreferredTimezoneResult;
+}
+
+const setUserPreferredTimezoneIR: any = {"usedParamSet":{"preferredTimezone":true,"userId":true},"params":[{"name":"preferredTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":38,"b":55}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":80}]}],"statement":"UPDATE users SET preferred_timezone = :preferredTimezone WHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users SET preferred_timezone = :preferredTimezone WHERE user_id = :userId!
+ * ```
+ */
+export function setUserPreferredTimezone(params: ISetUserPreferredTimezoneParams): Promise<Array<ISetUserPreferredTimezoneResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const setUserPreferredTimezone = new pgtyped.PreparedQuery<ISetUserPreferredTimezoneParams,ISetUserPreferredTimezoneResult>(setUserPreferredTimezoneIR);
+    return setUserPreferredTimezone.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'SetNotificationFlags' parameters type */
+export interface ISetNotificationFlagsParams {
+  competitionId: string;
+  sentComplete: boolean;
+  sentProcessing: boolean;
+  userId: Buffer;
+}
+
+/** 'SetNotificationFlags' return type */
+export type ISetNotificationFlagsResult = void;
+
+/** 'SetNotificationFlags' query type */
+export interface ISetNotificationFlagsQuery {
+  params: ISetNotificationFlagsParams;
+  result: ISetNotificationFlagsResult;
+}
+
+const setNotificationFlagsIR: any = {"usedParamSet":{"sentProcessing":true,"sentComplete":true,"userId":true,"competitionId":true},"params":[{"name":"sentProcessing","required":true,"transform":{"type":"scalar"},"locs":[{"a":61,"b":76}]},{"name":"sentComplete","required":true,"transform":{"type":"scalar"},"locs":[{"a":108,"b":121}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":139,"b":146}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":183}]}],"statement":"UPDATE users_competitions\nSET sent_processing_notification = :sentProcessing!, sent_complete_notification = :sentComplete!\nWHERE user_id = :userId! AND competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users_competitions
+ * SET sent_processing_notification = :sentProcessing!, sent_complete_notification = :sentComplete!
+ * WHERE user_id = :userId! AND competition_id = :competitionId!
+ * ```
+ */
+export function setNotificationFlags(params: ISetNotificationFlagsParams): Promise<Array<ISetNotificationFlagsResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const setNotificationFlags = new pgtyped.PreparedQuery<ISetNotificationFlagsParams,ISetNotificationFlagsResult>(setNotificationFlagsIR);
+    return setNotificationFlags.run(params, DatabaseConnectionPool);
   });
 }
 
@@ -519,6 +586,8 @@ export interface IGetUsersInCompetitionParams {
 export interface IGetUsersInCompetitionResult {
   competition_id: string;
   final_points: number | null;
+  sent_complete_notification: boolean;
+  sent_processing_notification: boolean;
   user_id: Buffer;
 }
 

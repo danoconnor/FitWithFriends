@@ -85,6 +85,17 @@ public class HomepageViewModel: ObservableObject {
         let activitySummaryTask = Task { await self.refreshTodayActivitySummary() }
         let competitionTask = Task { await self.competitionManager.refreshCompetitionOverviews() }
 
+        // Report the device timezone on every foreground so notifications track the
+        // user's current location. Fire-and-forget — failure just falls back to the
+        // competition timezone server-side.
+        Task.detached { [userService] in
+            do {
+                try await userService.reportTimezone(TimeZone.current.identifier)
+            } catch {
+                Logger.traceWarning(message: "Failed to report timezone: \(error)")
+            }
+        }
+
         await activitySummaryTask.value
         await competitionTask.value
     }

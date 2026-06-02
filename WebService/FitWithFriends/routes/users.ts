@@ -2,8 +2,9 @@
 import { validateAppleIdToken } from '../utilities/appleIdAuthenticationHelpers';
 import { handleError } from '../utilities/errorHelpers';
 import express from 'express';
-import { ICreateUserParams, createUser, deleteUser } from '../sql/users.queries';
+import { ICreateUserParams, createUser, deleteUser, updateUserTimezone } from '../sql/users.queries';
 import { convertUserIdToBuffer } from '../utilities/userHelpers';
+import { isValidTimeZone } from '../utilities/timezoneHelpers';
 import oauthServer from '../oauth/server';
 
 const router = express.Router();
@@ -55,13 +56,19 @@ router.post('/userFromAppleID', function (req, res) {
             const hexUserId = userId.replace(/\./g, '');
             const currentDate = new Date();
 
+            // Optional: the client may report the device timezone at sign-up so the
+            // first competition's notifications already fire at the user's local 8am.
+            const timezone: string | undefined = req.body['timezone'];
+            const preferredTimezone = (timezone && isValidTimeZone(timezone)) ? timezone : null;
+
             const createUserParams: ICreateUserParams = {
                 userId: convertUserIdToBuffer(hexUserId),
                 firstName: firstName,
                 lastName: lastName,
                 maxActiveCompetitions: 1,
                 isPro: false,
-                createdDate: currentDate
+                createdDate: currentDate,
+                preferredTimezone
             };
             createUser(createUserParams)
                 .then(_result => {
@@ -74,6 +81,23 @@ router.post('/userFromAppleID', function (req, res) {
         .catch(error => {
             handleError(error, 401, 'Token failed validation', res);
         });
+});
+
+// Updates the authenticated user's preferred timezone. The client calls this on
+// launch / when the device timezone changes so end-of-competition notifications
+// are scheduled at the user's local morning.
+router.post('/timezone', oauthServer.authenticate(), function (req, res) {
+    const timezone: string | undefined = req.body['timezone'];
+
+    if (!timezone || !timezone.length || timezone.length > 255 || !isValidTimeZone(timezone)) {
+        handleError(null, 400, 'Missing or invalid timezone', res);
+        return;
+    }
+
+    const userId: string = res.locals.oauth.token.user.id;
+    updateUserTimezone({ userId: convertUserIdToBuffer(userId), preferredTimezone: timezone })
+        .then(() => res.sendStatus(200))
+        .catch((error: Error) => handleError(error, 500, 'Unexpected error while updating timezone', res));
 });
 
 // Deletes the currently authenticated user's account and all associated data

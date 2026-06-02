@@ -1,5 +1,8 @@
 /* @name CreateUser */
-INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date) VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!);
+INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date, preferred_timezone) VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!, :preferredTimezone);
+
+/* @name UpdateUserTimezone */
+UPDATE users SET preferred_timezone = :preferredTimezone! WHERE user_id = :userId!;
 
 /* @name GetUserName */
 SELECT first_name, last_name FROM users WHERE user_id = :userId!;
