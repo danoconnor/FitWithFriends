@@ -299,6 +299,98 @@ final class HomeRedesignViewModelTests: XCTestCase {
         XCTAssertTrue(subtitle.contains(","))
     }
 
+    // MARK: - CompetitionOverview.bucket
+
+    func test_bucket_active_whenStartedAndNotEnded() {
+        let comp = CompetitionOverview(start: Date().addingTimeInterval(-.xtDays(2)),
+                                       end: Date().addingTimeInterval(.xtDays(2)))
+        XCTAssertEqual(comp.bucket, .active)
+    }
+
+    func test_bucket_upcoming_whenNotStarted() {
+        let comp = CompetitionOverview(start: Date().addingTimeInterval(.xtDays(2)),
+                                       end: Date().addingTimeInterval(.xtDays(9)))
+        XCTAssertEqual(comp.bucket, .upcoming)
+    }
+
+    func test_bucket_completed_whenEnded() {
+        let comp = CompetitionOverview(start: Date().addingTimeInterval(-.xtDays(9)),
+                                       end: Date().addingTimeInterval(-.xtDays(2)))
+        XCTAssertEqual(comp.bucket, .completed)
+    }
+
+    // MARK: - CompetitionOverview.finalPlacement
+
+    func test_finalPlacement_returnsOneBasedRank() {
+        let leader = UserCompetitionPoints(userId: "alice", firstName: "Alice", lastName: "Chen", total: 500, today: 0)
+        let me = UserCompetitionPoints(userId: "me", firstName: "You", lastName: "", total: 420, today: 0)
+        let last = UserCompetitionPoints(userId: "sam", firstName: "Sam", lastName: "Smith", total: 100, today: 0)
+        let comp = CompetitionOverview(currentResults: [me, last, leader])
+
+        XCTAssertEqual(comp.finalPlacement(for: "alice"), 1)
+        XCTAssertEqual(comp.finalPlacement(for: "me"), 2)
+        XCTAssertEqual(comp.finalPlacement(for: "sam"), 3)
+    }
+
+    func test_finalPlacement_nilWhenUserMissingOrNil() {
+        let comp = CompetitionOverview(currentResults: [
+            UserCompetitionPoints(userId: "alice", firstName: "Alice", lastName: "Chen", total: 500, today: 0)
+        ])
+        XCTAssertNil(comp.finalPlacement(for: "ghost"))
+        XCTAssertNil(comp.finalPlacement(for: nil))
+    }
+
+    // MARK: - CompetitionRecapStats.compute
+
+    func test_recapStats_derivesRingsStreaksAndBestDay() {
+        let day3Date = Date().addingTimeInterval(.xtDays(-1))
+        let summaries = [
+            // day 3 (best day) — full ring, move closed, active
+            DailySummary(date: day3Date,
+                         caloriesBurned: 450, caloriesGoal: 400,
+                         exerciseTime: 30, exerciseTimeGoal: 30,
+                         standTime: 12, standTimeGoal: 12, points: 400),
+            // day 2 — nothing
+            DailySummary(date: Date().addingTimeInterval(.xtDays(-2)),
+                         caloriesBurned: 100, caloriesGoal: 400,
+                         exerciseTime: 0, exerciseTimeGoal: 30,
+                         standTime: 0, standTimeGoal: 12, points: 0),
+            // day 1 — move closed only, active
+            DailySummary(date: Date().addingTimeInterval(.xtDays(-3)),
+                         caloriesBurned: 500, caloriesGoal: 400,
+                         exerciseTime: 10, exerciseTimeGoal: 30,
+                         standTime: 5, standTimeGoal: 12, points: 250),
+            // day 0 — full ring, move closed, active
+            DailySummary(date: Date().addingTimeInterval(.xtDays(-4)),
+                         caloriesBurned: 500, caloriesGoal: 400,
+                         exerciseTime: 35, exerciseTimeGoal: 30,
+                         standTime: 12, standTimeGoal: 12, points: 300),
+        ]
+
+        let stats = CompetitionRecapStats.compute(summaries: summaries, finalTotal: 950)
+
+        XCTAssertEqual(stats.totalDays, 4)
+        XCTAssertEqual(stats.fullRingDays, 2)
+        // day0 + day1 consecutive Move closures = streak of 2 (day2 breaks it)
+        XCTAssertEqual(stats.bestMoveStreak, 2)
+        XCTAssertEqual(stats.activeDays, 3)
+        XCTAssertEqual(stats.bestActiveStreak, 2)
+        XCTAssertEqual(stats.bestDayValue, 400)
+        XCTAssertEqual(stats.bestDayDate, day3Date)
+        XCTAssertEqual(stats.finalTotal, 950)
+    }
+
+    func test_recapStats_emptySummaries_zeroed() {
+        let stats = CompetitionRecapStats.compute(summaries: [], finalTotal: 0)
+        XCTAssertEqual(stats.totalDays, 0)
+        XCTAssertEqual(stats.fullRingDays, 0)
+        XCTAssertEqual(stats.bestMoveStreak, 0)
+        XCTAssertEqual(stats.activeDays, 0)
+        XCTAssertEqual(stats.bestActiveStreak, 0)
+        XCTAssertEqual(stats.bestDayValue, 0)
+        XCTAssertNil(stats.bestDayDate)
+    }
+
     // MARK: - Helpers
 
     private func makeHomepage() -> HomepageViewModel {

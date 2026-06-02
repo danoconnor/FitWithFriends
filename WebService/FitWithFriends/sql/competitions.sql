@@ -53,6 +53,9 @@ WHERE state = :state! AND end_date < :finishedBeforeDate!;
 /* @name UpdateCompetitionState */
 UPDATE competitions SET state = :newState! WHERE competition_id = :competitionId!;
 
+/* @name UpdateCompetitionDates */
+UPDATE competitions SET start_date = :startDate!, end_date = :endDate! WHERE competition_id = :competitionId!;
+
 /* @name UpdateCompetitionFinalPoints */
 UPDATE users_competitions
 SET final_points = :finalPoints!

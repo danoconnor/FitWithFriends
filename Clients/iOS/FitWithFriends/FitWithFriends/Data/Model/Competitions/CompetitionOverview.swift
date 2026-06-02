@@ -64,6 +64,31 @@ public class CompetitionOverview: IdentifiableBase, Codable, Comparable {
         return hasCompetitionStarted && !hasCompetitionEnded
     }
 
+    /// Home-feed grouping bucket derived purely from the competition dates.
+    /// - Active: `now >= startDate && now < endDate`
+    /// - Upcoming: `now < startDate`
+    /// - Completed: `now >= endDate`
+    enum Bucket {
+        case active
+        case upcoming
+        case completed
+    }
+
+    var bucket: Bucket {
+        if !hasCompetitionStarted { return .upcoming }
+        if hasCompetitionEnded { return .completed }
+        return .active
+    }
+
+    /// The current user's final 1-based placement among all participants, or `nil`
+    /// when the user isn't in the results. Uses the same ordering as the leaderboard.
+    func finalPlacement(for userId: String?) -> Int? {
+        guard let userId else { return nil }
+        let sorted = currentResults.sorted()
+        guard let idx = sorted.firstIndex(where: { $0.userId == userId }) else { return nil }
+        return idx + 1
+    }
+
     /// This init is used for testing and mock data. Production code will decode the entity from JSON
     init(id: UUID = UUID(), name: String = "Test Competition", start: Date = Date(), end: Date = Date(), currentResults: [UserCompetitionPoints] = [], isUserAdmin: Bool = false, competitionState: CompetitionState = .notStartedOrActive, isPublic: Bool = false, scoringRules: ScoringRules = .default, scoringUnit: ScoringUnit? = nil) {
         competitionId = id

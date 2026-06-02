@@ -496,6 +496,38 @@ export function updateCompetitionState(params: IUpdateCompetitionStateParams): P
 }
 
 
+/** 'UpdateCompetitionDates' parameters type */
+export interface IUpdateCompetitionDatesParams {
+  competitionId: string;
+  endDate: DateOrString;
+  startDate: DateOrString;
+}
+
+/** 'UpdateCompetitionDates' return type */
+export type IUpdateCompetitionDatesResult = void;
+
+/** 'UpdateCompetitionDates' query type */
+export interface IUpdateCompetitionDatesQuery {
+  params: IUpdateCompetitionDatesParams;
+  result: IUpdateCompetitionDatesResult;
+}
+
+const updateCompetitionDatesIR: any = {"usedParamSet":{"startDate":true,"endDate":true,"competitionId":true},"params":[{"name":"startDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":37,"b":47}]},{"name":"endDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":61,"b":69}]},{"name":"competitionId","required":true,"transform":{"type":"scalar"},"locs":[{"a":94,"b":108}]}],"statement":"UPDATE competitions SET start_date = :startDate!, end_date = :endDate! WHERE competition_id = :competitionId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE competitions SET start_date = :startDate!, end_date = :endDate! WHERE competition_id = :competitionId!
+ * ```
+ */
+export function updateCompetitionDates(params: IUpdateCompetitionDatesParams): Promise<Array<IUpdateCompetitionDatesResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateCompetitionDates = new pgtyped.PreparedQuery<IUpdateCompetitionDatesParams,IUpdateCompetitionDatesResult>(updateCompetitionDatesIR);
+    return updateCompetitionDates.run(params, DatabaseConnectionPool);
+  });
+}
+
+
 /** 'UpdateCompetitionFinalPoints' parameters type */
 export interface IUpdateCompetitionFinalPointsParams {
   competitionId: string;

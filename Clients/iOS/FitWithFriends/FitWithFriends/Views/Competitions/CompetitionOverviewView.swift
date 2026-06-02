@@ -297,6 +297,111 @@ struct CompetitionOverviewView: View {
     }
 }
 
+// MARK: - Compact completed row (collapsed "Completed" drawer)
+
+/// Condensed resting-state row for a finished competition. Drops the live rank
+/// hero + today delta and shows the user's final placement. Used inside the
+/// home-feed "Completed" drawer (Option C).
+struct CompletedCompetitionRow: View {
+    let competitionOverview: CompetitionOverview
+    let loggedInUserId: String?
+    let onTap: () -> Void
+
+    private var placement: Int? {
+        competitionOverview.finalPlacement(for: loggedInUserId)
+    }
+
+    private var participantCount: Int {
+        competitionOverview.currentResults.count
+    }
+
+    private var won: Bool {
+        placement == 1
+    }
+
+    private var medalColor: Color? {
+        MedalPalette.color(for: placement)
+    }
+
+    private var ordinalText: String {
+        guard let placement else { return "—" }
+        return CompetitionOverviewViewModel.ordinal(placement)
+    }
+
+    private var subtitle: String {
+        let ended = "Ended \(MedalPalette.shortMonthDay(competitionOverview.endDate))"
+        guard let placement else { return ended }
+        let placeText = placement == 1 ? "You won" : "\(CompetitionOverviewViewModel.ordinal(placement)) of \(participantCount)"
+        return "\(placeText) · \(ended)"
+    }
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 12) {
+                // Leading placement medallion
+                ZStack {
+                    Circle().fill(medalColor?.opacity(0.18) ?? Color("SurfaceAlt"))
+                    Text(ordinalText)
+                        .font(.system(size: 15, weight: .bold))
+                        .monospacedDigit()
+                        .foregroundStyle(medalColor ?? Color("InkSoft"))
+                }
+                .frame(width: 40, height: 40)
+
+                // Name + subtitle
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(competitionOverview.competitionName)
+                        .font(.system(size: 17, weight: .regular, design: .serif))
+                        .foregroundStyle(Color("Ink"))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    Text(subtitle)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color("InkMute"))
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                if won {
+                    Text("🏆")
+                        .font(.system(size: 18))
+                }
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color("InkFaint"))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("completedCompetitionRow")
+    }
+}
+
+// MARK: - Medal palette helpers
+
+/// Shared medal-color + date helpers used across the completed-competition
+/// treatments (compact row, result card, mini podium).
+enum MedalPalette {
+    /// Gold / Silver / Bronze for placements 1–3, `nil` otherwise.
+    static func color(for placement: Int?) -> Color? {
+        switch placement {
+        case 1: return Color("Gold")
+        case 2: return Color("Silver")
+        case 3: return Color("Bronze")
+        default: return nil
+        }
+    }
+
+    static func shortMonthDay(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
+    }
+}
+
 struct CompetitionOverviewView_Previews: PreviewProvider {
     private static var competitionOverview: CompetitionOverview {
         let results = [
@@ -328,5 +433,37 @@ struct CompetitionOverviewView_Previews: PreviewProvider {
             .fwfCard()
             .padding(.horizontal, 16)
             .background(Color("Bg"))
+
+        VStack(spacing: 0) {
+            CompletedCompetitionRow(
+                competitionOverview: CompetitionOverview(
+                    name: "Spring Step Showdown",
+                    start: Date().addingTimeInterval(-.xtDays(14)),
+                    end: Date().addingTimeInterval(-.xtDays(1)),
+                    currentResults: [
+                        UserCompetitionPoints(userId: "me", firstName: "You", lastName: "", total: 900, today: 0),
+                        UserCompetitionPoints(userId: "a", firstName: "Alice", lastName: "Chen", total: 700, today: 0),
+                    ]),
+                loggedInUserId: "me",
+                onTap: {})
+            Divider()
+            CompletedCompetitionRow(
+                competitionOverview: CompetitionOverview(
+                    name: "April Ring Rumble",
+                    start: Date().addingTimeInterval(-.xtDays(14)),
+                    end: Date().addingTimeInterval(-.xtDays(2)),
+                    currentResults: [
+                        UserCompetitionPoints(userId: "a", firstName: "Alice", lastName: "Chen", total: 700, today: 0),
+                        UserCompetitionPoints(userId: "b", firstName: "Bob", lastName: "Lee", total: 650, today: 0),
+                        UserCompetitionPoints(userId: "c", firstName: "Cara", lastName: "Ng", total: 600, today: 0),
+                        UserCompetitionPoints(userId: "me", firstName: "You", lastName: "", total: 400, today: 0),
+                    ]),
+                loggedInUserId: "me",
+                onTap: {})
+        }
+        .background(Color("Surface"))
+        .padding(.horizontal, 16)
+        .background(Color("Bg"))
+        .previewDisplayName("Completed rows")
     }
 }

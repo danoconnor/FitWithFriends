@@ -64,6 +64,11 @@ describe('testHelpers route guard', () => {
             const response = await axios.post(`${baseUrl}/seedCompetitionUsers`, {}, { validateStatus: () => true });
             expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
         });
+
+        test('setCompetitionDates returns 401', async () => {
+            const response = await axios.post(`${baseUrl}/setCompetitionDates`, {}, { validateStatus: () => true });
+            expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
+        });
     });
 
     describe('when FWF_ENABLE_TEST_HELPERS is set to a non-true value', () => {
@@ -80,6 +85,11 @@ describe('testHelpers route guard', () => {
             const response = await axios.post(`${baseUrl}/seedCompetitionUsers`, {}, { validateStatus: () => true });
             expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
         });
+
+        test('setCompetitionDates returns 401', async () => {
+            const response = await axios.post(`${baseUrl}/setCompetitionDates`, {}, { validateStatus: () => true });
+            expect({ status: response.status, body: response.data }).toEqual(expect.objectContaining({ status: 401 }));
+        });
     });
 
     describe('when FWF_ENABLE_TEST_HELPERS=true', () => {
@@ -94,6 +104,11 @@ describe('testHelpers route guard', () => {
 
         test('seedCompetitionUsers passes the guard (returns non-401)', async () => {
             const response = await axios.post(`${baseUrl}/seedCompetitionUsers`, {}, { validateStatus: () => true });
+            expect(response.status).not.toBe(401);
+        });
+
+        test('setCompetitionDates passes the guard (returns non-401)', async () => {
+            const response = await axios.post(`${baseUrl}/setCompetitionDates`, {}, { validateStatus: () => true });
             expect(response.status).not.toBe(401);
         });
     });

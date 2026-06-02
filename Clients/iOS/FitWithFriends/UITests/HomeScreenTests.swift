@@ -24,8 +24,8 @@ final class HomeScreenTests: FWFUITestBase {
         // Verify the competition is visible
         XCTAssertTrue(app.staticTexts["Screenshot Competition"].waitForExistence(timeout: 15))
 
-        // Verify the competitions section header
-        XCTAssertTrue(app.staticTexts["Your Competitions"].exists)
+        // Verify the competitions section header (active competitions group)
+        XCTAssertTrue(app.staticTexts["Active now"].exists)
 
         takeScreenshot(name: "02_HomeScreen")
     }

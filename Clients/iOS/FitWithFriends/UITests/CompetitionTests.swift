@@ -77,6 +77,69 @@ final class CompetitionTests: FWFUITestBase {
         takeScreenshot(name: "05_CompetitionDetail")
     }
 
+    func testCompletedCompetitionDrawerAndDetail() throws {
+        let competitionId = try createTestCompetition(name: "Completed Comp Test")
+
+        // Shift the window into the past so the competition lands in the Completed bucket.
+        let start = Date(timeIntervalSinceNow: -14 * 24 * 60 * 60)
+        let end = Date(timeIntervalSinceNow: -1 * 24 * 60 * 60)
+        try setCompetitionDates(competitionId: competitionId, start: start, end: end)
+
+        // Seed activity within the new window so standings + recap have real data.
+        try seedSelfActivityData(daysAgo: 14,
+                                 caloriesBurned: 500, caloriesGoal: 400,
+                                 exerciseTime: 35, exerciseTimeGoal: 30,
+                                 standTime: 12, standTimeGoal: 12)
+        try seedCompetitionWithUsers(competitionId: competitionId)
+
+        launchApp(loggedIn: true)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
+
+        // The competition sits in the collapsed "Completed" drawer — expand it.
+        let drawer = app.buttons["competitionDrawer_Completed"]
+        XCTAssertTrue(drawer.waitForExistence(timeout: 15))
+        drawer.tap()
+
+        // Tap the compact completed row to open the detail sheet.
+        let row = app.staticTexts["Completed Comp Test"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+
+        XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
+
+        // Completed detail shows the final-result card, recap grid, and final standings
+        // (instead of the live "Time left" standing card).
+        XCTAssertTrue(app.staticTexts["YOUR FINAL RESULT"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Your competition recap"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Final standings"].exists)
+
+        takeScreenshot(name: "11_CompletedCompetitionDetail")
+    }
+
+    func testScoringRulesSheetOpensFromDetail() throws {
+        try createTestCompetition(name: "Rules Sheet Test")
+
+        launchApp(loggedIn: true)
+
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
+        let competitionText = app.staticTexts["Rules Sheet Test"]
+        XCTAssertTrue(competitionText.waitForExistence(timeout: 15))
+        competitionText.tap()
+
+        XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
+
+        // Tap the ? help button in the header to open the "How scoring works" sheet.
+        let helpButton = app.buttons["scoringRulesButton"]
+        XCTAssertTrue(helpButton.waitForExistence(timeout: 5))
+        helpButton.tap()
+
+        // The sheet surfaces its "HOW SCORING WORKS" header tag and a worked example.
+        XCTAssertTrue(app.staticTexts["HOW SCORING WORKS"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["WORKED EXAMPLE"].waitForExistence(timeout: 5))
+
+        takeScreenshot(name: "10_ScoringRulesSheet")
+    }
+
     func testUserDetailsView() throws {
         // Create a competition with activity data
         let competitionId = try createCompetitionForScreenshots(name: "User Detail Test", daysInPast: 3)
