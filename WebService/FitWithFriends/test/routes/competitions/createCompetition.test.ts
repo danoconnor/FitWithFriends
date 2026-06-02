@@ -43,9 +43,15 @@ afterEach(async () => {
 
 test('Create competition happy path', async () => {
     const now = new Date();
+    // Anchor the dates to noon UTC. start_date/end_date are stored in DATE columns
+    // (the time is dropped), so an instant near midnight UTC would land on different
+    // calendar days depending on the server/test timezone, making the day-of-month
+    // assertions below flaky. Noon UTC is the same calendar day across UTC and the
+    // US timezones the tests run in.
+    const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 12, 0, 0));
     const competitionInfo = {
-        startDate: now,
-        endDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 7), // 7 days from now
+        startDate: startDate,
+        endDate: new Date(startDate.getTime() + 1000 * 60 * 60 * 24 * 7), // 7 days from start
         displayName: 'Test Competition',
         ianaTimezone: 'America/New_York'
     };

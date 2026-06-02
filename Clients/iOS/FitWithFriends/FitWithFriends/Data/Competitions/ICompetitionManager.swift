@@ -86,4 +86,9 @@ protocol ICompetitionManager: AnyObject {
     ///   - userId: The target user id
     /// - Returns: The user's daily competition details
     func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails
+
+    /// Marks the end-of-competition notifications as seen for the logged-in user, suppressing
+    /// the server's fallback push. Called when the end-of-competition screen is shown.
+    /// - Parameter competitionId: The competition id
+    func markCompetitionNotificationsSeen(competitionId: UUID) async throws
 }

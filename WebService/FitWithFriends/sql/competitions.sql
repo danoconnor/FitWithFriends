@@ -61,6 +61,45 @@ UPDATE users_competitions
 SET final_points = :finalPoints!
 WHERE user_id = :userId! AND competition_id = :competitionId!;
 
+/* @name GetPendingCompetitionNotifications */
+/* One row per (member, competition) that still needs an end-of-competition push.
+   Restricted to competitions that finished recently (within the caller's window)
+   and are in the processing or archived state. Bots are excluded — they have no
+   push tokens. The processing notification is skipped once the competition has
+   archived (handled by selecting on the per-state flag). */
+SELECT
+    c.competition_id,
+    c.display_name,
+    c.iana_timezone,
+    c.state,
+    encode(uc.user_id::bytea, 'hex') AS "user_id!",
+    u.preferred_timezone,
+    uc.final_points,
+    uc.sent_processing_notification AS "sent_processing_notification!",
+    uc.sent_complete_notification AS "sent_complete_notification!"
+FROM competitions c
+JOIN users_competitions uc ON uc.competition_id = c.competition_id
+JOIN users u ON u.user_id = uc.user_id
+WHERE c.end_date >= :finishedAfter!
+  AND u.is_bot = false
+  AND (
+        (c.state = :processingState! AND uc.sent_processing_notification = false)
+     OR (c.state = :archivedState! AND uc.sent_complete_notification = false)
+  );
+
+/* @name MarkProcessingNotificationSent */
+UPDATE users_competitions
+SET sent_processing_notification = true
+WHERE user_id = :userId! AND competition_id = :competitionId!;
+
+/* @name MarkCompleteNotificationSent */
+/* Seeing/receiving the final results makes the processing notification moot, so
+   both flags are satisfied. Also used by the client when the user views the
+   end-of-competition screen. */
+UPDATE users_competitions
+SET sent_complete_notification = true, sent_processing_notification = true
+WHERE user_id = :userId! AND competition_id = :competitionId!;
+
 /* @name GetPublicCompetitions */
 SELECT c.competition_id, c.display_name, c.start_date, c.end_date, c.iana_timezone, c.state,
        COUNT(uc.user_id)::INTEGER AS "member_count!"

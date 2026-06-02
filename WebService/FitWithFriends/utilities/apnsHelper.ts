@@ -16,6 +16,10 @@ export interface SendResult {
     sent: number;
     failed: number;
     failures: Array<{ userId: string; reason: string }>;
+    // User IDs for which at least one device was successfully delivered to.
+    // Callers use this to mark a per-user notification as delivered — a user
+    // with multiple devices counts as delivered if any one device succeeded.
+    succeededUserIds: string[];
 }
 
 // Cache the token and its expiry to avoid re-signing on every request.
@@ -26,14 +30,14 @@ let cachedTokenExpiresAt: number = 0;
 export async function sendPushNotifications(notifications: Notification[]): Promise<SendResult> {
     if (notifications.length === 0) {
         console.log('No notifications to send');
-        return { sent: 0, failed: 0, failures: [] };
+        return { sent: 0, failed: 0, failures: [], succeededUserIds: [] };
     }
 
     // Get distinct user IDs from notifications
     const userIds = Array.from(new Set(notifications.map(n => n.userId)));
     if (userIds.length === 0) {
         console.log('No distinct user IDs found in notifications');
-        return { sent: 0, failed: 0, failures: [] };
+        return { sent: 0, failed: 0, failures: [], succeededUserIds: [] };
     }
 
     const [pushTokenResults, apnsToken] = await Promise.all([
@@ -49,6 +53,7 @@ export async function sendPushNotifications(notifications: Notification[]): Prom
     let sent = 0;
     let failed = 0;
     const failures: Array<{ userId: string; reason: string }> = [];
+    const succeededUserIds = new Set<string>();
     const notificationTokenPairs: Array<{
         userId: string;
         pushToken: string;
@@ -84,6 +89,7 @@ export async function sendPushNotifications(notifications: Notification[]): Prom
         for (let j = 0; j < results.length; j++) {
             if (results[j].delivered) {
                 sent++;
+                succeededUserIds.add(batch[j].userId);
             } else {
                 failed++;
                 failures.push({ userId: batch[j].userId, reason: results[j].reason });
@@ -91,7 +97,7 @@ export async function sendPushNotifications(notifications: Notification[]): Prom
         }
     }
 
-    return { sent, failed, failures };
+    return { sent, failed, failures, succeededUserIds: Array.from(succeededUserIds) };
 }
 
 async function getPushTokenForUser(userId: string): Promise<{ userId: string, tokens: string[] }> {

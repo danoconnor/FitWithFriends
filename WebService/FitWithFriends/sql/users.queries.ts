@@ -10,6 +10,7 @@ export interface ICreateUserParams {
   isPro: boolean;
   lastName?: string | null | void;
   maxActiveCompetitions: number;
+  preferredTimezone?: string | null | void;
   userId: Buffer;
 }
 
@@ -22,18 +23,49 @@ export interface ICreateUserQuery {
   result: ICreateUserResult;
 }
 
-const createUserIR: any = {"usedParamSet":{"userId":true,"firstName":true,"lastName":true,"maxActiveCompetitions":true,"isPro":true,"createdDate":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":105,"b":112}]},{"name":"firstName","required":true,"transform":{"type":"scalar"},"locs":[{"a":115,"b":125}]},{"name":"lastName","required":false,"transform":{"type":"scalar"},"locs":[{"a":128,"b":136}]},{"name":"maxActiveCompetitions","required":true,"transform":{"type":"scalar"},"locs":[{"a":139,"b":161}]},{"name":"isPro","required":true,"transform":{"type":"scalar"},"locs":[{"a":164,"b":170}]},{"name":"createdDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":173,"b":185}]}],"statement":"INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date) VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!)"};
+const createUserIR: any = {"usedParamSet":{"userId":true,"firstName":true,"lastName":true,"maxActiveCompetitions":true,"isPro":true,"createdDate":true,"preferredTimezone":true},"params":[{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":125,"b":132}]},{"name":"firstName","required":true,"transform":{"type":"scalar"},"locs":[{"a":135,"b":145}]},{"name":"lastName","required":false,"transform":{"type":"scalar"},"locs":[{"a":148,"b":156}]},{"name":"maxActiveCompetitions","required":true,"transform":{"type":"scalar"},"locs":[{"a":159,"b":181}]},{"name":"isPro","required":true,"transform":{"type":"scalar"},"locs":[{"a":184,"b":190}]},{"name":"createdDate","required":true,"transform":{"type":"scalar"},"locs":[{"a":193,"b":205}]},{"name":"preferredTimezone","required":false,"transform":{"type":"scalar"},"locs":[{"a":208,"b":225}]}],"statement":"INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date, preferred_timezone) VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!, :preferredTimezone)"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date) VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!)
+ * INSERT INTO users(user_id, first_name, last_name, max_active_competitions, is_pro, created_date, preferred_timezone) VALUES (:userId!, :firstName!, :lastName, :maxActiveCompetitions!, :isPro!, :createdDate!, :preferredTimezone)
  * ```
  */
 export function createUser(params: ICreateUserParams): Promise<Array<ICreateUserResult>> {
   return import('@pgtyped/runtime').then(pgtyped => {
     const createUser = new pgtyped.PreparedQuery<ICreateUserParams,ICreateUserResult>(createUserIR);
     return createUser.run(params, DatabaseConnectionPool);
+  });
+}
+
+
+/** 'UpdateUserTimezone' parameters type */
+export interface IUpdateUserTimezoneParams {
+  preferredTimezone: string;
+  userId: Buffer;
+}
+
+/** 'UpdateUserTimezone' return type */
+export type IUpdateUserTimezoneResult = void;
+
+/** 'UpdateUserTimezone' query type */
+export interface IUpdateUserTimezoneQuery {
+  params: IUpdateUserTimezoneParams;
+  result: IUpdateUserTimezoneResult;
+}
+
+const updateUserTimezoneIR: any = {"usedParamSet":{"preferredTimezone":true,"userId":true},"params":[{"name":"preferredTimezone","required":true,"transform":{"type":"scalar"},"locs":[{"a":38,"b":56}]},{"name":"userId","required":true,"transform":{"type":"scalar"},"locs":[{"a":74,"b":81}]}],"statement":"UPDATE users SET preferred_timezone = :preferredTimezone! WHERE user_id = :userId!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE users SET preferred_timezone = :preferredTimezone! WHERE user_id = :userId!
+ * ```
+ */
+export function updateUserTimezone(params: IUpdateUserTimezoneParams): Promise<Array<IUpdateUserTimezoneResult>> {
+  return import('@pgtyped/runtime').then(pgtyped => {
+    const updateUserTimezone = new pgtyped.PreparedQuery<IUpdateUserTimezoneParams,IUpdateUserTimezoneResult>(updateUserTimezoneIR);
+    return updateUserTimezone.run(params, DatabaseConnectionPool);
   });
 }
 

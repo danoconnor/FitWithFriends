@@ -25,6 +25,17 @@ public class MockUserService: IUserService {
         }
     }
 
+    public var param_reportTimezone_timezone: String?
+    public var return_reportTimezone_error: Error?
+    public var reportTimezoneCallCount = 0
+    public func reportTimezone(_ timezone: String) async throws {
+        reportTimezoneCallCount += 1
+        param_reportTimezone_timezone = timezone
+        if let error = return_reportTimezone_error {
+            throw error
+        }
+    }
+
     public func createUser(firstName: String,
                     lastName: String,
                     userId: String,

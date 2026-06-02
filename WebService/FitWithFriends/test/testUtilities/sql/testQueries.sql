@@ -45,8 +45,16 @@ INSERT INTO users_competitions (user_id, competition_id)
 VALUES (:userId!, :competitionId!);
 
 /* @name UpdateUserCompetitionFinalPoints */
-UPDATE users_competitions 
-SET final_points = :finalPoints! 
+UPDATE users_competitions
+SET final_points = :finalPoints!
+WHERE user_id = :userId! AND competition_id = :competitionId!;
+
+/* @name SetUserPreferredTimezone */
+UPDATE users SET preferred_timezone = :preferredTimezone WHERE user_id = :userId!;
+
+/* @name SetNotificationFlags */
+UPDATE users_competitions
+SET sent_processing_notification = :sentProcessing!, sent_complete_notification = :sentComplete!
 WHERE user_id = :userId! AND competition_id = :competitionId!;
 
 /* @name GetCompetition */
