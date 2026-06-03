@@ -182,7 +182,7 @@ struct SettingsView: View {
                 .tracking(-0.5)
                 .foregroundStyle(.white)
 
-                Text("Up to 10 simultaneous competitions, custom scoring, public leaderboards. $19.99/yr.")
+                Text("Up to 10 simultaneous competitions, custom scoring, public leaderboards. $2.99/mo.")
                     .font(.system(size: 12.5))
                     .foregroundStyle(.white.opacity(0.85))
                     .fixedSize(horizontal: false, vertical: true)

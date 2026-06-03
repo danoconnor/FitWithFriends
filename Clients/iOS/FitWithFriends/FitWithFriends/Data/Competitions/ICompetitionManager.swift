@@ -80,6 +80,12 @@ protocol ICompetitionManager: AnyObject {
     /// Join a public competition
     func joinPublicCompetition(competitionId: UUID) async throws
 
+    /// Get the overview (scoring rules + live standings) for a public competition.
+    /// The user does not need to be a member - used to preview a public competition before joining.
+    /// - Parameter competitionId: The competition id
+    /// - Returns: The competition overview
+    func getPublicCompetitionOverview(competitionId: UUID) async throws -> CompetitionOverview
+
     /// Get daily activity details for a specific user in a competition
     /// - Parameters:
     ///   - competitionId: The competition id

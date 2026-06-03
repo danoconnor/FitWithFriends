@@ -116,6 +116,38 @@ final class CompetitionTests: FWFUITestBase {
         takeScreenshot(name: "11_CompletedCompetitionDetail")
     }
 
+    func testRematchFromCompletedDetailOpensCreateWizard() throws {
+        let competitionId = try createTestCompetition(name: "Rematch Detail Comp")
+
+        // Shift the window into the past so the competition is completed (shows the rematch CTA).
+        let start = Date(timeIntervalSinceNow: -14 * 24 * 60 * 60)
+        let end = Date(timeIntervalSinceNow: -1 * 24 * 60 * 60)
+        try setCompetitionDates(competitionId: competitionId, start: start, end: end)
+        try seedCompetitionWithUsers(competitionId: competitionId)
+
+        launchApp(loggedIn: true)
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 10))
+
+        let drawer = app.buttons["competitionDrawer_Completed"]
+        XCTAssertTrue(drawer.waitForExistence(timeout: 15))
+        drawer.tap()
+
+        let row = app.staticTexts["Rematch Detail Comp"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        row.tap()
+
+        XCTAssertTrue(competitionDetailScreen.waitForExistence(timeout: 5))
+
+        // Tapping rematch must dismiss the detail sheet AND open the create wizard
+        // (the bug: the sheet dismissed but nothing followed).
+        let rematchButton = app.buttons["competitionDetailRematchButton"]
+        XCTAssertTrue(rematchButton.waitForExistence(timeout: 5))
+        rematchButton.tap()
+
+        XCTAssertTrue(competitionDetailScreen.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(createWizard.waitForExistence(timeout: 10))
+    }
+
     func testScoringRulesSheetOpensFromDetail() throws {
         try createTestCompetition(name: "Rules Sheet Test")
 

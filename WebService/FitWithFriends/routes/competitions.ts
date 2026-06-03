@@ -426,6 +426,67 @@ router.get('/:competitionId/overview', function (req, res) {
         });
 });
 
+// Returns the overview (scoring rules + live standings) for a PUBLIC competition.
+// Unlike /overview, this does NOT require the caller to be a member, so the user can
+// preview a public competition before deciding to join. Private competitions are never
+// exposed here - the competition must have is_public = true.
+//
+// Expects a query param with the user's current timezone
+router.get('/:competitionId/publicOverview', function (req, res) {
+    const timezoneParam = req.query['timezone']?.toString();
+    const competitionId: string = req.params.competitionId;
+    if (!timezoneParam || !allIANATimezones.includes(timezoneParam)) {
+        handleError(null, 400, 'Invalid timezone query param: ' + timezoneParam, res);
+        return;
+    }
+
+    const userId = res.locals.oauth.token.user.id;
+    Promise.all([
+        UserQueries.getUsersInCompetition({ competitionId }),
+        CompetitionQueries.getCompetition({ competitionId })
+    ])
+        .then(([usersCompetitionsResult, competitionsResult]) => {
+            if (!competitionsResult.length) {
+                handleError(null, 404, 'Could not find competition info', res);
+                return;
+            }
+
+            // Only public competitions can be previewed by non-members. Treat private
+            // competitions as not found so we never leak their existence or details.
+            const competitionInfo = competitionsResult[0];
+            if (!competitionInfo.is_public) {
+                handleError(null, 404, 'Could not find competition info', res);
+                return;
+            }
+
+            const isUserAdmin = userId === convertBufferToUserId(competitionInfo.admin_user_id);
+
+            getCompetitionStandings(competitionInfo, usersCompetitionsResult, timezoneParam)
+                .then(userPoints => {
+                    const parsedRules = parseScoringRules(competitionInfo.scoring_rules);
+                    res.json({
+                        'competitionId': competitionInfo.competition_id,
+                        'competitionName': competitionInfo.display_name,
+                        'competitionStart': competitionInfo.start_date,
+                        'competitionEnd': competitionInfo.end_date,
+                        'competitionState': competitionInfo.state,
+                        'isCompetitionProcessingResults': competitionInfo.state === CompetitionState.ProcessingResults,
+                        'isUserAdmin': isUserAdmin,
+                        'isPublic': competitionInfo.is_public,
+                        'scoringRules': competitionInfo.scoring_rules ?? { kind: 'rings' },
+                        'scoringUnit': getScoringUnit(parsedRules),
+                        'currentResults': Object.values(userPoints)
+                    });
+                })
+                .catch(error => {
+                    handleError(error, 500, 'Error calculating results', res);
+                });
+        })
+        .catch(error => {
+            handleError(error, 500, 'Error getting competition info', res);
+        });
+});
+
 // Returns the daily activity summaries and points for a specific user within a competition
 // Both the requesting user and the target user must be members of the competition
 // Only returns data within the competition's date range

@@ -19,6 +19,14 @@ struct LoggedInContentView: View {
     @State private var upcomingExpanded = false
     @State private var completedExpanded = false
 
+    // Set when the user taps rematch on the competition-end cover; consumed in the
+    // cover's onDismiss to open the create wizard after the cover finishes dismissing.
+    @State private var shouldShowCreateAfterEnd = false
+
+    // Same handoff for the completed-competition detail sheet's rematch CTA — consumed
+    // in the detail sheet's onDismiss.
+    @State private var shouldShowCreateAfterDetail = false
+
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
         _homepageSheetViewModel = StateObject(wrappedValue: HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
@@ -72,6 +80,11 @@ struct LoggedInContentView: View {
                                     },
                                     onUpgrade: {
                                         homepageSheetViewModel.updateState(sheet: .proUpgrade, state: true)
+                                    },
+                                    onSelect: {
+                                        homepageSheetViewModel.updateState(sheet: .publicCompetitionDetails,
+                                                                           state: true,
+                                                                           contextData: competition)
                                     }
                                 )
                                 .fwfCard()
@@ -104,6 +117,13 @@ struct LoggedInContentView: View {
                     .padding(.top, 8)
                     .sheet(isPresented: $homepageSheetViewModel.shouldShowSheet, onDismiss: {
                         homepageSheetViewModel.dismissCurrentSheet()
+                        // Open the create wizard only once the detail sheet has fully
+                        // dismissed — presenting it while the sheet animates out gets
+                        // dropped by SwiftUI.
+                        if shouldShowCreateAfterDetail {
+                            shouldShowCreateAfterDetail = false
+                            homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+                        }
                     }, content: {
                         switch homepageSheetViewModel.sheetToShow {
                         case .createCompetition:
@@ -119,7 +139,17 @@ struct LoggedInContentView: View {
                             if let competitionOverview = homepageSheetViewModel.sheetContextData as? CompetitionOverview {
                                 CompetitionDetailView(competitionOverview: competitionOverview,
                                                       homepageSheetViewModel: homepageSheetViewModel,
-                                                      objectGraph: objectGraph)
+                                                      objectGraph: objectGraph,
+                                                      onRematch: { shouldShowCreateAfterDetail = true })
+                            } else {
+                                Text("Error showing competition details")
+                            }
+                        case .publicCompetitionDetails:
+                            if let publicCompetition = homepageSheetViewModel.sheetContextData as? PublicCompetition {
+                                PublicCompetitionDetailView(competition: publicCompetition,
+                                                            isUserPro: homepageViewModel.isUserPro,
+                                                            homepageSheetViewModel: homepageSheetViewModel,
+                                                            objectGraph: objectGraph)
                             } else {
                                 Text("Error showing competition details")
                             }
@@ -176,11 +206,19 @@ struct LoggedInContentView: View {
             isPresented: Binding(
                 get: { competitionEndAlertViewModel.currentEndCompetition != nil },
                 set: { if !$0 { competitionEndAlertViewModel.dismissCurrent() } }
-            )
+            ),
+            onDismiss: {
+                // Open the create wizard only once the end cover has fully dismissed —
+                // presenting it while the cover animates out gets dropped by SwiftUI.
+                if shouldShowCreateAfterEnd {
+                    shouldShowCreateAfterEnd = false
+                    homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+                }
+            }
         ) {
             CompetitionEndView(
                 viewModel: competitionEndAlertViewModel,
-                homepageSheetViewModel: homepageSheetViewModel
+                onRematch: { shouldShowCreateAfterEnd = true }
             )
         }
     }

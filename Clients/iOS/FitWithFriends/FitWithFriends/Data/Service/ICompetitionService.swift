@@ -63,6 +63,13 @@ public protocol ICompetitionService {
     /// Get the list of active public competitions
     func getPublicCompetitions() async throws -> PublicCompetitionsResponse
 
+    /// Get the overview (scoring rules + live standings) for a public competition.
+    /// The user does NOT need to be a member - this is used to preview a public
+    /// competition before joining. Only works for public competitions.
+    /// - Parameter competitionId: The competition id
+    /// - Returns: The competition overview, or a relevant error
+    func getPublicCompetitionOverview(competitionId: UUID) async throws -> CompetitionOverview
+
     /// Join a public competition (requires Pro subscription)
     /// - Parameter competitionId: The competition to join
     func joinPublicCompetition(competitionId: UUID) async throws

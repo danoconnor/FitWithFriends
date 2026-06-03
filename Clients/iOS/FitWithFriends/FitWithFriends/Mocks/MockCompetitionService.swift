@@ -136,6 +136,20 @@ public class MockCompetitionService: ICompetitionService {
         }
     }
 
+    public var param_getPublicCompetitionOverview_competitionId: UUID?
+    public var return_getPublicCompetitionOverview: CompetitionOverview?
+    public var getPublicCompetitionOverviewCallCount = 0
+    public func getPublicCompetitionOverview(competitionId: UUID) async throws -> CompetitionOverview {
+        getPublicCompetitionOverviewCallCount += 1
+        param_getPublicCompetitionOverview_competitionId = competitionId
+
+        if let retVal = return_getPublicCompetitionOverview {
+            return retVal
+        } else {
+            throw HttpError.generic
+        }
+    }
+
     public var param_joinPublicCompetition_competitionId: UUID?
     public var return_joinPublicCompetition_error: Error?
     public var joinPublicCompetitionCallCount = 0

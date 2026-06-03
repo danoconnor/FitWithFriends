@@ -175,6 +175,26 @@ public class MockCompetitionManager: ICompetitionManager {
         }
     }
 
+    public var param_getPublicCompetitionOverview_competitionId: UUID?
+    public var return_getPublicCompetitionOverview: CompetitionOverview?
+    public var return_getPublicCompetitionOverview_error: Error?
+
+    public var getPublicCompetitionOverviewCallCount = 0
+    public func getPublicCompetitionOverview(competitionId: UUID) async throws -> CompetitionOverview {
+        getPublicCompetitionOverviewCallCount += 1
+        param_getPublicCompetitionOverview_competitionId = competitionId
+
+        if let error = return_getPublicCompetitionOverview_error {
+            throw error
+        }
+
+        guard let overview = return_getPublicCompetitionOverview else {
+            throw NSError(domain: "Mock", code: 0, userInfo: nil)
+        }
+
+        return overview
+    }
+
     public var param_getUserCompetitionDetails_competitionId: UUID?
     public var param_getUserCompetitionDetails_userId: String?
     public var return_getUserCompetitionDetails: UserCompetitionDailyDetails?

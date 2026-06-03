@@ -133,6 +133,24 @@ final class CompetitionManagerTests: XCTestCase {
         XCTAssertEqual(result.dailySummaries.count, 1)
     }
 
+    func test_getPublicCompetitionOverview_shouldCallService() async throws {
+        // Arrange
+        let competitionId = UUID()
+        let expectedOverview = CompetitionOverview(id: competitionId,
+                                                   name: "Public Comp",
+                                                   isPublic: true)
+        mockCompetitionService.return_getPublicCompetitionOverview = expectedOverview
+
+        // Act
+        let result = try await competitionManager.getPublicCompetitionOverview(competitionId: competitionId)
+
+        // Assert
+        XCTAssertEqual(mockCompetitionService.getPublicCompetitionOverviewCallCount, 1)
+        XCTAssertEqual(mockCompetitionService.param_getPublicCompetitionOverview_competitionId, competitionId)
+        XCTAssertEqual(result.competitionId, competitionId)
+        XCTAssertTrue(result.isPublic)
+    }
+
     func XCTAssertThrowsErrorAsync<T>(_ expression: @autoclosure () async throws -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line, _ errorHandler: (Error) -> Void) async {
         do {
             _ = try await expression()

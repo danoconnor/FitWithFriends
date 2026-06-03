@@ -114,7 +114,6 @@ public class CreateCompetitionViewModel: ObservableObject {
 
     // Daily config
     @Published var dailyMetric: DailyMetric = .steps
-    @Published var dailyTarget: Int = 8000  // visual reference only — not sent to the server
 
     /// Name of the competition that was just created — the invite step uses this
     /// to look up the new competition from the manager's published overviews and

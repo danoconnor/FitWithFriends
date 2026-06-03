@@ -13,7 +13,10 @@ import SwiftUI
 
 struct CompetitionEndView: View {
     @ObservedObject var viewModel: CompetitionEndAlertViewModel
-    let homepageSheetViewModel: HomepageSheetViewModel
+    /// Invoked when the user taps the rematch / new-competition CTA. The parent is
+    /// responsible for opening the create wizard once this cover has fully dismissed —
+    /// presenting it here (while the cover is still animating out) gets dropped by SwiftUI.
+    var onRematch: () -> Void = {}
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingShare: Bool = false
@@ -345,13 +348,14 @@ struct CompetitionEndView: View {
         VStack(spacing: 10) {
             // Primary CTA — "Demand a rematch" or "Rematch" depending on variant.
             FWFPrimaryButton(rematchCtaTitle) {
+                // Signal the parent to open the create wizard from the cover's
+                // onDismiss, then dismiss. Opening it here races the dismissal
+                // animation and SwiftUI silently drops the presentation.
+                onRematch()
                 viewModel.dismissCurrent()
                 dismiss()
-                // Pop the create wizard so the user can spin up a new comp immediately.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-                }
             }
+            .accessibilityIdentifier("competitionEndRematchButton")
 
             FWFSecondaryButton(shareCtaTitle, icon: "square.and.arrow.up") {
                 showingShare = true
@@ -389,10 +393,6 @@ struct CompetitionEndView_Previews: PreviewProvider {
             viewModel: CompetitionEndAlertViewModel(
                 competitionManager: MockCompetitionManager(),
                 authenticationManager: MockAuthenticationManager()
-            ),
-            homepageSheetViewModel: HomepageSheetViewModel(
-                appProtocolHandler: MockAppProtocolHandler(),
-                healthKitManager: MockHealthKitManager()
             )
         )
     }

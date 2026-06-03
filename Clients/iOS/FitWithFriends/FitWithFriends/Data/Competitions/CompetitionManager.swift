@@ -166,6 +166,10 @@ public class CompetitionManager: ICompetitionManager, ObservableObject {
         }
     }
 
+    func getPublicCompetitionOverview(competitionId: UUID) async throws -> CompetitionOverview {
+        return try await competitionService.getPublicCompetitionOverview(competitionId: competitionId)
+    }
+
     func getUserCompetitionDetails(competitionId: UUID, userId: String) async throws -> UserCompetitionDailyDetails {
         return try await competitionService.getUserCompetitionDetails(competitionId: competitionId, userId: userId)
     }

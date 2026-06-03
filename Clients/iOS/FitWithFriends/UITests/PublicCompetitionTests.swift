@@ -110,4 +110,78 @@ final class PublicCompetitionTests: FWFUITestBase {
         takeScreenshot(name: "09_JoinedPublicCompetition")
     }
 
+    /// End-to-end: a Pro user discovers a public competition they have not joined, taps the
+    /// card to preview its live leaderboard + scoring rules (served by the non-member
+    /// publicOverview endpoint), then joins from the preview and sees it land in their
+    /// active competitions.
+    func testPublicCompetitionDetailPreviewAndJoinEndToEnd() throws {
+        let competitionId = try createPublicCompetition(name: "Preview & Join Challenge")
+
+        // Seed the competition with members + activity so the preview leaderboard has real data
+        try seedCompetitionWithUsers(competitionId: competitionId)
+
+        // Backend must see the user as Pro for the join to succeed
+        try makeUserPro()
+
+        // App must see the user as Pro (drives the Join vs Upgrade button in UI tests)
+        launchApp(loggedIn: true, isPro: true)
+
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
+
+        // The card appears in the Public Competitions section with the details affordance
+        XCTAssertTrue(app.staticTexts["Preview & Join Challenge"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["View leaderboard & scoring"].waitForExistence(timeout: 5))
+
+        // Tapping the card opens the preview sheet
+        app.staticTexts["Preview & Join Challenge"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["publicCompetitionDetailScreen"].waitForExistence(timeout: 10))
+
+        // The live leaderboard loaded from the publicOverview endpoint with the seeded members
+        XCTAssertTrue(app.otherElements["publicCompetitionLeaderboard"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Leaderboard"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Alice Chen"].waitForExistence(timeout: 10))
+
+        takeScreenshot(name: "10_PublicCompetitionDetail")
+
+        // The scoring rules sheet opens from the detail header
+        let helpButton = app.buttons["scoringRulesButton"]
+        XCTAssertTrue(helpButton.waitForExistence(timeout: 5))
+        helpButton.tap()
+        XCTAssertTrue(app.staticTexts["HOW SCORING WORKS"].waitForExistence(timeout: 5))
+        app.buttons["Close"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["HOW SCORING WORKS"].waitForNonExistence(timeout: 5))
+
+        // Join from the preview
+        let joinButton = app.buttons["publicCompetitionJoinButton"]
+        XCTAssertTrue(joinButton.waitForExistence(timeout: 5))
+        joinButton.tap()
+
+        // The preview dismisses and the now-joined competition appears in the active group
+        XCTAssertTrue(app.staticTexts["publicCompetitionDetailScreen"].waitForNonExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Active now"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["Preview & Join Challenge"].waitForExistence(timeout: 15))
+    }
+
+    /// A non-Pro user can still open the preview, but the join CTA is replaced by an
+    /// Upgrade to Pro action.
+    func testPublicCompetitionDetailShowsUpgradeForNonPro() throws {
+        let competitionId = try createPublicCompetition(name: "Locked Preview Challenge")
+        try seedCompetitionWithUsers(competitionId: competitionId)
+
+        // Non-pro user (no makeUserPro, no isPro launch flag)
+        launchApp(loggedIn: true)
+
+        XCTAssertTrue(app.otherElements["homeScreen"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Locked Preview Challenge"].waitForExistence(timeout: 10))
+
+        app.staticTexts["Locked Preview Challenge"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["publicCompetitionDetailScreen"].waitForExistence(timeout: 10))
+
+        // Non-pro users see the upgrade CTA instead of a join button
+        XCTAssertTrue(app.buttons["publicCompetitionUpgradeButton"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["publicCompetitionJoinButton"].exists)
+
+        takeScreenshot(name: "11_PublicCompetitionDetailUpgrade")
+    }
+
 }
