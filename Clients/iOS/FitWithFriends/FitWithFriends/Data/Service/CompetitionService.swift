@@ -96,6 +96,14 @@ public class CompetitionService: ServiceBase, ICompetitionService {
                                                            method: .get)
     }
 
+    public func getPublicCompetitionOverview(competitionId: UUID) async throws -> CompetitionOverview {
+        // Need to query using the user's current timezone so we get accurate information on whether the competition is active or not
+        let ianaTimezone = TimeZone.current.identifier
+
+        return try await makeRequestWithUserAuthentication(url: "\(serverEnvironmentManager.baseUrl)/competitions/\(competitionId.uuidString)/publicOverview?timezone=\(ianaTimezone)",
+                                                           method: .get)
+    }
+
     public func joinPublicCompetition(competitionId: UUID) async throws {
         let requestBody: [String: String] = [
             "competitionId": competitionId.uuidString

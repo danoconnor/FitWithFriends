@@ -12,6 +12,9 @@ struct PublicCompetitionCard: View {
     let isUserPro: Bool
     let onJoin: () -> Void
     let onUpgrade: () -> Void
+    /// Invoked when the card body is tapped to preview the competition details
+    /// (scoring rules + live leaderboard) before joining.
+    let onSelect: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -57,6 +60,17 @@ struct PublicCompetitionCard: View {
                 .foregroundStyle(.secondary)
             }
 
+            // Tappable affordance to preview the competition before joining
+            HStack(spacing: 4) {
+                Text("View leaderboard & scoring")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color("Brand"))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color("Brand"))
+            }
+
             Divider()
 
             // Action row
@@ -92,5 +106,10 @@ struct PublicCompetitionCard: View {
                 .buttonStyle(.plain)
             }
         }
+        // The inner Join / Upgrade buttons handle their own taps; tapping anywhere
+        // else on the card opens the details preview.
+        .contentShape(Rectangle())
+        .onTapGesture { onSelect() }
+        .accessibilityIdentifier("publicCompetitionCard")
     }
 }

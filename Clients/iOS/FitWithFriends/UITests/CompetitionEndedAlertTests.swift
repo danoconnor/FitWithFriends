@@ -43,6 +43,27 @@ final class CompetitionEndedAlertTests: FWFUITestBase {
         XCTAssertFalse(endScreen.waitForExistence(timeout: 5))
     }
 
+    func testRematchOpensCreateWizard() throws {
+        let competitionId = try createTestCompetition(name: "Rematch Competition")
+        try setCompetitionArchived(competitionId: competitionId, userPoints: 500)
+
+        launchApp(loggedIn: true)
+
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 30))
+        XCTAssertTrue(endScreen.waitForExistence(timeout: 30))
+
+        // Tapping the rematch / new-competition CTA must dismiss the end cover AND
+        // open the create wizard (the bug: the cover dismissed but nothing followed).
+        let rematchButton = app.buttons["competitionEndRematchButton"]
+        XCTAssertTrue(rematchButton.waitForExistence(timeout: 5))
+        rematchButton.tap()
+
+        XCTAssertTrue(endScreen.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.otherElements["createWizard"].waitForExistence(timeout: 10))
+
+        takeScreenshot(name: "12_RematchCreateWizard")
+    }
+
     func testProcessingResultsCompetitionDoesNotShowAlert() throws {
         try createTestCompetition(name: "Still Processing")
 

@@ -12,6 +12,10 @@ struct CompetitionDetailView: View {
     private let homepageSheetViewModel: HomepageSheetViewModel
     private let objectGraph: IObjectGraph
     private let viewModel: CompetitionDetailViewModel
+    /// Invoked when the user taps the rematch CTA on a completed competition. The parent
+    /// opens the create wizard from this sheet's onDismiss — presenting it here, while the
+    /// sheet is still animating out, gets dropped by SwiftUI.
+    private let onRematch: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var actionInProgress = false
@@ -23,10 +27,12 @@ struct CompetitionDetailView: View {
 
     init(competitionOverview: CompetitionOverview,
          homepageSheetViewModel: HomepageSheetViewModel,
-         objectGraph: IObjectGraph) {
+         objectGraph: IObjectGraph,
+         onRematch: @escaping () -> Void = {}) {
         self.competitionOverview = competitionOverview
         self.homepageSheetViewModel = homepageSheetViewModel
         self.objectGraph = objectGraph
+        self.onRematch = onRematch
         viewModel = CompetitionDetailViewModel(competitionManager: objectGraph.competitionManager,
                                                homepageSheetViewModel: homepageSheetViewModel)
         _recapViewModel = StateObject(wrappedValue: CompetitionRecapViewModel(competitionManager: objectGraph.competitionManager))
@@ -157,13 +163,13 @@ struct CompetitionDetailView: View {
     private var completedCtaStack: some View {
         VStack(spacing: 10) {
             FWFPrimaryButton(didWin ? "Defend your title" : "Demand a rematch", icon: "trophy") {
-                // Dismiss the detail sheet, then present the create wizard — mirrors
-                // the rematch behavior in CompetitionEndView.
+                // Signal the parent to open the create wizard from this sheet's onDismiss,
+                // then dismiss. Opening it here races the dismissal animation and SwiftUI
+                // silently drops the presentation. Mirrors CompetitionEndView.
+                onRematch()
                 dismiss()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
-                }
             }
+            .accessibilityIdentifier("competitionDetailRematchButton")
 
             FWFSecondaryButton(didWin ? "Share your win" : "Share recap", icon: "square.and.arrow.up") {
                 shareCompetition()
@@ -941,7 +947,7 @@ struct ScoringRulesSheet: View {
             VStack(alignment: .leading, spacing: 12) {
                 header
                     .padding(.horizontal, 18)
-                    .padding(.top, 4)
+                    .padding(.top, 24)
 
                 Text(competitionOverview.scoringRules.humanReadableDescription)
                     .font(.system(size: 14))

@@ -382,7 +382,7 @@ struct CreateScoringStep: View {
                         .foregroundStyle(Color("Sun"))
                 }
             }
-            .foregroundStyle(selected ? .white : Color("Ink"))
+            .foregroundStyle(selected ? Color("Bg") : Color("Ink"))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .background(
@@ -591,29 +591,6 @@ struct CreateScoringStep: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("Daily target")
-                    .font(.system(size: 14, weight: .semibold))
-                Slider(value: Binding(
-                    get: { Double(viewModel.dailyTarget) },
-                    set: { viewModel.dailyTarget = Int($0) }
-                ), in: 2000...25000, step: 500)
-                .tint(Color("Brand"))
-                HStack {
-                    Text("Light · 2k").font(.system(size: 10)).foregroundStyle(Color("InkFaint"))
-                    Spacer()
-                    Text("Typical · 7.5k").font(.system(size: 10)).foregroundStyle(Color("InkFaint"))
-                    Spacer()
-                    Text("Active · 15k").font(.system(size: 10)).foregroundStyle(Color("InkFaint"))
-                    Spacer()
-                    Text("Athlete · 25k").font(.system(size: 10)).foregroundStyle(Color("InkFaint"))
-                }
-                Text("Visual reference only — every \(viewModel.dailyMetric == .steps ? "step" : "meter") still counts toward the total.")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color("InkSoft"))
-            }
-            .fwfCard(padding: 14)
-
-            VStack(alignment: .leading, spacing: 6) {
                 Text("How it works")
                     .font(.system(size: 14, weight: .semibold))
                 Text("Each day, points are added up. Highest total at the end wins.")
@@ -629,10 +606,10 @@ struct CreateScoringStep: View {
             VStack(spacing: 6) {
                 Image(systemName: icon)
                     .font(.system(size: 20))
-                    .foregroundStyle(selected ? .white : Color("Brand"))
+                    .foregroundStyle(selected ? Color("Bg") : Color("Brand"))
                 Text(label)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(selected ? .white : Color("Ink"))
+                    .foregroundStyle(selected ? Color("Bg") : Color("Ink"))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
@@ -719,7 +696,7 @@ struct CreateScoringStep: View {
         } label: {
             Text(label)
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(selected ? .white : Color("Ink"))
+                .foregroundStyle(selected ? Color("Bg") : Color("Ink"))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
                 .background(
@@ -737,7 +714,7 @@ struct CreateScoringStep: View {
         } label: {
             Text("\(mins) min")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(selected ? .white : Color("Ink"))
+                .foregroundStyle(selected ? Color("Bg") : Color("Ink"))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(
@@ -758,7 +735,7 @@ struct CreateScoringStep: View {
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color("Ink"))
             }
-            Text("Custom scoring rules and non-rings modes are part of FitWithFriends Pro ($19.99/year).")
+            Text("Custom scoring rules and non-rings modes are part of FitWithFriends Pro ($2.99/month).")
                 .font(.system(size: 12))
                 .foregroundStyle(Color("InkSoft"))
             Button("See what Pro unlocks →") { onShowProUpgrade() }
@@ -776,7 +753,7 @@ struct CreateScoringStep: View {
     @ViewBuilder
     private var submitButton: some View {
         if viewModel.requiresProUserMissing {
-            FWFPrimaryButton("Start Pro · $19.99/yr") { onShowProUpgrade() }
+            FWFPrimaryButton("Start Pro · $2.99/mo") { onShowProUpgrade() }
                 .accessibilityIdentifier("createCompetitionProUpgradeButton")
                 .accessibilityLabel("Upgrade to Pro")
         } else {

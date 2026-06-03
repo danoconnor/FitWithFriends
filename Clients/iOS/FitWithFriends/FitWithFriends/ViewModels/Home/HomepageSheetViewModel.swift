@@ -23,6 +23,7 @@ public class HomepageSheetViewModel: ObservableObject {
         case joinCompetition
         case createCompetition
         case competitionDetails
+        case publicCompetitionDetails
         case userDetails
         case proUpgrade
         case settings
@@ -43,6 +44,7 @@ public class HomepageSheetViewModel: ObservableObject {
         .joinCompetition: (shouldShow: false, contextData: nil),
         .createCompetition: (shouldShow: false, contextData: nil),
         .competitionDetails: (shouldShow: false, contextData: nil),
+        .publicCompetitionDetails: (shouldShow: false, contextData: nil),
         .userDetails: (shouldShow: false, contextData: nil),
         .proUpgrade: (shouldShow: false, contextData: nil),
         .settings: (shouldShow: false, contextData: nil),
