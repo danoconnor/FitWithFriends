@@ -27,6 +27,11 @@ struct LoggedInContentView: View {
     // in the detail sheet's onDismiss.
     @State private var shouldShowCreateAfterDetail = false
 
+    // Set when the user taps "Full standings" on the competition-end sheet; the captured
+    // competition is opened in the detail sheet from the end sheet's onDismiss (presenting
+    // it while the sheet animates out gets dropped by SwiftUI).
+    @State private var standingsCompetitionAfterEnd: CompetitionOverview?
+
     init(objectGraph: IObjectGraph) {
         self.objectGraph = objectGraph
         _homepageSheetViewModel = StateObject(wrappedValue: HomepageSheetViewModel(appProtocolHandler: objectGraph.appProtocolHandler,
@@ -202,23 +207,29 @@ struct LoggedInContentView: View {
                 ConfettiOverlayView()
             }
         }
-        .fullScreenCover(
+        .sheet(
             isPresented: Binding(
                 get: { competitionEndAlertViewModel.currentEndCompetition != nil },
                 set: { if !$0 { competitionEndAlertViewModel.dismissCurrent() } }
             ),
             onDismiss: {
-                // Open the create wizard only once the end cover has fully dismissed —
-                // presenting it while the cover animates out gets dropped by SwiftUI.
+                // Open the follow-on sheet only once the end sheet has fully dismissed —
+                // presenting it while the sheet animates out gets dropped by SwiftUI.
                 if shouldShowCreateAfterEnd {
                     shouldShowCreateAfterEnd = false
                     homepageSheetViewModel.updateState(sheet: .createCompetition, state: true)
+                } else if let competition = standingsCompetitionAfterEnd {
+                    standingsCompetitionAfterEnd = nil
+                    homepageSheetViewModel.updateState(sheet: .competitionDetails,
+                                                       state: true,
+                                                       contextData: competition)
                 }
             }
         ) {
             CompetitionEndView(
                 viewModel: competitionEndAlertViewModel,
-                onRematch: { shouldShowCreateAfterEnd = true }
+                onRematch: { shouldShowCreateAfterEnd = true },
+                onViewStandings: { competition in standingsCompetitionAfterEnd = competition }
             )
         }
     }

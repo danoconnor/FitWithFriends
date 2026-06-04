@@ -4,6 +4,7 @@
 //
 
 import Combine
+import SwiftUI
 import XCTest
 @testable import Fit_with_Friends
 
@@ -170,14 +171,26 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
         XCTAssertTrue(vm.shouldShowConfetti)
     }
 
-    func test_userInThirdPlace_showsConfetti() async {
+    func test_userInThirdPlace_noConfetti() async {
+        // The podium sheet celebrates a win only — confetti no longer fires for podium
+        // finishes (2nd/3rd), only for 1st.
         let vm = makeVM()
         let competition = makeArchivedCompetition(userPosition: 3)
 
         mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
-        await waitUntil(vm.shouldShowConfetti)
+        await waitUntil(vm.currentAlertCompetition != nil)
 
-        XCTAssertTrue(vm.shouldShowConfetti)
+        XCTAssertFalse(vm.shouldShowConfetti)
+    }
+
+    func test_userInSecondPlace_noConfetti() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 2)
+
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertFalse(vm.shouldShowConfetti)
     }
 
     func test_userInFourthPlace_noConfetti() async {
@@ -556,5 +569,207 @@ final class CompetitionEndAlertViewModelTests: XCTestCase {
 
         // Current alert should not have changed
         XCTAssertEqual(vm.currentAlertCompetition?.competitionId, firstCompetitionId)
+    }
+
+    // MARK: - Podium sheet (Direction B) presentation model
+
+    func test_endOutcome_firstPlace_won() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 1, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.endOutcome, .won)
+    }
+
+    func test_endOutcome_midPack_mid() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 2, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        // 2nd of 6 is neither first nor last → mid.
+        XCTAssertEqual(vm.endOutcome, .mid)
+    }
+
+    func test_endOutcome_lastPlace_last() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 6, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.endOutcome, .last)
+    }
+
+    func test_userPlacementAndMemberCount() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 4, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.userPlacement, 4)
+        XCTAssertEqual(vm.memberCount, 6)
+    }
+
+    func test_isUserOnPodium_trueForTopThree() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 3, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertTrue(vm.isUserOnPodium)
+    }
+
+    func test_isUserOnPodium_falseForMidPack() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 4, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertFalse(vm.isUserOnPodium)
+    }
+
+    func test_headlineAccent_perOutcome() async {
+        let vm = makeVM()
+
+        let won = makeArchivedCompetition(id: UUID(), name: "A", userPosition: 1, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [won.competitionId: won]
+        await waitUntil(vm.currentAlertCompetition != nil)
+        XCTAssertEqual(vm.headlineAccent, "You won.")
+        vm.dismissCurrent()
+
+        let mid = makeArchivedCompetition(id: UUID(), name: "B", userPosition: 3, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [mid.competitionId: mid]
+        await waitUntil(vm.currentAlertCompetition != nil)
+        XCTAssertEqual(vm.headlineAccent, "Strong showing.")
+        vm.dismissCurrent()
+
+        let last = makeArchivedCompetition(id: UUID(), name: "C", userPosition: 6, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [last.competitionId: last]
+        await waitUntil(vm.currentAlertCompetition != nil)
+        XCTAssertEqual(vm.headlineAccent, "Every day counts.")
+    }
+
+    func test_outcomeSubline_lastIncludesDayCount() async {
+        let vm = makeVM()
+        // Competition spans 7 days (start -8d, end -1d).
+        let competition = makeArchivedCompetition(userPosition: 6, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertTrue(vm.outcomeSubline.contains("7 days"), "Expected day count in '\(vm.outcomeSubline)'")
+        XCTAssertTrue(vm.outcomeSubline.contains("never quit"))
+    }
+
+    func test_podiumEntries_returnsTopThreeInOrder() async {
+        let vm = makeVM()
+        // User is 4th, so they should NOT appear in the podium (top 3 only).
+        let competition = makeArchivedCompetition(userPosition: 4, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        let podium = vm.podiumEntries
+        XCTAssertEqual(podium.count, 3)
+        XCTAssertEqual(podium.map { $0.position }, [1, 2, 3])
+        // Descending points: (6-0)*100=600, 500, 400.
+        XCTAssertEqual(podium.map { $0.points }, [600, 500, 400])
+        XCTAssertFalse(podium.contains { $0.isCurrentUser })
+    }
+
+    func test_podiumEntries_flagsCurrentUserWhenOnPodium() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 1, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        let podium = vm.podiumEntries
+        XCTAssertEqual(podium.first(where: { $0.isCurrentUser })?.position, 1)
+    }
+
+    func test_userScoreValue_formatsPointsWithoutSuffix() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 2, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        // Position 2 of 6 → (6-1)*100 = 500, no unit suffix.
+        XCTAssertEqual(vm.userScoreValue, "500")
+    }
+
+    func test_unitTagText_defaultsToPTS() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(userPosition: 1, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        XCTAssertEqual(vm.unitTagText, "PTS")
+    }
+
+    // MARK: - Share
+
+    func test_shareText_win_includesTrophyAndPlacement() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(name: "Step Showdown", userPosition: 1, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        let text = vm.shareText
+        XCTAssertTrue(text.contains("🏆"), "Expected trophy in '\(text)'")
+        XCTAssertTrue(text.contains("1st of 6"))
+        XCTAssertTrue(text.contains("Step Showdown"))
+        XCTAssertTrue(text.contains("Fit with Friends"))
+    }
+
+    func test_shareText_midPack_noTrophy() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(name: "Step Showdown", userPosition: 3, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        let text = vm.shareText
+        XCTAssertFalse(text.contains("🏆"))
+        XCTAssertTrue(text.contains("3rd of 6"))
+    }
+
+    func test_shareText_last_includesDayCount() async {
+        let vm = makeVM()
+        let competition = makeArchivedCompetition(name: "Step Showdown", userPosition: 6, totalUsers: 6)
+        mockCompetitionManager.return_competitionOverviews = [competition.competitionId: competition]
+        await waitUntil(vm.currentAlertCompetition != nil)
+
+        let text = vm.shareText
+        XCTAssertTrue(text.contains("7 days"), "Expected day count in '\(text)'")
+        XCTAssertTrue(text.contains("never quit"))
+    }
+
+    func test_appStoreURL_isValid() {
+        XCTAssertNotNil(URL(string: CompetitionEndAlertViewModel.appStoreURL))
+        XCTAssertTrue(CompetitionEndAlertViewModel.appStoreURL.contains("apps.apple.com"))
+    }
+
+    func test_shareCard_rendersNonNilImage() {
+        // Smoke test: the share card builds and rasterizes via ImageRenderer for each outcome.
+        let entries = [
+            CompetitionEndAlertViewModel.PodiumEntry(position: 1, firstName: "You", displayName: "You", points: 612, isCurrentUser: true),
+            CompetitionEndAlertViewModel.PodiumEntry(position: 2, firstName: "Alice", displayName: "Alice Chen", points: 580, isCurrentUser: false),
+            CompetitionEndAlertViewModel.PodiumEntry(position: 3, firstName: "Marcus", displayName: "Marcus Lee", points: 512, isCurrentUser: false),
+        ]
+        for outcome in [CompetitionEndAlertViewModel.EndOutcome.won, .mid, .last] {
+            let card = CompetitionShareCardView(
+                outcome: outcome,
+                competitionName: "Saturday Step Showdown",
+                accent: "You won.",
+                entries: entries,
+                scoringUnit: .points,
+                placement: 1,
+                youFinishedTitle: "You finished 1st of 6",
+                subline: "First place is yours.",
+                score: "612",
+                unitTag: "PTS"
+            )
+            let renderer = ImageRenderer(content: card.environment(\.colorScheme, .light))
+            renderer.scale = 3
+            XCTAssertNotNil(renderer.uiImage, "Share card failed to render for outcome \(outcome)")
+        }
     }
 }
