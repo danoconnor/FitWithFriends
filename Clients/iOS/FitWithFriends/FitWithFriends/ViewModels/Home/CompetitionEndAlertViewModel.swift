@@ -76,7 +76,10 @@ class CompetitionEndAlertViewModel: ObservableObject {
         markNotificationsSeen(for: next.competitionId)
 
         let position = userPosition(in: next) ?? Int.max
-        let willShowConfetti = position <= 3
+        // The podium sheet (Direction B) celebrates a win only — confetti fires
+        // exclusively when the user finishes 1st. Podium finishes 2nd/3rd are
+        // still honored visually by the podium, but without confetti.
+        let willShowConfetti = position == 1
         if willShowConfetti {
             // Start confetti first so particles are already in motion when the
             // sheet appears, keeping them visible to the user.
@@ -130,6 +133,138 @@ class CompetitionEndAlertViewModel: ObservableObject {
         guard let competition = currentEndCompetition,
               let position = userPosition(in: competition) else { return nil }
         return CompetitionOverviewViewModel.ordinal(position)
+    }
+
+    // MARK: - Podium sheet (Direction B) presentation model
+
+    /// Three-way outcome that drives the podium sheet's gradient, confetti, and copy.
+    /// `won` (1st) is the loud, celebratory state; `last` (finished dead last) is the
+    /// gracious state; everyone in between is `mid`.
+    enum EndOutcome {
+        case won
+        case mid
+        case last
+    }
+
+    var endOutcome: EndOutcome {
+        guard let competition = currentEndCompetition,
+              let position = userPosition(in: competition) else {
+            return .mid
+        }
+        if position == 1 { return .won }
+        if position == competition.currentResults.count { return .last }
+        return .mid
+    }
+
+    /// The current user's 1-based final placement, or `nil` when they weren't in the results.
+    var userPlacement: Int? {
+        guard let competition = currentEndCompetition else { return nil }
+        return userPosition(in: competition)
+    }
+
+    /// Whether the user landed on the podium (top 3) — drives the highlighted pedestal.
+    var isUserOnPodium: Bool {
+        guard let placement = userPlacement else { return false }
+        return placement <= 3
+    }
+
+    /// Total number of competitors.
+    var memberCount: Int {
+        currentEndCompetition?.currentResults.count ?? 0
+    }
+
+    /// Italic serif accent rendered on the second line of the headline.
+    var headlineAccent: String {
+        switch endOutcome {
+        case .won:  return "You won."
+        case .mid:  return "Strong showing."
+        case .last: return "Every day counts."
+        }
+    }
+
+    /// One-line subline under the "You finished" title.
+    var outcomeSubline: String {
+        switch endOutcome {
+        case .won:
+            return "First place is yours. Nobody closed more."
+        case .mid:
+            return "Right in the hunt — a couple of big days from the podium."
+        case .last:
+            return "You logged \(competitionDayCount) days and never quit. That's the whole point."
+        }
+    }
+
+    /// Whole calendar days the competition spanned (inclusive), floored at 1. Derived from the
+    /// date range so it's available immediately, without waiting on the daily-summary load.
+    private var competitionDayCount: Int {
+        guard let competition = currentEndCompetition else { return 0 }
+        let days = Calendar.current.dateComponents([.day], from: competition.startDate, to: competition.endDate).day ?? 0
+        return max(1, days)
+    }
+
+    /// One podium slot for the top-3 visualization.
+    struct PodiumEntry: Identifiable {
+        let id = UUID()
+        let position: Int
+        let firstName: String
+        let displayName: String
+        let points: Double?
+        let isCurrentUser: Bool
+    }
+
+    /// The competition's actual top three, ordered 1 → 3. Always the real top 3 — when the user
+    /// finished mid-pack or last they won't appear here, only in the "You finished" row below.
+    var podiumEntries: [PodiumEntry] {
+        guard let competition = currentEndCompetition else { return [] }
+        let userId = authenticationManager.loggedInUserId
+        return competition.currentResults.sorted().prefix(3).enumerated().map { index, points in
+            PodiumEntry(position: index + 1,
+                        firstName: points.firstName,
+                        displayName: points.displayName,
+                        points: points.totalPoints,
+                        isCurrentUser: points.userId == userId)
+        }
+    }
+
+    /// The user's total score, formatted compactly without a unit suffix (the row shows a
+    /// separate "PTS"/"STEPS"/… tag beside it).
+    var userScoreValue: String {
+        guard let competition = currentEndCompetition,
+              let row = competition.currentResults.first(where: { $0.userId == authenticationManager.loggedInUserId }),
+              let total = row.totalPoints else { return "—" }
+        return ScoringValueFormatter.formatCompact(total, unit: competition.scoringUnit)
+    }
+
+    /// App Store listing for Fit with Friends — the payload attached to a shared result so
+    /// recipients can download the app.
+    static let appStoreURL = "https://apps.apple.com/app/id6451087375"
+
+    /// Hype-friend result sentence that accompanies the shared result card. Trophy emoji is
+    /// earned only on a win, matching the rest of the design's voice.
+    var shareText: String {
+        guard let competition = currentEndCompetition, let ordinal = userPositionOrdinal else {
+            return "Check out my results on Fit with Friends!"
+        }
+        switch endOutcome {
+        case .won:
+            return "🏆 I finished \(ordinal) of \(memberCount) in \(competition.competitionName) on Fit with Friends!"
+        case .mid:
+            return "I finished \(ordinal) of \(memberCount) in \(competition.competitionName) on Fit with Friends. 💪"
+        case .last:
+            return "I logged \(competitionDayCount) days in \(competition.competitionName) on Fit with Friends and never quit. 💪"
+        }
+    }
+
+    /// Short, uppercase unit tag shown beside the user's score ("PTS", "STEPS", "KCAL", …).
+    var unitTagText: String {
+        guard let competition = currentEndCompetition else { return "PTS" }
+        switch competition.scoringUnit {
+        case .points:  return "PTS"
+        case .steps:   return "STEPS"
+        case .kcal:    return "KCAL"
+        case .minutes: return "MIN"
+        case .meters:  return Locale.current.measurementSystem == .metric ? "KM" : "MI"
+        }
     }
 
     /// Number of days where the user closed all three Apple Activity rings.

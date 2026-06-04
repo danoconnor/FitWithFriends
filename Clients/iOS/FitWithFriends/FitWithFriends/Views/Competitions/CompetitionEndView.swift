@@ -2,387 +2,542 @@
 //  CompetitionEndView.swift
 //  FitWithFriends
 //
-//  Full-screen variant-aware celebration / consolation screen shown when a
-//  competition ends. Replaces the legacy `.alert(...)`. Five variants:
-//    1st (won) · 2nd (silver) · 3rd (bronze) · 4th–2nd-from-last (midPack) · last
-//  The lower the finish, the more the screen shrinks the rank chrome and grows
-//  personal stats.
+//  The "Competition Done" results sheet (design Direction B — "Podium"). Shown as a
+//  bottom sheet over the home feed the moment a competition ends (or when the user
+//  taps a finished competition). It names the competition that finished, celebrates a
+//  win with a brand-gradient header + confetti, visualizes the top-3 podium, and
+//  highlights the user's "You finished Nth of N" row. The same layout adapts to all
+//  three outcomes — loud on a win, paper-calm and gracious on a mid/last finish.
+//
+//  Tapping "Share" renders a standalone result card (CompetitionShareCardView) to an
+//  image via ImageRenderer and offers it — plus a hype sentence and the App Store link —
+//  through the system share sheet.
 //
 
+import ConfettiSwiftUI
 import SwiftUI
 
 struct CompetitionEndView: View {
     @ObservedObject var viewModel: CompetitionEndAlertViewModel
-    /// Invoked when the user taps the rematch / new-competition CTA. The parent is
-    /// responsible for opening the create wizard once this cover has fully dismissed —
-    /// presenting it here (while the cover is still animating out) gets dropped by SwiftUI.
+    /// Invoked when the user taps the rematch CTA. The parent is responsible for opening the
+    /// create wizard once this sheet has fully dismissed — presenting it here (while the sheet
+    /// is still animating out) gets dropped by SwiftUI.
     var onRematch: () -> Void = {}
-    @Environment(\.dismiss) private var dismiss
+    /// Invoked when the user taps "Full standings" — the parent routes to the Competition
+    /// Detail screen (which renders the full leaderboard) after this sheet dismisses.
+    var onViewStandings: (CompetitionOverview) -> Void = { _ in }
 
-    @State private var showingShare: Bool = false
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.displayScale) private var displayScale
+
+    @State private var showingShare = false
+    @State private var shareItems: [Any] = []
+    @State private var confettiTrigger = 0
+
+    private var won: Bool { viewModel.endOutcome == .won }
 
     var body: some View {
-        ZStack {
-            backgroundColor.ignoresSafeArea()
-
-            ScrollView {
-                VStack(spacing: 20) {
-                    FWFTag(text: "Competition complete",
-                           color: Color("Brand"),
-                           background: Color("BrandSoft"))
-                        .accessibilityIdentifier("competitionEndScreen")
-                        .padding(.top, 24)
-
-                    headline
-                        .padding(.horizontal, 22)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .multilineTextAlignment(.center)
-
-                    subParagraph
-                        .padding(.horizontal, 22)
-
-                    hero
-                        .padding(.horizontal, 16)
-
-                    statsGrid
-                        .padding(.horizontal, 16)
-
-                    actionRow
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 28)
-                }
-                .frame(maxWidth: .infinity)
-            }
-
-            VStack {
-                HStack {
-                    Spacer()
-                    Button {
-                        viewModel.dismissCurrent()
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(Color("Ink"))
-                            .frame(width: 36, height: 36)
-                            .background(Circle().fill(Color("Surface")))
-                            .shadow(color: Color("Ink").opacity(0.1), radius: 6, x: 0, y: 2)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("competitionEndDismiss")
-                    .accessibilityLabel("OK")
-                    .padding(16)
-                }
-                Spacer()
+        ScrollView {
+            VStack(spacing: 0) {
+                headerCap
+                bodyRegion
+                    .padding(.top, -12)
             }
         }
+        .scrollBounceBehavior(.basedOnSize)
+        .background(Color("Surface"))
+        .presentationDetents([.height(580), .large])
+        .presentationDragIndicator(.hidden)
+        .presentationCornerRadius(30)
         .sheet(isPresented: $showingShare) {
-            // Reuses the system share sheet with a simple plain-text composition.
-            if let text = shareText, let url = URL(string: text) ?? URL(string: "https://example.com") {
-                ShareSheet(url: url)
+            ShareSheet(activityItems: shareItems)
+        }
+    }
+
+    private func dismissSheet() {
+        viewModel.dismissCurrent()
+        dismiss()
+    }
+
+    // MARK: - Header cap
+
+    private var headerCap: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            grabHandle
+
+            VStack(alignment: .leading, spacing: 9) {
+                eyebrow
+                headline
             }
-        }
-    }
-
-    // MARK: - Variant text
-
-    private var backgroundColor: Color {
-        switch viewModel.endVariant {
-        case .won:     return Color("Sun").opacity(0.18)
-        case .silver:  return Color("Bg")
-        case .bronze:  return Color("Bg")
-        case .midPack: return Color("Sun").opacity(0.10)
-        case .last:    return Color("Bg")
-        }
-    }
-
-    @ViewBuilder
-    private var headline: some View {
-        switch viewModel.endVariant {
-        case .won:
-            FWFDisplay(parts: [("You ", false), ("won", true), (".", false)],
-                       size: 56, italicColor: Color("Brand"), alignment: .center)
-        case .silver:
-            FWFDisplay(parts: [("So ", false), ("close.", true), (" Silver.", false)],
-                       size: 48, italicColor: Color("Silver"), alignment: .center)
-        case .bronze:
-            FWFDisplay(parts: [("Bronze. ", false), ("The podium.", true)],
-                       size: 48, italicColor: Color("Bronze"), alignment: .center)
-        case .midPack:
-            FWFDisplay(parts: [("You showed up. ", false), ("Every day.", true)],
-                       size: 44, italicColor: Color("Sun"), alignment: .center)
-        case .last:
-            FWFDisplay(parts: [("Tough one. But you ", false), ("showed up", true), (".", false)],
-                       size: 44, italicColor: Color("Brand"), alignment: .center)
-        }
-    }
-
-    private var subParagraph: some View {
-        let text: String
-        switch viewModel.endVariant {
-        case .won:
-            text = "You closed all three rings on \(viewModel.daysClosedAllRings) of \(viewModel.dailySummaries.count) days — your most consistent comp yet."
-        case .silver:
-            if let gap = viewModel.gapToFirst, let winner = viewModel.winner {
-                text = "\(gap) behind \(winner.firstName). She had a big day — without it, this was yours."
-            } else {
-                text = "An incredibly close finish."
-            }
-        case .bronze:
-            text = "A solid \(viewModel.dailySummaries.count) days. You beat most of your group, closed all rings \(viewModel.daysClosedAllRings) days."
-        case .midPack:
-            text = "Your best streak yet — \(viewModel.moveRingStreak) consecutive Move closures. The leaderboard says one thing, the chart says you're getting fitter."
-        case .last:
-            text = "Not your week on the leaderboard. That said — here's everything you did right."
-        }
-        return Text(text)
-            .font(.system(size: 15))
-            .foregroundStyle(Color("InkSoft"))
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
-    }
-
-    // MARK: - Hero
-
-    @ViewBuilder
-    private var hero: some View {
-        switch viewModel.endVariant {
-        case .won:
-            podium(highlightStep: 1)
-        case .silver:
-            silverHero
-        case .bronze:
-            podium(highlightStep: 3)
-        case .midPack:
-            streakHero
-        case .last:
-            achievementStrip
-        }
-    }
-
-    private func podium(highlightStep: Int) -> some View {
-        // 3-step podium with steps shown in medal colors. The user's avatar sits
-        // on the highlighted step.
-        let me = viewModel.currentEndCompetition?.currentResults
-            .sorted()
-            .first(where: { $0.userId == nil ? false : true })  // any row exists
-        _ = me  // suppress unused warning for previews
-
-        return HStack(alignment: .bottom, spacing: 8) {
-            podiumStep(rank: 2, height: 70, color: Color("Silver"), isMine: highlightStep == 2)
-            podiumStep(rank: 1, height: 96, color: Color("Gold"), isMine: highlightStep == 1)
-            podiumStep(rank: 3, height: 50, color: Color("Bronze"), isMine: highlightStep == 3)
-        }
-        .padding(20)
-        .frame(maxWidth: .infinity)
-        .fwfCard(padding: 0)
-    }
-
-    private func podiumStep(rank: Int, height: CGFloat, color: Color, isMine: Bool) -> some View {
-        VStack(spacing: 6) {
-            if isMine {
-                FWFAvatar(name: "You", size: 36, ring: color)
-            } else {
-                Circle().fill(Color("InkFaint").opacity(0.4)).frame(width: 32, height: 32)
-            }
-            ZStack {
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(color.opacity(0.9))
-                Text("\(rank)")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: 64, height: height)
-        }
-    }
-
-    private var silverHero: some View {
-        HStack(alignment: .center, spacing: 16) {
-            ZStack {
-                Circle().fill(Color("Silver"))
-                Text("2")
-                    .font(.system(size: 72, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: 140, height: 140)
-
-            if let winner = viewModel.winner {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Winner")
-                        .font(.system(size: 10.5, weight: .semibold))
-                        .tracking(0.6)
-                        .foregroundStyle(Color("InkMute"))
-                    FWFAvatar(name: winner.displayName, size: 36, ring: Color("Gold"))
-                    Text(winner.displayName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Color("Ink"))
-                    if let total = winner.totalPoints, let competition = viewModel.currentEndCompetition {
-                        Text(ScoringValueFormatter.format(total, unit: competition.scoringUnit))
-                            .font(.system(size: 12))
-                            .foregroundStyle(Color("InkSoft"))
-                    }
-                }
-            }
-        }
-        .padding(20)
-        .frame(maxWidth: .infinity)
-        .fwfCard(padding: 0)
-    }
-
-    private var streakHero: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(viewModel.moveRingStreak)")
-                    .font(.system(size: 64, weight: .bold))
-                    .monospacedDigit()
-                    .foregroundStyle(Color("Sun"))
-                Text("day Move streak")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(Color("InkSoft"))
-            }
-
-            // 12-cell intensity strip
-            let summaries = viewModel.dailySummaries.sorted { $0.date < $1.date }
-            HStack(spacing: 3) {
-                ForEach(Array(summaries.enumerated()), id: \.offset) { _, summary in
-                    let closed = summary.caloriesGoal > 0 && summary.caloriesBurned >= summary.caloriesGoal
-                    RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(closed ? Color("Sun") : Color("Sun").opacity(0.18))
-                        .frame(height: 18)
-                }
-            }
-
-            Text("Consecutive days you closed your Move ring across this competition.")
-                .font(.system(size: 11))
-                .foregroundStyle(Color("InkMute"))
-        }
-        .fwfCard(padding: 18)
-    }
-
-    private var achievementStrip: some View {
-        VStack(spacing: 10) {
-            achievementCard(icon: "checkmark.seal.fill", color: Color("Brand"),
-                            title: "Logged \(viewModel.dailySummaries.count) of \(viewModel.dailySummaries.count) days",
-                            subtitle: "Perfect attendance — most participants miss 2+ days.")
-            achievementCard(icon: "flame.fill", color: Color("Move"),
-                            title: "Move ring closed \(viewModel.daysClosedAllRings) days",
-                            subtitle: "Days you hit your Move goal during this competition.")
-            if let best = viewModel.bestDay, let competition = viewModel.currentEndCompetition {
-                achievementCard(icon: "arrow.up.right", color: Color("Exercise"),
-                                title: "\(ScoringValueFormatter.format(best.points, unit: competition.scoringUnit)) on \(Self.shortMonthDay(best.date))",
-                                subtitle: "Your highest-effort day in this competition.")
-            }
-        }
-    }
-
-    private static func shortMonthDay(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter.string(from: date)
-    }
-
-    private func achievementCard(icon: String, color: Color, title: String, subtitle: String) -> some View {
-        HStack(alignment: .center, spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 18))
-                .foregroundStyle(color)
-                .frame(width: 36, height: 36)
-                .background(Circle().fill(color.opacity(0.18)))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color("Ink"))
-                Text(subtitle)
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color("InkSoft"))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer()
-        }
-        .fwfCard(padding: 12)
-    }
-
-    // MARK: - Stats grid
-
-    private var statsGrid: some View {
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-            statCell(label: "Total", value: viewModel.totalDisplay)
-            statCell(label: "Full-ring days",
-                     value: "\(viewModel.daysClosedAllRings) of \(viewModel.dailySummaries.count)")
-            statCell(label: "Move streak",
-                     value: "\(viewModel.moveRingStreak) days",
-                     highlight: viewModel.endVariant == .midPack || viewModel.endVariant == .last)
-            if let best = viewModel.bestDay, let competition = viewModel.currentEndCompetition {
-                statCell(label: "Best day",
-                         value: "\(ScoringValueFormatter.formatCompact(best.points, unit: competition.scoringUnit)) · \(Self.shortMonthDay(best.date))")
-            } else {
-                statCell(label: "Best day", value: "—")
-            }
-        }
-    }
-
-    private func statCell(label: String, value: String, highlight: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label)
-                .font(.system(size: 11, weight: .semibold))
-                .tracking(0.5)
-                .foregroundStyle(Color("InkMute"))
-            Text(value)
-                .font(.system(size: 18, weight: .bold))
-                .monospacedDigit()
-                .foregroundStyle(highlight ? Color("Sun") : Color("Ink"))
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
+            .padding(.top, 8)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(highlight ? Color("Sun").opacity(0.14) : Color("Surface"))
+        .padding(.horizontal, 22)
+        .padding(.bottom, 30)
+        .background(headerBackground)
+        .overlay(alignment: .top) {
+            if won {
+                Color.clear
+                    .frame(height: 1)
+                    .confettiCannon(trigger: $confettiTrigger,
+                                    num: 60,
+                                    colors: confettiColors,
+                                    openingAngle: .degrees(40),
+                                    closingAngle: .degrees(140),
+                                    radius: 220)
+            }
+        }
+        .onAppear {
+            guard won, !reduceMotion else { return }
+            confettiTrigger += 1
+        }
+    }
+
+    @ViewBuilder
+    private var headerBackground: some View {
+        if won {
+            LinearGradient(colors: [Color("BrandHi"), Color("Brand")],
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
+        } else {
+            Color("SurfaceAlt")
+        }
+    }
+
+    private var confettiColors: [Color] {
+        [Color("Move"), Color("Exercise"), Color("Stand"), Color("Gold"), Color("BrandHi")]
+    }
+
+    private var grabHandle: some View {
+        // Tap or drag-down dismisses. We draw the handle ourselves (system indicator is
+        // hidden) so it can carry the win-mode white treatment from the design.
+        Button(action: dismissSheet) {
+            Capsule()
+                .fill((won ? Color.white.opacity(0.6) : Color("InkFaint")).opacity(won ? 1 : 0.7))
+                .frame(width: 38, height: 5)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 10)
+                .padding(.bottom, 2)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("competitionEndDismiss")
+        .accessibilityLabel("Dismiss")
+    }
+
+    private var eyebrow: some View {
+        HStack(spacing: 7) {
+            if won {
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+            Text("Final results")
+                .font(.system(size: 10.5, weight: .semibold))
+                .tracking(1.05)
+                .textCase(.uppercase)
+                .foregroundStyle(won ? Color.white.opacity(0.82) : Color("InkSoft"))
+                .accessibilityIdentifier("competitionEndScreen")
+        }
+    }
+
+    private var headline: some View {
+        let name = viewModel.currentEndCompetition?.competitionName ?? ""
+        let primary = won ? Color.white : Color("Ink")
+        let accent = won ? Color.white.opacity(0.82) : Color("InkSoft")
+        return (
+            Text(name + "\n")
+                .foregroundColor(primary)
+            + Text(viewModel.headlineAccent)
+                .italic()
+                .foregroundColor(accent)
         )
+        .font(.system(size: 27, weight: .regular, design: .serif))
+        .tracking(-0.54)
+        .lineSpacing(1)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Body region (white)
+
+    private var bodyRegion: some View {
+        VStack(spacing: 18) {
+            CompetitionPodiumView(entries: viewModel.podiumEntries,
+                                  scoringUnit: viewModel.currentEndCompetition?.scoringUnit ?? .points)
+            CompetitionResultSummaryRow(placement: viewModel.userPlacement,
+                                        title: youFinishedTitle,
+                                        subline: viewModel.outcomeSubline,
+                                        score: viewModel.userScoreValue,
+                                        unitTag: viewModel.unitTagText)
+            actions
+        }
+        .padding(.top, 20)
+        .padding(.horizontal, 22)
+        .padding(.bottom, 24)
+        .frame(maxWidth: .infinity)
+        .background(
+            UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20, style: .continuous)
+                .fill(Color("Surface"))
+        )
+    }
+
+    private var youFinishedTitle: String {
+        guard viewModel.userPlacement != nil else { return "Competition complete" }
+        return "You finished \(viewModel.userPositionOrdinal ?? "") of \(viewModel.memberCount)"
     }
 
     // MARK: - Actions
 
-    private var actionRow: some View {
-        VStack(spacing: 10) {
-            // Primary CTA — "Demand a rematch" or "Rematch" depending on variant.
-            FWFPrimaryButton(rematchCtaTitle) {
-                // Signal the parent to open the create wizard from the cover's
-                // onDismiss, then dismiss. Opening it here races the dismissal
-                // animation and SwiftUI silently drops the presentation.
+    private var actions: some View {
+        VStack(spacing: 9) {
+            // Rematch — restarts the same competition with the same people.
+            Button {
                 onRematch()
-                viewModel.dismissCurrent()
-                dismiss()
+                dismissSheet()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 17, weight: .semibold))
+                    Text("Rematch")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundStyle(Color("BgDeep"))
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color("Ink"))
+                )
             }
+            .buttonStyle(.plain)
             .accessibilityIdentifier("competitionEndRematchButton")
 
-            FWFSecondaryButton(shareCtaTitle, icon: "square.and.arrow.up") {
-                showingShare = true
+            HStack(spacing: 9) {
+                ghostButton(title: "Share", icon: "square.and.arrow.up", color: Color("Ink")) {
+                    presentShare()
+                }
+                .accessibilityIdentifier("competitionEndShareButton")
+
+                ghostButton(title: "Full standings", icon: "list.number", color: Color("Brand")) {
+                    if let competition = viewModel.currentEndCompetition {
+                        onViewStandings(competition)
+                    }
+                    dismissSheet()
+                }
+                .accessibilityIdentifier("competitionEndStandingsButton")
             }
         }
+        .padding(.top, 4)
     }
 
-    private var rematchCtaTitle: String {
-        switch viewModel.endVariant {
-        case .silver, .last: return "Demand a rematch"
-        default: return "Start a new competition"
+    private func ghostButton(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 7) {
+                Image(systemName: icon)
+                    .font(.system(size: 14.5, weight: .semibold))
+                Text(title)
+                    .font(.system(size: 14.5, weight: .semibold))
+            }
+            .foregroundStyle(color)
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color("Surface"))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(Color("BorderStrong"), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Share
+
+    private func presentShare() {
+        var items: [Any] = []
+        if let image = renderShareCard() {
+            items.append(image)
+        }
+        items.append(viewModel.shareText)
+        if let url = URL(string: CompetitionEndAlertViewModel.appStoreURL) {
+            items.append(url)
+        }
+        shareItems = items
+        showingShare = true
+    }
+
+    private func renderShareCard() -> UIImage? {
+        let card = CompetitionShareCardView(
+            outcome: viewModel.endOutcome,
+            competitionName: viewModel.currentEndCompetition?.competitionName ?? "",
+            accent: viewModel.headlineAccent,
+            entries: viewModel.podiumEntries,
+            scoringUnit: viewModel.currentEndCompetition?.scoringUnit ?? .points,
+            placement: viewModel.userPlacement,
+            youFinishedTitle: youFinishedTitle,
+            subline: viewModel.outcomeSubline,
+            score: viewModel.userScoreValue,
+            unitTag: viewModel.unitTagText
+        )
+        // Force light mode so the shared card reads consistently regardless of device appearance.
+        let renderer = ImageRenderer(content: card.environment(\.colorScheme, .light))
+        renderer.scale = max(displayScale, 3)
+        return renderer.uiImage
+    }
+}
+
+// MARK: - Shared podium visualization (top-3 pedestals)
+
+/// The top-3 podium used by both the result sheet and the rendered share card. Stage order
+/// left → right is 2nd · 1st · 3rd (center-tallest). The current user's pedestal — when they're
+/// on the podium — gets the brand-gradient highlight.
+struct CompetitionPodiumView: View {
+    let entries: [CompetitionEndAlertViewModel.PodiumEntry]
+    let scoringUnit: ScoringUnit
+
+    var body: some View {
+        let byPosition = Dictionary(uniqueKeysWithValues: entries.map { ($0.position, $0) })
+        let staged = [byPosition[2], byPosition[1], byPosition[3]].compactMap { $0 }
+        return HStack(alignment: .bottom, spacing: 10) {
+            ForEach(staged) { entry in
+                column(entry)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func column(_ entry: CompetitionEndAlertViewModel.PodiumEntry) -> some View {
+        let isYou = entry.isCurrentUser
+        let medal = MedalPalette.color(for: entry.position)
+
+        return VStack(spacing: 0) {
+            FWFAvatar(name: isYou ? "You" : entry.displayName,
+                      size: entry.position == 1 ? 46 : 38,
+                      ring: medal)
+
+            Text(isYou ? "You" : entry.firstName)
+                .font(.system(size: 12, weight: isYou ? .bold : .semibold))
+                .foregroundStyle(Color("Ink"))
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .padding(.top, 7)
+
+            Text(pointsText(entry.points))
+                .font(.system(size: 12.5, weight: .bold))
+                .monospacedDigit()
+                .foregroundStyle(Color("Ink"))
+                .padding(.top, 1)
+
+            pedestal(entry: entry, highlighted: isYou, medal: medal)
+                .padding(.top, 8)
+        }
+        .frame(width: 84)
+    }
+
+    @ViewBuilder
+    private func pedestal(entry: CompetitionEndAlertViewModel.PodiumEntry,
+                          highlighted: Bool,
+                          medal: Color?) -> some View {
+        let height: CGFloat = {
+            switch entry.position {
+            case 1: return 64
+            case 2: return 44
+            default: return 32
+            }
+        }()
+        let shape = UnevenRoundedRectangle(topLeadingRadius: 10, topTrailingRadius: 10, style: .continuous)
+        let numberColor: Color = highlighted ? .white : (medal ?? Color("InkMute"))
+
+        ZStack {
+            if highlighted {
+                shape.fill(LinearGradient(colors: [Color("Brand"), Color("BrandHi")],
+                                          startPoint: .top, endPoint: .bottom))
+            } else if entry.position == 1 {
+                // color-mix(gold 26%, surface-alt)
+                shape.fill(Color("SurfaceAlt"))
+                shape.fill(Color("Gold").opacity(0.26))
+            } else {
+                shape.fill(Color("SurfaceAlt"))
+                shape.strokeBorder(Color("Border"), lineWidth: 1)
+            }
+
+            Text("\(entry.position)")
+                .font(.system(size: 16, weight: .heavy))
+                .monospacedDigit()
+                .foregroundStyle(numberColor)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: height)
+    }
+
+    private func pointsText(_ points: Double?) -> String {
+        guard let points else { return "—" }
+        return ScoringValueFormatter.formatCompact(points, unit: scoringUnit)
+    }
+}
+
+// MARK: - Shared "You finished" summary row
+
+/// The brand-tinted "you" treatment summarizing the user's final placement, score, and the
+/// outcome subline. Shared by the result sheet and the rendered share card.
+struct CompetitionResultSummaryRow: View {
+    let placement: Int?
+    let title: String
+    let subline: String
+    let score: String
+    let unitTag: String
+
+    var body: some View {
+        let medal = MedalPalette.color(for: placement)
+        HStack(spacing: 11) {
+            ZStack {
+                if let medal {
+                    Circle().fill(medal)
+                } else {
+                    Circle().fill(Color("SurfaceAlt"))
+                    Circle().strokeBorder(Color("Border"), lineWidth: 1)
+                }
+                if let placement {
+                    Text("\(placement)")
+                        .font(.system(size: 13, weight: .bold))
+                        .monospacedDigit()
+                        .foregroundStyle(medal != nil ? .white : Color("InkSoft"))
+                }
+            }
+            .frame(width: 32, height: 32)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 14.5, weight: .bold))
+                    .foregroundStyle(Color("Ink"))
+                Text(subline)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color("InkSoft"))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 8)
+
+            VStack(alignment: .trailing, spacing: 0) {
+                Text(score)
+                    .font(.system(size: 19, weight: .heavy))
+                    .monospacedDigit()
+                    .foregroundStyle(Color("Brand"))
+                Text(unitTag)
+                    .font(.system(size: 9, weight: .semibold))
+                    .tracking(0.9)
+                    .foregroundStyle(Color("InkMute"))
+            }
+        }
+        .padding(.horizontal, 13)
+        .padding(.vertical, 11)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color("BrandSoft"))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color("Brand"), lineWidth: 1.5)
+        )
+    }
+}
+
+// MARK: - Share card (rendered to an image)
+
+/// A self-contained, fixed-size result card rasterized by `ImageRenderer` for the system share
+/// sheet. Mirrors the sheet's visual language (brand-gradient cap on a win, podium, "you finished"
+/// row) plus a wordmark footer, sized for social/message sharing.
+struct CompetitionShareCardView: View {
+    let outcome: CompetitionEndAlertViewModel.EndOutcome
+    let competitionName: String
+    let accent: String
+    let entries: [CompetitionEndAlertViewModel.PodiumEntry]
+    let scoringUnit: ScoringUnit
+    let placement: Int?
+    let youFinishedTitle: String
+    let subline: String
+    let score: String
+    let unitTag: String
+
+    private var won: Bool { outcome == .won }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            header
+            VStack(spacing: 16) {
+                CompetitionPodiumView(entries: entries, scoringUnit: scoringUnit)
+                CompetitionResultSummaryRow(placement: placement,
+                                            title: youFinishedTitle,
+                                            subline: subline,
+                                            score: score,
+                                            unitTag: unitTag)
+                Spacer(minLength: 0)
+                footer
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(Color("Surface"))
+        }
+        .frame(width: 340, height: 460)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 7) {
+                if won {
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                Text("Final results")
+                    .font(.system(size: 10.5, weight: .semibold))
+                    .tracking(1.05)
+                    .textCase(.uppercase)
+                    .foregroundStyle(won ? Color.white.opacity(0.82) : Color("InkSoft"))
+            }
+
+            (
+                Text(competitionName + "\n")
+                    .foregroundColor(won ? .white : Color("Ink"))
+                + Text(accent)
+                    .italic()
+                    .foregroundColor(won ? Color.white.opacity(0.82) : Color("InkSoft"))
+            )
+            .font(.system(size: 24, weight: .regular, design: .serif))
+            .tracking(-0.48)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(headerBackground)
+    }
+
+    @ViewBuilder
+    private var headerBackground: some View {
+        if won {
+            LinearGradient(colors: [Color("BrandHi"), Color("Brand")],
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
+        } else {
+            Color("SurfaceAlt")
         }
     }
 
-    private var shareCtaTitle: String {
-        switch viewModel.endVariant {
-        case .won:    return "Share win"
-        case .midPack: return "Share streak"
-        case .last:   return "Share progress"
-        default:      return "Share"
+    private var footer: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "figure.run.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(Color("Brand"))
+            Text("Fit with Friends")
+                .font(.system(size: 14, weight: .regular, design: .serif))
+                .foregroundStyle(Color("InkMute"))
         }
-    }
-
-    private var shareText: String? {
-        guard let competition = viewModel.currentEndCompetition,
-              let ordinal = viewModel.userPositionOrdinal else { return nil }
-        return "I finished \(ordinal) in \(competition.competitionName) on FitWithFriends."
+        .frame(maxWidth: .infinity)
     }
 }
 
