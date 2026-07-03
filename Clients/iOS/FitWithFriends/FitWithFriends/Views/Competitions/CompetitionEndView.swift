@@ -78,8 +78,8 @@ struct CompetitionEndView: View {
         }
         .sheet(isPresented: $showingShare) {
             // Reuses the system share sheet with a simple plain-text composition.
-            if let text = shareText, let url = URL(string: text) ?? URL(string: "https://example.com") {
-                ShareSheet(url: url)
+            if let text = shareText {
+                ShareSheet(text: text)
             }
         }
     }
