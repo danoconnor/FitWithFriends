@@ -12,7 +12,7 @@ FitWithFriends is a fitness competition app with an iOS client (SwiftUI) and Nod
 ## Architecture Patterns
 
 ### Backend (Node.js/Express/TypeScript)
-- **Type-safe SQL**: Uses `@pgtyped` to generate TypeScript interfaces from SQL files. Regenerate with: `pgtyped_cli/lib/index.js -c pgtypedconfig.json`
+- **Type-safe SQL**: Uses `@pgtyped` to generate TypeScript interfaces from SQL files. Regenerate with: `node pgtyped_cli/lib/index.js -c pgtypedconfig.json` (needs a running database matching the schema)
 - **User ID Format**: Database stores user IDs as hex `bytea`. Convert with `convertUserIdToBuffer()` and `convertBufferToUserId()` in `utilities/userHelpers.ts`
 - **OAuth Flow**: Custom Apple ID token grant in `oauth/AppleIdTokenGrant.ts`. Validates Apple tokens and creates users if needed
 - **Error Handling**: Use `FWFErrorCodes` enum for custom error codes. Route-specific error handlers can catch by `err.customErrorCode`
@@ -45,7 +45,7 @@ FitWithFriends is a fitness competition app with an iOS client (SwiftUI) and Nod
 ```bash
 cd WebService/FitWithFriends
 npm run build    # TypeScript compilation
-npm test         # Jest tests with timezone set to America/New_York
+npm test         # Jest tests (TZ=America/New_York); needs the docker-compose stack running, see Environment Setup
 npm start        # Run compiled app
 ```
 
@@ -70,7 +70,8 @@ This command ensures that the tests are executed on the specified iOS Simulator.
 
 ## Environment Setup
 - **Local Development**: Use `docker-compose-local-testing.yml` with PostgreSQL 17
-- **Azure Deployment**: Windows App Service with Node.js 22.x, requires `web.config` for IIS/iisnode
+- **Local test stack**: `docker compose -f WebService/docker-compose-local-testing.yml up -d --build` starts Postgres 17 and the app on port 3000, which the integration tests call
+- **Azure Deployment**: Azure Web App deployed by `.github/workflows/web-service-deploy.yml` on push to main. Node 24 (`.nvmrc`). `Web.config` is still in the deploy package; the hosting OS is not recorded in the repo
 - **Apple Authentication**: Requires Apple Developer account, configured JWKS endpoint for token validation
 
 

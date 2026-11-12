@@ -6,13 +6,13 @@ FitWithFriends is a fitness competition app that allows users to create group fi
 ## Backend Architecture (WebService/FitWithFriends/)
 
 ### Technology Stack
-- **Runtime**: Node.js 21.6.x
-- **Framework**: Express.js 4.19.2
-- **Language**: TypeScript 5.4.5
+- **Runtime**: Node.js 24 (Dockerfile, CI and .nvmrc)
+- **Framework**: Express.js 5.2
+- **Language**: TypeScript 5.9 (TypeScript 7 is not yet supported: the vendored pgtyped CLI needs the TypeScript JS API, which TS 7 removed)
 - **Database**: PostgreSQL with pg driver
 - **Authentication**: OAuth 2.0 with custom Apple ID token grant
 - **View Engine**: Pug templates
-- **Testing**: Jest with ts-jest
+- **Testing**: Jest 30 with ts-jest
 
 ### Core Dependencies
 - @node-oauth/express-oauth-server: OAuth 2.0 server implementation
@@ -88,7 +88,7 @@ Core tables:
 - To regenerate types:
   ```bash
   cd WebService/FitWithFriends/
-  pgtyped_cli/lib/index.js -c pgtypedconfig.json
+  node pgtyped_cli/lib/index.js -c pgtypedconfig.json   # needs a running database matching the schema (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
   ```
 - Generated TypeScript interfaces from SQL files
 - Separate query files for each domain:
@@ -100,9 +100,10 @@ Core tables:
 
 ### Development & Deployment
 - **Build**: TypeScript compilation to dist/
-- **Testing**: Jest with timezone-specific configuration (America/New_York)
+- **Testing**: `npm test` runs Jest with TZ=America/New_York. Most tests are HTTP integration tests that call the app on port 3000 and use Postgres 17, so start the stack first: `docker compose -f WebService/docker-compose-local-testing.yml up -d --build`
 - **Environment**: Environment variable based configuration
 - **Docker**: Dockerfile for containerized deployment
+- **Deployment**: `.github/workflows/web-service-deploy.yml` builds, tests and zip-deploys to an Azure Web App on push to main
 - **Azure**: Integration with Azure Key Vault for secrets
 
 ### Key Business Logic
